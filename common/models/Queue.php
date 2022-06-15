@@ -60,6 +60,10 @@ class Queue extends \yii\db\ActiveRecord {
         ];
     }
 
+    /**
+     * @param bool $insert
+     * @return bool
+     */
     public function beforeSave($insert) {
 
         if (!$insert && $this->queue_status == self::QUEUE_STATUS_CREATING) {
@@ -74,12 +78,22 @@ class Queue extends \yii\db\ActiveRecord {
 
                 //Replace test with store branch name
                 $branchName = 'refs/heads/' . $store_model->store_branch_name;
+
                 $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
+
+                /**
+                 * if branch already exists
+                 *
+                if(Yii::$app->githubComponent->isBranchExists($store_model->store_branch_name)) {
+
+                }*/
 
                 if ($createBranchResponse->isOk) {
 
                     sleep(1);
+
                     $url = parse_url($store_model->restaurant_domain);
+
                     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($url['host'], $store_model->store_branch_name);
 
                         if ($createNewSiteResponse->isOk) {
@@ -106,6 +120,7 @@ class Queue extends \yii\db\ActiveRecord {
             $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
 
         }
+
         return parent::beforeSave($insert);
     }
 
@@ -114,13 +129,13 @@ class Queue extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'queue_id' => 'Queue ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'queue_status' => 'Queue Status',
-            'queue_created_at' => 'Queue Created At',
-            'queue_updated_at' => 'Queue Updated At',
-            'queue_start_at' => 'Queue Start At',
-            'queue_end_at' => 'Queue End At',
+            'queue_id' => Yii::t('app','Queue ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'queue_status' => Yii::t('app','Queue Status'),
+            'queue_created_at' => Yii::t('app','Queue Created At'),
+            'queue_updated_at' => Yii::t('app','Queue Updated At'),
+            'queue_start_at' => Yii::t('app','Queue Start At'),
+            'queue_end_at' => Yii::t('app','Queue End At')
         ];
     }
 

@@ -43,8 +43,8 @@ class CountryPaymentMethod extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'payment_method_id' => 'Payment Method ID',
-            'country_id' => 'Country ID',
+            'payment_method_id' => Yii::t('app','Payment Method ID'),
+            'country_id' => Yii::t('app','Country ID'),
         ];
     }
 

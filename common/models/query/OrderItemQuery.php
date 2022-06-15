@@ -19,7 +19,7 @@ class OrderItemQuery extends \yii\db\ActiveQuery
 
         return $this->andWhere ([
                 'NOT IN',
-                'order_status',
+                'order.order_status',
                 [
                     Order::STATUS_DRAFT,
                     Order::STATUS_ABANDONED_CHECKOUT,

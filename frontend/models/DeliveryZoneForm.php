@@ -62,7 +62,10 @@ class DeliveryZoneForm extends \yii\db\ActiveRecord {
             return false;
         }
 
-        $restaurantDeliveryAreas = RestaurantDelivery::find()->with('area')->where(['restaurant_uuid' => $this->restaurant_uuid])->all();
+        $restaurantDeliveryAreas = RestaurantDelivery::find()
+            ->with('area')
+            ->where(['restaurant_uuid' => $this->restaurant_uuid])
+            ->all();
 
         foreach ($restaurantDeliveryAreas as $restaurantDeliveryArea) {
             if ($restaurantDeliveryArea->area->city_id == $this->city_id) {

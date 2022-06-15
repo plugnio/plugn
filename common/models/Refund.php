@@ -85,9 +85,6 @@ class Refund extends \yii\db\ActiveRecord
         ];
     }
 
-
-
-
     /**
      * Update refund's Status from Myfatoorah Payments
      * @param  [type]  $id                           [description]
@@ -112,32 +109,41 @@ class Refund extends \yii\db\ActiveRecord
         return true;
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function attributeLabels()
     {
         return [
-            'refund_id' => 'Refund ID',
-            'payment_uuid' => 'Payment UUID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'order_uuid' => 'Order Uuid',
-            'refund_reference' => 'Refund Reference',
-            'refund_amount' => 'Refund amount',
-            'refund_status' => 'Refund Status',
-            'reason' => 'Reason for refund',
-
+            'refund_id' => Yii::t('app','Refund ID'),
+            'payment_uuid' => Yii::t('app','Payment UUID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'order_uuid' => Yii::t('app','Order Uuid'),
+            'refund_reference' =>Yii::t('app', 'Refund Reference'),
+            'refund_amount' => Yii::t('app','Refund amount'),
+            'refund_status' => Yii::t('app','Refund Status'),
+            'reason' => Yii::t('app','Reason for refund'),
+            'refund_message' => Yii::t('app','Refund Note'),
         ];
     }
 
+    /**
+     * validate refund amount
+     * @param $attribute
+     * @param $params
+     * @param $validator
+     */
     public function validateRefundAmount($attribute, $params, $validator)
     {
 
       if ($this->refund_amount < 0 )
-        return  $this->addError($attribute, 'Refund amount must be greater than zero.');
+      {
+          return $this->addError($attribute, Yii::t('app','Refund amount must be greater than zero.'));
+      }
       else if ($this->refund_amount > $this->order->total_price)
-        return  $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+      {
+          return  $this->addError($attribute, Yii::t('app','Refund amount cannot exceed amount available for refund.'));
+      }
 
       if($this->store->is_myfatoorah_enable){
 
@@ -150,15 +156,15 @@ class Refund extends \yii\db\ActiveRecord
           if ( !$totalAwaitingBalanceResponse->isOk && !$responseContent->IsSuccess){
               $errorMessage = "Error: " . $responseContent->Message;
               Yii::error('Refund Error (#'. $this->order_uuid .'): ' . $errorMessage);
-              return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+              return $this->addError($attribute, Yii::t('app','Refund amount cannot exceed amount available for refund.'));
 
           }else if ($totalAwaitingBalanceResponse->isOk){
             if($responseContent->TotalAwaitingBalance < $this->refund_amount)
-              return  $this->addError($attribute, 'Insufficcent Balance');
+              return  $this->addError($attribute, Yii::t('app','Insufficcent Balance'));
 
 
           } else {
-            return $this->addError($attribute, 'Refund amount cannot exceed amount available for refund.');
+            return $this->addError($attribute, Yii::t('app','Refund amount cannot exceed amount available for refund.'));
           }
 
       }
@@ -223,6 +229,36 @@ class Refund extends \yii\db\ActiveRecord
     }
 
     /**
+     * notify refund failure to customer and vendor
+     * @param $errorMessage
+     */
+    public function notifyFailure($errorMessage)
+    {
+        $replyTo = [];
+        if ($this->restaurant->restaurant_email) {
+            $replyTo = [
+                $this->restaurant->restaurant_email
+            ];
+        } else if ($this->restaurant->owner_email) {
+            $replyTo = [
+                $this->restaurant->owner_email
+            ];
+        }
+
+        \Yii::$app->mailer->compose([
+            'html' => 'refund-failure-html',
+        ], [
+            'refund' => $this,
+            'errorMessage' => $errorMessage
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+            ->setTo($replyTo)
+            ->setCc([$this->order->customer_email])
+            ->setSubject('Refund was not processed successfully for Order #' . $this->order_uuid)
+            ->send();
+    }
+
+    /**
      * Gets query for [[OrderUu]].
      *
      * @return \yii\db\ActiveQuery
@@ -262,7 +298,6 @@ class Refund extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
     }
-
 
     /**
      * Gets query for [[RefundedItems]].

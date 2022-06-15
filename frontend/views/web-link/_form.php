@@ -11,39 +11,41 @@ use common\models\WebLink;
 $js = "
 let webLinkTypeInput = $('#webLinkTypeInput');
 
-
-
 // On Change of web link type input
 webLinkTypeInput.change(function(){
     let selection = $(this).val();
     if(selection == 1) {
-        document.getElementById('group-text').innerHTML='https://example.com/users/';
+        document.getElementById('group-text').innerHTML='e.g., https://example.com';
+        document.getElementById('weblink-url_txt').innerHTML='Url';
     }
      // facebook
      else if (selection == 2){
       document.getElementById('group-text').innerHTML='https://www.facebook.com/';
+      document.getElementById('weblink-url_txt').innerHTML='Url';
     }
 
      // instagram
      else if (selection == 3){
       document.getElementById('group-text').innerHTML='https://www.instagram.com/';
+      document.getElementById('weblink-url_txt').innerHTML='Url';
     }
 
      // twitter
      else if (selection == 4){
       document.getElementById('group-text').innerHTML='https://www.twitter.com/';
+      document.getElementById('weblink-url_txt').innerHTML='Url';
     }
 
      // snapchat
      else if (selection == 5){
       document.getElementById('group-text').innerHTML='https://www.snapchat.com/add/';
+      document.getElementById('weblink-url_txt').innerHTML='Url';
     }
 
      // whatsApp
      else if (selection == 6){
       document.getElementById('group-text').innerHTML='$countryCode';
       document.getElementById('weblink-url_txt').innerHTML='Phone Number';
-
     }
 
      // Email
@@ -55,48 +57,11 @@ webLinkTypeInput.change(function(){
 
 });
 
-// On page load
-    let selection = webLinkTypeInput.val();
-    if(selection == 1) {
-        document.getElementById('group-text').innerHTML='https://example.com/users/';
-    }
-     // facebook
-     else if (selection == 2){
-      document.getElementById('group-text').innerHTML='https://www.facebook.com/';
-    }
+webLinkTypeInput.trigger('change');
 
-     // instagram
-     else if (selection == 3){
-      document.getElementById('group-text').innerHTML='https://www.instagram.com/';
-    }
-
-     // twitter
-     else if (selection == 4){
-      document.getElementById('group-text').innerHTML='https://www.twitter.com/';
-    }
-
-     // snapchat
-     else if (selection == 5){
-      document.getElementById('group-text').innerHTML='https://www.snapchat.com/add/';
-    }
-
-     // whatsApp
-     else if (selection == 6){
-      document.getElementById('group-text').innerHTML='$countryCode';
-      document.getElementById('weblink-url_txt').innerHTML='Phone Number';
-    }
-
-    // Email
-    else if (selection == 7){
-    document.getElementById('weblink-url_txt').innerHTML='Email';
-    document.getElementById('group-text').innerHTML='example@domain.com';
-    }
 ";
 
-
 $this->registerJs($js);
-
-
 
 if (!$model->isNewRecord) {
     echo Html::a('Delete', ['delete', 'id' => $model->web_link_id, 'storeUuid' => $model->restaurant_uuid], [
@@ -145,7 +110,6 @@ if (!$model->isNewRecord) {
               </div>
           </div>
 
-
           <?= $form->field($model, 'url', [
             'labelOptions' => ['id' => 'weblink-url_txt'],
               'template' => "{label}"
@@ -160,8 +124,6 @@ if (!$model->isNewRecord) {
 
               . "{error}{hint}"
           ])->textInput(['maxlength' => true,'style' => '    border-top-left-radius: 0px !important;   border-bottom-left-radius: 0px !important;'])?>
-
-
 
           <div class="form-group" style="background: #f4f6f9; padding-bottom: 0px; margin-bottom: 0px;  background:#f4f6f9 ">
             <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>

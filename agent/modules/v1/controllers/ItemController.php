@@ -2,6 +2,8 @@
 
 namespace agent\modules\v1\controllers;
 
+use common\models\ItemVariant;
+use common\models\ItemVariantOption;
 use Yii;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -17,7 +19,6 @@ use agent\models\Order;
 
 class ItemController extends Controller
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors ();
@@ -132,7 +133,13 @@ class ItemController extends Controller
         $model->item_name_ar = Yii::$app->request->getBodyParam ("item_name_ar");
         $model->item_description = Yii::$app->request->getBodyParam ("item_description");
         $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
+        $model->item_meta_description = Yii::$app->request->getBodyParam("item_meta_description");
+        $model->item_meta_description_ar = Yii::$app->request->getBodyParam("item_meta_description_ar");
+        $model->item_meta_title = Yii::$app->request->getBodyParam("meta_title");
+        $model->item_meta_title_ar = Yii::$app->request->getBodyParam("meta_title_ar");
+
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
+        $model->item_type = Yii::$app->request->getBodyParam ("item_type"); 
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
         $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
         $model->item_price = Yii::$app->request->getBodyParam ("item_price");
@@ -143,31 +150,51 @@ class ItemController extends Controller
         $model->stock_qty = Yii::$app->request->getBodyParam ("stock_qty");
         $model->items_category = Yii::$app->request->getBodyParam ("itemCategories");
         $model->item_images = Yii::$app->request->getBodyParam ("itemImages");
+
         $itemOptions = Yii::$app->request->getBodyParam('options');
         $transaction = Yii::$app->db->beginTransaction();
 
-        try {
             if (!$model->save()) {
                 $transaction->rollBack();
                 return [
                     "operation" => "error",
-                    "message" => $model->errors
+                    "message" => sizeof($model->errors) > 0 ? $model->errors:
+                        Yii::t('app', 'Error saving item detail')
                 ];
             }
 
             if ($itemOptions && count($itemOptions) > 0) {
+
                 foreach ($itemOptions as $option) {
+
+                    $min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
+
+                    //for radio button
+
+                    if(in_array($option['option_type'], [2, '2'])) {
+
+                        if($option['is_required'])
+                            $min_qty = 1;
+
+                        $max_qty = 1;
+                    }
+
                     $optionModel = new Option();
                     $optionModel->item_uuid = $model->item_uuid;
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
-                    $optionModel->max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
-                    $optionModel->min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $optionModel->max_qty = $max_qty;
+                    $optionModel->min_qty = $min_qty;
+                    $optionModel->is_required = $option['is_required'];
+                    $optionModel->option_type = $option['option_type'];
+
                     if (!$optionModel->save()) {
                         $transaction->rollBack();
                         return [
                             "operation" => "error",
-                            "message" => $optionModel->errors
+                            "message" => sizeof($optionModel->errors) > 0 ? $optionModel->errors:
+                                Yii::t('app', 'Error saving option')
                         ];
                     }
 
@@ -183,7 +210,8 @@ class ItemController extends Controller
                                 $transaction->rollBack();
                                 return [
                                     "operation" => "error",
-                                    "message" => $extraOptionModel->errors
+                                    "message" => sizeof($extraOptionModel->errors) > 0 ? $extraOptionModel->errors:
+                                        Yii::t('app', 'Error saving option value')
                                 ];
                             }
                         }
@@ -200,19 +228,96 @@ class ItemController extends Controller
             $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
             $model->saveItemsCategory($arrCategoryIds);
 
+            //add variants
+
+            $variants = Yii::$app->request->getBodyParam ("itemVariants");
+
+            if(!$variants)
+                $variants = [];
+
+            foreach($variants as $variant)
+            {
+                $itemVariant = new ItemVariant();
+                $itemVariant->item_uuid = $model->item_uuid;
+
+                $itemVariant->stock_qty = $variant['stock_qty'];
+                //$itemVariant->track_quantity = $variant['track_quantity'];
+                $itemVariant->sku = $variant['sku'];
+                $itemVariant->barcode = $variant['barcode'];
+                $itemVariant->price = $variant['price'];
+                $itemVariant->compare_at_price = $variant['compare_at_price'];
+                $itemVariant->weight = $variant['weight'];
+                $itemVariant->images = isset($variant['itemVariantImages'])? $variant['itemVariantImages']: [];
+
+                if(!$itemVariant->save())
+                {
+                    $transaction->rollBack();
+
+                    return [
+                        "operation" => "error",
+                        "message" => sizeof($itemVariant->errors) > 0 ? $itemVariant->errors:
+                            Yii::t('app', 'Error saving item variant')
+                    ];
+                }
+
+
+                //add variant options
+
+                foreach($variant['itemVariantOptions'] as $value) {
+
+                    if(empty($value['option_id'])) {
+                        $option_id = Option::findOne([
+                            'item_uuid' => $itemVariant->item_uuid,
+                            'option_name' => $value['option']['option_name']
+                        ])->option_id;
+                    }
+                    else
+                    {
+                        $option_id = $value['option_id'];
+                    }
+
+                    if(empty($value['extra_option_id'])) {
+                        $extra_option_id = ExtraOption::findOne([
+                            'option_id' => $option_id,
+                            'extra_option_name' => $value['extraOption']['extra_option_name']
+                        ])->extra_option_id;
+                    }
+                    else
+                    {
+                        $extra_option_id = $value['extra_option_id'];
+                    }
+
+                    if(empty($value['item_variant_option_uuid'])) {
+                        $itemVariantOption = new ItemVariantOption();
+                    } else {
+                        $itemVariantOption = ItemVariantOption::findOne($value['item_variant_option_uuid']);
+                    }
+
+                    $itemVariantOption->item_variant_uuid  = $itemVariant->item_variant_uuid;
+                    $itemVariantOption->item_uuid = $itemVariant->item_uuid;
+                    $itemVariantOption->option_id = $option_id;
+                    $itemVariantOption->extra_option_id = $extra_option_id;
+
+                    if(!$itemVariantOption->save())
+                    {
+                        $transaction->rollBack();
+
+                        return [
+                            "operation" => "error",
+                            "message" => sizeof($itemVariantOption->errors) > 0 ? $itemVariantOption->errors:
+                                Yii::t('app', 'Error saving item variant option')
+                        ];
+                    }
+                }
+            }
+
             $transaction->commit();
 
             return [
                 "operation" => "success",
                 "message" => Yii::t('agent', "Item created successfully"),
             ];
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            return [
-                "operation" => "error",
-                "message" => $e->getMessage()
-            ];
-        }
+
     }
 
     /**
@@ -226,7 +331,12 @@ class ItemController extends Controller
         $model->item_name_ar = Yii::$app->request->getBodyParam ("item_name_ar");
         $model->item_description = Yii::$app->request->getBodyParam ("item_description");
         $model->item_description_ar = Yii::$app->request->getBodyParam ("item_description_ar");
+        $model->item_meta_description = Yii::$app->request->getBodyParam("item_meta_description");
+        $model->item_meta_description_ar = Yii::$app->request->getBodyParam("item_meta_description_ar");
+        $model->item_meta_title = Yii::$app->request->getBodyParam("meta_title");
+        $model->item_meta_title_ar = Yii::$app->request->getBodyParam("meta_title_ar");
         $model->sort_number = Yii::$app->request->getBodyParam ("sort_number");
+        $model->item_type = Yii::$app->request->getBodyParam ("item_type"); 
         $model->prep_time = Yii::$app->request->getBodyParam ("prep_time");
         $model->prep_time_unit = Yii::$app->request->getBodyParam ("prep_time_unit");
         $model->item_price = Yii::$app->request->getBodyParam ("item_price");
@@ -240,55 +350,117 @@ class ItemController extends Controller
 
         $itemOptions = Yii::$app->request->getBodyParam('options');
         $transaction = Yii::$app->db->beginTransaction();
-        try {
+
             if (!$model->save()) {
                 $transaction->rollBack();
                 return [
                     "operation" => "error",
-                    "message" => $model->errors
+                    "message" => sizeof($model->errors) > 0? $model->errors: 
+                        Yii::t('app', 'Error saving item detail')
                 ];
             }
-            Yii::$app->db->createCommand("delete from `option` where item_uuid = '$id'")->execute();
-            Yii::$app->db->createCommand("delete from `extra_option` where option_id in (SELECT option_id FROM `option` where item_uuid = '$id')")->execute();
+
+            $arrOptionIds = [];
 
             if ($itemOptions && count($itemOptions) > 0) {
+
                 foreach ($itemOptions as $option) {
-                    $optionModel = new Option();
+
+                    $min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
+
+                    //for radio button
+
+                    if(in_array($option['option_type'], [2, '2'])) {
+
+                        if($option['is_required'])
+                            $min_qty = 1;
+
+                        $max_qty = 1;
+                    }
+
+                    if(empty($option['option_id'])) {
+                        $optionModel = new Option();
+                    } else {
+                        $optionModel = Option::findOne([
+                            'option_id' => $option['option_id'],
+                            'item_uuid' => $id
+                        ]);
+                    }
+
                     $optionModel->item_uuid = $model->item_uuid;
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
-                    $optionModel->max_qty = $option['max_qty'];
-                    $optionModel->min_qty = $option['min_qty'];
+                    $optionModel->is_required = $option['is_required'];
+                    $optionModel->option_type = $option['option_type'];
+                    $optionModel->max_qty = $max_qty;
+                    $optionModel->min_qty = $min_qty;
+
                     if (!$optionModel->save()) {
                         $transaction->rollBack();
                         return [
                             "operation" => "error",
-                            "message" => $optionModel->errors
+                            "message" => sizeof($optionModel->errors) > 0? $optionModel->errors:
+                                Yii::t('app', 'Error saving option')
                         ];
                     }
 
+                    $arrOptionIds[] =  $optionModel->option_id;
+
+                    $arrExtraOptionIds = [];
+
                     if ($option['extraOptions'] && count($option['extraOptions']) > 0) {
+
                         foreach ($option['extraOptions'] as $extraOption) {
-                            $extraOptionModel = new ExtraOption();
+
+                            if(empty($extraOption['extra_option_id'])) {
+                                $extraOptionModel = new ExtraOption();
+                            } else {
+                                $extraOptionModel = ExtraOption::findOne([
+                                    'option_id' => $optionModel->option_id,
+                                    'extra_option_id' => $extraOption['extra_option_id']
+                                ]);
+                            }
+
                             $extraOptionModel->option_id = $optionModel->option_id;
                             $extraOptionModel->extra_option_name = $extraOption['extra_option_name'];
                             $extraOptionModel->extra_option_name_ar = $extraOption['extra_option_name_ar'];
                             $extraOptionModel->extra_option_price = $extraOption['extra_option_price'];
                             $extraOptionModel->stock_qty = (isset($extraOption['stock_qty']))?$extraOption['stock_qty'] : null;
+
                             if (!$extraOptionModel->save()) {
                                 $transaction->rollBack();
                                 return [
                                     "operation" => "error",
-                                    "message" => $extraOptionModel->errors
+                                    "message" => sizeof($extraOptionModel->errors) > 0? $extraOptionModel->errors:
+                                        Yii::t('app', 'Error saving option value')
                                 ];
                             }
+
+                            $arrExtraOptionIds[] = $extraOptionModel->extra_option_id;
                         }
                     }
+
+                    ExtraOption::deleteAll([
+                        'AND',
+                        ['NOT IN', 'extra_option_id', $arrExtraOptionIds],
+                        ['option_id' => $optionModel->option_id]
+                    ]);
                 }
             }
 
+            //remove other option
+
+            Option::deleteAll([
+                'AND',
+                ['NOT IN', 'option_id', $arrOptionIds],
+                ['item_uuid' => $model->item_uuid]
+            ]);
+
             // save images
+
             $itemImages = Yii::$app->request->getBodyParam ("itemImages");
+
             $model->saveItemImages($itemImages);
 
             //save categories
@@ -296,19 +468,126 @@ class ItemController extends Controller
             $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
             $model->saveItemsCategory($arrCategoryIds);
 
+            //add variants
+
+            $variants = Yii::$app->request->getBodyParam ("itemVariants");
+
+            if(!$variants)
+                $variants = [];
+
+            $arrItemVariantIds = [];
+            $arrItemVariantOptionIds = [];
+
+            foreach($variants as $variant)
+            {
+                if(empty($variant['item_variant_uuid'])) {
+                    $itemVariant = new ItemVariant();
+                }
+                else
+                {
+                    $itemVariant = $model->getItemVariants()
+                        ->andWhere(['item_variant_uuid' => $variant['item_variant_uuid']])
+                        ->one();
+                }
+
+                $itemVariant->item_uuid = $model->item_uuid;
+
+                $itemVariant->stock_qty = $variant['stock_qty'];
+                //$itemVariant->track_quantity = $variant['track_quantity'];
+                $itemVariant->sku = $variant['sku'];
+                $itemVariant->barcode = $variant['barcode'];
+                $itemVariant->price = $variant['price'];
+                $itemVariant->compare_at_price = $variant['compare_at_price'];
+                $itemVariant->weight = $variant['weight'];
+                $itemVariant->images = isset($variant['itemVariantImages'])? $variant['itemVariantImages']: [];
+
+                if(!$itemVariant->save())
+                {
+                    $transaction->rollBack();
+
+                    return [
+                        "operation" => "error",
+                        "message" => sizeof($itemVariant->errors) > 0? $itemVariant->errors:
+                            Yii::t('app', 'Error saving item variant')
+                    ];
+                }
+
+                //add variant options
+
+                foreach($variant['itemVariantOptions'] as $value) {
+
+                    if(empty($value['option_id'])) {
+                        $option_id = Option::findOne([
+                            'item_uuid' => $itemVariant->item_uuid,
+                            'option_name' => $value['option']['option_name']
+                        ])->option_id;
+                    }
+                    else
+                    {
+                        $option_id = $value['option_id'];
+                    }
+
+                    if(empty($value['extra_option_id'])) {
+                        $extra_option_id = ExtraOption::findOne([
+                            'option_id' => $option_id,
+                            'extra_option_name' => $value['extraOption']['extra_option_name']
+                        ])->extra_option_id;
+                    }
+                    else
+                    {
+                        $extra_option_id = $value['extra_option_id'];
+                    }
+
+                    if(empty($value['item_variant_option_uuid'])) {
+                        $itemVariantOption = new ItemVariantOption();
+                    } else {
+                        $itemVariantOption = ItemVariantOption::findOne($value['item_variant_option_uuid']);
+                    }
+
+                    $itemVariantOption->item_variant_uuid  = $itemVariant->item_variant_uuid;
+                    $itemVariantOption->item_uuid = $itemVariant->item_uuid;
+                    $itemVariantOption->option_id = $option_id;
+                    $itemVariantOption->extra_option_id = $extra_option_id;
+
+                    if(!$itemVariantOption->save())
+                    {
+                        $transaction->rollBack();
+
+                        return [
+                            "operation" => "error",
+                            "message" => sizeof($itemVariantOption->errors) > 0? $itemVariantOption->errors:
+                                Yii::t('app', 'Error saving item variant option')
+                        ];
+                    }
+
+                    $arrItemVariantOptionIds[] = $itemVariantOption->item_variant_option_uuid;
+                }
+
+                $arrItemVariantIds[] = $itemVariant->item_variant_uuid;
+            }
+
+            //remove other variants
+
+            ItemVariant::deleteAll([
+                'AND',
+                ['NOT IN', 'item_variant_uuid', $arrItemVariantIds],
+                ['item_uuid' => $id]
+            ]);
+
+            //remove other variantOptions
+
+            ItemVariantOption::deleteAll([
+                'AND',
+                ['NOT IN', 'item_variant_option_uuid', $arrItemVariantOptionIds],
+                ['item_uuid' => $id]
+            ]);
+
             $transaction->commit();
 
             return [
                 "operation" => "success",
                 "message" => Yii::t('agent',"Item updated successfully")
             ];
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            return [
-                "operation" => "error",
-                "message" => $e->getMessage()
-            ];
-        }
     }
 
     /**
@@ -316,8 +595,8 @@ class ItemController extends Controller
      * @param type $itemUuid
      * @return boolean
      */
-    public function actionUpdateStockQty(){
-
+    public function actionUpdateStockQty()
+    {
         $id = Yii::$app->request->getBodyParam('item_uuid');
 
         $stock_qty = Yii::$app->request->getBodyParam('stock_qty');
@@ -325,10 +604,13 @@ class ItemController extends Controller
 
         $model = $this->findModel($id);
 
+        $model->setScenario(Item::SCENARIO_UPDATE_STOCK);
+
         $model->stock_qty = (int) $stock_qty;
         $model->track_quantity = (int) $track_quantity;
 
-        if (!$model->save(false)){
+        if (!$model->save())
+        {
             return [
                 "operation" => "error",
                 "message" => $model->errors
@@ -351,9 +633,17 @@ class ItemController extends Controller
         $items = Yii::$app->request->getBodyParam('items');
 
         foreach ($items as $key => $value) {
+
             $model = $this->findModel($value);
-            $model->sort_number = (int)$key+1;
-            $model->save(false);
+
+            if(!$model) {
+                continue;
+            }
+
+            $model->setScenario(Item::SCENARIO_UPDATE_SORT);
+
+            $model->sort_number = (int) $key+1;
+            $model->save();
         }
 
         return [
@@ -473,7 +763,8 @@ class ItemController extends Controller
                         'label' => 'Sold items',
                         'format' => 'html',
                         'value' => function ($data)  use ($start_date,$end_date) {
-                            return $data->getSoldUnitsInSpecifcDate($start_date,$end_date);
+                            $total = $data->getSoldUnitsInSpecifcDate($start_date,$end_date);
+                            return ($total) ? $total : 0;
                         },
                     ],
                 ],
@@ -529,9 +820,11 @@ class ItemController extends Controller
     public function actionChangeStatus($id, $store_uuid)
     {
         $model = $this->findModel($id, $store_uuid);
+
         $model->scenario = Item::SCENARIO_UPDATE_STATUS;
 
         $model->item_status = ($model->item_status == Item::ITEM_STATUS_PUBLISH) ? Item::ITEM_STATUS_UNPUBLISH : Item::ITEM_STATUS_PUBLISH;
+
         if (!$model->save ()) {
             if (isset($model->errors)) {
                 return [

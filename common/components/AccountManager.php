@@ -99,6 +99,12 @@ class AccountManager  extends BaseObject
         throw new \yii\web\BadRequestHttpException('You do not own this store.');
     }
 
+    /**
+     * get store assignment
+     * @param $restaurantUuid
+     * @return mixed
+     * @throws \yii\web\BadRequestHttpException
+     */
     public function getAssignment($restaurantUuid = null) {
 
         if(!$restaurantUuid) {
@@ -121,11 +127,10 @@ class AccountManager  extends BaseObject
      * @param string $restaurantUuid
      * @return boolean
      */
-    public function isOwner($restaurantUuid = null) {
+    public function isOwner($restaurantUuid = null)
+    {
         $assignment = $this->getAssignment($restaurantUuid);
 
         return $assignment && $assignment->role == AgentAssignment::AGENT_ROLE_OWNER;
     }
-
-
 }

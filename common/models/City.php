@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "city".
  *
  * @property int $city_id
+ * @property int $country_id
  * @property string $city_name
  * @property string $city_name_ar
  *
@@ -30,8 +31,9 @@ class City extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['city_name', 'city_name_ar'], 'required'],
+            [['city_name', 'city_name_ar', 'country_id'], 'required'],
             [['city_name', 'city_name_ar'], 'string', 'max' => 255],
+            [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className (), 'targetAttribute' => ['country_id' => 'country_id']],
         ];
     }
 
@@ -41,9 +43,10 @@ class City extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'city_id' => 'City ID',
-            'city_name' => 'City Name',
-            'city_name_ar' => 'City Name Ar',
+            'city_id' => Yii::t('app','City ID'),
+            'country_id' => Yii::t('app','Country ID'),
+            'city_name' => Yii::t('app','City Name'),
+            'city_name_ar' => Yii::t('app','City Name in Arabic'),
         ];
     }
 

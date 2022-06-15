@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use common\models\CustomerBankDiscount;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "bank_discount".
@@ -28,18 +29,15 @@ use common\models\CustomerBankDiscount;
  */
 class BankDiscount extends \yii\db\ActiveRecord
 {
-
     public $duration;
 
     //Values for `discount_type`
     const DISCOUNT_TYPE_PERCENTAGE = 1;
     const DISCOUNT_TYPE_AMOUNT = 2;
 
-
     //Values for `bank_discount_status`
     const BANK_DISCOUNT_STATUS_ACTIVE = 1;
     const BANK_DISCOUNT_STATUS_EXPIRED = 2;
-
 
     /**
      * {@inheritdoc}
@@ -56,7 +54,7 @@ class BankDiscount extends \yii\db\ActiveRecord
     {
         return [
             [['bank_id', 'discount_type', 'discount_amount', 'bank_discount_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
-            [['restaurant_uuid', 'discount_amount'], 'required'],
+            [['restaurant_uuid', 'discount_amount', 'discount_type', 'discount_amount'], 'required'],
             ['bank_discount_status', 'in', 'range' => [self::BANK_DISCOUNT_STATUS_ACTIVE, self::BANK_DISCOUNT_STATUS_EXPIRED]],
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT]],
             [['valid_from', 'valid_until', 'bank_discount_created_at', 'bank_discount_updated_at','duration'], 'safe'],
@@ -72,22 +70,21 @@ class BankDiscount extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'bank_discount_id' => 'Bank Discount ID',
-            'bank_id' => 'Bank ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'discount_type' => 'Discount Type',
-            'discount_amount' => 'Discount Amount',
-            'bank_discount_status' => 'Bank Discount Status',
-            'valid_from' => 'Valid From',
-            'valid_until' => 'Valid Until',
-            'max_redemption' => 'Max Redemption',
-            'limit_per_customer' => 'Limit Per Customer',
-            'minimum_order_amount' => 'Minimum Order Amount',
-            'bank_discount_created_at' => 'Bank Discount Created At',
-            'bank_discount_updated_at' => 'Bank Discount Updated At',
+            'bank_discount_id' => Yii::t('app','Bank Discount ID'),
+            'bank_id' => Yii::t('app','Bank ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'discount_type' => Yii::t('app','Discount Type'),
+            'discount_amount' => Yii::t('app','Discount Amount'),
+            'bank_discount_status' => Yii::t('app','Bank Discount Status'),
+            'valid_from' => Yii::t('app','Valid From'),
+            'valid_until' => Yii::t('app','Valid Until'),
+            'max_redemption' => Yii::t('app','Max Redemption'),
+            'limit_per_customer' => Yii::t('app','Limit Per Customer'),
+            'minimum_order_amount' => Yii::t('app','Minimum Order Amount'),
+            'bank_discount_created_at' => Yii::t('app','Bank Discount Created At'),
+            'bank_discount_updated_at' => Yii::t('app','Bank Discount Updated At'),
         ];
     }
-
 
     public function getBankDiscountStatus() {
         switch ($this->bank_discount_status) {
@@ -102,15 +99,23 @@ class BankDiscount extends \yii\db\ActiveRecord
         return "Couldnt find a status";
     }
 
-
+    /**
+     * @return array|false|int[]|string[]
+     */
     public function extraFields()
     {
-        return [
+        $fields = parent::fields();
+
+        $fields['voucherChartData'] = function() {
+            return $this->voucherChartData();
+        };
+
+        return array_merge($fields, [
           'restaurant',
           'currency',
           'bank',
           'customerBankDiscounts'
-        ];
+        ]);
     }
 
     public function isValid($phone_number) {
@@ -155,11 +160,68 @@ class BankDiscount extends \yii\db\ActiveRecord
     }
 
     /**
+     * return voucher usage by months
+     * @return array
+     */
+    public function voucherChartData() {
+
+        $voucher_chart_data = [];
+
+        /*$date_start = $this->valid_from;
+
+        if(strtotime($this->valid_until) < time()) {
+            $date_end = $this->valid_until;
+        } else {
+            $date_end = date('Y') . '-' . date('m') . '-1';
+        }
+
+        $months = $this->getMonthsBetween($date_start, $date_end);
+
+        for ($i = 0; $i < $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $voucher_chart_data[$month] = array(
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'total' => 0
+            );
+        }*/
+
+        $rows = $this->getOrders()
+            ->activeOrders()
+            ->select ('order_created_at, COUNT(*) as total')
+            //->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
+            ->groupBy (new Expression('MONTH(order_created_at), YEAR(order_created_at)'))
+            ->orderBy('order_created_at')
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $voucher_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
+                'month' => Yii::t('app', date ('M', strtotime ($result['order_created_at']))),
+                'total' => (int) $result['total']
+            );
+        }
+
+        return array_values($voucher_chart_data);
+    }
+
+    /**
      * Gets query for [[CustomerBankDiscounts]].
      *
      * @return \yii\db\ActiveQuery
      */
     public function getCustomerBankDiscounts($modelClass = "\common\models\CustomerBankDiscount")
+    {
+        return $this->hasMany($modelClass::className(), ['bank_discount_id' => 'bank_discount_id']);
+    }
+
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrders($modelClass = "\common\models\Order")
     {
         return $this->hasMany($modelClass::className(), ['bank_discount_id' => 'bank_discount_id']);
     }

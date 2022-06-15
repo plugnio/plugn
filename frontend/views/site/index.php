@@ -8,10 +8,10 @@ use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 $this->title = 'Dashboard';
 
-$currencyCode = $restaurant_model->currency->code;
+$currencyCode = $restaurant->currency->code;
 
 $js = "
  $(document).ready(function(){
@@ -401,7 +401,7 @@ $this->registerJs($js);
     }
 
 
-   if( !$restaurant_model->is_myfatoorah_enable && !$restaurant_model->is_tap_enable ){ ?>
+   if( !$restaurant->is_myfatoorah_enable && !$restaurant->is_tap_enable ){ ?>
 
   <div class="card">
       <div class="card-body">
@@ -414,7 +414,7 @@ $this->registerJs($js);
                   <div>
                       <div>
                           <div>
-                              <?= Html::a('Set up payments', ['store/view-payment-methods', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                              <?= Html::a('Set up payments', ['store/view-payment-methods', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                           </div>
                       </div>
                   </div>
@@ -435,7 +435,7 @@ $this->registerJs($js);
 <?php
 
 
-  if($restaurant_model->getItems()->count() == 0){ ?>
+  if($restaurant->getItems()->count() == 0){ ?>
 
     <div class="card">
         <div class="card-body">
@@ -448,7 +448,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Add Product', ['item/create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?= Html::a('Add Product', ['item/create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -467,7 +467,7 @@ $this->registerJs($js);
   <?php } ?>
 
   <?php
-  if(!$restaurant_model->has_deployed){ ?>
+  if(!$restaurant->has_deployed){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -479,7 +479,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Customize theme', ['store/update-design-layout', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?= Html::a('Customize theme', ['store/update-design-layout', 'id' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -495,7 +495,7 @@ $this->registerJs($js);
     </div>
 
       <?php }
-    if(str_contains($restaurant_model->restaurant_domain, '.plugn.store') &&   $restaurant_model->has_deployed == 1 ){ ?>
+    if(str_contains($restaurant->restaurant_domain, '.plugn.store') &&   $restaurant->has_deployed == 1 ){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -503,11 +503,11 @@ $this->registerJs($js);
                     <div>
                         <h3><span>Strengthen your brand with a custom domain</span></h3>
                     </div>
-                    <p>Your current domain is <a target="_blank" href="<?= $restaurant_model->restaurant_domain ?>"> <?= $restaurant_model->restaurant_domain ?> </a> but you can add a custom domain to help customers find your online store.</p>
+                    <p>Your current domain is <a target="_blank" href="<?= $restaurant->restaurant_domain ?>"> <?= $restaurant->restaurant_domain ?> </a> but you can add a custom domain to help customers find your online store.</p>
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Add domain', ['site/connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?= Html::a('Add domain', ['site/connect-domain', 'id' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -540,7 +540,7 @@ $this->registerJs($js);
                         <div>
                             <div>
                                 <?php
-                                // Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary'])
+                                // Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary'])
                                 ?>
                             </div>
                         </div>

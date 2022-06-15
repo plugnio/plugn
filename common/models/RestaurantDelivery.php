@@ -49,38 +49,35 @@ class RestaurantDelivery extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'area_id' => 'Area ID',
-            'delivery_time' => 'Delivery time',
-            'delivery_time_ar' => 'Delivery time Ar',
-            'delivery_fee' => 'Delivery fee',
-            'restaurant_delivery_area_array' => 'Delivery Areas',
-            'min_charge' => 'Min Charge',
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'area_id' => Yii::t('app','Area ID'),
+            'delivery_time' => Yii::t('app','Delivery time'),
+            'delivery_time_ar' => Yii::t('app','Delivery time Ar'),
+            'delivery_fee' => Yii::t('app','Delivery fee'),
+            'restaurant_delivery_area_array' => Yii::t('app','Delivery Areas'),
+            'min_charge' => Yii::t('app','Min Charge')
         ];
     }
 
     /**
      * save restaurant delivery areas
      */
-    public function saveRestaurantDeliveryArea($delivery_areas) {
-        
-        $stored_restaurant_delivery_areas = RestaurantDelivery::find()
-                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
-                ->all();
+    public function saveRestaurantDeliveryArea($delivery_areas)
+    {
+        RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
 
-        foreach ($stored_restaurant_delivery_areas as $restaurant_delivery_area) {
-            if (!in_array($restaurant_delivery_area->area_id, $delivery_areas)) {
-                RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $restaurant_delivery_area->area_id]);
-            }
-        }
-        
+        $data = [];
+
         foreach ($delivery_areas as $area_id) {
-            $delivery_area = new RestaurantDelivery();
-            $delivery_area->area_id = $area_id;
-            $delivery_area->restaurant_uuid = $this->restaurant_uuid;
-            $delivery_area->save();
+            $data[] = [
+                'area_id' => $area_id,
+                'restaurant_uuid' => $this->restaurant_uuid
+            ];
         }
-        
+
+        Yii::$app->db->createCommand()->batchInsert(self::tableName(), ['area_id', 'restaurant_uuid'], $data)
+            ->execute();
+
         return true;
     }
 

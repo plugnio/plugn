@@ -22,9 +22,10 @@ class City extends \common\models\City
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantDeliveryAreas()
+    public function getRestaurantDeliveryAreas($modelClass = "\common\models\RestaurantDelivery")
     {
-        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas');
+        return $this->hasMany($modelClass::className(), ['area_id' => 'area_id'])
+            ->via('areas');
     }
 
 }

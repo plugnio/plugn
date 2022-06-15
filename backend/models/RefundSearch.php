@@ -19,7 +19,7 @@ class RefundSearch extends Refund
     public function rules()
     {
         return [
-            [['refund_id', 'store_name', 'payment_uuid', 'restaurant_uuid', 'order_uuid', 'reason', 'refund_status', 'refund_created_at', 'refund_updated_at', 'refund_reference'], 'safe'],
+            [['refund_id', 'store_name', 'payment_uuid', 'restaurant_uuid', 'order_uuid', 'reason', 'refund_status', 'refund_created_at', 'refund_updated_at', 'refund_reference', 'refund_message'], 'safe'],
             [['refund_amount'], 'number'],
         ];
     }

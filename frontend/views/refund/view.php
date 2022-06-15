@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'order_uuid',
             'refund_amount',
             'reason',
+            'refund_message'
             ],
             'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
             ])

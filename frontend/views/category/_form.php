@@ -17,7 +17,7 @@ $js = <<< JS
 // enable fileuploader plugin
 $('input[class="category-upload"]').fileuploader({
 	limit: 1,
-	fileMaxSize: 30,
+	fileMaxSize: 5,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {
@@ -88,6 +88,7 @@ $this->registerJs($js);
             $file_name = $model->category_image;
 
             $file_location = "https://res.cloudinary.com/plugn/image/upload/restaurants/" . $model->restaurant_uuid . "/category/" . $model->category_image;
+
             $preloadedFiles[] = array(
                 "name" => $file_name,
                 "type" => FileUploader::mime_content_type($file_location),

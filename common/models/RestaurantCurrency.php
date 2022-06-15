@@ -36,7 +36,7 @@ class RestaurantCurrency extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['restaurant_uuid'], 'required'],
+            [['restaurant_uuid', 'currency_id'], 'required'],
             [['currency_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['restaurant_currency_uuid'], 'string', 'max' => 36],

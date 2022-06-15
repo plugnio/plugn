@@ -40,12 +40,17 @@ class LoginForm extends Model {
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
-    public function validatePassword($attribute, $params) {
-       
+    public function validatePassword($attribute, $params)
+    {
         if (!$this->hasErrors()) {
             $agent = $this->getAgent();
+
+            if ($agent && !$agent->agent_email_verification) {
+                $this->addError($attribute, Yii::t('app', 'Please verify email to use it.'));
+            }
+
             if (!$agent || !$agent->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect email or password.');
+                $this->addError($attribute, Yii::t('app', 'Incorrect email or password.'));
             }
         }
     }
@@ -58,10 +63,13 @@ class LoginForm extends Model {
     public function login() {
 
         if ($this->validate()) {
+
             $loggedInAgent = $this->getAgent();
 
             if ($loggedInAgent != NULL) {
+
                 $duration = 3600 * 24 * 30;
+
                 Yii::$app->user->login($loggedInAgent, $duration);
 
                 if ($managedRestaurants = Yii::$app->accountManager->getManagedAccounts()) {
@@ -83,11 +91,11 @@ class LoginForm extends Model {
      * @return Agent|null
      */
     public function getAgent() {
+
         if ($this->_agent === false) {
             $this->_agent = Agent::findByEmail($this->email);
         }
 
         return $this->_agent;
     }
-
 }

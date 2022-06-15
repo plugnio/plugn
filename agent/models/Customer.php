@@ -27,6 +27,10 @@ class Customer extends \common\models\Customer
 
         return (int) parent::getOrders($modelClass)
             ->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid])
+            ->andWhere(['NOT IN', 'order_status', [
+                Order::STATUS_ABANDONED_CHECKOUT,
+                Order::STATUS_DRAFT
+            ]])
             ->count();
     }
 

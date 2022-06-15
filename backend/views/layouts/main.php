@@ -27,7 +27,7 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
+<div class="wrap <?php if(!Yii::$app->user->isGuest) echo 'role-' . Yii::$app->user->identity->admin_role; ?>">
     <?php
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
@@ -46,6 +46,7 @@ AppAsset::register($this);
 
 
             ['label' => 'Stores', 'url' => ['/restaurant/index']],
+            ['label' => 'Orders', 'url' => ['/order/index']],
             ['label' => 'Agents', 'url' => ['/agent/index']],
             ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
             ['label' => 'Payment gateway Queue', 'url' => ['/payment-gateway-queue/index']],

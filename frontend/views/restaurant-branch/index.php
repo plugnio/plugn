@@ -56,7 +56,7 @@ $this->registerJs($js);
 
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table dataTable data-list-view'],
         ]);
         ?>
 

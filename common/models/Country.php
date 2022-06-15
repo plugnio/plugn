@@ -37,6 +37,7 @@ class Country extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['country_name'], 'required'],
             [['country_code'], 'integer'],
             [['country_name','country_name_ar'], 'string', 'max' => 80],
             [['iso'], 'string', 'max' => 2],
@@ -50,11 +51,11 @@ class Country extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'country_id' => 'Country ID',
-            'country_name' => 'Country Name',
-            'iso' => 'Iso',
-            'emoji' => 'Emoji',
-            'country_code' => 'Country Code',
+            'country_id' => Yii::t('app','Country ID'),
+            'country_name' => Yii::t('app','Country Name'),
+            'iso' => Yii::t('app','Iso'),
+            'emoji' => Yii::t('app','Emoji'),
+            'country_code' => Yii::t('app','Country Code'),
         ];
     }
 

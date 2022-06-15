@@ -45,7 +45,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     public function rules() {
         return [
 //            [['assignment_agent_email'], 'required'],
-            [['role'], 'required'],
+            [['role', 'agent_id', 'restaurant_uuid'], 'required'],
             [['business_location_id'], 'required','when' => function($model) {
                     return ($model->role == self::AGENT_ROLE_BRANCH_MANAGER);
                 }
@@ -83,10 +83,12 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             if ($agent_model = Agent::findByEmail($this->assignment_agent_email))
                 $this->agent_id = $agent_model->agent_id;
             else
-                return $this->addError('assignment_agent_email', 'Could not find a Plugn account matching ' . $this->assignment_agent_email);
+                return $this->addError('assignment_agent_email', Yii::t('app', 'Could not find a Plugn account matching {email}', [
+                    'email' => $this->assignment_agent_email
+                ]));
 
             if (AgentAssignment::find()->where(['agent_id' => $this->agent_id, 'restaurant_uuid' => $this->restaurant_uuid])->exists())
-                return $this->addError('assignment_agent_email', 'This person has already been added as an agent.');
+                return $this->addError('assignment_agent_email', Yii::t('app', 'This person has already been added as an agent.'));
         }
 
         return parent::beforeSave($insert);
@@ -97,18 +99,21 @@ class AgentAssignment extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'assignment_id' => 'Assignment ID',
-            'restaurant_uuid' => 'Restaurant UUID',
-            'agent_id' => 'Agent ID',
-            'business_location_id' => 'Business Location',
-            'role' => "Role",
-            'email_notification' => 'Email Notification',
-            'assignment_agent_email' => 'Email',
-            'assignment_created_at' => 'Date Assigned',
-            'assignment_updated_at' => 'Assignment Updated At',
+            'assignment_id' => Yii::t('app','Assignment ID'),
+            'restaurant_uuid' =>Yii::t('app', 'Restaurant UUID'),
+            'agent_id' => Yii::t('app','Agent ID'),
+            'business_location_id' => Yii::t('app','Business Location'),
+            'role' => Yii::t('app',"Role"),
+            'email_notification' =>Yii::t('app', 'Email Notification'),
+            'assignment_agent_email' => Yii::t('app', 'Email'),
+            'assignment_created_at' => Yii::t('app','Date Assigned'),
+            'assignment_updated_at' => Yii::t('app','Assignment Updated At'),
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function extraFields()
     {
         return [
@@ -127,7 +132,6 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     {
         return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id']);
     }
-
 
     /**
      * @return \yii\db\ActiveQuery

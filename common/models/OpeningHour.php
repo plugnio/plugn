@@ -16,7 +16,8 @@ use Yii;
  *
  * @property Restaurant $restaurant
  */
-class OpeningHour extends \yii\db\ActiveRecord {
+class OpeningHour extends \yii\db\ActiveRecord
+{
 
     //Values for `day_of_week`
     const DAY_OF_WEEK_SUNDAY = 0;
@@ -44,14 +45,16 @@ class OpeningHour extends \yii\db\ActiveRecord {
     /**
      * {@inheritdoc}
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return 'opening_hour';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['restaurant_uuid', 'day_of_week', 'open_at', 'close_at'], 'required'],
             ['updateType', 'required', 'on' => self::SCENARIO_BATCH_UPDATE],
@@ -89,7 +92,8 @@ class OpeningHour extends \yii\db\ActiveRecord {
      * Returns String value of day of week
      * @return string
      */
-    public function getDayOfWeek() {
+    public function getDayOfWeek()
+    {
         switch ($this->day_of_week) {
             case self::DAY_OF_WEEK_SATURDAY:
                 return "Saturday";
@@ -118,108 +122,109 @@ class OpeningHour extends \yii\db\ActiveRecord {
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
-            'opening_hour_id' => 'Opening Hour ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'day_of_week' => 'Day Of Week',
-            'open_at' => 'Open at',
-            'close_at' => 'Close at',
+            'opening_hour_id' => Yii::t('app', 'Opening Hour ID'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
+            'day_of_week' => Yii::t('app', 'Day Of Week'),
+            'open_at' => Yii::t('app', 'Open at'),
+            'close_at' => Yii::t('app', 'Close at')
         ];
     }
 
-    public static function roundToNextHour($dateString) {
-      $date = new \DateTime($dateString);
-      $minutes = $date->format('i');
-      if ($minutes > 0) {
-          $date->modify("+1 hour");
-          $date->modify('-'.$minutes.' minutes');
-      }
-          return $date->format('c');
+    public static function roundToNextHour($dateString)
+    {
+        $date = new \DateTime($dateString);
+        $minutes = $date->format('i');
+        if ($minutes > 0) {
+            $date->modify("+1 hour");
+            $date->modify('-' . $minutes . ' minutes');
+        }
+        return $date->format('c');
     }
 
-
-        public static function getReopeningAt($store) {
-
-
-          for ($i = 0; $i <= 7; $i++) {
+    public static function getReopeningAt($store)
+    {
 
 
-             $data =  date('c',strtotime($i . " day",strtotime('now')));
+        for ($i = 0; $i <= 7; $i++) {
 
 
-              $getWorkingHours = OpeningHour::find()
-                                  ->where(['restaurant_uuid' => $store->restaurant_uuid])
-                                  ->andWhere(['day_of_week' => date('w',strtotime($data))])
-                                  ->orderBy(['open_at' => SORT_ASC])
-                                  ->all();
+            $data = date('c', strtotime($i . " day", strtotime('now')));
 
 
-                foreach ($getWorkingHours as $key => $workingHours) {
+            $getWorkingHours = OpeningHour::find()
+                ->where(['restaurant_uuid' => $store->restaurant_uuid])
+                ->andWhere(['day_of_week' => date('w', strtotime($data))])
+                ->orderBy(['open_at' => SORT_ASC])
+                ->all();
 
 
-                  $startAt = date('c', strtotime($workingHours->open_at, strtotime($data) ));
+            foreach ($getWorkingHours as $key => $workingHours) {
 
 
-                    if(date('c', strtotime($startAt)) > date('c', strtotime('now')) ){
+                $startAt = date('c', strtotime($workingHours->open_at, strtotime($data)));
 
 
-                        $tmwDate = date('Y-m-d', strtotime("1 day"));
-                        if($tmwDate == date('Y-m-d', strtotime($startAt) )){
-                          Yii::$app->formatter->locale = 'en';
-                          $en = 'Opens Tomorrow at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
-
-                          Yii::$app->formatter->locale = 'ar';
-                          $ar =  ' سيعاد الافتتاح غدا الساعه ' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
+                if (date('c', strtotime($startAt)) > date('c', strtotime('now'))) {
 
 
-                        } else {
-                          Yii::$app->formatter->locale = 'en';
-                          $en = 'Opening on '. Yii::$app->formatter->asDate($startAt,  'php:l') .' at ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
+                    $tmwDate = date('Y-m-d', strtotime("1 day"));
+                    if ($tmwDate == date('Y-m-d', strtotime($startAt))) {
+                        Yii::$app->formatter->locale = 'en';
+                        $en = 'Opens Tomorrow at ' . Yii::$app->formatter->asDate($startAt, 'php:h:i A');
 
-                          Yii::$app->formatter->locale = 'ar';
-                          $ar =  ' سيعاد الافتتاح غدا الساعه ' . Yii::$app->formatter->asDate($startAt,  'php:h:i A') ;
-                          $ar = 'سيعاد الافتتاح يوم '. Yii::$app->formatter->asDate($startAt,  'php:l') .' الساعة ' .  Yii::$app->formatter->asDate($startAt,  'php:h:i A');
-
-
-                        }
-
-                        return [
-                          'en' => $en ,
-                          'ar' => $ar
-                        ];
+                        Yii::$app->formatter->locale = 'ar';
+                        $ar = ' سيعاد الافتتاح غدا الساعه ' . Yii::$app->formatter->asDate($startAt, 'php:h:i A');
 
 
-                  }
+                    } else {
+                        Yii::$app->formatter->locale = 'en';
+                        $en = 'Opening on ' . Yii::$app->formatter->asDate($startAt, 'php:l') . ' at ' . Yii::$app->formatter->asDate($startAt, 'php:h:i A');
+
+                        Yii::$app->formatter->locale = 'ar';
+                        $ar = ' سيعاد الافتتاح غدا الساعه ' . Yii::$app->formatter->asDate($startAt, 'php:h:i A');
+                        $ar = 'سيعاد الافتتاح يوم ' . Yii::$app->formatter->asDate($startAt, 'php:l') . ' الساعة ' . Yii::$app->formatter->asDate($startAt, 'php:h:i A');
 
 
+                    }
 
-          }
+                    return [
+                        'en' => $en,
+                        'ar' => $ar
+                    ];
+
+
+                }
+
+
+            }
         }
 
     }
 
-    public static function getDeliveryTime($delivery_time, $prep_time ,$store) {
+    public static function getDeliveryTime($delivery_time, $prep_time, $store)
+    {
 
-      $schedule_time = [];
-
-
-      for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
+        $schedule_time = [];
 
 
-         $minDate =  date('c', strtotime("+". intval(($prep_time + $delivery_time))  . " min" ,strtotime('now')) );
+        for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
 
 
-         $currentWeekDay =  date('w',strtotime($i . " day",strtotime($minDate)));
-         $currentDate =  date('c',strtotime($i . " day",strtotime($minDate)));
+            $minDate = date('c', strtotime("+" . intval(($prep_time + $delivery_time)) . " min", strtotime('now')));
 
 
-          $getWorkingHours = OpeningHour::find()
-                              ->where(['restaurant_uuid' => $store->restaurant_uuid])
-                              ->andWhere(['day_of_week' => $currentWeekDay])
-                              ->orderBy(['open_at' => SORT_ASC])
-                              ->all();
+            $currentWeekDay = date('w', strtotime($i . " day", strtotime($minDate)));
+            $currentDate = date('c', strtotime($i . " day", strtotime($minDate)));
 
+
+            $getWorkingHours = OpeningHour::find()
+                ->where(['restaurant_uuid' => $store->restaurant_uuid])
+                ->andWhere(['day_of_week' => $currentWeekDay])
+                ->orderBy(['open_at' => SORT_ASC])
+                ->all();
 
 
             $timeSlots = [];
@@ -227,66 +232,64 @@ class OpeningHour extends \yii\db\ActiveRecord {
 
             foreach ($getWorkingHours as $key => $workingHours) {
 
-              $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
+                $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate)));
 
 
-              $startAt = static::roundToNextHour($startAt);
+                $startAt = static::roundToNextHour($startAt);
 
 
-              if($minDate < $startAt){
-                $startAt =  date('c', strtotime($workingHours->open_at, strtotime($startAt) ));
-              }
-
-              while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at  && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at) {
-
-                $endAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
-
-
-
-                if($minDate > $endAt){
-
-                  $startAt = $endAt;
-
-                  continue;
-
+                if ($minDate < $startAt) {
+                    $startAt = date('c', strtotime($workingHours->open_at, strtotime($startAt)));
                 }
 
+                while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at) {
 
-                if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($endAt))) {
+                    $endAt = date('c', strtotime("+" . intval($store->schedule_interval) . " min", strtotime($startAt)));
 
-                  if( date('c',strtotime($endAt))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
 
-                  array_push($timeSlots, [
-                      'date' =>  date('Y-m-d', strtotime($startAt) ),
-                      'start_time' =>  date('c', strtotime($startAt) ) ,
-                      'end_time' =>   date('c' , strtotime( $endAt) )
-                  ]);
-                  }
-                } else if ($workingHours->day_of_week != date('w', strtotime("today")) ) {
+                    if ($minDate > $endAt) {
 
-                  array_push($timeSlots, [
-                      'date' =>  date('Y-m-d', strtotime($startAt) ),
-                      'start_time' =>  date('c', strtotime($startAt) ) ,
-                      'end_time' =>   date('c' , strtotime( $endAt) )
-                  ]);
+                        $startAt = $endAt;
+
+                        continue;
+
+                    }
+
+
+                    if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($endAt))) {
+
+                        if (date('c', strtotime($endAt)) > date('c', strtotime("now") + (intval($delivery_time) * 60))) {
+
+                            array_push($timeSlots, [
+                                'date' => date('Y-m-d', strtotime($startAt)),
+                                'start_time' => date('c', strtotime($startAt)),
+                                'end_time' => date('c', strtotime($endAt))
+                            ]);
+                        }
+                    } else if ($workingHours->day_of_week != date('w', strtotime("today"))) {
+
+                        array_push($timeSlots, [
+                            'date' => date('Y-m-d', strtotime($startAt)),
+                            'start_time' => date('c', strtotime($startAt)),
+                            'end_time' => date('c', strtotime($endAt))
+                        ]);
+
+
+                    }
+
+
+                    if (date("Y/m/d", strtotime($endAt)) != date("Y/m/d", strtotime($startAt)))
+                        break;
+
+                    $startAt = $endAt;
 
 
                 }
-
-
-                if (date("Y/m/d", strtotime($endAt)) != date("Y/m/d", strtotime($startAt)) )
-                  break;
-
-                  $startAt = $endAt;
-
-
-
-              }
 
             }
 
 
-              if($timeSlots){
+            if ($timeSlots) {
                 array_push($schedule_time, [
 
                     'date' => date('c', strtotime($startAt)),
@@ -294,107 +297,109 @@ class OpeningHour extends \yii\db\ActiveRecord {
                     'scheduleTimeSlots' => $timeSlots
                 ]);
 
-              }
+            }
 
 
-      }
+        }
 
-      return array_values(array_unique($schedule_time, SORT_REGULAR));
+        return array_values(array_unique($schedule_time, SORT_REGULAR));
 
     }
 
 
-    public static function getAvailableTimeSlots($delivery_time, $store, $timeUnit) {
+    public static function getAvailableTimeSlots($delivery_time, $store, $timeUnit)
+    {
 
-      $schedule_time = [];
+        $schedule_time = [];
 
-      $currentWeekDay = date('w');
+        $currentWeekDay = date('w');
 
-      for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
+        for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
 
-         $currentWeekDay =  date('w',strtotime($i . " day"));
-         $currentDate =  date('c',strtotime($i . " day"));
-         // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
+            $currentWeekDay = date('w', strtotime($i . " day"));
+            $currentDate = date('c', strtotime($i . " day"));
+            // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
 
-         $getWorkingHours = OpeningHour::find()
-                              ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
-                              ->andWhere(['day_of_week' => $currentWeekDay])
-                              ->orderBy(['open_at' => SORT_ASC])
-                              ->all();
+            $getWorkingHours = OpeningHour::find()
+                ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
+                ->andWhere(['day_of_week' => $currentWeekDay])
+                ->orderBy(['open_at' => SORT_ASC])
+                ->all();
 
             $timeSlots = [];
 
 
             foreach ($getWorkingHours as $key => $workingHours) {
 
-              $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate) ));
+                $startAt = date('c', strtotime($workingHours->open_at, strtotime($currentDate)));
 
-              if($delivery_time < 180)
-                $startAt =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($startAt)));
-
-
-              $startAt = static::roundToNextHour($startAt);
+                if ($delivery_time < 180)
+                    $startAt = date('c', strtotime('+ ' . $delivery_time . ' min', strtotime($startAt)));
 
 
-              while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at ) {
-
-                $endAt = date('c', strtotime("+". intval($store->schedule_interval)  . " min" ,strtotime($startAt)) );
+                $startAt = static::roundToNextHour($startAt);
 
 
-                if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {
+                while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at) {
 
-                  if( date('c',strtotime($startAt))  >  date('c', strtotime("now") + (intval($delivery_time) * 60)) ){
+                    $endAt = date('c', strtotime("+" . intval($store->schedule_interval) . " min", strtotime($startAt)));
 
-                  array_push($timeSlots, [
-                      'date' =>  date('Y-m-d', strtotime($startAt) ),
-                      'start_time' =>  date('c', strtotime($startAt) ) ,
-                      'end_time' =>   date('c' , strtotime( $endAt) )
-                  ]);
-                  }
-                } else if ($workingHours->day_of_week != date('w', strtotime("today")) ) {
 
-                  array_push($timeSlots, [
-                      'date' =>  date('Y-m-d', strtotime($startAt) ),
-                      'start_time' =>  date('c', strtotime($startAt) ) ,
-                      'end_time' =>   date('c' , strtotime( $endAt) )
-                  ]);
+                    if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {
 
+                        if (date('c', strtotime($startAt)) > date('c', strtotime("now") + (intval($delivery_time) * 60))) {
+
+                            array_push($timeSlots, [
+                                'date' => date('Y-m-d', strtotime($startAt)),
+                                'start_time' => date('c', strtotime($startAt)),
+                                'end_time' => date('c', strtotime($endAt))
+                            ]);
+                        }
+                    } else if ($workingHours->day_of_week != date('w', strtotime("today"))) {
+
+                        array_push($timeSlots, [
+                            'date' => date('Y-m-d', strtotime($startAt)),
+                            'start_time' => date('c', strtotime($startAt)),
+                            'end_time' => date('c', strtotime($endAt))
+                        ]);
+
+
+                    }
+
+
+                    if (date("Y/m/d", strtotime($endAt)) != date("Y/m/d", strtotime($startAt)))
+                        break;
+
+                    $startAt = $endAt;
 
                 }
-
-
-                if (date("Y/m/d", strtotime($endAt)) != date("Y/m/d", strtotime($startAt)) )
-                  break;
-
-                  $startAt = $endAt;
-
-              }
 
             }
 
 
-              if($timeSlots){
+            if ($timeSlots) {
                 array_push($schedule_time, [
                     'date' => $currentDate,
                     'dayOfWeek' => $currentWeekDay,
                     'scheduleTimeSlots' => $timeSlots
                 ]);
 
-              }
+            }
 
 
-      }
+        }
 
-      return $schedule_time;
+        return $schedule_time;
 
     }
 
     /**
      * @inheritdoc
      */
-    public function extraFields() {
+    public function extraFields()
+    {
         return [
-          'dayOfWeek'
+            'dayOfWeek'
         ];
     }
 
@@ -469,7 +474,8 @@ class OpeningHour extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
+    {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }

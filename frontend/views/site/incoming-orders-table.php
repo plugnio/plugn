@@ -9,6 +9,7 @@ use common\models\Order;
 
 echo GridView::widget([
     'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
     'rowOptions' => function($model) {
         $url = Url::to(['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -17,9 +18,10 @@ echo GridView::widget([
         ];
     },
     'columns' => [
-        ['class' => 'yii\grid\SerialColumn'],
+        //['class' => 'yii\grid\SerialColumn'],
         [
             'label' => 'Order ID',
+            'attribute' => 'order_uuid',
             "format" => "raw",
             "value" => function($model) {
                 return Html::a('#' . $model->order_uuid, ['order/view', 'id' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid]);
@@ -35,11 +37,7 @@ echo GridView::widget([
 
 
         [
-            'attribute' => 'business_location_name',
-            "format" => "raw",
-            "value" => function($model) {
-               return $model->business_location_name ? $model->business_location_name : '';
-            }
+            'attribute' => 'business_location_name'
         ],
 
         [
@@ -60,14 +58,19 @@ echo GridView::widget([
               return '<a href="tel:'. $model->customer_phone_number .'"> '. str_replace(' ', '', $model->customer_phone_number) .' </a>';
             }
         ],
-        [
+        /*[
             'label' => 'When',
             'format' => 'raw',
+            'filter' => [
+                1 => 'Scheduled',
+                0 => 'As soon as possible'
+            ],
             'value' => function ($data) {
                 return $data->is_order_scheduled ? 'Scheduled' : 'As soon as possible';
             },
-        ],
+        ],*/
         [
+            'attribute' => 'payment_method_name',
             'label' => 'Payment',
             "format" => "raw",
             "value" => function($data) {
@@ -87,6 +90,6 @@ echo GridView::widget([
         ],
     ],
     'layout' => '{summary}{items}{pager}',
-    'tableOptions' => ['class' => 'table data-list-view', 'id' => 'new-order-table'],
+    'tableOptions' => ['class' => 'table dataTable data-list-view', 'id' => 'new-order-table'],
 ]);
 ?>

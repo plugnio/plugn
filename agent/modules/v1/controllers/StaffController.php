@@ -80,6 +80,7 @@ class StaffController extends Controller {
      * @return ActiveDataProvider
      */
     public function actionList() {
+
         $this->ownerCheck();
         $keyword = Yii::$app->request->get('keyword');
 
@@ -162,7 +163,6 @@ class StaffController extends Controller {
                   "message" => $agent->errors
               ];
           }
-
         }
 
         $model = new AgentAssignment();
@@ -183,7 +183,6 @@ class StaffController extends Controller {
           else
             $model->inviteAgent();
         }
-
 
         return [
             "operation" => "success",

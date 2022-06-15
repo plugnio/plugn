@@ -15,6 +15,23 @@ return [
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
+
+        'resourceManager' => [
+            'class' => 'common\components\S3ResourceManager',
+            'region' => 'eu-west-2', // Bucket based in London
+            'key' => 'AKIAJXOMRCDE65WKBPUA',
+            'secret' => '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',
+            'bucket' => 'plugn-uploads-dev-server',
+            /**
+             * For Local Development, we access using key and secret
+             * For Dev and Production servers, access is via server embedded IAM roles so no key/secret required
+             *
+             * You can access the bucket with:
+             * https://plugn-uploads-dev-server.s3.amazonaws.com/
+             * https://plugn-uploads-dev-server.s3.amazonaws.com/folderName/fileName.jpg
+             */
+        ],
+        
         'log' => [
             'targets' => [
                 [
@@ -44,30 +61,22 @@ return [
             ],
         ],
         'mailer' => [
-                 'class' => 'yii\swiftmailer\Mailer',
-                 'viewPath' => '@common/mail',
-                 // send all mails to a file by default. You have to set
-                 // 'useFileTransport' to false and configure a transport
-                 // for the mailer to send real emails.
-                 'useFileTransport' => true,
+             'class' => 'yii\swiftmailer\Mailer',
+             'viewPath' => '@common/mail',
+             'transport' => [
+                 'class' => 'Swift_SmtpTransport',
+                 'host' => 'smtp.sendgrid.net',
+                 'username' => 'apikey',
+                 'password' => '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',
+                 'port' => '587',
+                 'encryption' => 'tls',
+                 // 'plugins' => [
+                 //     [
+                 //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                 //     ],
+                 // ],
+            ],
         ],
-        // 'mailer' => [
-        //     'class' => 'yii\swiftmailer\Mailer',
-        //     'viewPath' => '@common/mail',
-        //     'transport' => [
-        //         'class' => 'Swift_SmtpTransport',
-        //         'host' => 'smtp.sendgrid.net',
-        //         'username' => 'apikey',
-        //         'password' => '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',
-        //         'port' => '587',
-        //         'encryption' => 'tls',
-        //         // 'plugins' => [
-        //         //     [
-        //         //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
-        //         //     ],
-        //         // ],
-        //     ],
-        // ],
         // 'cache' => [
         //     // Use Redis as a cache
         //     'class' => 'yii\redis\Cache',

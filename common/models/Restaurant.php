@@ -18,6 +18,10 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property int $currency_id
  * @property string $name
  * @property string|null $name_ar
+ * @property string|null $meta_title
+ * @property string|null $meta_title_ar
+ * @property string|null $meta_description
+ * @property string|null $meta_description_ar
  * @property string|null $tagline
  * @property string|null $tagline_ar
  * @property string|null $restaurant_domain
@@ -157,16 +161,20 @@ class Restaurant extends \yii\db\ActiveRecord
     const STORE_LAYOUT_GRID_HALFWIDTH = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
 
+    const SCENARIO_UPDATE_DESIGN_LAYOUT = 'update_design_layout';
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
     const SCENARIO_CREATE_MYFATOORAH_ACCOUNT = 'myfatoorah_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
     const SCENARIO_CONNECT_DOMAIN = 'domain';
     const SCENARIO_UPDATE = 'update';
+    const SCENARIO_UPDATE_LOGO = 'update-logo';
+    const SCENARIO_UPDATE_THUMBNAIL = 'update-thumbnail';
     const SCENARIO_UPDATE_LAYOUT = 'layout';
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
     const SCENARIO_CURRENCY = 'currency';
+    const SCENARIO_UPDATE_STATUS = '';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -194,8 +202,6 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return [
             [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
-
-
             [
                 [
                     'vendor_sector', 'iban', 'company_name', 'business_type'
@@ -209,6 +215,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
 
+            [['meta_title', 'meta_title_ar', 'meta_description', 'meta_description_ar'], 'string'],
 
             [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
                 return $model->business_type == 'corp';
@@ -242,12 +249,14 @@ class Restaurant extends \yii\db\ActiveRecord
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
-            [['name', 'name_ar'], 'required', 'on' => 'default'],
+            [['name', 'name_ar', 'restaurant_email'], 'required', 'on' => 'default'],
             [['name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
             [['restaurant_domain'], 'string', 'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            [['name', 'name_ar'], 'string', 'min' => 3],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
             [['restaurant_status', 'support_delivery', 'support_pick_up', 'hide_request_driver_button', 'sitemap_require_update', 'version'], 'integer', 'min' => 0],
@@ -280,7 +289,7 @@ class Restaurant extends \yii\db\ActiveRecord
             [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent','enable_gift_message'], 'integer'],
 
             [['phone_number', 'owner_number'], 'string', 'min' => 6, 'max' => 20],
-            [['phone_number', 'owner_number'], 'number'],
+            //[['phone_number', 'owner_number'], 'number'],
 
 
             // [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT ,self::SCENARIO_CREATE_STORE_BY_AGENT]],
@@ -356,6 +365,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return array_merge($scenarios, [
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
+            self::SCENARIO_UPDATE_STATUS => ['restaurant_status'],
             self::SCENARIO_UPDATE_ANALYTICS => [
                 'google_analytics_id',
                 'facebook_pixil_id',
@@ -363,10 +373,32 @@ class Restaurant extends \yii\db\ActiveRecord
                 'sitemap_require_update'
             ],
             self::SCENARIO_CREATE_STORE_BY_AGENT => [
-                'name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'
+                'name',
+                'owner_number',
+                'restaurant_domain',
+                'currency_id',
+                'country_id'
+            ],
+            self::SCENARIO_UPDATE_LOGO => [
+                'logo'
+            ],
+            self::SCENARIO_UPDATE_THUMBNAIL => [
+                'thumbnail_image'
             ],
             self::SCENARIO_UPDATE_LAYOUT => [
-                'default_language', 'store_layout', 'phone_number_display', 'logo', 'thumbnail_image'
+                'default_language',
+                'store_layout',
+                'phone_number_display',
+                'logo',
+                'thumbnail_image'
+            ],
+            self::SCENARIO_UPDATE_DESIGN_LAYOUT => [
+                'logo',
+                'thumbnail_image',
+                'restaurant_logo',
+                'restaurant_thumbnail_image',
+                'phone_number_display',
+                'sitemap_require_update'
             ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
@@ -401,84 +433,83 @@ class Restaurant extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'country_id' => 'Country',
-            'currency_id' => 'Store currency',
-            'name' => 'Store name / Business name in English',
-            'name_ar' => 'Store name / Business name in Arabic',
-            'tagline' => 'Tagline in English',
-            'tagline_ar' => 'Tagline in Arabic',
-            'restaurant_domain' => 'Store Url',
-            'app_id' => 'App id',
-            'restaurant_payments_method' => 'Payment method',
-            'restaurant_status' => 'Store Status',
-            'thumbnail_image' => 'Header Image',
-            'logo' => 'Logo',
-            'restaurant_thumbnail_image' => 'Header Image',
-            'restaurant_logo' => 'Logo',
-            'support_delivery' => 'Support Delivery',
-            'support_pick_up' => 'Support Pick Up',
-            'hide_request_driver_button' => 'Hide request driver button',
-            'restaurant_delivery_area' => 'Delivery Areas',
-            'export_orders_data_in_specific_date_range' => 'Export orders data in a specific date range',
-            'export_sold_items_data_in_specific_date_range' => 'Export sold items data in a specific date range',
-            'phone_number' => "Store's phone number",
-            'restaurant_email' => "Store's Email",
-            'restaurant_created_at' => 'Store Created At',
-            'restaurant_updated_at' => 'Store Updated At',
-            'armada_api_key' => 'Armada Api Key',
-            'armada_branch_id' => 'Mashkor Branch ID',
-            'restaurant_email_notification' => 'Email notification',
-            'demand_delivery' => 'On demand delivery',
-            'show_opening_hours' => 'Show Opening hours',
-            'phone_number_display' => 'Phone number display',
-            'store_branch_name' => 'Branch name',
-            'custom_css' => 'Custom css',
-            'platform_fee' => 'Platform fee',
-            'warehouse_fee' => 'Warehouse fee',
-            'warehouse_delivery_charges' => 'Delivery charges',
-            'company_name' => 'Company name',
-            'store_layout' => 'Store layout',
-            'google_analytics_id' => 'Google Analytics ID',
-            'facebook_pixil_id' => 'Facebook Pixil ID',
-            'instagram_url' => 'Instagram url',
-            'schedule_order' => 'Schedule order',
-            'schedule_interval' => 'Schedule interval',
-            'business_type' => 'Account type',
-            'vendor_sector' => 'Vendor sector',
-            'license_number' => 'License number',
-            'owner_identification_file_front_side' => 'Civil ID Front side',
-            'owner_identification_file_back_side' => 'Civil ID Back side',
-
-
-            'authorized_signature_issuing_date' => 'Authorized Signature Issuing Date',
-            'authorized_signature_expiry_date' => 'Authorized Signature Expiry Date',
-            'authorized_signature_file' => 'Authorized signature',
-            'restaurant_authorized_signature_file' => 'Authorized Signature',
-            'authorized_signature_title' => 'Authorized Signature Title',
-            'authorized_signature_file_purpose' => 'Authorized Signature File Purpose',
-            'commercial_license_issuing_date' => 'Commercial License Issuing Date',
-            'commercial_license_expiry_date' => 'Commercial License Expiry Date',
-            'commercial_license_file' => 'License copy',
-            'restaurant_commercial_license_file' => 'License copy ',
-            'commercial_license_title' => 'Commercial License Title',
-            'commercial_license_file_purpose' => 'Commercial License File Purpose',
-            'iban' => 'IBAN',
-            'owner_first_name' => 'First Name',
-            'owner_last_name' => 'Last Name',
-            'owner_email' => 'Email Address',
-            'owner_number' => 'Owner Phone Number',
-            'identification_issuing_date' => 'Identification Issuing Date',
-            'identification_expiry_date' => 'Identification Expiry Date',
-            'identification_file_front_side' => ' National ID File front side',
-            'identification_file_back_side' => ' National ID File back side',
-            'identification_title' => 'Identification Title',
-            'identification_file_purpose' => 'Identification File Purpose',
-
-            'live_api_key' => 'Live secret key',
-            'test_api_key' => 'Test secret key',
-            'default_language' => 'Default Language',
-
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'country_id' => Yii::t('app','Country'),
+            'currency_id' => Yii::t('app','Store currency'),
+            'name' => Yii::t('app','Store name / Business name in English'),
+            'name_ar' => Yii::t('app','Store name / Business name in Arabic'),
+            'tagline' => Yii::t('app','Tagline in English'),
+            'tagline_ar' => Yii::t('app','Tagline in Arabic'),
+            'meta_title' => Yii::t('app','Page Title'),
+            'meta_title_ar' => Yii::t('app','Page Title in Arabic'),
+            'meta_description' => Yii::t('app','Meta Tag Description'),
+            'meta_description_ar' => Yii::t('app','Meta Tag Description in Arabic'),
+            'restaurant_domain' => Yii::t('app','Store Url'),
+            'app_id' => Yii::t('app','App id'),
+            'restaurant_payments_method' => Yii::t('app','Payment method'),
+            'restaurant_status' => Yii::t('app','Store Status'),
+            'thumbnail_image' => Yii::t('app','Header Image'),
+            'logo' => Yii::t('app','Logo'),
+            'restaurant_thumbnail_image' => Yii::t('app','Header Image'),
+            'restaurant_logo' => Yii::t('app','Logo'),
+            'support_delivery' => Yii::t('app','Support Delivery'),
+            'support_pick_up' => Yii::t('app','Support Pick Up'),
+            'hide_request_driver_button' => Yii::t('app','Hide request driver button'),
+            'restaurant_delivery_area' => Yii::t('app','Delivery Areas'),
+            'export_orders_data_in_specific_date_range' => Yii::t('app','Export orders data in a specific date range'),
+            'export_sold_items_data_in_specific_date_range' => Yii::t('app','Export sold items data in a specific date range'),
+            'phone_number' => Yii::t('app',"Store's phone number"),
+            'restaurant_email' => Yii::t('app',"Store's Email"),
+            'restaurant_created_at' => Yii::t('app','Store Created At'),
+            'restaurant_updated_at' => Yii::t('app','Store Updated At'),
+            'armada_api_key' => Yii::t('app','Armada Api Key'),
+            'armada_branch_id' => Yii::t('app','Mashkor Branch ID'),
+            'restaurant_email_notification' => Yii::t('app','Email notification'),
+            'show_opening_hours' => Yii::t('app','Show Opening hours'),
+            'phone_number_display' => Yii::t('app','Phone number display'),
+            'store_branch_name' => Yii::t('app','Branch name'),
+            'custom_css' => Yii::t('app','Custom css'),
+            'platform_fee' => Yii::t('app','Platform fee'),
+            'warehouse_fee' => Yii::t('app','Warehouse fee'),
+            'warehouse_delivery_charges' =>Yii::t('app','Delivery charges'),
+            'company_name' => Yii::t('app','Company name'),
+            'store_layout' => Yii::t('app','Store layout'),
+            'google_analytics_id' => Yii::t('app','Google Analytics ID'),
+            'facebook_pixil_id' => Yii::t('app','Facebook Pixil ID'),
+            'instagram_url' => Yii::t('app','Instagram url'),
+            'schedule_order' => Yii::t('app','Schedule order'),
+            'schedule_interval' => Yii::t('app','Schedule interval'),
+            'business_type' => Yii::t('app','Account type'),
+            'vendor_sector' => Yii::t('app','Vendor sector'),
+            'license_number' => Yii::t('app','License number'),
+            'owner_identification_file_front_side' => Yii::t('app','Civil ID Front side'),
+            'owner_identification_file_back_side' => Yii::t('app','Civil ID Back side'),
+            'authorized_signature_issuing_date' => Yii::t('app','Authorized Signature Issuing Date'),
+            'authorized_signature_expiry_date' => Yii::t('app','Authorized Signature Expiry Date'),
+            'authorized_signature_file' => Yii::t('app','Authorized signature'),
+            'restaurant_authorized_signature_file' => Yii::t('app','Authorized Signature'),
+            'authorized_signature_title' => Yii::t('app','Authorized Signature Title'),
+            'authorized_signature_file_purpose' => Yii::t('app','Authorized Signature File Purpose'),
+            'commercial_license_issuing_date' => Yii::t('app','Commercial License Issuing Date'),
+            'commercial_license_expiry_date' => Yii::t('app','Commercial License Expiry Date'),
+            'commercial_license_file' => Yii::t('app','License copy'),
+            'restaurant_commercial_license_file' => Yii::t('app','License copy'),
+            'commercial_license_title' => Yii::t('app','Commercial License Title'),
+            'commercial_license_file_purpose' => Yii::t('app','Commercial License File Purpose'),
+            'iban' => Yii::t('app','IBAN'),
+            'owner_first_name' => Yii::t('app','First Name'),
+            'owner_last_name' => Yii::t('app','Last Name'),
+            'owner_email' => Yii::t('app','Email Address'),
+            'owner_number' => Yii::t('app','Owner Phone Number'),
+            'identification_issuing_date' => Yii::t('app','Identification Issuing Date'),
+            'identification_expiry_date' => Yii::t('app','Identification Expiry Date'),
+            'identification_file_front_side' => Yii::t('app',' National ID File front side'),
+            'identification_file_back_side' => Yii::t('app',' National ID File back side'),
+            'identification_title' => Yii::t('app','Identification Title'),
+            'identification_file_purpose' => Yii::t('app','Identification File Purpose'),
+            'live_api_key' => Yii::t('app','Live secret key'),
+            'test_api_key' => Yii::t('app','Test secret key'),
+            'default_language' => Yii::t('app','Default Language')
         ];
     }
 
@@ -572,7 +603,7 @@ class Restaurant extends \yii\db\ActiveRecord
                     return true;
                 }
             } catch (\Cloudinary\Error $err) {
-              Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
+              //Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
               $this->addError($attribute, $err->getMessage());
               return false;
             }
@@ -601,7 +632,8 @@ class Restaurant extends \yii\db\ActiveRecord
                     $this[$attribute] = basename($result['url']);
                 }
             } catch (\Cloudinary\Error $err) {
-                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+                //todo: notify vendor?
+                //Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
             }
 
     }
@@ -622,11 +654,15 @@ class Restaurant extends \yii\db\ActiveRecord
             @unlink ($tmpFile);
 
 
-            if ($response->isOk)
+            if ($response->isOk) {
                 $this->authorized_signature_file_id = $response->data['id'];
-
+            }
             else
-                return Yii::error ('Error when uploading authorized signature document: ' . json_encode ($response->data));
+            {
+                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+
+                return Yii::error ('Error when uploading authorized signature document: ' . $error);
+            }
         }
 
         //Upload commercial_license file
@@ -787,9 +823,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                 return Yii::error('Error when uploading civil id (back side): ' . $errorMessage);
             }
-
         }
-
     }
 
     /**
@@ -799,7 +833,6 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getCivilIdFrontSidePhoto()
     {
         $photo_url = [];
-
 
         if ($this->identification_file_front_side) {
 
@@ -879,20 +912,23 @@ class Restaurant extends \yii\db\ActiveRecord
         Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
 
         $response = Yii::$app->myFatoorahPayment->createSupplier($this);
+
         $supplierApiResponse = json_decode($response->content);
 
         if ($supplierApiResponse->IsSuccess) {
 
             $this->supplierCode = $supplierApiResponse->Data->SupplierCode;
+
             \Yii::info($this->name . " has just created MyFatooraha account", __METHOD__);
 
-          if ($this->supplierCode){
+          if ($this->supplierCode) {
             $this->is_myfatoorah_enable = 1;
             $this->is_tap_enable = 0;
           }
           else
-            $this->is_myfatoorah_enable = 0;
-
+          {
+              $this->is_myfatoorah_enable = 0;
+          }
             if($this->save()){
                 // //Upload documents file on our server before we create an account on MyFatoorah we gonaa delete them
                 $this->uploadDocumentsToMyFatoorah();
@@ -932,7 +968,10 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         //Create a merchant on Tap
-        $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount($this->company_name, $this->currency->code ,$this->business_id, $this->business_entity_id, $this->iban);
+        $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount(
+            $this->company_name, $this->currency->code,
+            $this->business_id, $this->business_entity_id,
+            $this->iban);
 
         if ($merchantApiResponse->isOk)
         {
@@ -951,6 +990,7 @@ class Restaurant extends \yii\db\ActiveRecord
                    $this->merchant_id = $merchantApiResponse->data['id'];
                    $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
                } else{
+
                    Yii::error('Error while create Merchant [ ' . $this->name . '] #2#' . json_encode($merchantApiResponse->data));
 
                    self::updateAll([
@@ -1117,6 +1157,7 @@ class Restaurant extends \yii\db\ActiveRecord
             );
 
             if ($result || count ($result) > 0) {
+                //todo: refactor
                 $this->logo = basename ($result['url']);
                 $this->save ();
             }
@@ -1157,6 +1198,7 @@ class Restaurant extends \yii\db\ActiveRecord
             );
 
             if ($result || count ($result) > 0) {
+                //todo: refactor
                 $this->thumbnail_image = basename ($result['url']);
                 $this->save ();
             }
@@ -1184,13 +1226,26 @@ class Restaurant extends \yii\db\ActiveRecord
             $store_name = strtolower(str_replace(' ', '_', $this->name));
             $store_domain = strtolower(str_replace(' ', '_', $this->restaurant_domain));
             $this->app_id = 'store.plugn.' . $store_domain;
+
+            /**
+             * if we change this to use store domain name as git branch name,
+             * it would be hard for us to keep track of branch and store relation,
+             * in case someone keep changing store domain ?
+             */
+            $this->store_branch_name = $store_domain;// $store_name;
+
+            $isBranchExists = Yii::$app->githubComponent->isBranchExists($this->store_branch_name);
+
+            if($isBranchExists) {
+                return  $this->addError('restaurant_domain', Yii::t('app','Another store is already using this domain'));
+            }
+
+            $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
+
+            if($isDomainExist)
+                return  $this->addError('restaurant_domain', Yii::t('app','Another store is already using this domain'));
+
             $this->restaurant_domain = 'https://' . $store_domain . '.plugn.store';
-            $this->store_branch_name = $store_name;
-
-          $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
-
-          if($isDomainExist)
-            return  $this->addError('restaurant_domain', 'Another store is already using this domain');
         }
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
@@ -1246,7 +1301,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
         if ($insert) {
 
-            $freePlan = Plan::find ()->where (['valid_for' => 0])->one ();
+            $freePlan = Plan::find ()
+                ->where (['valid_for' => 0])
+                ->one ();
 
             $subscription = new Subscription();
             $subscription->restaurant_uuid = $this->restaurant_uuid;
@@ -1259,7 +1316,9 @@ class Restaurant extends \yii\db\ActiveRecord
             $restaurant_theme->save ();
 
             //Add opening hrs
-            for ($i = 0; $i < 7; ++$i) {
+            
+            for ($i = 0; $i < 7; ++$i) 
+            {
                 $opening_hour = new OpeningHour();
                 $opening_hour->restaurant_uuid = $this->restaurant_uuid;
                 $opening_hour->day_of_week = $i;
@@ -1336,8 +1395,8 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function isOpen($asap = null) {
 
-        if(!$this->demand_delivery)
-          return false;
+       // if(!$this->demand_delivery)
+       //   return false;
 
         $opening_hour_model = OpeningHour::find()
                                 ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
@@ -1356,9 +1415,7 @@ class Restaurant extends \yii\db\ActiveRecord
                   return true;
           }
 
-
-
-        return false;
+          return false;
     }
 
     /**
@@ -1380,6 +1437,9 @@ class Restaurant extends \yii\db\ActiveRecord
             },
             'country' => function ($restaurant) {
                 return $restaurant->getCountry ()->one ();
+            },
+            'storeTheme' => function ($restaurant) {
+                return $restaurant->getRestaurantTheme ()->one ();
             },
             'currencies',
             'currency' => function ($restaurant) {
@@ -1971,7 +2031,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['customer_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['customer_created_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -2015,7 +2075,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
                 'total' => (float) $result['total']
             );
         }
@@ -2059,7 +2119,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -2102,7 +2162,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
-                'month' => date ('F', strtotime ($result['order_item_created_at'])),
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_item_created_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -2313,6 +2373,16 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->activeOrders ($this->restaurant_uuid);;
     }
+    
+    /**
+     * Gets query for [[Tickets]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTickets($modelClass = "\common\models\Ticket")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
 
     /**
      * Gets query for [[OrderItems]].
@@ -2369,8 +2439,7 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getVouchers($modelClass = "\common\models\Voucher")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->with ('bank');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

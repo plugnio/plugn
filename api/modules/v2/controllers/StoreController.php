@@ -4,15 +4,13 @@ namespace api\modules\v2\controllers;
 
 use Yii;
 use yii\rest\Controller;
-use yii\data\ActiveDataProvider;
-use common\models\City;
-use common\models\RestaurantBranch;
 use api\models\Restaurant;
 use common\models\RestaurantTheme;
 use common\models\OpeningHour;
-use common\models\RestaurantDelivery;
 use api\models\BusinessLocation;
 use common\models\DeliveryZone;
+use yii\web\NotFoundHttpException;
+
 
 class StoreController extends Controller
 {
@@ -60,15 +58,23 @@ class StoreController extends Controller
         return $actions;
     }
 
+    /**
+     * return store detail by id
+     * @param $id
+     * @return Category
+     */
+    public function actionView($id)
+    {
+        return $this->findModel($id);
+    }
 
     /**
      * Return Restaurant's branches
      */
     public function actionGetOpeningHours()
     {
-
-
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+
         $delivery_zone_id = Yii::$app->request->get("delivery_zone_id");
 
         if ($store_model = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one()) {
@@ -128,7 +134,6 @@ class StoreController extends Controller
      */
     public function actionGetDeliveryTime()
     {
-
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
         $delivery_zone_id = Yii::$app->request->get("delivery_zone_id");
         $cart = Yii::$app->request->getBodyParam("cart");
@@ -138,12 +143,10 @@ class StoreController extends Controller
 
             $schedule_time = [];
 
-
             if ($deliveryZone) {
 
                 $timeUnit = $deliveryZone->time_unit == 'hrs' ? 'hour' : $deliveryZone->time_unit;
                 $startDate = strtotime('+ ' . $deliveryZone->delivery_time . ' ' . $timeUnit);
-
 
                 if ($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_MIN)
                     $deliveryTime = intval($deliveryZone->delivery_time);
@@ -161,11 +164,9 @@ class StoreController extends Controller
                     }
                 }
 
-
-                if ($store_model->schedule_order) {
-
+                if ($store_model->schedule_order)
+                {
                     $schedule_time = OpeningHour::getDeliveryTime($deliveryTime, $prepTime, $store_model);
-
                 }
 
                 $todayOpeningHours = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])->one();
@@ -208,13 +209,11 @@ class StoreController extends Controller
         }
     }
 
-
     /**
      * Return Restaurant's data
      */
     public function actionGetRestaurantData($branch_name)
     {
-
         $store = Restaurant::find()
             ->andWhere(['store_branch_name' => $branch_name]);
 
@@ -223,7 +222,6 @@ class StoreController extends Controller
             $restaurant = $store
                 ->select(['restaurant_uuid', 'name', 'logo', 'tagline', 'restaurant_domain', 'app_id', 'google_analytics_id', 'facebook_pixil_id', 'snapchat_pixil_id', 'custom_css'])
                 ->one();
-
 
             $themeColor = RestaurantTheme::find()
                 ->select(['primary'])
@@ -260,4 +258,23 @@ class StoreController extends Controller
         }
     }
 
+    /**
+     * Finds the Restaurant model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return Category the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        $model = Restaurant::find()
+            ->where(['restaurant_uuid' => $id])
+            ->one();
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+    }
 }

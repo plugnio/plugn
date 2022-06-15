@@ -10,7 +10,9 @@ use yii\web\AssetBundle;
 class DashboardAsset extends AssetBundle {
 
     public $basePath = '@webroot';
+
     public $baseUrl = '@web';
+
     public $css = [
         'app-assets/vendors/css/vendors.min.css',
         'app-assets/vendors/css/charts/apexcharts.css',
@@ -48,25 +50,25 @@ class DashboardAsset extends AssetBundle {
         'app-assets/vendors/css/editors/quill/quill.snow.css',
         'app-assets/vendors/css/charts/apexcharts.css',
 
-        'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+        //'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+        //'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+        //'app-assets/vendors/css/pickers/pickadate/pickadate.css',
+
         'app-assets/css/pages/invoice.css',
-        'app-assets/vendors/css/pickers/pickadate/pickadate.css',
-        'app-assets/vendors/css/pickers/pickadate/pickadate.css',
         'css/bootstrap-duallistbox.css',
-        'app-assets/css/pages/coming-soon.css',
+        //'app-assets/css/pages/coming-soon.css',
         'css/intlTelInput.css',
+
+        'js/bootstrap-datepicker/css/bootstrap-datepicker.min.css',
 
         'https://fonts.googleapis.com/css?family=Roboto:400,700',
         'fileuploader/dist/font/font-fileuploader.css',
         'fileuploader/dist/jquery.fileuploader.min.css',
         'fileuploader/dist/css/jquery.fileuploader-theme-boxafter.css'
-
-
-
-
     ];
 
     public $js = [
+        //'js/scripts.js',
         'app-assets/vendors/js/vendors.min.js',
         'app-assets/vendors/js/extensions/dropzone.min.js',
         'app-assets/vendors/js/ui/prism.min.js',
@@ -76,50 +78,53 @@ class DashboardAsset extends AssetBundle {
         'app-assets/js/scripts/extensions/dropzone.js',
         'app-assets/vendors/js/charts/apexcharts.min.js',
         'app-assets/vendors/js/extensions/tether.min.js',
-        'app-assets/vendors/js/extensions/shepherd.min.js',
+        //'app-assets/vendors/js/extensions/shepherd.min.js',
         'app-assets/js/scripts/pages/dashboard-analytics.js',
         'app-assets/js/scripts/pages/dashboard-ecommerce.js',
-        'app-assets/js/scripts/ui/data-list-view.js',
+        /*'app-assets/js/scripts/ui/data-list-view.js',
         'app-assets/vendors/js/tables/datatable/datatables.min.js',
         'app-assets/vendors/js/tables/datatable/datatables.buttons.min.js',
         'app-assets/vendors/js/tables/datatable/datatables.bootstrap4.min.js',
         'app-assets/vendors/js/tables/datatable/buttons.bootstrap.min.js',
-        'app-assets/vendors/js/tables/datatable/dataTables.select.min.js',
-        'app-assets/vendors/js/tables/ag-grid/ag-grid-community.min.noStyle.js',
+        'app-assets/vendors/js/tables/datatable/dataTables.select.min.js',*/
+        //'app-assets/vendors/js/tables/ag-grid/ag-grid-community.min.noStyle.js',
         'app-assets/js/scripts/pages/app-user.js',
         'app-assets/vendors/js/forms/select/select2.full.min.js',
         'app-assets/js/scripts/forms/select/form-select2.js',
         'js/daterangepicker/daterangepicker.js',
         'js/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',
-        'js/scripts.js',
         'js/fileinput.js',
         'js/map.js',
+
         'app-assets/vendors/js/charts/apexcharts.min.js',
         'app-assets/js/scripts/charts/chart-apex.js',
         'app-assets/vendors/js/editors/quill/katex.min.js',
         'app-assets/vendors/js/editors/quill/highlight.min.js',
-        'app-assets/vendors/js/editors/quill/quill.min.js',
+
+        //'app-assets/vendors/js/editors/quill/quill.min.js',
         'app-assets/vendors/js/extensions/jquery.steps.min.js',
         'app-assets/vendors/js/forms/validation/jquery.validate.min.js',
         'app-assets/js/scripts/pages/invoice.js',
-        'app-assets/vendors/js/pickers/pickadate/picker.js',
+        
+        'js/bootstrap-datepicker/js/bootstrap-datepicker.min.js',
+
+        /*'app-assets/vendors/js/pickers/pickadate/picker.js',
         'app-assets/vendors/js/pickers/pickadate/picker.date.js',
         'app-assets/vendors/js/pickers/pickadate/picker.time.js',
         'app-assets/vendors/js/pickers/pickadate/legacy.js',
-        'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',
+        'app-assets/js/scripts/pickers/dateTime/pick-a-datetime.js',*/
+
         'js/intlTelInput-jquery.js',
         // 'https://code.jquery.com/jquery-3.2.1.slim.min.js',
         'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
         'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
         'js/jquery.bootstrap-duallistbox.min.js',
-        'app-assets/js/scripts/pages/coming-soon.js',
-        'app-assets/vendors/js/coming-soon/jquery.countdown.min.js',
+        //'app-assets/js/scripts/pages/coming-soon.js',
+        //'app-assets/vendors/js/coming-soon/jquery.countdown.min.js',
 
         // 'https://code.jquery.com/jquery-3.2.1.min.js',
         'fileuploader/dist/jquery.fileuploader.min.js',
         'fileuploader/dist/js/custom.js',
-
-
     ];
 
     public $depends = [

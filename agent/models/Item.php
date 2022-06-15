@@ -63,13 +63,16 @@ class Item extends \common\models\Item {
                                 'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
                             ]
                         );
+
                         $item_image_model = new ItemImage();
                         $item_image_model->item_uuid = $this->item_uuid;
                         $item_image_model->product_file_name = basename($result['url']);
                         $item_image_model->save(false);
 
                     } catch (\Cloudinary\Error $err) {
-                        Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+                        //Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+
+                        //todo: show cloudinary error in api response
                         return false;
                     }
                 }

@@ -168,6 +168,7 @@ class OpeningHoursController extends Controller
              $model->day_of_week = $day_of_week;
              $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
              $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
+             
              if (!$model->save ()) {
                  if (isset($model->errors)) {
                      return [

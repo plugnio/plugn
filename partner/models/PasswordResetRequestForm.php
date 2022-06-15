@@ -36,6 +36,7 @@ class PasswordResetRequestForm extends Model {
      * @return bool whether the email was send
      */
     public function sendEmail() {
+
         /* @var $partner Partner */
         $partner = Partner::findOne([
                     'partner_status' => Partner::STATUS_ACTIVE,
@@ -47,9 +48,14 @@ class PasswordResetRequestForm extends Model {
         }
 
         if (!Partner::isPasswordResetTokenValid($partner->partner_password_reset_token)) {
+
             $partner->generatePasswordResetToken();
+
+            $partner->setScenario(Partner::SCENARIO_PASSWORD_TOKEN);
+
             if (!$partner->save()) {
-              die(var_dump($partner->errors));
+
+                //die(var_dump($partner->errors));
 
                 return false;
             }

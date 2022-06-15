@@ -15,6 +15,23 @@ return [
           // Name of the cache component used to store schema information
           'schemaCache' => 'cache',
       ],
+
+        'resourceManager' => [
+            'class' => 'common\components\S3ResourceManager',
+            'region' => 'eu-west-2', // Bucket based in London
+            'key' => 'AKIAJXOMRCDE65WKBPUA',
+            'secret' => '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',
+            'bucket' => 'plugn-uploads-dev-server',
+            /**
+             * For Local Development, we access using key and secret
+             * For Dev and Production servers, access is via server embedded IAM roles so no key/secret required
+             *
+             * You can access the bucket with:
+             * https://plugn-uploads-dev-server.s3.amazonaws.com/
+             * https://plugn-uploads-dev-server.s3.amazonaws.com/folderName/fileName.jpg
+             */
+        ],
+        
         // 'log' => [
         //     'targets' => [
         //         [

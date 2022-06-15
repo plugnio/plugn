@@ -30,10 +30,10 @@ $this->params['breadcrumbs'][] = $this->title;
             $model->hide_request_driver_button == 1 ?  'display-request-driver-button' : 'hide-request-driver-button'
          , 'id' => $model->restaurant_uuid], ['class' => $model->hide_request_driver_button == 0 ? 'btn btn-success' : 'btn btn-danger'])
          ?>
-        <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
-            'class' => 'btn btn-danger',
+            'class' => 'btn btn-danger btn-delete',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this store?',
                 'method' => 'post',

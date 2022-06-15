@@ -47,15 +47,19 @@ class CategoryController extends Controller {
      */
     public function actionIndex($storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $searchModel = new CategorySearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant_model->restaurant_uuid);
+
+        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurant_model' => $restaurant_model
+                    'count' => $count,
+                    'restaurant' => $restaurant
         ]);
     }
 
@@ -220,8 +224,18 @@ class CategoryController extends Controller {
      * @return Category the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $storeUuid) {
-        if (($model = Category::find()->where(['category_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+    protected function findModel($id, $storeUuid)
+    {
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = Category::find()
+            ->where([
+                'category_id' => $id,
+                'restaurant_uuid' => $store->restaurant_uuid
+            ])
+            ->one();
+
+        if ($model !== null) {
             return $model;
         }
 
