@@ -662,6 +662,12 @@ class OrderController extends Controller
                 'sort' => false
             ]);
 
+            // order's Item
+            $refundItemsDataProvider = new \yii\data\ActiveDataProvider([
+                'query' => $order->getRefundedItems()->with('item'),
+                'sort' => false
+            ]);
+
             return $this->render('view', [
                 'model' => $order,
                 'refundDataProvider' => $refundDataProvider,
