@@ -35,6 +35,8 @@ phpunit.phar
 /.vagrant
 
 # ignore generated files
+/crm/web/index.php
+/crm/web/index-test.php
 /frontend/web/index.php
 /frontend/web/index-test.php
 /frontend/web/robots.txt
@@ -44,3 +46,5 @@ phpunit.phar
 /partner/web/index.php
 /partner/web/index-test.php
 /partner/web/robots.txt
+crm/config/main-local.php
+crm/config/params-local.php
