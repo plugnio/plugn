@@ -41,7 +41,6 @@ class ItemQuery extends \yii\db\ActiveQuery
         return $this->andWhere(['category_item.category_id' => $category_id]);
     }
 
-
     /**
    * filter by given keyword
    * @param $keyword

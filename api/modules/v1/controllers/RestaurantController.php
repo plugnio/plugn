@@ -79,7 +79,7 @@ class RestaurantController extends Controller {
 
                   $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , $deliveryDate)])->one();
 
-                  if($opening_hrs && $opening_hrs->is_closed)
+                  if(!$opening_hrs || ($opening_hrs && $opening_hrs->is_closed))
                       continue;
 
                   $selectedDay = 'next '  . date('l', $deliveryDate);
@@ -108,8 +108,6 @@ class RestaurantController extends Controller {
                     'ASAP' => $restaurant_model->isOpen() ? $asap : null,
                     'scheduleOrder' => $restaurant_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
                 ];
-
-
 
             } else {
               return [

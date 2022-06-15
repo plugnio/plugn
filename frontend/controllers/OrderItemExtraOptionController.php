@@ -49,15 +49,18 @@ class OrderItemExtraOptionController extends Controller {
      */
     public function actionCreate($id, $storeUuid) {
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        if ($order_item_model = OrderItem::find()->where(['order_item_id' => $id])->one()) {
+        $order_item = OrderItem::find()->where(['order_item_id' => $id])->one();
+
+        if ($order_item) {
+
             $model = new OrderItemExtraOption();
             $model->setScenario(OrderItemExtraOption::SCENARIO_CREATE_ORDER_ITEM_EXTRA_OPTION_BY_ADMIN);
             $model->order_item_id = $id;
 
             //Get item's extra options to retrieve it on create-form page
-            $extraOptions = $order_item_model->item->getExtraOptions()->all();
+            $extraOptions = $order_item->item->getExtraOptions()->all();
 
             foreach ($extraOptions as $key => $extraOption) {
                 if($extraOption->item->item_uuid != $model->orderItem->item_uuid){
@@ -68,7 +71,7 @@ class OrderItemExtraOptionController extends Controller {
             $extraOptionsQuery = ArrayHelper::map($extraOptions, 'extra_option_id', 'extra_option_name');
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                return $this->redirect(['order-item/view', 'id' => $model->order_item_id, 'storeUuid' => $restaurant_model->restaurant_uuid]);
+                return $this->redirect(['order-item/view', 'id' => $model->order_item_id, 'storeUuid' => $restaurant->restaurant_uuid]);
             }
 
             return $this->render('create', [

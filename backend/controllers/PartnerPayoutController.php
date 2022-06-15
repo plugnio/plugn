@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
 use backend\models\TranferExcel;
 use common\models\PartnerPayout;
@@ -32,6 +33,11 @@ class PartnerPayoutController extends Controller
           'access' => [
               'class' => \yii\filters\AccessControl::className(),
               'rules' => [
+                  [
+                      'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                      'actions' => ['create', 'update', 'delete', 'import-expert'],
+                      'roles' => ['@'],
+                  ],
                   [//allow authenticated users only
                       'allow' => true,
                       'roles' => ['@'],
@@ -97,10 +103,11 @@ class PartnerPayoutController extends Controller
         return Yii::$app->response->sendFile($path);
     }
 
-
+    /**
+     * @return array|string|\yii\web\Response
+     */
     public function actionImportExcel()
     {
-
           $model = new TranferExcel();
 
           if ($model->load(Yii::$app->request->post())) {

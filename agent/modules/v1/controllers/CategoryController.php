@@ -134,6 +134,8 @@ class CategoryController extends Controller
         $model->title_ar = Yii::$app->request->getBodyParam("title_ar");
         $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
         $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
+        $model->category_meta_description = Yii::$app->request->getBodyParam("category_meta_description");
+        $model->category_meta_description_ar = Yii::$app->request->getBodyParam("category_meta_description_ar");
         $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
 
         //validate before uploading image
@@ -176,6 +178,8 @@ class CategoryController extends Controller
         $model->title_ar = Yii::$app->request->getBodyParam("title_ar");
         $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
         $model->subtitle_ar = Yii::$app->request->getBodyParam("subtitle_ar");
+        $model->category_meta_description = Yii::$app->request->getBodyParam("category_meta_description");
+        $model->category_meta_description_ar = Yii::$app->request->getBodyParam("category_meta_description_ar");
         $model->sort_number = Yii::$app->request->getBodyParam("sort_number");
 
         //validate before uploading image
@@ -219,7 +223,6 @@ class CategoryController extends Controller
      */
     public function actionUploadCategoryImage()
     {
-
         $category_image = urldecode(Yii::$app->request->getBodyParam('category_image'));
         $store_uuid = Yii::$app->request->getBodyParam('store_uuid');
         $category_id = Yii::$app->request->getBodyParam('category_id');
@@ -293,11 +296,21 @@ class CategoryController extends Controller
      */
     public function actionChangePosition()
     {
-
         $items = Yii::$app->request->getBodyParam('items');
 
-        foreach ($items as $key => $value) {
-            $model = Category::findOne($value);
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        foreach ($items as $key => $category_id) {
+
+            $model = Category::find()->where([
+                'category_id' => $category_id,
+                'restaurant_uuid' => $store->restaurant_uuid
+            ])->one();
+
+            if(!$model) {
+                continue;
+            }
+            
             $model->sort_number = (int)$key + 1;
             $model->save(false);
         }
@@ -318,7 +331,6 @@ class CategoryController extends Controller
     {
         return $this->findModel($category_id);
     }
-
 
     /**
      * Finds the Category model based on its primary key value.

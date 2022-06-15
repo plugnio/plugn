@@ -5,7 +5,7 @@ return [
         'plan_id' => 1,
         'name' => 'excepturi',
         'price' => 100,
-        'valid_for' => 71,
+        'valid_for' => 0,
         'platform_fee' => 7,
         'description' => 'Porro sint et enim nisi debitis.',
     ],

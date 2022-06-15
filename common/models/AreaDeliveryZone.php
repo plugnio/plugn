@@ -36,7 +36,9 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
             [['delivery_zone_id', 'restaurant_uuid'], 'required'],
             [['delivery_zone_id', 'area_id'], 'integer'],
             [['delivery_zone_id', 'area_id'], 'unique', 'targetAttribute' => ['delivery_zone_id', 'area_id']],
+            [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'city_id']],
             [['delivery_zone_id'], 'exist', 'skipOnError' => true, 'targetClass' => DeliveryZone::className(), 'targetAttribute' => ['delivery_zone_id' => 'delivery_zone_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -48,10 +50,10 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'area_delivery_zone_id' => 'Area Delivery Zone ID',
-            'delivery_zone_id' => 'Delivery Zone ID',
-            'area_id' => 'Area ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
+            'area_delivery_zone_id' => Yii::t('app', 'Area Delivery Zone ID'),
+            'delivery_zone_id' => Yii::t('app', 'Delivery Zone ID'),
+            'area_id' => Yii::t('app', 'Area ID'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
         ];
     }
 
@@ -66,8 +68,8 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
 
         if ($insert) {
 
-          if( $this->area_id){
-            $this->country_id = $this->area->country->country_id;
+          if($this->area_id) {
+            $this->country_id = $this->area->city? $this->area->city->country_id: null;
             $this->city_id = $this->area->city_id;
           } else {
             $this->country_id = $this->deliveryZone->country_id;

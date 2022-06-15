@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\SluggableBehavior;
 
 /**
  * This is the model class for table "category".
@@ -13,6 +14,10 @@ use Yii;
  * @property string|null $title_ar
  * @property string|null $subtitle
  * @property string|null $subtitle_ar
+ * @property string|null $category_meta_title
+ * @property string|null $category_meta_title_ar
+ * @property string|null $category_meta_description
+ * @property string|null $category_meta_description_ar
  * @property string $category_image
  * @property int|null $sort_number
  *
@@ -21,7 +26,6 @@ use Yii;
  */
 class Category extends \yii\db\ActiveRecord
 {
-
     public $image;
 
     /**
@@ -38,7 +42,7 @@ class Category extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'title_ar'], 'required'],
+            [['title', 'title_ar', 'restaurant_uuid'], 'required'],
             //Upload Category Image
             // ['category_image', 'file', 'extensions' => 'jpg, png, gif', 'maxSize' => 10000000,
             //     'wrongExtension' => Yii::t('app', 'Only files with these extensions are allowed for your Image: {extensions}')
@@ -46,7 +50,9 @@ class Category extends \yii\db\ActiveRecord
             [['image'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 1],
             [['sort_number'], 'integer', 'min' => 0],
             [['restaurant_uuid'], 'string', 'max' => 60],
+            ['slug', 'safe'],
             [['title', 'title_ar', 'subtitle', 'subtitle_ar'], 'string', 'max' => 255],
+            [['category_meta_title', 'category_meta_title_ar', 'category_meta_description', 'category_meta_description_ar'], 'string'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className (), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -57,18 +63,36 @@ class Category extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'category_id' => 'Category ID',
-            'title' => 'Title',
-            'title_ar' => 'Title in Arabic',
-            'subtitle' => 'Subtitle',
-            'image' => 'Category Image',
-            'subtitle_ar' => 'Subtitle in Arabic',
-            'sort_number' => 'Sort Number',
-            'restaurant_uuid' => 'Restaurant UUID',
+            'category_id' => Yii::t('app', 'Category ID'),
+            'title' => Yii::t('app', 'Title'),
+            'title_ar' => Yii::t('app', 'Title in Arabic'),
+            'subtitle' => Yii::t('app', 'Subtitle'),
+            'image' => Yii::t('app', 'Category Image'),
+            'subtitle_ar' => Yii::t('app', 'Subtitle in Arabic'),
+            'category_meta_title' => Yii::t('app', 'Page Title'),
+            'category_meta_title_ar' => Yii::t('app', 'Page Title in Arabic'),
+            'category_meta_description' => Yii::t('app', 'Meta tag description'),
+            'category_meta_description_ar' => Yii::t('app', 'Meta tag description in Arabic'),
+            'sort_number' => Yii::t('app', 'Sort Number'),
+            'slug' => Yii::t('app', 'Slug'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant UUID')
         ];
     }
 
-
+    /**
+     * @return array[]
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'title',
+                'ensureUnique' => true,
+                'uniqueValidator' => ['targetAttribute' => ['restaurant_uuid', 'slug']]
+            ],
+        ];
+    }
 
     /**
      * Scenarios for validation and massive assignment
@@ -113,7 +137,7 @@ class Category extends \yii\db\ActiveRecord
             $this->category_image = null;
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
+            //Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
         }
     }
 
@@ -164,8 +188,10 @@ class Category extends \yii\db\ActiveRecord
                 unlink ($imageURL);
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
-            Yii::error ("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode ($imageURL));
+            //todo: notify vendor in api response?
+
+            //Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+            //Yii::error ("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode ($imageURL));
         }
     }
 
@@ -205,7 +231,9 @@ class Category extends \yii\db\ActiveRecord
             return true;
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+            //todo: notify vendor?
+            //Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+
         }
     }
 
@@ -238,7 +266,8 @@ class Category extends \yii\db\ActiveRecord
         } catch (\Cloudinary\Error  $err) {
 
             $this->addError ('category_image', Yii::t ('app', 'Please try again.'));
-            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+
+            //Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
 
             return false;
 

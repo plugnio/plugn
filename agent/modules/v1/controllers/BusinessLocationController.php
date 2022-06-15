@@ -205,7 +205,7 @@ class BusinessLocationController extends Controller
 
         return [
             "operation" => "success",
-            "message" => Yii::t('agent',"Business Location updated successfully"),
+            "message" => Yii::t('agent',"Business Location details updated successfully"),
             "model" => $model
         ];
     }

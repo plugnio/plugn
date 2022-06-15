@@ -2,6 +2,7 @@
 namespace api\components;
 
 use yii\base\BaseObject;
+use api\models\Restaurant;
 
 
 class Currency extends BaseObject
@@ -21,6 +22,20 @@ class Currency extends BaseObject
     }
 
     public function getCode() {
+
+        if(!$this->code) {
+            
+            $id = \Yii::$app->request->headers->get('Store-Id');
+
+            if(!$id) {
+                return $this->code;
+            }
+
+            $restaurant = Restaurant::findOne($id);
+
+            $this->code = $restaurant->currency->code;
+        }
+
         return $this->code;
     }
 }

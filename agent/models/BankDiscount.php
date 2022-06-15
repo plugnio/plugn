@@ -18,6 +18,16 @@ class BankDiscount extends \common\models\BankDiscount
     }
 
     /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrders($modelClass = "\agent\models\Order")
+    {
+        return $this->hasMany($modelClass::className(), ['bank_discount_id' => 'bank_discount_id']);
+    }
+
+    /**
      * Gets query for [[CustomerBankDiscounts]].
      *
      * @return \yii\db\ActiveQuery

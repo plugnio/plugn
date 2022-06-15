@@ -417,9 +417,9 @@
     .has("ul")
     .addClass("has-sub");
 
-  $(".carousel").carousel({
+  /*$(".carousel").carousel({
     interval: 2000
-  });
+  });*/
 
   // Page full screen
   $(".nav-link-expand").on("click", function (e) {
@@ -489,7 +489,7 @@
   // main menu internationalization
 
   // init i18n and load language file
-  i18next.use(window.i18nextXHRBackend).init({
+  /*i18next.use(window.i18nextXHRBackend).init({
       debug: false,
       fallbackLng: "en",
       backend: {
@@ -501,7 +501,7 @@
       // resources have been loaded
       jqueryI18next.init(i18next, $);
     }
-  );
+  );*/
 
   // change language according to data-language of dropdown item
   $(".dropdown-language .dropdown-item").on("click", function () {

@@ -429,7 +429,6 @@ class TapPayments extends Component
      */
     public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $webhookUrl , $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null)
     {
-
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $phone =  str_replace(' ', '', $phone);
@@ -474,7 +473,7 @@ class TapPayments extends Component
 
 
         if($platform_fee > 0) {
-           if($gateway == static::GATEWAY_KNET){
+           if($gateway == static::GATEWAY_KNET) {
 
                  //if greater than 10KD
                 if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
@@ -505,13 +504,11 @@ class TapPayments extends Component
          if($warehouse_delivery_charges > 0 && $country_name != null && $country_name == 'Kuwait')
            $charge_amount = $warehouse_delivery_charges + $charge_amount;
 
-
            $destination = [
                "id" => $this->destinationId,
                "amount" => $charge_amount,
                "currency" => $currency,
            ];
-
 
            array_push($chargeParams['destinations']['destination'], $destination);
 

@@ -3,6 +3,8 @@ include:
     - common
     - frontend
     - backend
+    - api
+    - crm
 paths:
     log: console/runtime/logs
 settings:

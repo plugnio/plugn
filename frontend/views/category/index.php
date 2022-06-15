@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /* @var $searchModel frontend\models\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Manage Categories';
 $this->params['breadcrumbs'][] = $this->title;
@@ -25,22 +25,21 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php if ($dataProvider->getCount() > 0) { ?>
+  <?php if ($count > 0) { ?>
 
 <!-- Data list view starts -->
-<div class="action-btns d-none">
+<div class="action-btns">
     <div class="btn-dropdown mr-1 mb-1">
         <div class="btn-group dropdown actions-dropodown">
-          <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+          <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
         </div>
     </div>
 </div>
 
 
-
-   <?php if($dataProvider->getCount() == 0 ){  ?>
+   <?php if($count == 0 ) {  ?>
      <div style="padding-left:14px">
-     <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
+     <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary','style'=>'    padding: 0.85rem 1.7rem;']) ?>
    </div>
    <?php } ?>
 
@@ -50,6 +49,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['category/update', 'id' => $model->category_id, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -60,10 +60,7 @@ $this->registerJs($js);
             'columns' => [
               [
                   'label' => 'Sort #',
-                  'format' => 'html',
-                  'value' => function ($data) {
-                      return $data->sort_number;
-                  },
+                  'attribute' => 'sort_number'
               ],
                 'title',
                 'title_ar',
@@ -71,7 +68,7 @@ $this->registerJs($js);
                 'subtitle_ar',
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table  dataTable data-list-view'],
         ]);
         ?>
 
@@ -95,7 +92,7 @@ $this->registerJs($js);
         <p>
           Use categories to organize your products for your online store.
         </p>
-        <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Create category', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
 
