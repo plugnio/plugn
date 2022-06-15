@@ -82,6 +82,7 @@ class AccountManager  extends BaseObject
      * @return \common\models\Restaurant  The user account
      * @throws \yii\web\NotFoundHttpException if the account isnt one this agent owns
      */
+
     public function getManagedAccount($restaurantUuid = null) {
 
         if(!$restaurantUuid) {
