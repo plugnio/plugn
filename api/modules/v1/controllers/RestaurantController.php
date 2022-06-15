@@ -7,7 +7,7 @@ use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\City;
 use common\models\RestaurantBranch;
-use common\models\Restaurant;
+use api\models\Restaurant;
 use common\models\RestaurantTheme;
 use common\models\OpeningHour;
 use common\models\RestaurantDelivery;
@@ -71,7 +71,6 @@ class RestaurantController extends Controller {
 
           $schedule_time = [];
 
-
             if($deliveryArea){
 
               for ($i = 0; $i <= OpeningHour::DAY_OF_WEEK_SATURDAY; $i++) {
@@ -80,13 +79,10 @@ class RestaurantController extends Controller {
 
                   $opening_hrs = OpeningHour::find()->where(['restaurant_uuid' => $restaurant_uuid, 'day_of_week' => date('w' , $deliveryDate)])->one();
 
-                  if($opening_hrs->is_closed)
+                  if(!$opening_hrs || ($opening_hrs && $opening_hrs->is_closed))
                       continue;
 
                   $selectedDay = 'next '  . date('l', $deliveryDate);
-
-
-
 
                   $startTime =   date('c',strtotime( date('Y-m-d', strtotime($i == 0 ? "now" : $selectedDay)) . ' ' . $opening_hrs->open_at));
 
@@ -113,8 +109,6 @@ class RestaurantController extends Controller {
                     'scheduleOrder' => $restaurant_model->schedule_order ?  ($schedule_time  ? $schedule_time  : null): null
                 ];
 
-
-
             } else {
               return [
                   'operation' => 'error',
@@ -134,7 +128,7 @@ class RestaurantController extends Controller {
     public function actionListAllRestaurantsBranches($id) {
 
         $restaurantBranches = RestaurantBranch::find()
-                        ->where(['restaurant_uuid' => $id])->all();
+                        ->andWhere(['restaurant_uuid' => $id])->all();
 
         if ($restaurantBranches) {
             return $restaurantBranches;
@@ -152,7 +146,7 @@ class RestaurantController extends Controller {
     public function actionGetRestaurantData($branch_name) {
 
       $store = Restaurant::find()
-              ->where(['store_branch_name' => $branch_name]);
+              ->andWhere(['store_branch_name' => $branch_name]);
 
       if( $store->exists() ){
 
@@ -163,7 +157,7 @@ class RestaurantController extends Controller {
 
         $themeColor = RestaurantTheme::find()
                 ->select(['primary'])
-                ->where(['restaurant_uuid' => $restaurant->restaurant_uuid])
+                ->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid])
                 ->one();
 
         if ($restaurant && $themeColor) {

@@ -28,7 +28,7 @@ class AgentSearch extends Agent
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+        return parent::scenarios();
     }
 
     /**
@@ -45,8 +45,7 @@ class AgentSearch extends Agent
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => false
+            'query' => $query
         ]);
 
         $this->load($params);

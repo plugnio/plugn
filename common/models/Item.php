@@ -4,7 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\AttributeBehavior;
-use common\models\ItemImage;
+use yii\behaviors\SluggableBehavior;
 use yii\db\Expression;
 use yii\behaviors\TimestampBehavior;
 
@@ -17,7 +17,12 @@ use yii\behaviors\TimestampBehavior;
  * @property string|null $item_name_ar
  * @property string|null $item_description
  * @property string|null $item_description_ar
+ * @property string|null $item_meta_title
+ * @property string|null $item_meta_title_ar
+ * @property string|null $item_meta_description
+ * @property string|null $item_meta_description_ar
  * @property int|null $sort_number
+ * @property int|null $item_type
  * @property int|null $track_quantity
  * @property string $barcode
  * @property string $sku
@@ -27,6 +32,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int|null $unit_sold
  * @property string|null $item_image
  * @property float|null $item_price
+ * @property float|null $compare_at_price
  * @property string|null $item_created_at
  * @property string|null $item_updated_at
  *
@@ -43,17 +49,21 @@ class Item extends \yii\db\ActiveRecord
     public $items_category;
     public $item_images;
 
-
     //Values for `prep_time_unit`
     const TIME_UNIT_MIN = 'min';
     const TIME_UNIT_HRS = 'hrs';
     const TIME_UNIT_DAY = 'day';
 
-
     //Values for `item_status`
     const ITEM_STATUS_PUBLISH = 1;
-    const ITEM_STATUS_UNPUBLISH =  2;
+    const ITEM_STATUS_UNPUBLISH = 2;
 
+    const TYPE_SIMPLE = 1;
+    const TYPE_CONFIGURABLE = 2;
+
+    const SCENARIO_UPDATE_STATUS = 'update-status';
+    const SCENARIO_UPDATE_STOCK = 'update-stock';
+    const SCENARIO_UPDATE_SORT = 'update-sort-number';
 
     /**
      * {@inheritdoc}
@@ -68,31 +78,55 @@ class Item extends \yii\db\ActiveRecord
      */
     public function rules()
     {
+        //sku barcode track_quantity stock_qty
+
         return [
-            [['item_name', 'prep_time_unit' , 'prep_time' ], 'required', 'on' => 'create'],
-            ['prep_time_unit', 'in', 'range' => [self::TIME_UNIT_MIN,self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
-            [['item_name', 'item_name_ar', 'item_price', 'items_category'], 'required'],
-            [['sort_number', 'stock_qty'], 'integer', 'min' => 0],
+            [['item_name', 'prep_time_unit', 'prep_time'], 'required', 'on' => 'create'],
+            ['prep_time_unit', 'in', 'range' => [self::TIME_UNIT_MIN, self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
+            [['item_name', 'item_name_ar', 'items_category', 'restaurant_uuid'], 'required'],
+            [['sort_number', 'stock_qty', 'item_type'], 'integer', 'min' => 0],
             [['unit_sold'], 'integer', 'min' => 0],
-            [['item_price'], 'number', 'min' => 0],
+            [['item_price', 'compare_at_price'], 'number', 'min' => 0],
             [['track_quantity', 'prep_time'], 'integer'],
-            ['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
-            ['stock_qty', 'required', 'when' => function($model) {
-                return $model->track_quantity;
+            //['item_status', 'in', 'range' => [self::ITEM_STATUS_PUBLISH, self::ITEM_STATUS_UNPUBLISH]],
+            [['item_type'], 'default', 'value' => self::TYPE_SIMPLE],
+            [['stock_qty'], 'required', 'when' => function ($model) {
+                return $model->track_quantity && $model->item_type == self::TYPE_SIMPLE;
             }],
+            ['item_price', 'required', 'when' => function ($model) {
+                return $model->item_type == self::TYPE_SIMPLE;
+            }],
+            ['item_price', 'default', 'value' => 0],
             [['item_images'], 'file', 'extensions' => 'jpg, jpeg , png', 'maxFiles' => 10],
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['item_name', 'item_name_ar', 'item_image','barcode', 'sku'], 'string', 'max' => 255],
-            [['item_description', 'item_description_ar'], 'string', 'max' => 2500],
+            [['item_name', 'item_name_ar', 'item_image', 'barcode', 'sku'], 'string', 'max' => 255],
+            [['item_description', 'item_description_ar', 'item_meta_title', 'item_meta_title_ar', 'item_meta_description', 'item_meta_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
+            ['slug', 'safe'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
 
 
+    public function scenarios()
+    {
+        $parent = parent::scenarios();
 
+        $parent[self::SCENARIO_UPDATE_STATUS] = ['item_status'];
+
+        $parent[self::SCENARIO_UPDATE_STOCK] = [
+            'stock_qty',
+            'track_quantity'
+        ];
+
+        $parent[self::SCENARIO_UPDATE_SORT] = [
+            'sort_number'
+        ];
+
+        return $parent;
+    }
 
     /**
      * {@inheritdoc}
@@ -100,26 +134,32 @@ class Item extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'item_uuid' => 'Item uuid',
-            'restaurant_uuid' => 'Restaurant uuid',
-            'item_name' => 'Title in English',
-            'item_name_ar' => 'Title in Arabic',
-            'item_description' => 'Item description in English',
-            'item_description_ar' => 'Item description in Arabic',
-            'sort_number' => 'Sort number',
-            'stock_qty' => 'Stock quantity',
-            'track_quantity' => 'Track quantity',
-            'unit_sold' => 'Unit sold',
-            'barcode' => 'Barcode (ISBN, UPC, GTIN, etc.)',
-            'sku' => 'SKU (Stock Keeping Unit)',
-            'item_image' => 'Item image',
-            'item_price' => 'Price',
-            'prep_time' => 'Preparation time',
-            'prep_time_unit' => 'Preparation time unit',
-            'item_status' => 'Item status',
-            'items_category' => 'Category',
-            'item_created_at' => 'Item created at',
-            'item_updated_at' => 'Item updated qt',
+            'item_uuid' => Yii::t('app','Item uuid'),
+            'restaurant_uuid' => Yii::t('app','Restaurant uuid'),
+            'item_name' => Yii::t('app','Title in English'),
+            'item_name_ar' => Yii::t('app','Title in Arabic'),
+            'item_description' => Yii::t('app','Item description in English'),
+            'item_description_ar' => Yii::t('app','Item description in Arabic'),
+            'item_meta_description' => Yii::t('app','Meta tag description'),
+            'item_meta_description_ar' => Yii::t('app','Meta tag description in Arabic'),
+            'item_meta_title' => Yii::t('app','Page Title'),
+            'item_meta_title_ar' => Yii::t('app','Page Title in Arabic'),
+            'sort_number' => Yii::t('app','Sort number'),
+            'stock_qty' => Yii::t('app','Stock quantity'),
+            'track_quantity' => Yii::t('app','Track quantity'),
+            'unit_sold' => Yii::t('app','Unit sold'),
+            'barcode' => Yii::t('app','Barcode (ISBN, UPC, GTIN, etc.)'),
+            'sku' => Yii::t('app','SKU (Stock Keeping Unit)'),
+            'item_image' => Yii::t('app','Item image'),
+            'item_price' => Yii::t('app','Price'),
+            'compare_at_price' => Yii::t('app','Compare at price'),
+            'prep_time' => Yii::t('app','Preparation time'),
+            'prep_time_unit' => Yii::t('app','Preparation time unit'),
+            'item_status' => Yii::t('app','Item status'),
+            'items_category' => Yii::t('app','Category'),
+            'slug' => Yii::t('app',"Slug"),
+            'item_created_at' => Yii::t('app','Item created at'),
+            'item_updated_at' => Yii::t('app','Item updated at')
         ];
     }
 
@@ -127,17 +167,18 @@ class Item extends \yii\db\ActiveRecord
      * Returns String value of current status
      * @return string
      */
-    public function getTimeUnit() {
+    public function getTimeUnit()
+    {
         switch ($this->prep_time_unit) {
-          case self::TIME_UNIT_MIN:
-              return "Minutes";
-              break;
-          case self::TIME_UNIT_HRS:
-            return  $this->prep_time == 1 ?  "Hour" : "Hours";
-              break;
-          case self::TIME_UNIT_DAY:
-              return  $this->prep_time == 1 ?  "Day" : "Days";
-              break;
+            case self::TIME_UNIT_MIN:
+                return "Minutes";
+                break;
+            case self::TIME_UNIT_HRS:
+                return $this->prep_time == 1 ? "Hour" : "Hours";
+                break;
+            case self::TIME_UNIT_DAY:
+                return $this->prep_time == 1 ? "Day" : "Days";
+                break;
         }
     }
 
@@ -167,42 +208,123 @@ class Item extends \yii\db\ActiveRecord
                 'updatedAtAttribute' => 'item_updated_at',
                 'value' => new Expression('NOW()'),
             ],
+            [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'item_name',
+                'ensureUnique' => true,
+                'uniqueValidator' => ['targetAttribute' => ['restaurant_uuid', 'slug']]
+            ],
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    // public function fields()
+    // {
+    //     $fields = parent::fields ();
+    //
+    //     // remove fields that contain sensitive information
+    //     unset($fields['item_created_at']);
+    //     unset($fields['item_updated_at']);
+    //     unset($fields['unit_sold']);
+    //     unset($fields['barcode']);
+    //     unset($fields['sku']);
+    //
+    //     return $fields;
+    // }
 
-        /**
-         * @inheritdoc
-         */
-        public function fields() {
-            $fields = parent::fields();
 
-            // remove fields that contain sensitive information
-            unset($fields['item_created_at']);
-            unset($fields['item_updated_at']);
-            unset($fields['barcode']);
+    /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+        $fields = parent::fields();
 
-            return $fields;
+        return array_merge($fields, [
+            'currency',
+            'options',
+            'itemImages',
+            'extraOptions',
+            'itemVariants',
+            'itemSchema'
+        ]);
+    }
+
+    public function getItemSchema()
+    {
+        $images = [];
+
+        foreach ($this->itemImages as $key => $itemImage) {
+            $images[] = "https://res.cloudinary.com/plugn/image/upload/q_auto:eco,w_1000/restaurants/" . $this->restaurant_uuid
+                . "/items/" . $itemImage->product_file_name;
         }
 
+        $url = $this->restaurant->restaurant_domain. '/' . $this->slug;
+
+        $data = [
+            "@context" => "https://schema.org/",
+            "@type" => "Product",
+            "name" => $this->item_name,
+            "image" => $images,
+            "description" => $this->item_description,
+            "sku" => $this->sku,
+            /*"mpn" => "925872",
+            "brand": {
+                      "@type": "Brand",
+              "name": "ACME"
+            },
+            "review": {
+                      "@type": "Review",
+              "reviewRating": {
+                          "@type": "Rating",
+                "ratingValue": "4",
+                "bestRating": "5"
+              },
+              "author": {
+                          "@type": "Person",
+                "name": "Fred Benson"
+              }
+            },
+            "aggregateRating": {
+                      "@type": "AggregateRating",
+              "ratingValue": "4.4",
+              "reviewCount": "89"
+            },*/
+            "offers" => [
+                "@type" => "Offer",
+                "url" => $url,
+                "priceCurrency" => $this->restaurant->currency->code,
+                "price" => $this->item_price,
+                "itemCondition" => "https://schema.org/NewCondition",
+                "availability" => "https://schema.org/InStock"
+            ]
+        ];
+
+        return $data;
+    }
 
     /**
      *
      * @param type $insert
      * @param type $changedAttributes
      */
-    public function afterSave($insert, $changedAttributes) {
+    public function afterSave($insert, $changedAttributes)
+    {
         parent::afterSave($insert, $changedAttributes);
 
-        if($insert || isset($changedAttributes['item_name']) ) {
+        if ($insert || isset($changedAttributes['item_name'])) {
+            if ($this->restaurant->sitemap_require_update == 0) {
+                $this->restaurant->sitemap_require_update = 1;
 
-          $store = $this->restaurant;
-
-          if($store->sitemap_require_update == 0){
-            $store->sitemap_require_update = 1;
-            $store->save(false);
-          }
-
+                Restaurant::updateAll([
+                    'sitemap_require_update' => $this->restaurant->sitemap_require_update
+                ], [
+                    'restaurant_uuid' => $this->restaurant_uuid
+                ]);
+                //$this->restaurant->save (false);
+            }
         }
 
         return true;
@@ -214,11 +336,17 @@ class Item extends \yii\db\ActiveRecord
      */
     public function increaseStockQty($qty)
     {
-      if($this->track_quantity)
-        $this->stock_qty += $qty;
+        if ($this->track_quantity)
+            $this->stock_qty += $qty;
 
-      $this->unit_sold -= $qty;
-      $this->save(false);
+        $this->unit_sold -= $qty;
+
+        self::updateAll([
+            'unit_sold' => $this->unit_sold,
+            'stock_qty' => $this->stock_qty
+        ], [
+            'item_uuid' => $this->item_uuid
+        ]);
     }
 
     /**
@@ -227,11 +355,17 @@ class Item extends \yii\db\ActiveRecord
      */
     public function decreaseStockQty($qty)
     {
-        if($this->track_quantity)
-          $this->stock_qty -= $qty;
+        if ($this->track_quantity)
+            $this->stock_qty -= $qty;
 
         $this->unit_sold += $qty;
-        $this->save(false);
+
+        self::updateAll([
+            'unit_sold' => $this->unit_sold,
+            'stock_qty' => $this->stock_qty
+        ], [
+            'item_uuid' => $this->item_uuid
+        ]);
     }
 
     /**
@@ -262,7 +396,6 @@ class Item extends \yii\db\ActiveRecord
 
         foreach ($imagesPath as $key => $path) {
 
-
             $filename = Yii::$app->security->generateRandomString();
 
             $itemName = str_replace(' ', '', $this->item_name);
@@ -271,7 +404,7 @@ class Item extends \yii\db\ActiveRecord
                 $result = Yii::$app->cloudinaryManager->upload(
                     $path['file'],
                     [
-                'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
+                        'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
                     ]
                 );
 
@@ -285,28 +418,39 @@ class Item extends \yii\db\ActiveRecord
                 unlink($path['file']);
 
             } catch (\Cloudinary\Error $err) {
-                Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
-                Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));
+                //todo: notify vendor
+                
+                //Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
+                //Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));
 
             }
         }
     }
 
-
     public function beforeDelete()
     {
-        foreach ($this->getItemImages()->all() as  $itemImage) {
+        foreach ($this->getItemImages()->all() as $itemImage) {
             $itemImage->delete();
         }
-
 
         return parent::beforeDelete();
     }
 
-
     public function findItemImageByFileName($file_name)
     {
-        return ItemImage::find()->where(['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])->one();
+        return ItemImage::find()
+            ->andWhere(['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])
+            ->one();
+    }
+
+    /**
+     * Gets query for [[ItemVariant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVariants($model = 'common\models\ItemVariant')
+    {
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -314,9 +458,9 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategoryItems()
+    public function getCategoryItems($model = 'common\models\CategoryItem')
     {
-        return $this->hasMany(CategoryItem::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -324,9 +468,9 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory()
+    public function getCategory($modelClass = "\common\models\Category")
     {
-        return $this->hasMany(Category::className(), ['category_id' => 'category_id'])->via('categoryItems');
+        return $this->hasMany($modelClass::className(), ['category_id' => 'category_id'])->via('categoryItems');
     }
 
     /**
@@ -334,9 +478,10 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategories()
+    public function getCategories($modelClass = "\common\models\Category")
     {
-        return $this->hasMany(Category::className(), ['category_id' => 'category_id'])->viaTable('category_item', ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($modelClass::className(), ['category_id' => 'category_id'])
+            ->viaTable('category_item', ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -344,9 +489,9 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -354,9 +499,9 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 
     /**
@@ -364,9 +509,9 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOptions()
+    public function getOptions($modelClass = "\common\models\Option")
     {
-        return $this->hasMany(Option::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -374,14 +519,15 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImages()
+    public function getItemImages($model = 'common\models\ItemImage')
     {
-        return $this->hasMany(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
 
-    public function getItemImage(){
-      return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+    public function getItemImage($model = 'common\models\ItemImage')
+    {
+        return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -389,55 +535,77 @@ class Item extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getExtraOptions()
+    public function getExtraOptions($modelClass = "\common\models\ExtraOption")
     {
-        return $this->hasMany(ExtraOption::className(), ['option_id' => 'option_id'])->via('options');
+        return $this->hasMany($modelClass::className(), ['option_id' => 'option_id'])->via('options');
     }
-
 
     /**
      * Gets query for [[Options]].
      *
      */
-    public function getSoldUnits(){
-      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+    public function getSoldUnits($modelClass = "\common\models\OrderItem")
+    {
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
-            ->where(['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere([
+                'IN',
+                'order.order_status', [
+                    Order::STATUS_ACCEPTED,
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE
+                ]
+            ])
             ->sum('qty');
     }
 
     /**
      * Gets query for [[Options]].
-     *
      */
-    public function getSoldUnitsInSpecifcDate($start_date, $end_date){
-      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+    public function getSoldUnitsInSpecifcDate($start_date = null, $end_date = null, $modelClass = "\common\models\OrderItem")
+    {
+        $query = $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
-            ->where(['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere(['order_status' => Order::STATUS_CANCELED])
-            ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
-            ->sum('qty');
+            ->andWhere([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_ACCEPTED,
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE
+                ]
+            ]);
+
+        if ($start_date && $end_date) {
+            $query->andWhere(['between', 'order.order_created_at', $start_date, $end_date]);
+        }
+
+        return $query->sum('qty');
     }
 
     /**
      * Gets query for [[Options]].
      *
      */
-    public function getTodaySoldUnits(){
-      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+    public function getTodaySoldUnits($modelClass = "\common\models\OrderItem")
+    {
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
-            ->where(['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_ACCEPTED,
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE
+                ]
+            ])
             ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 1 DAY)')])
             ->sum('qty');
     }
@@ -446,14 +614,21 @@ class Item extends \yii\db\ActiveRecord
      * Gets query for [[Options]].
      *
      */
-    public function getThisWeekSoldUnits(){
-      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+    public function getThisWeekSoldUnits($modelClass = "\common\models\OrderItem")
+    {
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
-            ->where(['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_ACCEPTED,
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE
+                ]
+            ])
             ->andWhere(['>', 'order.order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 7 DAY)')])
             ->sum('qty');
     }
@@ -462,14 +637,21 @@ class Item extends \yii\db\ActiveRecord
      * Gets query for [[Options]].
      *
      */
-    public function getCurrentMonthSoldUnits(){
-      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+    public function getCurrentMonthSoldUnits($modelClass = "\common\models\OrderItem")
+    {
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
-            ->where(['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_ACCEPTED,
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE
+                ]
+            ])
             ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 0 MONTH)')
             ->sum('qty');
@@ -479,14 +661,21 @@ class Item extends \yii\db\ActiveRecord
      * Gets query for [[Options]].
      *
      */
-    public function getLastMonthSoldUnits(){
-      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+    public function getLastMonthSoldUnits($modelClass = "\common\models\OrderItem")
+    {
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
-            ->where(['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_ACCEPTED,
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE
+                ]
+            ])
             ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->sum('qty');
@@ -496,37 +685,51 @@ class Item extends \yii\db\ActiveRecord
      * Gets query for [[Options]].
      *
      */
-    public function getLastThreeMonthSoldUnits(){
-      return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid'])
+    public function getLastThreeMonthSoldUnits($modelClass = "\common\models\OrderItem")
+    {
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
             ->joinWith('order')
-            ->where(['order.order_status' => Order::STATUS_PENDING])
-            ->orWhere(['order.order_status' => Order::STATUS_BEING_PREPARED])
-            ->orWhere(['order.order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-            ->orWhere(['order.order_status' => Order::STATUS_COMPLETE])
-            ->orWhere(['order_status' => Order::STATUS_CANCELED])
+            ->andWhere([
+                'IN',
+                'order.order_status',
+                [
+                    Order::STATUS_ACCEPTED,
+                    Order::STATUS_PENDING,
+                    Order::STATUS_BEING_PREPARED,
+                    Order::STATUS_OUT_FOR_DELIVERY,
+                    Order::STATUS_COMPLETE
+                ]
+            ])
             ->andWhere('YEAR(`order`.`order_created_at`) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH)')
             ->andWhere('MONTH(`order`.`order_created_at`) = MONTH(CURRENT_DATE - INTERVAL 3 MONTH)')
             ->sum('qty');
     }
 
-
-
     /**
      * Gets query for [[OrderItems]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItems()
+    public function getOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany(OrderItem::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
+
     /**
      * Gets query for [[OrderItems]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder()
+    public function getOrder($modelClass = "\common\models\Order")
     {
-        return $this->hasMany(Order::className(), ['order_uuid' => 'order_uuid'])->via('orderItems');
+        return $this->hasMany($modelClass::className(), ['order_uuid' => 'order_uuid'])->via('orderItems');
+    }
+
+    /**
+     * @return query\ItemQuery
+     */
+    public static function find()
+    {
+        return new query\ItemQuery(get_called_class());
     }
 }

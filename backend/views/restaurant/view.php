@@ -16,10 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="restaurant-view">
     <h1>
         <?= Html::encode($this->title) ?>
-        <span class="badge">
-            <?= $model->status ?>
-        </span>
-        <?= $model->is_tap_enable ? '' : Html::a('Create Tap account', ['create-tap-account', 'restaurant_uuid' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
 
 
     </h1>
@@ -34,10 +30,10 @@ $this->params['breadcrumbs'][] = $this->title;
             $model->hide_request_driver_button == 1 ?  'display-request-driver-button' : 'hide-request-driver-button'
          , 'id' => $model->restaurant_uuid], ['class' => $model->hide_request_driver_button == 0 ? 'btn btn-success' : 'btn btn-danger'])
          ?>
-        <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
-            'class' => 'btn btn-danger',
+            'class' => 'btn btn-danger btn-delete',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this store?',
                 'method' => 'post',
@@ -45,21 +41,36 @@ $this->params['breadcrumbs'][] = $this->title;
         ])
         ?>
 
-    </p>
+        <br/>
+        <br/>
 
-    <p>
-      <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
-      <?= Html::a('Delete Build Js', ['delete-specific-file','filePath' =>'build.js' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
-      <?= Html::a('Delete branch-name txt', ['delete-specific-file','filePath' =>'branch-name.txt' ,'id' => $model->restaurant_uuid], ['class' => 'btn btn-danger']) ?>
-      <?= Html::a('Merge w/ master', ['merge-branch', 'id' => $model->restaurant_uuid, 'head' => 'master'], ['class' => 'btn btn-primary']) ?>
-      <?= Html::a('Merge w/ master-temp', ['merge-branch', 'id' => $model->restaurant_uuid, 'head' => 'master-temp'], ['class' => 'btn btn-primary']) ?>
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_BUSY || $model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSED ) { ?>
+          <?=
+          Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
+              'class' => 'btn btn-success',
+              'data' => [
+                  'confirm' => 'Are you sure you want to change store status to open?',
+                  'method' => 'post',
+              ],
+          ])
+          ?>
+        <?php } ?>
+
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
+          <?=
+          Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
+              'class' => 'btn btn-danger',
+              'data' => [
+                  'confirm' => 'Are you sure you want to change store status to busy?',
+                  'method' => 'post',
+              ],
+          ])
+          ?>
+        <?php } ?>
 
 
 
-      <?= Html::a('Merge', ['merge-to-master-branch', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
-
-
-
+        <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
 
     </p>
 
@@ -67,6 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+          'payment_gateway_queue_id',
           [
               'label' => 'is_tap_enable',
               'value' => function ($data) {
@@ -74,6 +86,14 @@ $this->params['breadcrumbs'][] = $this->title;
               },
               'format' => 'raw'
           ],
+          [
+              'label' => 'is_myfatoorah_enable',
+              'value' => function ($data) {
+                  return $data->is_myfatoorah_enable ? 'Yes' : 'No';
+              },
+              'format' => 'raw'
+          ],
+          'retention_email_sent',
             'tap_queue_id',
             'version',
             'sitemap_require_update',
@@ -158,6 +178,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_updated_at',
             'platform_fee:percent',
             'warehouse_fee',
+            'warehouse_delivery_charges',
             'facebook_pixil_id',
             'google_analytics_id',
             [
@@ -170,6 +191,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'owner_email',
             'owner_number',
             'vendor_sector',
+            'supplierCode',
             'business_id',
             'developer_id',
             'business_entity_id',

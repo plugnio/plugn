@@ -37,6 +37,7 @@ class Country extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['country_name'], 'required'],
             [['country_code'], 'integer'],
             [['country_name','country_name_ar'], 'string', 'max' => 80],
             [['iso'], 'string', 'max' => 2],
@@ -50,11 +51,11 @@ class Country extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'country_id' => 'Country ID',
-            'country_name' => 'Country Name',
-            'iso' => 'Iso',
-            'emoji' => 'Emoji',
-            'country_code' => 'Country Code',
+            'country_id' => Yii::t('app','Country ID'),
+            'country_name' => Yii::t('app','Country Name'),
+            'iso' => Yii::t('app','Iso'),
+            'emoji' => Yii::t('app','Emoji'),
+            'country_code' => Yii::t('app','Country Code'),
         ];
     }
 
@@ -63,9 +64,9 @@ class Country extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCities()
+    public function getCities($modelClass = "\common\models\City")
     {
-        return $this->hasMany(City::className(), ['country_id' => 'country_id']);
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
     }
 
     /**
@@ -73,32 +74,29 @@ class Country extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreas()
+    public function getAreas($modelClass = "\common\models\Area")
     {
-        return $this->hasMany(Area::className(), ['city_id' => 'city_id'])->via('cities');
+        return $this->hasMany($modelClass::className(), ['city_id' => 'city_id'])->via('cities');
     }
-
-
 
     /**
      * Gets query for [[DeliveryZones]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getDeliveryZones()
+    public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany(DeliveryZone::className(), ['country_id' => 'country_id']);
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
     }
-
 
     /**
      * Gets query for [[CountryPaymentMethods]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountryPaymentMethods()
+    public function getCountryPaymentMethods($modelClass = "\common\models\CountryPaymentMethod")
     {
-        return $this->hasMany(CountryPaymentMethod::className(), ['country_id' => 'country_id']);
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
     }
 
     /**
@@ -106,20 +104,19 @@ class Country extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentMethods()
+    public function getPaymentMethods($modelClass = "\common\models\PaymentMethod")
     {
-        return $this->hasMany(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id'])->viaTable('country_payment_method', ['country_id' => 'country_id']);
+        return $this->hasMany($modelClass::className(), ['payment_method_id' => 'payment_method_id'])
+            ->viaTable('country_payment_method', ['country_id' => 'country_id']);
     }
-
 
     /**
      * Gets query for [[Restaurants]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurants()
+    public function getRestaurants($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasMany(Restaurant::className(), ['country_id' => 'country_id']);
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
     }
-
 }

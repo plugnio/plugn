@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
 use common\models\Country;
 use backend\models\CountrySearch;
@@ -14,20 +15,35 @@ use yii\filters\VerbFilter;
  */
 class CountryController extends Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
+  public $enableCsrfValidation = false;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function behaviors() {
+      return [
+          'verbs' => [
+              'class' => VerbFilter::className(),
+              'actions' => [
+                  'delete' => ['POST'],
+              ],
+          ],
+          'access' => [
+              'class' => \yii\filters\AccessControl::className(),
+              'rules' => [
+                  [
+                      'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                      'actions' => ['create', 'update', 'delete'],
+                      'roles' => ['@'],
+                  ],
+                  [//allow authenticated users only
+                      'allow' => true,
+                      'roles' => ['@'],
+                  ],
+              ],
+          ],
+      ];
+  }
 
     /**
      * Lists all Country models.

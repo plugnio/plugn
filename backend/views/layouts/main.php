@@ -27,7 +27,7 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
+<div class="wrap <?php if(!Yii::$app->user->isGuest) echo 'role-' . Yii::$app->user->identity->admin_role; ?>">
     <?php
     NavBar::begin([
         'brandLabel' => Yii::$app->name,
@@ -46,9 +46,10 @@ AppAsset::register($this);
 
 
             ['label' => 'Stores', 'url' => ['/restaurant/index']],
+            ['label' => 'Orders', 'url' => ['/order/index']],
             ['label' => 'Agents', 'url' => ['/agent/index']],
             ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
-            ['label' => 'Tap Queue', 'url' => ['/tap-queue/index']],
+            ['label' => 'Payment gateway Queue', 'url' => ['/payment-gateway-queue/index']],
 
 
 
@@ -56,8 +57,12 @@ AppAsset::register($this);
             [
             'label' => 'Other',
                 'items' => [
+                  ['label' => 'Refund', 'url' => ['/refund/index']],
+                  ['label' => 'Payment', 'url' => ['/payment/index']],
+                  ['label' => 'Subscription Payment', 'url' => ['/subscription-payment/index']],
                   ['label' => 'Queue', 'url' => ['/queue/index']],
                   ['label' => 'Subscription', 'url' => ['/subscription/index']],
+                  ['label' => 'Partner', 'url' => ['/partner/index']],
                   ['label' => 'Country', 'url' => ['/country/index']],
                   ['label' => 'Cities', 'url' => ['/city/index']],
                   ['label' => 'Areas', 'url' => ['/area/index']],
@@ -65,6 +70,7 @@ AppAsset::register($this);
                   ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
                   ['label' => 'Plans', 'url' => ['/plan/index']],
                   ['label' => 'Bank', 'url' => ['/bank/index']],
+                  ['label' => 'Opening Hours', 'url' => ['/opening-hour/index']],
 
                   ['label' => 'Admins', 'url' => ['/admin/index']],
 

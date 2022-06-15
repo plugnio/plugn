@@ -18,10 +18,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->assignment_id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Update', ['update', 'id' => $model->assignment_id], ['class' => 'btn btn-primary btn-update']) ?>
         <?=
         Html::a('Delete', ['delete', 'id' => $model->assignment_id], [
-            'class' => 'btn btn-danger',
+            'class' => 'btn btn-danger btn-delete',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
                 'method' => 'post',
@@ -40,8 +40,34 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'role',
                 'format' => 'html',
                 'value' => function ($data) {
-                    return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
+                    if($data->role == AgentAssignment::AGENT_ROLE_OWNER)
+                      $role = 'Owner';
+                    else  if($data->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
+                      $role = 'Branch Manager';
+                    else
+                      $role = 'Staff';
+
+                    return $role;
                 },
+            ],
+            [
+                'attribute' => 'business_location_id',
+                'value' => function ($data) {
+                    return $data->businessLocation->business_location_name;
+                },
+                'visible' => $model->business_location_id != null
+            ],
+            [
+                'attribute' => 'email_notification',
+                'value' => $model->email_notification ? 'Yes' : 'No',
+            ],
+            [
+                'attribute' => 'receive_weekly_stats',
+                'value' => $model->receive_weekly_stats ? 'Yes' : 'No',
+            ],
+            [
+                'attribute' => 'reminder_email',
+                'value' => $model->reminder_email ? 'Yes' : 'No',
             ],
             'assignment_agent_email:email',
             'assignment_created_at',

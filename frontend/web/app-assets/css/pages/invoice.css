@@ -3,6 +3,7 @@
 =========================================================*/
 .invoice-page {
   padding : 2.2rem;
+  background: white !important;
 }
 .invoice-page .recipient-contact i, .invoice-page .company-contact i {
   padding-right : 0.2rem;
@@ -17,9 +18,28 @@
   border : 2px solid #F8F8F8;
 }
 
+
+.item th {
+  background-color : #333333 !important;
+  color: white !important;
+}
+
+table, .summary  th, .summary td{
+  border: none !important;
+
+}
+
+
 @media print {
+  .invoice-page {
+    height: 100%;
+    background: white !important;
+
+  }
   body {
     font-size: 14pt;
+    background: white !important;
+
   }
   .invoice-page .invoice-items-table table, .invoice-page .invoice-total-table table {
     border : 2px solid #cfcfcf7d;

@@ -33,7 +33,7 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
         return [
             [['restaurant_uuid'], 'required'],
             [['restaurant_uuid', 'primary', 'secondary', 'tertiary', 'light', 'medium', 'dark'], 'string', 'max' => 60],
-            [['primary' , 'secondary', 'tertiary', 'light', 'medium', 'dark'], 'validateColorFormat'],
+            [['primary'], 'validateColorFormat'],//, 'secondary', 'tertiary', 'light', 'medium', 'dark'
             [['restaurant_uuid'], 'unique'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -41,23 +41,21 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
 
     public function validateColorFormat($attribute, $params, $validator) {
         if($this->$attribute[0] != '#')
-            $this->addError($attribute, 'Invalid color format');
+            $this->addError($attribute, Yii::t('app', 'Invalid color format'));
     }
-
-
 
     /**
      * {@inheritdoc}
      */
     public function attributeLabels() {
         return [
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'primary' => 'Primary',
-            'secondary' => 'Secondary',
-            'tertiary' => 'Tertiary',
-            'light' => 'Light',
-            'medium' => 'Medium',
-            'dark' => 'Dark',
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'primary' => Yii::t('app','Primary'),
+            'secondary' => Yii::t('app','Secondary'),
+            'tertiary' => Yii::t('app','Tertiary'),
+            'light' => Yii::t('app','Light'),
+            'medium' => Yii::t('app','Medium'),
+            'dark' => Yii::t('app','Dark')
         ];
     }
 
@@ -66,8 +64,7 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 }

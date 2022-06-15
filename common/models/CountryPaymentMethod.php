@@ -43,8 +43,8 @@ class CountryPaymentMethod extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'payment_method_id' => 'Payment Method ID',
-            'country_id' => 'Country ID',
+            'payment_method_id' => Yii::t('app','Payment Method ID'),
+            'country_id' => Yii::t('app','Country ID'),
         ];
     }
 
@@ -53,9 +53,9 @@ class CountryPaymentMethod extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountry()
+    public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
     }
 
     /**
@@ -63,8 +63,8 @@ class CountryPaymentMethod extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPaymentMethod()
+    public function getPaymentMethod($modelClass = "\common\models\PaymentMethod")
     {
-        return $this->hasOne(PaymentMethod::className(), ['payment_method_id' => 'payment_method_id']);
+        return $this->hasOne($modelClass::className(), ['payment_method_id' => 'payment_method_id']);
     }
 }

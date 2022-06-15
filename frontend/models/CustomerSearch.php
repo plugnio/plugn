@@ -4,13 +4,15 @@ namespace frontend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Customer;
+use frontend\models\Customer;
 
 /**
  * CustomerSearch represents the model behind the search form of `common\models\Customer`.
  */
 class CustomerSearch extends Customer
 {
+    public $date_range;
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +20,7 @@ class CustomerSearch extends Customer
     {
         return [
             [['customer_id'], 'integer'],
-            [['customer_name', 'customer_phone_number', 'customer_email', 'customer_created_at'], 'safe'],
+            [['customer_name', 'customer_phone_number', 'customer_email', 'customer_created_at','date_range'], 'safe'],
         ];
     }
 
@@ -28,7 +30,7 @@ class CustomerSearch extends Customer
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+        return parent::scenarios();
     }
 
     /**
@@ -41,16 +43,16 @@ class CustomerSearch extends Customer
     public function search($params, $storeUuid)
     {
         $query = Customer::find()->where(['restaurant_uuid' => $storeUuid])
-          ->with(['currency','activeOrders'])
-        ->orderBy(['customer_created_at' => SORT_DESC]);
-
+          ->orderBy(['customer_created_at' => SORT_DESC]);
 
         // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => false
+            'pagination' => [
+                'pageSize' => 20,
+             ],
         ]);
+
 
         $this->load($params);
 
@@ -59,6 +61,16 @@ class CustomerSearch extends Customer
             // $query->where('0=1');
             return $dataProvider;
         }
+
+
+          // do we have values? if so, add a filter to our query
+          if (!empty($this->date_range) && strpos($this->date_range, '-') !== false) {
+
+              list($start_date, $end_date) = explode(' - ', $this->date_range);
+              $query->andFilterWhere(['between', 'customer_created_at', $start_date, $end_date]);
+          }
+
+
 
         // grid filtering conditions
         $query->andFilterWhere([

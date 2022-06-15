@@ -42,6 +42,9 @@ return [
                 ],
             ],
         ],
+        'currency' => [
+            'class' => 'api\components\Currency',
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => false,
@@ -77,12 +80,18 @@ return [
                     'controller' => 'v2/item',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET view/<slug>' => 'view',
                         'GET detail' => 'item-data',
+                        'GET items' => 'items',
                         'GET' => 'restaurant-menu',
+                        'GET category/<slug>' => 'category-products',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS items' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS view/<slug>' => 'options',
+                        'OPTIONS category/<slug>' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
@@ -96,7 +105,7 @@ return [
                         'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
                         'GET pickup-location/<restaurant_uuid>/<pickup_location_id>' => 'get-pickup-location',
                         'GET <restaurant_uuid>/<delivery_zone_id>' => 'get-delivery-zone',
-                        'GET <restaurant_uuid>' => 'delivery-zone',
+                        // 'GET <restaurant_uuid>' => 'delivery-zone',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
@@ -104,10 +113,10 @@ return [
                         'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',
                         'OPTIONS pickup-location/<restaurant_uuid>/<pickup_location_id>' => 'options',
                         'OPTIONS <restaurant_uuid>/<delivery_zone_id>' => 'options',
-                        'OPTIONS <restaurant_uuid>' => 'options'
+                        // 'OPTIONS <restaurant_uuid>' => 'options'
                     ]
                 ],
-                [// RestaurantController
+                [// RestaurantCest
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',
                     'pluralize' => false,
@@ -127,12 +136,16 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET get-opening-hours' => 'get-opening-hours',
+                        'POST get-delivery-time' => 'get-delivery-time',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
+                        'GET <id>' => 'view',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',
+                        'OPTIONS get-delivery-time' => 'options',
                         'OPTIONS locations/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
+                        'OPTIONS <id>' => 'options',
                     ]
                 ],
                 [// RestaurantDeliveryController
@@ -165,8 +178,10 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET <id>' => 'list-all-restaurants-payment-method',
+                        'POST status-update-webhook' => 'my-fatoorah-webhook',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
@@ -181,8 +196,8 @@ return [
                         'GET callback' => 'callback',
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
-                        'GET <id>/<restaurant_uuid>' => 'order-details',
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
+                        'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
@@ -200,19 +215,25 @@ return [
                     'controller' => 'v2/order',
                     'pluralize' => false,
                     'patterns' => [
+                        'POST payment-webhook' => 'payment-webhook',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
+                        'POST update-armada-order-status' => 'update-armada-order-status',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
+                        'GET my-fatoorah-callback' => 'my-fatoorah-callback',
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS payment-webhook' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
+                        'OPTIONS update-armada-order-status' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',
+                        'GET my-fatoorah-callback' => 'my-fatoorah-callback',
                         'OPTIONS apply-promo-code' => 'options',
                         'OPTIONS apply-bank-discount' => 'options',
                         'OPTIONS order-details/<id>/<restaurant_uuid>' => 'options',

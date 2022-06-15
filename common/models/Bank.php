@@ -35,7 +35,7 @@ class Bank extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['bank_iban_code', 'bank_swift_code', 'bank_address', 'bank_transfer_type', 'bank_created_at', 'bank_updated_at'], 'required'],
+            [['bank_name', 'bank_iban_code', 'bank_swift_code', 'bank_address', 'bank_transfer_type', 'bank_created_at', 'bank_updated_at'], 'required'],
             [['bank_created_at', 'bank_updated_at'], 'safe'],
             [['deleted'], 'integer'],
             [['bank_name', 'bank_address', 'bank_transfer_type'], 'string', 'max' => 100],
@@ -49,15 +49,15 @@ class Bank extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'bank_id' => 'Bank ID',
-            'bank_name' => 'Bank Name',
-            'bank_iban_code' => 'Bank Iban Code',
-            'bank_swift_code' => 'Bank Swift Code',
-            'bank_address' => 'Bank Address',
-            'bank_transfer_type' => 'Bank Transfer Type',
-            'bank_created_at' => 'Bank Created At',
-            'bank_updated_at' => 'Bank Updated At',
-            'deleted' => 'Deleted',
+            'bank_id' => Yii::t('app', 'Bank ID'),
+            'bank_name' => Yii::t('app', 'Bank Name'),
+            'bank_iban_code' => Yii::t('app', 'Bank Iban Code'),
+            'bank_swift_code' => Yii::t('app', 'Bank Swift Code'),
+            'bank_address' => Yii::t('app', 'Bank Address'),
+            'bank_transfer_type' => Yii::t('app', 'Bank Transfer Type'),
+            'bank_created_at' => Yii::t('app', 'Bank Created At'),
+            'bank_updated_at' => Yii::t('app', 'Bank Updated At'),
+            'deleted' => Yii::t('app', 'Deleted'),
         ];
     }
 
@@ -66,8 +66,8 @@ class Bank extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBankDiscounts()
+    public function getBankDiscounts($modelClass = "\common\models\BankDiscount")
     {
-        return $this->hasMany(BankDiscount::className(), ['bank_id' => 'bank_id']);
+        return $this->hasMany($modelClass::className(), ['bank_id' => 'bank_id']);
     }
 }

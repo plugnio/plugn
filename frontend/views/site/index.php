@@ -8,10 +8,10 @@ use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 $this->title = 'Dashboard';
 
-$currencyCode = $restaurant_model->currency->code;
+$currencyCode = $restaurant->currency->code;
 
 $js = "
  $(document).ready(function(){
@@ -374,7 +374,34 @@ $this->registerJs($js);
 <section id="tutorial-card">
 
 
-  <?php if( !$restaurant_model->tap_queue_id && !$restaurant_model->is_tap_enable ){ ?>
+  <?php
+  if($numberOfOrders == 0){ ?>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-12 col-md-9 col-lg-9">
+                    <div>
+                        <h3><span>Learn how to use Plugn</span></h3>
+                    </div>
+                    <p> Check out our introductory course on how to design, build, and launch your online store.</p>
+                    <div>
+                        <div>
+                            <div>
+                                <?= Html::a('Learn', 'https://www.plugn.io/learn', ['class' => 'btn btn-primary']) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <?php
+    }
+
+
+   if( !$restaurant->is_myfatoorah_enable && !$restaurant->is_tap_enable ){ ?>
 
   <div class="card">
       <div class="card-body">
@@ -387,7 +414,7 @@ $this->registerJs($js);
                   <div>
                       <div>
                           <div>
-                              <?= Html::a('Set up payments', ['store/view-payment-methods', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                              <?= Html::a('Set up payments', ['store/view-payment-methods', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                           </div>
                       </div>
                   </div>
@@ -398,10 +425,17 @@ $this->registerJs($js);
       </div>
   </div>
 
-<?php } ?>
+<?php }
 
-  <?php
-  if($restaurant_model->getItems()->count() == 0){ ?>
+?>
+
+
+
+
+<?php
+
+
+  if($restaurant->getItems()->count() == 0){ ?>
 
     <div class="card">
         <div class="card-body">
@@ -414,7 +448,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Add Product', ['item/create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?= Html::a('Add Product', ['item/create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -433,7 +467,7 @@ $this->registerJs($js);
   <?php } ?>
 
   <?php
-  if(!$restaurant_model->has_deployed){ ?>
+  if(!$restaurant->has_deployed){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -445,7 +479,7 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Customize theme', ['store/update-design-layout', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?= Html::a('Customize theme', ['store/update-design-layout', 'id' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -461,7 +495,7 @@ $this->registerJs($js);
     </div>
 
       <?php }
-    if(str_contains($restaurant_model->restaurant_domain, '.plugn.store') ){ ?>
+    if(str_contains($restaurant->restaurant_domain, '.plugn.store') &&   $restaurant->has_deployed == 1 ){ ?>
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -469,11 +503,11 @@ $this->registerJs($js);
                     <div>
                         <h3><span>Strengthen your brand with a custom domain</span></h3>
                     </div>
-                    <p>Your current domain is <a target="_blank" href="<?= $restaurant_model->restaurant_domain ?>"> <?= $restaurant_model->restaurant_domain ?> </a> but you can add a custom domain to help customers find your online store.</p>
+                    <p>Your current domain is <a target="_blank" href="<?= $restaurant->restaurant_domain ?>"> <?= $restaurant->restaurant_domain ?> </a> but you can add a custom domain to help customers find your online store.</p>
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('Add domain', ['site/connect-domain', 'id' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?= Html::a('Add domain', ['site/connect-domain', 'id' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                             </div>
                         </div>
                     </div>
@@ -488,9 +522,13 @@ $this->registerJs($js);
         </div>
     </div>
 
-      <?php } ?>
+      <?php
+      }
 
-    <div class="card">
+      // if($numberOfOrders > 0){
+      ?>
+
+    <!-- <div class="card">
         <div class="card-body">
             <div class="row">
                 <div class="col-sm-12 col-md-9 col-lg-9">
@@ -501,7 +539,9 @@ $this->registerJs($js);
                     <div>
                         <div>
                             <div>
-                                <?= Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                                <?php
+                                // Html::a('View orders', ['site/real-time-orders', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary'])
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -514,9 +554,11 @@ $this->registerJs($js);
             </div>
 
         </div>
-    </div>
+    </div> -->
 
-
+    <?php
+    // }
+    ?>
 
 
 
@@ -577,7 +619,10 @@ $this->registerJs($js);
                     </div>
                     <div style="  margin-bottom: 0.5rem;  margin-top: 1rem !important;">
                         <h2 style="  display: contents;" class="text-bold-700 mt-1 number-of-revenue-generated">
-                            <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, $currencyCode, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                            <?= Yii::$app->formatter->asCurrency($number_of_all_revenue_generated_this_week, $currencyCode, [
+                                    \NumberFormatter::MIN_FRACTION_DIGITS => 3,
+                                \NumberFormatter::MAX_FRACTION_DIGITS => 3
+                            ]) ?>
                         </h2>
                     </div>
                     <p class="mb-0">Revenue Generated</p>
@@ -684,7 +729,7 @@ $this->registerJs($js);
                             </div>
                         </div>
                         <h2 class="text-bold-700">
-                          <?= Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
+                          <?= Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?>
                         </h2>
                         <p class="mb-0 line-ellipsis">Today's Revenue Generated</p>
                     </div>

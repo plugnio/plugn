@@ -45,8 +45,22 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'role',
                             'format' => 'html',
                             'value' => function ($data) {
-                                return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
+                                if($data->role == AgentAssignment::AGENT_ROLE_OWNER)
+                                  $role = 'Owner';
+                                else  if($data->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
+                                  $role = 'Branch Manager';
+                                else
+                                  $role = 'Staff';
+
+                                return $role;
                             },
+                        ],
+                        [
+                            'attribute' => 'business_location_id',
+                            'value' => function ($data) {
+                                return $data->businessLocation->business_location_name;
+                            },
+                            'visible' => $model->business_location_id != null
                         ],
                         'assignment_agent_email:email',
                         'assignment_created_at',

@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "city".
  *
  * @property int $city_id
+ * @property int $country_id
  * @property string $city_name
  * @property string $city_name_ar
  *
@@ -30,8 +31,9 @@ class City extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['city_name', 'city_name_ar'], 'required'],
+            [['city_name', 'city_name_ar', 'country_id'], 'required'],
             [['city_name', 'city_name_ar'], 'string', 'max' => 255],
+            [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className (), 'targetAttribute' => ['country_id' => 'country_id']],
         ];
     }
 
@@ -41,32 +43,50 @@ class City extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'city_id' => 'City ID',
-            'city_name' => 'City Name',
-            'city_name_ar' => 'City Name Ar',
+            'city_id' => Yii::t('app','City ID'),
+            'country_id' => Yii::t('app','Country ID'),
+            'city_name' => Yii::t('app','City Name'),
+            'city_name_ar' => Yii::t('app','City Name in Arabic'),
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function extraFields() {
+        return [
+          'areas'
+        ];
+    }
 
     /**
      * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountry()
+    public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
     }
-
 
     /**
      * Gets query for [[Areas]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreas()
+    public function getAreas($modelClass = "\common\models\Area")
     {
-        return $this->hasMany(Area::className(), ['city_id' => 'city_id']);
+        return $this->hasMany($modelClass::className(), ['city_id' => 'city_id']);
+    }
+
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
+    {
+        return $this->hasMany($modelClass::className(), ['city_id' => 'city_id']);
     }
 
         /**
@@ -74,11 +94,8 @@ class City extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantDeliveryAreas()
+    public function getRestaurantDeliveryAreas($modelClass = "\common\models\RestaurantDelivery")
     {
-        return $this->hasMany(RestaurantDelivery::className(), ['area_id' => 'area_id'])->via('areas')->with('area');
+        return $this->hasMany ($modelClass::className (), ['area_id' => 'area_id'])->via ('areas')->with ('area');
     }
-
-
-
 }

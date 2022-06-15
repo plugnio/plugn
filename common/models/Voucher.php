@@ -5,9 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
-use yii\behaviors\AttributeBehavior;
-use common\models\Customer;
-use common\models\CustomerVoucher;
+
 
 /**
  * This is the model class for table "voucher".
@@ -25,6 +23,7 @@ use common\models\CustomerVoucher;
  * @property int|null $max_redemption
  * @property int|null $limit_per_customer
  * @property int|null $minimum_order_amount
+ * @property int is_deleted
  * @property string|null $voucher_created_at
  * @property string|null $voucher_updated_at
  *
@@ -41,10 +40,12 @@ class Voucher extends \yii\db\ActiveRecord {
     const DISCOUNT_TYPE_AMOUNT = 2;
     const DISCOUNT_TYPE_FREE_DELIVERY = 3;
 
-
     //Values for `voucher_status`
     const VOUCHER_STATUS_ACTIVE = 1;
     const VOUCHER_STATUS_EXPIRED = 2;
+
+    const SCENARIO_UPDATE_STATUS = 'update-status';
+    const SCENARIO_DELETE = 'delete';
 
     /**
      * {@inheritdoc}
@@ -61,13 +62,19 @@ class Voucher extends \yii\db\ActiveRecord {
             [['restaurant_uuid',  'discount_type', 'code' , 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'required'],
             ['discount_amount', 'required', 'when' => function($model) {
                return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
-           }],
+            }],
             [['discount_type', 'voucher_status', 'max_redemption', 'limit_per_customer', 'minimum_order_amount'], 'integer'],
             [['valid_from', 'valid_until', 'duration'], 'safe'],
             ['discount_type', 'in', 'range' => [self::DISCOUNT_TYPE_PERCENTAGE, self::DISCOUNT_TYPE_AMOUNT, self::DISCOUNT_TYPE_FREE_DELIVERY]],
             ['voucher_status', 'in', 'range' => [self::VOUCHER_STATUS_ACTIVE, self::VOUCHER_STATUS_EXPIRED]],
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['discount_amount'], 'number', 'min' => 0],
+            /*['discount_amount', 'compare', 'compareValue' => 0, 'operator' => '>', 'when' => function($model) {
+                return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
+            }],*/
+            ['is_deleted', 'integer'],
+            [['discount_amount'], 'integer', 'min' => 1, 'when' => function($model) {
+                return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
+            }],
             [['voucher_created_at', 'voucher_updated_at'], 'safe'],
             [['code','description','description_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -94,21 +101,21 @@ class Voucher extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'voucher_id' => 'Voucher ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'description' => 'Description',
-            'description_ar' => 'Description in Arabic',
-            'code' => 'Code',
-            'discount_type' => 'Discount Type',
-            'discount_amount' => 'Discount Amount',
-            'voucher_status' => 'Voucher Status',
-            'valid_from' => 'Valid From',
-            'valid_until' => 'Valid Until',
-            'voucher_created_at' => 'Created At',
-            'voucher_updated_at' => 'Updated At',
-            'max_redemption' => 'Max Redemption',
-            'limit_per_customer' => 'Limit Per Customer',
-            'minimum_order_amount' => 'Minimum Order Amount',
+            'voucher_id' => Yii::t('app','Voucher ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'description' => Yii::t('app','Description'),
+            'description_ar' => Yii::t('app','Description in Arabic'),
+            'code' => Yii::t('app','Code'),
+            'discount_type' => Yii::t('app','Discount Type'),
+            'discount_amount' => Yii::t('app','Discount Amount'),
+            'voucher_status' => Yii::t('app','Voucher Status'),
+            'valid_from' => Yii::t('app','Valid From'),
+            'valid_until' => Yii::t('app','Valid Until'),
+            'voucher_created_at' => Yii::t('app','Created At'),
+            'voucher_updated_at' => Yii::t('app','Updated At'),
+            'max_redemption' => Yii::t('app','Max Redemption'),
+            'limit_per_customer' => Yii::t('app','Limit Per Customer'),
+            'minimum_order_amount' => Yii::t('app','Minimum Order Amount')
         ];
     }
 
@@ -142,7 +149,6 @@ class Voucher extends \yii\db\ActiveRecord {
         return "Couldnt find discount type";
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -156,6 +162,19 @@ class Voucher extends \yii\db\ActiveRecord {
         }
     }
 
+    /**
+     * @return bool
+     */
+    public function beforeDelete()
+    {
+        if(!parent::beforeDelete ()) {
+            return false;
+        }
+
+        CustomerVoucher::deleteAll (['voucher_id' => $this->voucher_id]);
+
+        return true;
+    }
 
     public function isValid($phone_number) {
         $isValid = true;
@@ -197,18 +216,101 @@ class Voucher extends \yii\db\ActiveRecord {
           }
         }
 
-
         return $isValid ? $this : false;
     }
 
+    public function extraFields()
+    {
+        $fields = parent::extraFields();
+
+        $fields['voucherChartData'] = function() {
+            return $this->voucherChartData();
+        };
+
+        return $fields;
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        return array_merge($scenarios, [
+            self::SCENARIO_UPDATE_STATUS => ['restaurant_status'],
+            self::SCENARIO_DELETE => ['is_deleted']
+        ]);
+    }
+
+    /**
+     * return voucher usage by months
+     * @return array
+     */
+    public function voucherChartData() {
+
+        $voucher_chart_data = [];
+
+        /*$date_start = $this->valid_from;
+
+        if(strtotime($this->valid_until) < time()) {
+            $date_end = $this->valid_until;
+        } else {
+            $date_end = date('Y') . '-' . date('m') . '-1';
+        }
+
+        $months = $this->getMonthsBetween($date_start, $date_end);
+
+        for ($i = 0; $i < $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $voucher_chart_data[$month] = array(
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'total' => 0
+            );
+        }*/
+
+        $rows = $this->getOrders()
+            ->activeOrders()
+            ->select ('order_created_at, COUNT(*) as total')
+            //->andWhere('DATE(`order_created_at`) >= DATE("'.$date_start.'") AND DATE(`order_created_at`) < DATE("'.$date_end.'")')
+            ->groupBy (new Expression('MONTH(order_created_at), YEAR(order_created_at)'))
+            ->orderBy('order_created_at')
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $voucher_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
+                'month' => Yii::t('app', date ('M', strtotime ($result['order_created_at']))),
+                'total' => (int) $result['total']
+            );
+        }
+
+        return array_values($voucher_chart_data);
+    }
+
+    /**
+     * Function will give you the difference months between two dates
+     *
+     * @param string $start_date
+     * @param string $end_date
+     * @return int|null
+     */
+    public function getMonthsBetween($start_date, $end_date)
+    {
+        $startDate = new \DateTime($start_date);
+        $endDate = new \DateTime($end_date);
+        $interval = $startDate->diff($endDate);
+        $months = ($interval->y * 12) + $interval->m;
+
+        return $startDate > $endDate ? -$months : $months;
+    }
 
     /**
      * Gets query for [[CustomerVouchers]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomerVouchers() {
-        return $this->hasMany(CustomerVoucher::className(), ['voucher_id' => 'voucher_id']);
+    public function getCustomerVouchers($modelClass = "\common\models\CustomerVoucher") {
+        return $this->hasMany($modelClass::className(), ['voucher_id' => 'voucher_id']);
     }
 
     /**
@@ -216,8 +318,8 @@ class Voucher extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders() {
-        return $this->hasMany(Order::className(), ['voucher_id' => 'voucher_id']);
+    public function getOrders($modelClass = "\common\models\Order") {
+        return $this->hasMany($modelClass::className(), ['voucher_id' => 'voucher_id']);
     }
 
     /**
@@ -225,8 +327,8 @@ class Voucher extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getActiveOrders() {
-        return $this->hasMany(Order::className(), ['voucher_id' => 'voucher_id'])
+    public function getActiveOrders($modelClass = "\common\models\Order") {
+        return $this->hasMany($modelClass::className(), ['voucher_id' => 'voucher_id'])
         ->activeOrders($this->restaurant_uuid);
     }
 
@@ -235,8 +337,8 @@ class Voucher extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -244,8 +346,13 @@ class Voucher extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
+
+    public static function find()
+    {
+        return new query\VoucherQuery(get_called_class());
     }
 }

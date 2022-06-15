@@ -30,6 +30,7 @@ class CustomerVoucher extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['customer_id', 'voucher_id'], 'required'],
             [['customer_id', 'voucher_id'], 'integer'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['voucher_id'], 'exist', 'skipOnError' => true, 'targetClass' => Voucher::className(), 'targetAttribute' => ['voucher_id' => 'voucher_id']],
@@ -42,9 +43,9 @@ class CustomerVoucher extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'customer_voucher_id' => 'Customer Voucher ID',
-            'customer_id' => 'Customer ID',
-            'voucher_id' => 'Voucher ID',
+            'customer_voucher_id' => Yii::t('app', 'Customer Voucher ID'),
+            'customer_id' => Yii::t('app', 'Customer ID'),
+            'voucher_id' => Yii::t('app', 'Voucher ID'),
         ];
     }
 
@@ -53,9 +54,9 @@ class CustomerVoucher extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCustomer()
+    public function getCustomer($modelClass = "\common\models\Customer")
     {
-        return $this->hasOne(Customer::className(), ['customer_id' => 'customer_id']);
+        return $this->hasOne($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
     /**
@@ -63,8 +64,8 @@ class CustomerVoucher extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getVoucher()
+    public function getVoucher($modelClass = "\common\models\Voucher")
     {
-        return $this->hasOne(Voucher::className(), ['voucher_id' => 'voucher_id']);
+        return $this->hasOne($modelClass::className(), ['voucher_id' => 'voucher_id']);
     }
 }

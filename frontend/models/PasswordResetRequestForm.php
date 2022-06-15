@@ -47,7 +47,9 @@ class PasswordResetRequestForm extends Model {
         }
 
         if (!Agent::isPasswordResetTokenValid($agent->agent_password_reset_token)) {
+            
             $agent->generatePasswordResetToken();
+
             if (!$agent->save()) {
               die(var_dump($agent->errors));
 
@@ -55,15 +57,22 @@ class PasswordResetRequestForm extends Model {
             }
         }
 
+        $resetLink = Yii::$app->urlManager->createAbsoluteUrl(['site/reset-password', 'token' => $agent->agent_password_reset_token]);
 
         return Yii::$app->mailer
-                        ->compose(
-                                ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'], ['agent' => $agent]
-                        )
-                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                        ->setTo($this->email)
-                        ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard')
-                        ->send();
+            ->compose(
+                [
+                    'html' => 'passwordResetToken-html', 
+                    'text' => 'passwordResetToken-text'
+                ], [
+                    'resetLink' => $resetLink,
+                    'agent' => $agent
+                ]
+            )
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setTo($this->email)
+            ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard')
+            ->send();
     }
 
 }

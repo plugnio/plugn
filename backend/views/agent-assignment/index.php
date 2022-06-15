@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Agent Assignment', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Agent Assignment', ['create'], ['class' => 'btn btn-success btn-create']) ?>
     </p>
 
 
@@ -32,11 +32,19 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'agent_name',
               'value' =>     'agent.agent_name'
             ],
+        
             [
                 'attribute' => 'role',
                 'format' => 'html',
                 'value' => function ($data) {
-                    return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
+                    if($data->role == AgentAssignment::AGENT_ROLE_OWNER)
+                      $role = 'Owner';
+                    else  if($data->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
+                      $role = 'Branch Manager';
+                    else
+                      $role = 'Staff';
+
+                    return $role;
                 },
             ],
             'assignment_agent_email:email',

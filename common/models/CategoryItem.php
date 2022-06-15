@@ -45,8 +45,8 @@ class CategoryItem extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'category_id' => 'Category ID',
-            'item_uuid' => 'Item Uuid',
+            'category_id' => Yii::t('app', 'Category ID'),
+            'item_uuid' => Yii::t('app', 'Item Uuid'),
         ];
     }
 
@@ -55,9 +55,9 @@ class CategoryItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory()
+    public function getCategory($model = '\common\models\Category')
     {
-        return $this->hasOne(Category::className(), ['category_id' => 'category_id']);
+        return $this->hasOne($model::className(), ['category_id' => 'category_id']);
     }
 
     /**
@@ -65,8 +65,8 @@ class CategoryItem extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem()
+    public function getItem($modelClass = "\common\models\Item")
     {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 }

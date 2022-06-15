@@ -11,6 +11,9 @@ use common\models\Queue;
  */
 class QueueSearch extends Queue
 {
+
+    public $store_name;
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +21,7 @@ class QueueSearch extends Queue
     {
         return [
             [['queue_id', 'queue_status'], 'integer'],
-            [['restaurant_uuid', 'queue_created_at', 'queue_updated_at', 'queue_start_at', 'queue_end_at'], 'safe'],
+            [['restaurant_uuid', 'store_name','queue_created_at', 'queue_updated_at', 'queue_start_at', 'queue_end_at'], 'safe'],
         ];
     }
 
@@ -28,7 +31,7 @@ class QueueSearch extends Queue
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
+        return parent::scenarios();
     }
 
     /**
@@ -40,13 +43,20 @@ class QueueSearch extends Queue
      */
     public function search($params)
     {
-        $query = Queue::find();
+        $query = Queue::find()->joinWith(['restaurant']);;
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+
+
+        $dataProvider->sort->attributes['store_name'] = [
+            'asc' => ['restaurant.name' => SORT_ASC],
+            'desc' => ['restaurant.name' => SORT_DESC],
+        ];
 
         $this->load($params);
 
@@ -66,7 +76,8 @@ class QueueSearch extends Queue
             'queue_end_at' => $this->queue_end_at,
         ]);
 
-        $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid]);
+        $query->andFilterWhere(['like', 'restaurant.restaurant_uuid', $this->restaurant_uuid])
+                  ->andFilterWhere(['like', 'restaurant.name', $this->store_name]);
 
         return $dataProvider;
     }

@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use Yii;
+use common\models\Restaurant;
 use common\models\BusinessLocation;
 use frontend\models\BusinessLocationSearch;
 use yii\web\Controller;
@@ -45,18 +46,17 @@ class BusinessLocationController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid])->all();
-
+        $businessLocations = BusinessLocation::find()
+            ->where(['restaurant_uuid' => $store->restaurant_uuid])
+            ->all();
 
         return $this->render('index', [
             'businessLocations' => $businessLocations,
-            'store' => $store_model
+            'store' => $store
         ]);
     }
-
-
 
     /**
      * Creates a new BusinessLocation model.
@@ -65,60 +65,194 @@ class BusinessLocationController extends Controller
      */
     public function actionCreate($storeUuid)
     {
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
         $model = new BusinessLocation();
-        $model->restaurant_uuid = $storeUuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
 
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+        if ($model->load(Yii::$app->request->post()) ) {
+
+          if($model->latitude && $model->longitude ) {
+            $response = Yii::$app->googleMapComponent->getReverseGeocodeing($model->latitude,$model->longitude);
+
+            if($response->isOk){
+
+              $building = '';
+              $block = '';
+              $street = '';
+              $area = '';
+              $country = '';
+
+              foreach ($response->data['results'] as $key => $address) {
+
+                if(in_array('neighborhood', $address['types'])){
+                   foreach ($address['address_components'] as $key => $adress_component) {
+                     if(in_array('neighborhood', $adress_component['types'])){
+                       $block = $adress_component['long_name'];
+                     }
+                   }
+               }
+
+                else if(in_array('route', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('route', $adress_component['types'])){
+                        $street = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+                else if(in_array('premise', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('premise', $adress_component['types'])){
+                        $building = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+                else if(in_array('sublocality', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('sublocality', $adress_component['types'])){
+                        $area = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+                else if(in_array('political', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('political', $adress_component['types'])){
+                        $country = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+
+
+              }
+
+              $address = '';
+
+              if($building)
+                $address = $building . ', ';
+
+              if($block)
+                $address .= $block . ', ';
+
+              if($street)
+                $address .= $street . ', ';
+
+              if($area)
+                $address .= $area . ', ';
+
+                $address .=   $country;
+
+
+              $model->address = $address;
+
+            } else {
+              Yii::error('[ ReverseGeocodeing ]' . json_encode($response) . ' lat: '. $lat . ', lng: '. $lng , __METHOD__);
+            }
+          }
+
+          if($model->save()) {
+              return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+          } else {
+              Yii::$app->session->setFlash('error', $model->errors);
+          }
         }
 
         return $this->render('create', [
             'model' => $model,
-            'storeUuid' => $storeUuid
+            'store' => $store
         ]);
     }
 
-
+    /**
+     * @param $id
+     * @param $storeUuid
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionEnablePickup($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
         $model->support_pick_up = 1;
-        $model->save();
 
+        $model->setScenario(BusinessLocation::SCENARIO_UPDATE_PICK_UP);
+
+        if(!$model->save())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index',  'storeUuid' => $storeUuid]);
 
     }
 
+    /**
+     * @param $id
+     * @param $storeUuid
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionDisablePickup($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
+
+        $model->setScenario(BusinessLocation::SCENARIO_UPDATE_PICK_UP);
+
         $model->support_pick_up = 0;
-        $model->save();
 
-
-        return $this->redirect(['index',  'storeUuid' => $storeUuid]);
-
-    }
-
-
-
-        public function actionRemoveTax($id, $storeUuid)
+        if(!$model->save())
         {
-            $model = $this->findModel($id, $storeUuid);
-            $model->business_location_tax = 0;
-            $model->save();
-
-            return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+            Yii::$app->session->setFlash('error', $model->errors);
         }
 
+        return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+    }
+
+    /**
+     * @param $id
+     * @param $storeUuid
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionRemoveTax($id, $storeUuid)
+    {
+        $model = $this->findModel($id, $storeUuid);
+
+        $model->setScenario(BusinessLocation::SCENARIO_UPDATE_TAX);
+
+        $model->business_location_tax = 0;
+
+        if(!$model->save())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
+
+        return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+    }
+
+    /**
+     * @param $id
+     * @param $storeUuid
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionConfigureTax($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+        }
+
+        if($model->errors)
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
         }
 
         return $this->render('_set-tax', [
@@ -138,13 +272,100 @@ class BusinessLocationController extends Controller
     {
         $model = $this->findModel($id, $storeUuid);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+
+        if ($model->load(Yii::$app->request->post()) ) {
+
+          if($model->latitude && $model->longitude ) {
+            $response = Yii::$app->googleMapComponent->getReverseGeocodeing($model->latitude,$model->longitude);
+
+            if($response->isOk){
+
+              $building = '';
+              $block = '';
+              $street = '';
+              $area = '';
+              $country = '';
+
+              foreach ($response->data['results'] as $key => $address) {
+
+                if(in_array('neighborhood', $address['types'])){
+                   foreach ($address['address_components'] as $key => $adress_component) {
+                     if(in_array('neighborhood', $adress_component['types'])){
+                       $block = $adress_component['long_name'];
+                     }
+                   }
+               }
+
+                else if(in_array('route', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('route', $adress_component['types'])){
+                        $street = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+                else if(in_array('premise', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('premise', $adress_component['types'])){
+                        $building = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+                else if(in_array('sublocality', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('sublocality', $adress_component['types'])){
+                        $area = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+
+                else if(in_array('political', $address['types'])){
+                    foreach ($address['address_components'] as $key => $adress_component) {
+                      if(in_array('political', $adress_component['types'])){
+                        $country = $adress_component['long_name'];
+                      }
+                    }
+                }
+
+              }
+
+              $address = '';
+
+              if($building)
+                $address = $building . ', ';
+
+              if($block)
+                $address .= $block . ', ';
+
+              if($street)
+                $address .= $street . ', ';
+
+              if($area)
+                $address .= $area . ', ';
+
+                $address .=   $country;
+
+
+              $model->address = $address;
+
+            } else {
+              Yii::error('[ ReverseGeocodeing ]' . json_encode($response) . ' lat: '. $lat . ', lng: '. $lng , __METHOD__);
+            }
+          }
+
+          if($model->save()) {
+              return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+          } else {
+              Yii::$app->session->setFlash('error', $model->errors);
+          }
         }
 
         return $this->render('update', [
             'model' => $model,
-            'storeUuid' => $storeUuid
+            'store' => Restaurant::findOne($storeUuid)
         ]);
     }
 
@@ -157,7 +378,12 @@ class BusinessLocationController extends Controller
      */
     public function actionDelete($id, $storeUuid)
     {
-        $this->findModel($id, $storeUuid)->delete();
+        $model = $this->findModel($id, $storeUuid);
+
+        if(!$model->delete())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
@@ -171,7 +397,6 @@ class BusinessLocationController extends Controller
      */
     protected function findModel($id, $storeUuid)
     {
-
         if (($model = BusinessLocation::find()->where(['business_location_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }

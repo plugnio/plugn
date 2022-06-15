@@ -5,9 +5,9 @@ namespace api\modules\v2\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use common\models\Item;
-use common\models\Category;
-use common\models\Restaurant;
+use api\models\Item;
+use api\models\Category;
+use api\models\Restaurant;
 use common\models\ItemImage;
 
 class ItemController extends Controller {
@@ -56,16 +56,32 @@ class ItemController extends Controller {
     /**
      * Return category's products
      */
-    public function actionCategoryProducts($category_id) {
+    public function actionCategoryProducts($category_id = null, $slug = null) {
+
       $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
       if($restaurant_uuid){
 
+          $filter = $category_id? [
+              'category.restaurant_uuid' => $restaurant_uuid,
+              'category.category_id' => $category_id
+          ]: [
+              'category.restaurant_uuid' => $restaurant_uuid,
+              'category.slug' => $slug
+          ];
+
         $category = Category::find()
-                    ->where(['category.restaurant_uuid' => $restaurant_uuid, 'category.category_id' => $category_id])
+                    ->andWhere($filter)
                     ->joinWith(['items', 'items.options', 'items.options.extraOptions','items.itemImages'])
                     ->asArray()
                     ->one();
+
+          if(isset($category['items'])){
+            foreach ($category['items'] as $key => $item) {
+                unset($category['items'][$key]['unit_sold']);
+            }
+          }
+
 
         return [
             'category' => $category,
@@ -81,26 +97,44 @@ class ItemController extends Controller {
     }
 
     /**
+     * list items
+     * @return ActiveDataProvider
      */
-    // public function actionDeleteItemImage() {
-    //   $fullPath = Yii::$app->request->getBodyParam("file");
-    //   $file_name = Yii::$app->request->getBodyParam("name");
-    //
-    //
-    //   $restaurant_uuid = explode("restaurants/", $fullPath);
-    //   $restaurant_uuid = $restaurant_uuid[1];
-    //   $restaurant_uuid = explode("/items/" . $file_name, $restaurant_uuid);
-    //   $restaurant_uuid = $restaurant_uuid[0];
-    //
-    //
-    //   $item_image = ItemImage::find()->where(['product_file_name' => $file_name])->one();
-    //
-    //
-    //   if($item_image->item->restaurant_uuid == $restaurant_uuid && $item_image)
-    //     $item_image->delete();
-    //
-    //   return true;
-    // }
+    public function actionItems()
+    {
+        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $category_id = Yii::$app->request->get("category_id");
+        $keyword = Yii::$app->request->get("keyword");
+
+        $restaurant = Restaurant::find()
+            ->where(['restaurant_uuid' => $restaurant_uuid])
+            ->one();
+
+        $query = $restaurant
+            ->getItems()
+            ->with('options', 'options.extraOptions', 'itemImages')
+            ->andWhere (['item_status' => Item::ITEM_STATUS_PUBLISH])
+            ->orderBy ([new \yii\db\Expression('
+                item.sort_number IS NULL,
+                item.sort_number ASC,
+                item.sku IS NULL,
+                item.sku ASC')]);
+
+        if($keyword) {
+            $query->filterKeyword($keyword);
+        }
+
+        if($category_id) {
+            $query->joinWith('categoryItems')
+                ->andWhere(['category_id' => $category_id]);
+        }
+           // ->orderBy([new \yii\db\Expression(' sort_number IS NULL, sort_number ASC')]);
+        //->with('items', 'items.options', 'items.options.extraOptions', 'items.itemImages')
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
 
     /**
      * Return restaurant menu
@@ -108,63 +142,116 @@ class ItemController extends Controller {
     public function actionRestaurantMenu() {
 
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $wihoutItems = Yii::$app->request->get("wihoutItems");
 
         $restaurant = Restaurant::find()->where(['restaurant_uuid' => $restaurant_uuid])->one();
 
-        if ($restaurant) {
+        if (!$restaurant) {
+            return [
+                'operation' => 'error',
+                'message' => 'Store Uuid is invalid'
+            ];
+        }
+
+          if($restaurant->is_myfatoorah_enable)
+            unset($restaurant['live_public_key']);
+
+        $restaurantMenu = [];
+
+        if(!$wihoutItems) {
+
             $restaurantMenu = Category::find()
-                    ->where(['restaurant_uuid' => $restaurant_uuid])
-                    ->with('items', 'items.options', 'items.options.extraOptions','items.itemImages')
-                    ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
-                    ->asArray()
-                    ->all();
+                ->andWhere(['restaurant_uuid' => $restaurant_uuid])
+                ->with('items', 'items.options', 'items.options.extraOptions', 'items.itemImages')
+                ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')])
+                ->asArray()
+                ->all();
 
 
-            foreach ($restaurantMenu as $item) {
-                unset($item['categoryItems']);
+            foreach ($restaurantMenu as $category) {
+                unset($category['categoryItems']);
             }
 
-            foreach ($restaurantMenu as $key => $item) {
+            foreach ($restaurantMenu as $key => $category) {
                 unset($restaurantMenu[$key]['categoryItems']);
+
+                foreach ($category['items'] as $itemKey => $item) {
+                    unset($restaurantMenu[$key]['items'][$itemKey]['unit_sold']);
+                }
             }
+        }
 
             return [
                 'restaurant' => $restaurant,
                 'restaurantTheme' => $restaurant->getRestaurantTheme()->one(),
                 'restaurantMenu' => $restaurantMenu
             ];
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
-        }
     }
 
     /**
      * Return item's data
      */
-    public function actionItemData() {
+    public function actionItemData()
+    {
         $item_uuid = Yii::$app->request->get("item_uuid");
-        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $expand = Yii::$app->request->get("expand");
 
-        $item_model = Item::find()
-                ->where(['item_uuid' => $item_uuid, 'restaurant_uuid' => $restaurant_uuid])
+        //for old stores
+
+        if(!$expand)
+        {
+            $item_model = Item::find()
+                ->andWhere(['item_uuid' => $item_uuid])
                 ->with('options', 'options.extraOptions','itemImages')
                 ->asArray()
                 ->one();
 
-        if ($item_model) {
-            return [
-                'operation' => 'success',
-                'itemData' => $item_model
-            ];
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Item Uuid is invalid'
-            ];
+            if ($item_model) {
+                return [
+                    'operation' => 'success',
+                    'itemData' => $item_model
+                ];
+            } else {
+                return [
+                    'operation' => 'error',
+                    'message' => 'Item Uuid is invalid'
+                ];
+            }
         }
+
+        return $this->findModel($item_uuid);
     }
 
+    /**
+     * Return item's data
+     */
+    public function actionView($slug)
+    {
+        return $this->findBySlug($slug);
+    }
+
+    /**
+     * Finds the Item model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Item the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Item::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    protected function findBySlug($slug)
+    {
+        if (($model = Item::findOne(['slug' => $slug])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
 }

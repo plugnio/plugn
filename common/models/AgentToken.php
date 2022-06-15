@@ -42,7 +42,7 @@ class AgentToken extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['agent_id'], 'required'],
+            [['agent_id', 'token_value', 'token_status'], 'required'],
             [['token_status'], 'integer'],
             [['token_last_used_datetime', 'token_expiry_datetime', 'token_created_datetime'], 'safe'],
             [['token_value', 'token_device', 'token_device_id'], 'string', 'max' => 255],
@@ -109,18 +109,17 @@ class AgentToken extends \yii\db\ActiveRecord
         $randomString = Yii::$app->getSecurity()->generateRandomString();
         if(!static::findOne(['token_value' => $randomString ])){
                 return $randomString;
+
         }else return static::generateUniqueTokenString();
     }
-
 
     /**
      * Gets query for [[Agent]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAgent()
+    public function getAgent($modelClass = "\common\models\Agent")
     {
-        return $this->hasOne(Agent::className(), ['agent_id' => 'agent_id']);
+        return $this->hasOne($modelClass::className(), ['agent_id' => 'agent_id']);
     }
-
 }

@@ -26,15 +26,12 @@ use Yii;
  */
 class DeliveryZone extends \yii\db\ActiveRecord
 {
-
     public $selectedAreas;
 
     //Values for `time_unit`
     const TIME_UNIT_MIN = 'min';
     const TIME_UNIT_HRS = 'hrs';
     const TIME_UNIT_DAY = 'day';
-
-
 
     /**
      * {@inheritdoc}
@@ -69,13 +66,14 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'delivery_zone_id' => 'Delivery Zone ID',
-            'country_id' => 'Country ID',
-            'business_location_id' => 'Business Location',
-            'delivery_time' => 'Delivery Time',
-            'delivery_fee' => 'Delivery Fee',
-            'min_charge' => 'Min Charge',
-            'delivery_zone_tax' => 'Tax Override',
+            'delivery_zone_id' => Yii::t('app', 'Delivery Zone ID'),
+            'city_id' => Yii::t('app', 'City ID'),
+            'country_id' => Yii::t('app', 'Country ID'),
+            'business_location_id' => Yii::t('app', 'Business Location'),
+            'delivery_time' => Yii::t('app', 'Delivery Time'),
+            'delivery_fee' => Yii::t('app', 'Delivery Fee'),
+            'min_charge' => Yii::t('app', 'Min Charge'),
+            'delivery_zone_tax' => Yii::t('app', 'Tax Override')
         ];
     }
 
@@ -97,14 +95,39 @@ class DeliveryZone extends \yii\db\ActiveRecord
         }
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+      return [
+          'totalAreas',
+          'businessLocation',
+          'areas',
+          'country'
+      ];
+    }
+
     /**
      * Gets query for [[AreaDeliveryZones]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreaDeliveryZones()
+    public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany(AreaDeliveryZone::className(), ['delivery_zone_id' => 'delivery_zone_id'])->joinWith(['area']);
+        return $this->hasMany($modelClass::className(), ['delivery_zone_id' => 'delivery_zone_id'])
+            ->joinWith(['area']);
+    }
+
+    /**
+     * return total areas
+     * @param string $modelClass
+     * @return bool|int|string|null
+     */
+    public function getTotalAreas($modelClass = "\common\models\Area")
+    {
+        return $this->getAreas($modelClass)->count();
     }
 
     /**
@@ -112,9 +135,10 @@ class DeliveryZone extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getAreas()
+    public function getAreas($modelClass = "\common\models\Area")
     {
-        return $this->hasMany(Area::className(), ['area_id' => 'area_id'])->viaTable('area_delivery_zone', ['delivery_zone_id' => 'delivery_zone_id']);
+        return $this->hasMany($modelClass::className(), ['area_id' => 'area_id'])
+            ->viaTable('area_delivery_zone', ['delivery_zone_id' => 'delivery_zone_id']);
     }
 
     /**
@@ -122,21 +146,19 @@ class DeliveryZone extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBusinessLocation()
+    public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasOne(BusinessLocation::className(), ['business_location_id' => 'business_location_id']);
+        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id']);
     }
-
-
 
     /**
      * Gets query for [[RestaurantUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -144,21 +166,34 @@ class DeliveryZone extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])
+            ->via('restaurant');
     }
 
-
+    /**
+    * Gets query for [[Orders]].
+    *
+    * @return \yii\db\ActiveQuery
+    */
+   public function getOrders()
+   {
+       return $this->hasMany(Order::className(), ['delivery_zone_id' => 'delivery_zone_id']);
+   }
 
     /**
      * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountry()
+    public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
+    }
+
+    public static function find() {
+        return new query\DeliveryZoneQuery(get_called_class());
     }
 
 }

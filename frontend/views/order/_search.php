@@ -27,7 +27,7 @@ $this->registerJs($js);
 
 
 
-    <div class="card-header">
+    <div class="card-header" style="padding-bottom:21px !important">
         <h4 class="card-title">Filters</h4>
         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
         <div class="heading-elements">
@@ -37,10 +37,10 @@ $this->registerJs($js);
             </ul>
         </div>
     </div>
-    <div class="card-content collapse show">
+    <div class="card-content collapse ">
 
 
-        <div class="card-body">
+        <div class="card-body" style="padding-top:0px !important">
             <div class="users-list-filter">
                 <form>
                     <div class="row">
@@ -84,20 +84,6 @@ $this->registerJs($js);
                             ?>
                         </div>
                       </div>
-
-
-                        <div class="row">
-                          <div class="col-6">
-                            <?php
-
-                            $store_model = Restaurant::findOne($restaurant_uuid);
-                            $businessLocationQuery = $store_model->getBusinessLocations()->asArray()->all();
-                            $businessLocationArray = ArrayHelper::map($businessLocationQuery, 'business_location_id', 'business_location_name');
-
-                            echo $form->field($model, 'business_location_id')->dropDownList($businessLocationArray, ['class' => 'form-control', 'prompt' => 'Select order status'])->label('Branch');
-                            ?>
-                          </div>
-                        </div>
 
 
                         <div class="form-group">

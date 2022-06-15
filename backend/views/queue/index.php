@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Queue', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Queue', ['create'], ['class' => 'btn btn-success btn-create']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -27,7 +27,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'restaurant_uuid',
-            'restaurant.name',
+            [
+              'attribute' => 'store_name',
+              'value' =>     'restaurant.name'
+            ],
             'queue_status',
             'queue_created_at',
             'queue_updated_at',

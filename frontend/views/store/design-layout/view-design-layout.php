@@ -20,6 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <?= Html::a('Update', ['update-design-layout', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
 
     </p>
+
     <div class="card">
         <div class="card-body">
             <div class="box-body table-responsive no-padding">
@@ -73,12 +74,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format' => 'html',
                             'value' => function ($data) {
 
-                               $store_theme_model = RestaurantTheme::findOne($data->restaurant_uuid);
+                               $store_theme = RestaurantTheme::findOne($data->restaurant_uuid);
                                 return
                                 '<div id="primary-wrapper"
                                 style=" cursor: pinter; width:50%; margin-bottom: 21px; position: relative;
                                 height: 50px;   margin: 0px !important;
-                                background:' . $store_theme_model->primary . '"
+                                background:' . $store_theme->primary . '"
                                 class="text-center colors-container rounded text-white  height-40 d-flex align-items-center justify-content-center  shadow">';
                             }
                         ],

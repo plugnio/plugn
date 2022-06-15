@@ -47,15 +47,15 @@ class OptionController extends Controller {
      */
     public function actionView($id, $storeUuid) {
         
-        $option_model = $this->findModel($id, $storeUuid);
+        $option = $this->findModel($id, $storeUuid);
 
         // extra options
         $itemExtraOptionsDataProvider = new \yii\data\ActiveDataProvider([
-            'query' => $option_model->getExtraOptions(),
+            'query' => $option->getExtraOptions(),
         ]);
 
         return $this->render('view', [
-                    'model' => $option_model,
+                    'model' => $option,
                     'itemExtraOptionsDataProvider' => $itemExtraOptionsDataProvider,
                     'storeUuid' => $storeUuid
         ]);

@@ -29,46 +29,30 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             // ['class' => 'yii\grid\SerialColumn'],
 
-            // [
-            //   'attribute' => 'currency_title',
-            //   'value' =>     'currency.title'
-            // ],
-            // 'restaurant_uuid',
-
             'name',
             'restaurant_domain',
-            // 'store_branch_name',
-            'restaurant_created_at:datetime',
-            'platform_fee:percent',
             [
               'attribute' => 'country_name',
               'value' =>     'country.country_name'
             ],
+            [
+              'label' => 'Currency',
+              'attribute' => 'currency_title',
+              'value' =>     'currency.title'
+            ],
+            'platform_fee:percent',
             'warehouse_fee',
+            'warehouse_delivery_charges',
             'version',
 
-            // [
-            //   'attribute' => 'currency_title',
-            //   'value' =>     'currency.title'
-            // ],
+            'restaurant_created_at:datetime',
+            'referral_code',
+
 
             [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'restaurant',
-                'template' => ' {view} {update} {merge}',
-                'buttons' => [
-                    'merge' => function ($url, $model) {
-                        return Html::a(
-                            '<span style="margin-right: 20px; color: red;" class="glyphicon glyphicon-transfer"></span>',
-                            ['merge-to-master-branch', 'id' => $model->restaurant_uuid ]
-
-                        );
-
-
-
-
-                    },
-                ],
+                'template' => ' {view} {update}'
             ],
 
 

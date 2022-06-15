@@ -44,11 +44,11 @@ class Plan extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'plan_id' => 'Plan ID',
-            'name' => 'Name',
-            'description' => 'Description',
-            'price' => 'Price',
-            'platform_fee' => 'Platform Fee',
+            'plan_id' => Yii::t('app','Plan ID'),
+            'name' => Yii::t('app','Name'),
+            'description' => Yii::t('app','Description'),
+            'price' => Yii::t('app','Price'),
+            'platform_fee' => Yii::t('app','Platform Fee'),
         ];
     }
 
@@ -57,8 +57,8 @@ class Plan extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSubscriptions()
+    public function getSubscriptions($modelClass = "\common\models\Subscription")
     {
-        return $this->hasMany(Subscription::className(), ['plan_id' => 'plan_id']);
+        return $this->hasMany($modelClass::className(), ['plan_id' => 'plan_id']);
     }
 }

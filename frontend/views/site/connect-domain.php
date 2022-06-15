@@ -9,12 +9,23 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 $this->title = 'Connect existing domain';
 ?>
 
 <section>
+
+
+    <?php if (Yii::$app->session->getFlash('successResponse') != null) { ?>
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h5><i class="icon fa fa-check"></i> Success!</h5>
+            <?= (Yii::$app->session->getFlash('successResponse')) ?>
+        </div>
+    <?php } ?>
+    
   <div class="card">
+
 
         <div class="card-header">
             <h5>Domain</h5>
@@ -26,7 +37,7 @@ $this->title = 'Connect existing domain';
                 <?php $form = ActiveForm::begin(); ?>
 
                 <?=
-                $form->field($restaurant_model, 'restaurant_domain', [
+                $form->field($restaurant, 'restaurant_domain', [
                     'template' => "{label}"
                     . "
                    {input}
@@ -35,6 +46,7 @@ $this->title = 'Connect existing domain';
                     . "{error}{hint}"
                 ])->textInput([
                     'class' => 'form-control',
+                    'required' => true,
                     'type' => 'url'
                 ])->label(false)
                 ?>

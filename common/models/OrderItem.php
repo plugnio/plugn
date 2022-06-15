@@ -3,19 +3,26 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\AttributeBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "order_item".
  *
  * @property int $order_item_id
  * @property int $order_uuid
+ * @property string $restaurant_uuid
  * @property string $item_uuid
+ * @property string $item_variant_uuid
  * @property string $item_name
  * @property string $item_name_ar
  * @property float $item_price
+ * @property float $item_unit_price
  * @property int|null $qty
  * @property string|null $customer_instruction
- *
+ * @property datetime $order_item_created_at
+ * @property datetime $order_item_updated_at
  * @property Item $item
  * @property Restaurant $restaurant
  * @property Order $order
@@ -35,15 +42,34 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['order_uuid', 'item_uuid', 'qty'], 'required'],
+            //'item_name', 'item_price',
+            [['order_uuid', 'restaurant_uuid', 'qty'], 'required'],
             [['qty'], 'integer', 'min' => 0],
+            ['qty', 'validateQty'],
             [['order_uuid'], 'string', 'max' => 40],
-            [['item_price'], 'number', 'min' => 0],
+            [['item_price', 'item_unit_price'], 'number', 'min' => 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
+            [['item_variant_uuid'], 'checkIfVariantBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
             [['item_name', 'item_name_ar', 'customer_instruction'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
+            [['item_variant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => ItemVariant::className(), 'targetAttribute' => ['item_variant_uuid' => 'item_variant_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
+            [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors() {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'order_item_created_at',
+                'updatedAtAttribute' => 'order_item_updated_at',
+                'value' => new Expression('NOW()'),
+            ]
         ];
     }
 
@@ -52,72 +78,152 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'order_item_id' => 'Order Item ID',
-            'order_uuid' => 'Order ID',
-            'item_uuid' => 'Item Uuid',
-            'item_name' => 'Item Name',
-            'item_name_ar' => 'Item Name in Arabic',
-            'item_price' => 'Item Price',
-            'qty' => 'Quantity',
-            'customer_instruction' => 'Instructions',
+            'order_item_id' => Yii::t('app','Order Item ID'),
+            'order_uuid' => Yii::t('app','Order ID'),
+            'restaurant_uuid' => Yii::t('app','Store ID'),
+            'item_uuid' => Yii::t('app','Item Uuid'),
+            'item_variant_uuid' => Yii::t('app','Item Variant Uuid'),
+            'item_name' => Yii::t('app','Item Name'),
+            'item_name_ar' => Yii::t('app','Item Name in Arabic'),
+            'item_price' => Yii::t('app','Item Price'),
+            'item_unit_price' => Yii::t('app','Item Unit Price'),
+            'qty' => Yii::t('app','Quantity'),
+            'customer_instruction' => Yii::t('app','Instructions'),
         ];
+    }
+
+    /**
+     * @param $attribute
+     * @return bool|void
+     */
+    public function validateQty($attribute)
+    {
+        if(!$this->item || !$this->item->track_quantity) {
+            return true;
+        }
+
+        if($this->item->item_type == Item::TYPE_SIMPLE) {
+            if($this->qty > $this->item->stock_qty) {
+                $this->addError($attribute, Yii::t('app', 'Out of stock'));
+            }
+        } else {
+            if(!$this->variant) {
+                $this->addError($attribute, Yii::t('app', 'Variant detail missing'));
+            }
+            else if($this->qty > $this->variant->stock_qty)
+            {
+                $this->addError($attribute, Yii::t('app', 'Out of stock'));
+            }
+        }
     }
 
     /**
      * Check if item belongs to restaurant
      * @param type $attribute
      */
-    public function checkIfItemBelongToRestaurant($attribute) {
-        $isItemBelongToRestaurant = Item::find()->where(['restaurant_uuid' => $this->order->restaurant_uuid, 'item_uuid' => $this->item_uuid])->one();
+    public function checkIfItemBelongToRestaurant($attribute)
+    {
+        $isItemBelongToRestaurant = $this->order ? Item::find()
+            ->where([
+                'restaurant_uuid' => $this->order->restaurant_uuid,
+                'item_uuid' => $this->item_uuid
+            ])
+            ->one(): null;
+
+        if (!$isItemBelongToRestaurant) {
+            $this->addError($attribute, Yii::t('yii', '{attribute} is invalid', [
+                'attribute' => $attribute
+            ]));
+        }
+        else if ($isItemBelongToRestaurant->item_status == Item::ITEM_STATUS_UNPUBLISH)
+        {
+            $this->addError($attribute, Yii::t('app', 'Sorry, the selected item is no longer available.'));
+        }
+    }
+
+    /**
+     * Check if variant belongs to restaurant
+     * @param type $attribute
+     */
+    public function checkIfVariantBelongToRestaurant($attribute)
+    {
+        $isItemBelongToRestaurant = $this->order? ItemVariant::find()
+            ->where([
+                'item_uuid' => $this->item_uuid,
+                'item_variant_uuid' => $this->item_variant_uuid
+            ])
+            ->one(): null;
 
         if (!$isItemBelongToRestaurant)
-            $this->addError($attribute, 'Item Uuid is invalid');
-        else if ($isItemBelongToRestaurant->item_status == Item::ITEM_STATUS_UNPUBLISH)
-            $this->addError($attribute, 'Sorry, the selected item is no longer available.');
-
+            $this->addError($attribute, Yii::t('yii', '{attribute} is invalid', [
+                'attribute' => $attribute
+            ]));
     }
 
     /**
      * Calculate order item total price => (item price + extra optns price)
      */
-    public function calculateOrderItemPrice() {
+    public function calculateOrderItemPrice()
+    {
+        $item = $this->getItem ()->one();
 
-        if($this->item)
-          $totalPrice = $this->item->item_price; //5
-        else
-          $totalPrice = $this->item_price; //5
-
-
+        if($this->variant) {
+            $totalPrice = $this->variant->price;
+        } else if($item) {
+            $totalPrice = $item->item_price;
+        } else if($this->item_unit_price) {
+            $totalPrice = $this->item_unit_price;
+        } else {
+            $totalPrice = $this->item_price;
+        }
 
         foreach ($this->getOrderItemExtraOptions()->asArray()->all() as $extraOption)
-            $totalPrice += $extraOption['extra_option_price']; //1
+            $totalPrice += $extraOption['extra_option_price'];
 
-        $totalPrice *= $this->qty; //6*5
+        //convert from store currency to order currency if not same
 
-        return $totalPrice;
+        /*if($this->order->currency && $this->restaurant->currency->code != $this->order->currency_code)
+        {
+            $totalPrice = ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
+        }*/
+
+        $this->item_unit_price = $totalPrice;
+
+        return $totalPrice * $this->qty;
     }
 
+    /**
+     * delete related data before delete
+     * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function beforeDelete() {
 
-        if ($this->item)
+        if ($this->item) {
             $this->item->increaseStockQty($this->qty);
+        }
 
+        if ($this->variant) {
+            $this->variant->increaseStockQty($this->qty);
+        }
 
-        $orderItemsExtraOption = OrderItemExtraOption::find()->where(['order_item_id' => $this->order_item_id])->all();
+        $orderItemsExtraOption = OrderItemExtraOption::find()
+            ->where(['order_item_id' => $this->order_item_id])
+            ->all();
 
         if($orderItemsExtraOption) {
 
           foreach ($orderItemsExtraOption as $orderItemExtraOption)
              $orderItemExtraOption->delete();
-
         }
-
-
-
 
         return parent::beforeDelete();
     }
 
+    /**
+     * @return false|void
+     */
     public function afterDelete() {
         $order_model = Order::findOne($this->order_uuid);
 
@@ -128,35 +234,68 @@ class OrderItem extends \yii\db\ActiveRecord {
         return false;
     }
 
+    /**
+     * @param bool $insert
+     * @return bool|void
+     */
     public function beforeSave($insert) {
 
         parent::beforeSave($insert);
+
         $item_model = Item::findOne($this->item_uuid);
         $order_model = Order::findOne($this->order_uuid);
 
         //Update order total price
         $order_model->updateOrderTotalPrice();
 
-        if ($insert) {
-
-            if ($this->item->track_quantity && $this->qty  > $this->item->stock_qty)
-                return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
-        }
-        else {
-
-            if ($this->item->track_quantity && $this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
-                return $this->addError('qty', $this->item->item_name . " is currently out of stock and unavailable.");
-
+        if(!$this->restaurant_uuid && $this->order) {
+            $this->restaurant_uuid = $this->order->restaurant_uuid;
         }
 
-        if ($this->qty == 0)
-            return $this->addError('qty', "Invalid input");
-
-
-
-
+        if ($this->qty == 0) {
+            return $this->addError('qty', Yii::t('yii', '{attribute} is invalid', [
+                'attribute' => Yii::t('app', 'Quantity')
+            ]));
+        }
 
         //Update product inventory
+
+        if ($insert && $item_model) {
+
+            $this->item_name = $item_model->item_name;
+            $this->item_name_ar = $item_model->item_name_ar;
+
+            $this->item->decreaseStockQty($this->qty);
+        }
+
+        $this->item_price = $this->calculateOrderItemPrice();
+
+        //if custom item
+
+        if(!$item_model && $this->item_price) {
+            return true;
+        }
+
+        if ($insert) {
+
+            if ($this->item_uuid && $this->item->track_quantity && $this->qty > $this->item->stock_qty) {
+                return $this->addError('qty',  Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                    'name' => $this->item->item_name
+                ]));
+            }
+        }
+        else
+        {
+            if ($this->item_uuid && $this->item->track_quantity && $this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
+            {
+                return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                    'name' => $this->item->item_name
+                ]));
+            }
+        }
+
+        //Update product inventory
+        
         if ($insert){
           if ($item_model) {
               $this->item_name = $item_model->item_name;
@@ -164,27 +303,41 @@ class OrderItem extends \yii\db\ActiveRecord {
           } else
               return false;
 
-
           $this->item->decreaseStockQty($this->qty);
 
+          if($this->variant)
+            $this->variant->decreaseStockQty($this->qty);
         }
 
         $this->item_price = $this->calculateOrderItemPrice();
 
+        //$this->item_unit_price = $this->item_price / $this->qty;
 
         return true;
     }
 
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
     public function afterSave($insert, $changedAttributes) {
+
+      if($this->item_uuid != null) {
 
         $item_model = Item::findOne($this->item_uuid);
 
-        if (!$insert && isset($changedAttributes['qty'])) {
-
+        if (!$insert && isset($changedAttributes['qty']) && $item_model) {
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);
+
+            if ($this->variant) {
+                $this->variant->increaseStockQty($changedAttributes['qty']);
+                $this->variant->decreaseStockQty($this->qty);
+            }
         }
 
+      }
 
         $order_model = Order::findOne($this->order_uuid);
 
@@ -195,12 +348,65 @@ class OrderItem extends \yii\db\ActiveRecord {
     }
 
     /**
+     * @return string[]
+     */
+    public function extraFields() {
+        return [
+            'currency',
+            'orderItemExtraOptions',
+            'itemImage',
+            'itemVariantImage',
+            'image',
+            'item',
+            'variant',
+            'refundedQty'
+        ];
+    }
+
+    /**
+     * Gets query for [[RefundedItem]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedQty($modelClass = "\common\models\RefundedItem") {
+        return $this->getRefundedItem($modelClass)
+            ->sum('qty');
+    }
+
+    /**
+     * Gets query for [[RefundedItem]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRefundedItem($modelClass = "\common\models\RefundedItem") {
+        return $this->hasMany($modelClass::className(), ['order_item_id' => 'order_item_id']);
+    }
+
+    /**
      * Gets query for [[ItemUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem() {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+    public function getItem($modelClass = "\common\models\Item") {
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+    /**
+     * Gets query for [[Variant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVariant($modelClass = "\common\models\ItemVariant") {
+        return $this->hasOne($modelClass::className(), ['item_variant_uuid' => 'item_variant_uuid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->item_variant_uuid? $this->getItemVariantImage():
+            $this->getItemImage();
     }
 
     /**
@@ -208,9 +414,19 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemImage()
+    public function getItemImage($modelClass = "\common\models\ItemImage")
     {
-        return $this->hasOne(ItemImage::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+    /**
+     * Gets query for [[ItemVariantImages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVariantImage($modelClass = "\common\models\ItemVariantImage")
+    {
+        return $this->hasOne($modelClass::className(), ['item_variant_uuid' => 'item_variant_uuid']);
     }
 
     /**
@@ -218,8 +434,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder() {
-        return $this->hasOne(Order::className(), ['order_uuid' => 'order_uuid']);
+    public function getOrder($modelClass = "\common\models\Order") {
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
 
     /**
@@ -227,8 +443,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('order');
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -236,9 +452,10 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['code' => 'currency_code'])
+            ->via('order');
     }
 
     /**
@@ -246,8 +463,15 @@ class OrderItem extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrderItemExtraOptions() {
-        return $this->hasMany(OrderItemExtraOption::className(), ['order_item_id' => 'order_item_id']);
+    public function getOrderItemExtraOptions($modelClass = "\common\models\OrderItemExtraOption") {
+        return $this->hasMany($modelClass::className(), ['order_item_id' => 'order_item_id']);
     }
 
+    /**
+     * @return query\OrderItemQuery
+     */
+    public static function find()
+    {
+        return new query\OrderItemQuery(get_called_class ());
+    }
 }

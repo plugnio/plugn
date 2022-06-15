@@ -6,10 +6,10 @@ use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
-use common\models\Item;
-use common\models\Category;
+use api\models\Item;
+use api\models\Category;
 use common\models\City;
-use common\models\Restaurant;
+use api\models\Restaurant;
 use common\models\ItemImage;
 use common\models\AreaDeliveryZone;
 use common\models\DeliveryZone;
@@ -57,30 +57,6 @@ class DeliveryZoneController extends Controller {
         return $actions;
     }
 
-    /**
-     * Return Delivery zones
-     */
-    public function actionDeliveryZone($restaurant_uuid) {
-
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
-
-            $shipping_countries = $store_model->getShippingCountries()->asArray()->all();
-
-            foreach ($shipping_countries as $key => $shippingCountry) {
-              $deliveryZones = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->asArray()->all();
-              $shippingCountry['businessLocations'] = $deliveryZones;
-            }
-
-            return $shipping_countries;
-
-
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
-        }
-    }
 
     /**
      * Return List of countries available for delivery
@@ -89,19 +65,32 @@ class DeliveryZoneController extends Controller {
 
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
-            $deliveryZones = $store_model->getDeliveryZones()->with('country')->asArray()->all();
+            $deliveryZones = $store_model->getDeliveryZones()
+                ->with('country')
+                ->asArray()
+                ->all();
+
             $shipping_countries = [];
 
             foreach ($deliveryZones as $key => $deliveryZone) {
-              if(!array_search($deliveryZone['country']['country_id'], array_column($shipping_countries, 'country_id')))
 
-              $isExist = false;
+                if(empty($deliveryZone['country']))
+                {
+                    continue;
+                }
 
-              foreach ($shipping_countries as  $shipping_country) {
-                if($deliveryZone['country']['country_id'] == $shipping_country['country_id'])
-                $isExist = true;
-              }
+              if(
+                  !array_search(
+                      $deliveryZone['country']['country_id'],
+                      array_column($shipping_countries, 'country_id')
+                  )
+              )
+                $isExist = false;
 
+                  foreach ($shipping_countries as  $shipping_country) {
+                      if($deliveryZone['country']['country_id'] == $shipping_country['country_id'])
+                          $isExist = true;
+                  }
 
               if(!$isExist)
                 $shipping_countries[] = $deliveryZone['country'];
@@ -128,7 +117,7 @@ class DeliveryZoneController extends Controller {
 
 
 
-            return $shipping_countries;
+            return array_values($shipping_countries);
 
 
         } else {
@@ -146,8 +135,15 @@ class DeliveryZoneController extends Controller {
 
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
+            $pickupLocations = $store_model->getPickupBusinessLocations()->asArray()->all();
 
-            return $store_model->getPickupBusinessLocations()->asArray()->all();
+            foreach ($pickupLocations as $key => $pickupLocation) {
+
+              unset($pickupLocations[$key]['mashkor_branch_id']);
+              unset($pickupLocations[$key]['armada_api_key']);
+            }
+
+            return $pickupLocations;
 
 
         } else {
@@ -172,6 +168,9 @@ class DeliveryZoneController extends Controller {
 
             if( $deliveryZone = $store_model->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id])->asArray()->joinWith(['businessLocation'])->one() ){
 
+                unset($deliveryZone['businessLocation']['armada_api_key']);
+                unset($deliveryZone['businessLocation']['mashkor_branch_id']);
+
 
               if($area_id && !AreaDeliveryZone::find()->where(['area_id' => $area_id , 'delivery_zone_id' => $delivery_zone_id])->exists()){
                 return [
@@ -181,6 +180,7 @@ class DeliveryZoneController extends Controller {
               }
 
               $deliveryTime = intval($deliveryZone['delivery_time']);
+              $deliveryTimeInMin = intval($deliveryZone['delivery_time']);
 
               if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
                 $deliveryTime = $deliveryTime * 24 * 60 * 60;
@@ -189,6 +189,14 @@ class DeliveryZoneController extends Controller {
               else if (DeliveryZone::TIME_UNIT_MIN == $deliveryZone['time_unit'])
                 $deliveryTime = $deliveryTime *  60;
 
+              if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
+                $deliveryTimeInMin = $deliveryTimeInMin * 24 * 60;
+              else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
+                $deliveryTimeInMin = $deliveryTimeInMin *  60;
+
+
+
+              $deliveryZone['delivery_time_in_min'] = $deliveryTimeInMin;
 
               $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryTime);
 
@@ -223,6 +231,10 @@ class DeliveryZoneController extends Controller {
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
             if( $pickupLocation = $store_model->getBusinessLocations()->where(['business_location_id' => $pickup_location_id])->asArray()->one() ){
+
+              unset($pickupLocation['armada_api_key']);
+              unset($pickupLocation['mashkor_branch_id']);
+
               return $pickupLocation;
             }
             else {
@@ -249,7 +261,7 @@ class DeliveryZoneController extends Controller {
 
 
           $countryCities = City::find()
-                  ->where(['country_id' => $country_id])
+                  ->andWhere(['country_id' => $country_id])
                   ->asArray()
                   ->all();
 

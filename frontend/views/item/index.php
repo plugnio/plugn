@@ -11,7 +11,7 @@ use kartik\daterange\DateRangePicker;
 /* @var $searchModel backend\models\ItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
@@ -46,31 +46,29 @@ $this->registerJs($js);
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php if ($dataProvider->getCount() > 0) { ?>
+  <?php if ($count > 0) { ?>
 
     <!-- Data list view starts -->
-    <div class="action-btns d-none">
+    <div class="action-btns">
         <div class="btn-dropdown mr-1 mb-1">
             <div class="btn-group dropdown actions-dropodown">
-                <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
 
-
-    <?php if ($dataProvider->getCount() == 0) { ?>
-        <div style="padding-left:14px">
-            <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-outline-primary', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
-        </div>
-    <?php } ?>
+    <div style="padding-left:14px">
+        <?= Html::a('<i class="feather icon-plus"></i> Add New', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-outline-primary pull-right', 'style' => '    padding: 0.85rem 1.7rem;']) ?>
+    </div>
 
 
     <!-- DataTable starts -->
-    <div class="table-responsive">
+    <div class="table-responsive dataTables_wrapper">
 
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['item/update', 'id' => $model->item_uuid, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -95,18 +93,14 @@ $this->registerJs($js);
                     },
                 ],
                 [
+                        'attribute' => 'item_name',
                            'label' => 'Item name',
-                           'format' => 'html',
-                           'value' => function ($data) {
-                               return $data->item_name;
-                           },
+                           'format' => 'html'
                 ],
                 [
+                    'attribute' => 'sku',
                     'label' => 'SKU',
-                    'format' => 'raw',
-                    'value' => function ($data) {
-                        return $data->sku;
-                    },
+                    'format' => 'raw'
                 ],
                 [
                     'label' => 'Category name',
@@ -135,16 +129,22 @@ $this->registerJs($js);
                 [
                     'attribute' => 'item_price',
                     "format" => "raw",
-                    "value" => function($model) {
+                    "value" => function($model) use ($restaurant) {
                         if ($model->extraOptions)
                           return 'Price on selection';
                         else
-                        return Yii::$app->formatter->asCurrency($model->item_price, $model->currency->code);
+                        return Yii::$app->formatter->asCurrency($model->item_price, $restaurant->currency->code, [
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $restaurant->currency->decimal_place
+                        ]);
                     }
                 ],
                 [
                     'attribute' => 'item_status',
                     "format" => "raw",
+                    "filter" => [
+                        Item::ITEM_STATUS_UNPUBLISH => 'Unpublished',
+                        Item::ITEM_STATUS_PUBLISH => 'Published'
+                    ],
                     "value" => function($model) {
                         if ($model->item_status == Item::ITEM_STATUS_PUBLISH) {
                             return '
@@ -157,7 +157,7 @@ $this->registerJs($js);
                 [
                     'header' => 'Action',
                     'class' => 'yii\grid\ActionColumn',
-                    'template' => ' {view} {update} {delete}',
+                    'template' => ' {update}',
                     'buttons' => [
                         'update' => function ($url, $model) {
                             return Html::a(
@@ -181,7 +181,7 @@ $this->registerJs($js);
                 ],
             ],
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table data-list-view dataTable'],
         ]);
         ?>
 
@@ -205,7 +205,7 @@ $this->registerJs($js);
         <p>
           This is where you’ll add products and manage your pricing. You can also import and export your product inventory.
         </p>
-        <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Add item', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
       </div>
     </div>
 

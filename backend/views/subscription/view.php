@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Delete', ['delete', 'id' => $model->subscription_uuid], [
-            'class' => 'btn btn-danger',
+            'class' => 'btn btn-danger btn-delete',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
                 'method' => 'post',
@@ -41,6 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
             'status',
+            'notified_email',
             'subscription_start_at',
             'subscription_end_at',
         ],

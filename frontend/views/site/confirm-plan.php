@@ -1,5 +1,6 @@
 <?php
 
+use Yii;
 use common\models\Restaurant;
 use yii\helpers\Html;
 use common\models\Order;
@@ -11,13 +12,33 @@ use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 $this->title = "Confirm " . $selectedPlan->name;
 
 ?>
 
 
 <section>
+
+  <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
+
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fa fa-ban"></i> Error!</h5>
+        <?= (Yii::$app->session->getFlash('errorResponse')) ?>
+    </div>
+  <?php } if (Yii::$app->session->hasFlash('error')) { ?>
+      <div class="alert alert-danger alert-dismissable">
+          <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+          <?php
+          foreach(Yii::$app->session->getFlash('error') as $errors) {
+              foreach($errors as $error) { ?>
+                  <p><?= $error ?></p>
+              <?php
+              }
+          } ?>
+      </div>
+  <?php }
 
   <div class="card" style=" padding-bottom:2.1rem;">
     <div class="card-header">
@@ -39,7 +60,7 @@ $this->title = "Confirm " . $selectedPlan->name;
         ?>
 
         <?=
-        $form->field($subscription_model, 'payment_method_id')->radioList($paymentMethodArray, [
+        $form->field($subscription, 'payment_method_id')->radioList($paymentMethodArray, [
             'style' => 'display:grid',
             'item' => function($index, $label, $name, $checked, $value) {
 
@@ -61,7 +82,7 @@ $this->title = "Confirm " . $selectedPlan->name;
 
 
         <div class="form-group">
-            <?= Html::submitButton('Make Payment ('.  \Yii::$app->formatter->asCurrency($selectedPlan->price,$restaurant_model->currency->code) .')', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
+            <?= Html::submitButton('Make Payment ('.  \Yii::$app->formatter->asCurrency($selectedPlan->price, 'KWD') .')', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
         </div>
 
 

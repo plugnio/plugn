@@ -14,21 +14,25 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Tap Queue', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Tap Queue', ['create'], ['class' => 'btn btn-success btn-create']) ?>
     </p>
 
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'tap_queue_id',
+            // 'tap_queue_id',
             'restaurant_uuid',
-            'restaurant.name',
+            [
+              'attribute' => 'store_name',
+              'value' =>     'restaurant.name'
+            ],
             'queue_status',
             'queue_created_at',
-            'queue_updated_at',
+            // 'queue_updated_at',
             //'queue_start_at',
             //'queue_end_at',
 

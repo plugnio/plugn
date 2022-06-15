@@ -46,7 +46,7 @@ trackQuantityInput.change(function(e){
 // enable fileuploader plugin
 $('input[class="item-upload"]').fileuploader({
 	limit:10,
-	fileMaxSize: 30,
+	fileMaxSize: 5,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {
@@ -216,9 +216,11 @@ $this->registerJs($js);
     <div class="card">
         <div class="card-body">
             <h5 style="margin-bottom: 20px;">
-                Price
+                Pricing
             </h5>
 
+        <div class="row">
+					 <div class="col-12 col-sm-6 col-lg-6">
 
             <?=
             $form->field($modelItem, 'item_price', [
@@ -232,8 +234,28 @@ $this->registerJs($js);
                 'style' => 'border-top-left-radius: unset !important; border-bottom-left-radius: unset !important;',
                 'value' => $modelItem->item_price != null ? $modelItem->item_price : \Yii::$app->formatter->asDecimal(0, 2),
                 'class' => 'form-control'
-            ])->label(false)
+            ])
             ?>
+        		</div>
+					 <div class="col-12 col-sm-6 col-lg-6">
+
+            <?=
+            $form->field($modelItem, 'compare_at_price', [
+                'template' => "{label}"
+                . "<div class='input-group' style='margin-bottom: 5.600px'> <div class='input-group-prepend'> <span class='input-group-text'>" . $modelItem->currency->code . " </span> </div>{input}"
+                . "</div>"
+                . "<label class='control-label'>To show a reduced price, move the product's original price into Compared at price. Enter a lower value into Price </label> "
+                . "{error}{hint}"
+            ])->textInput([
+                'type' => 'number',
+                'step' => '.01',
+                'style' => 'border-top-left-radius: unset !important; border-bottom-left-radius: unset !important;',
+                'class' => 'form-control'
+            ])
+            ?>
+        		</div>
+	        </div>
+
         </div>
     </div>
 

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
 use common\models\Restaurant;
 use common\models\TapQueue;
@@ -13,7 +14,7 @@ use yii\filters\AccessControl;
 use yii\web\UploadedFile;
 
 /**
- * RestaurantController implements the CRUD actions for Restaurant model.
+ * RestaurantCest implements the CRUD actions for Restaurant model.
  */
 class RestaurantController extends Controller {
 
@@ -33,6 +34,11 @@ class RestaurantController extends Controller {
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
+                    [
+                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'actions' => ['create', 'update', 'delete'],
+                        'roles' => ['@'],
+                    ],
                     [//allow authenticated users only
                         'allow' => true,
                         'roles' => ['@'],
@@ -99,12 +105,16 @@ class RestaurantController extends Controller {
 
             if (!$deleteBuildJs->isOk) {
               Yii::error('[Github > Error While deleting'. $filePath . ']' . json_encode($deleteBuildJs->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
               Yii::$app->session->setFlash('errorResponse', json_encode($deleteBuildJs->data['message']));
+              
               return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
             }
       } else {
         Yii::error('[Github > Error while getting file sha]' . json_encode($getBuildJsSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+        
         Yii::$app->session->setFlash('errorResponse', json_encode($getBuildJsSHA->data['message']));
+        
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
       }
 
@@ -190,28 +200,6 @@ class RestaurantController extends Controller {
 
 
     /**
-     * Merge
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionMergeBranch($id, $head) {
-
-        $store = $this->findModel($id);
-
-        $mergeDevelopResponse = Yii::$app->githubComponent->mergeABranch('Merge branch develop into' . $store->store_branch_name, $store->store_branch_name,  $head);
-
-        if (!$mergeDevelopResponse->isOk) {
-          Yii::error('[Github > Error While merging with develop]' . json_encode($mergeDevelopResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-          Yii::$app->session->setFlash('errorResponse', json_encode($mergeDevelopResponse->data['message']));
-          return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-        }
-
-      return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-
-    }
-
-    /**
      * Update sitemap
      * @param integer $id
      * @return mixed
@@ -280,86 +268,6 @@ class RestaurantController extends Controller {
 
     }
 
-
-    /**
-     * Creates a new Tap account
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreateTapAccount($restaurant_uuid) {
-        $model = $this->findModel($restaurant_uuid);
-        $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
-
-            $restaurant_authorized_signature_file = UploadedFile::getInstances($model, 'restaurant_authorized_signature_file');
-            $restaurant_commercial_license_file = UploadedFile::getInstances($model, 'restaurant_commercial_license_file');
-
-            $owner_identification_file_front_side = UploadedFile::getInstances($model, 'owner_identification_file_front_side');
-            $owner_identification_file_back_side = UploadedFile::getInstances($model, 'owner_identification_file_back_side');
-
-            if (sizeof($restaurant_commercial_license_file) > 0)
-                $model->restaurant_commercial_license_file = $restaurant_commercial_license_file[0]; //Commercial License
-
-            if (sizeof($restaurant_authorized_signature_file) > 0)
-                $model->restaurant_authorized_signature_file = $restaurant_authorized_signature_file[0]; //Authorized signature
-
-            if (sizeof($owner_identification_file_front_side) > 0)
-                $model->owner_identification_file_front_side = $owner_identification_file_front_side[0]; //Owner's civil id front side
-
-            if (sizeof($owner_identification_file_back_side) > 0)
-                $model->owner_identification_file_back_side = $owner_identification_file_back_side[0]; //Owner's civil id back side
-
-
-
-            $model->createAnAccountOnTap();
-
-
-            if ($model->validate() && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-            } else {
-                Yii::$app->session->setFlash('error', print_r($model->errors, true));
-            }
-        }
-
-        return $this->render('create_tap_account', [
-                    'model' => $model,
-        ]);
-    }
-
-    /**
-     * Creates a new Restaurant model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate() {
-        $model = new Restaurant();
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->save()) {
-
-            if ($model->restaurant_payments_method)
-                $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
-
-
-            $thumbnail_image = UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
-
-            $logo = UploadedFile::getInstances($model, 'restaurant_logo');
-
-            if ($thumbnail_image)
-                $model->uploadThumbnailImage($thumbnail_image[0]->tempName);
-
-            if ($logo)
-                $model->uploadLogo($logo[0]->tempName);
-
-
-            return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-        }
-
-        return $this->render('create', [
-                    'model' => $model,
-        ]);
-    }
-
     /**
      * Updates an existing Restaurant model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -370,6 +278,7 @@ class RestaurantController extends Controller {
     public function actionUpdate($id) {
 
         $model = $this->findModel($id);
+
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
 
             if ($model->restaurant_payments_method)
@@ -428,44 +337,47 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
-    // /**
-    //  * Change restaurant status to become open
-    //  * @param integer $id
-    //  * @return mixed
-    //  * @throws NotFoundHttpException if the model cannot be found
-    //  */
-    // public function actionPromoteToOpen($id) {
-    //     $model = $this->findModel($id);
-    //     $model->promoteToOpenRestaurant();
-    //
-    //     return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-    // }
-    //
-    // /**
-    //  * Change restaurant status to become busy
-    //  * @param integer $id
-    //  * @return mixed
-    //  * @throws NotFoundHttpException if the model cannot be found
-    //  */
-    // public function actionPromoteToBusy($id) {
-    //     $model = $this->findModel($id);
-    //     $model->promoteToBusyRestaurant();
-    //
-    //     return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-    // }
-    //
-    // /**
-    //  * Change restaurant status to become close
-    //  * @param integer $id
-    //  * @return mixed
-    //  * @throws NotFoundHttpException if the model cannot be found
-    //  */
-    // public function actionPromoteToClose($id) {
-    //     $model = $this->findModel($id);
-    //     $model->promoteToCloseRestaurant();
-    //
-    //     return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
-    // }
+    /**
+     * Change restaurant status to become open
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToOpen($id) {
+        $model = $this->findModel($id);
+        $model->restaurant_status = Restaurant::RESTAURANT_STATUS_OPEN;
+        $model->save(false);
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * Change restaurant status to become busy
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToBusy($id) {
+        $model = $this->findModel($id);
+        $model->restaurant_status = Restaurant::RESTAURANT_STATUS_BUSY;
+        $model->save(false);
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * Change restaurant status to become close
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionPromoteToClose($id) {
+        $model = $this->findModel($id);
+        $model->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSED;
+        $model->save(false);
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
 
     /**
      * Deletes an existing Restaurant model.

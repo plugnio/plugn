@@ -5,12 +5,12 @@ namespace api\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
-use common\models\Order;
+use api\models\Order;
 use common\models\Agent;
 use common\models\OrderItem;
 use common\models\OrderItemExtraOption;
-use common\models\Restaurant;
-use common\models\Payment;
+use api\models\Restaurant;
+use api\models\Payment;
 use common\components\TapPayments;
 use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
@@ -82,10 +82,13 @@ class ZapierController extends Controller {
 
       $storeList = [];
 
-        foreach (Yii::$app->accountManager->getManagedAccounts() as $key => $store) {
-          $storeList[$key]['id'] = $store['restaurant_uuid'];
-          $storeList[$key]['store_name'] = $store['name'];
+        foreach (Yii::$app->accountManager->getManagedAccounts() as $key => $managedAccount) {
 
+            if(!$managedAccount->restaurant)
+                continue;
+
+            $storeList[$key]['id'] = $managedAccount->restaurant_uuid;
+            $storeList[$key]['store_name'] = $managedAccount->restaurant->name;
       }
 
       return $storeList;
@@ -104,12 +107,17 @@ class ZapierController extends Controller {
 
             $orders = Order::find()
                     ->joinWith('orderItems')
-                    ->where(['order_status' => Order::STATUS_PENDING])
-                    ->orWhere(['order_status' => Order::STATUS_BEING_PREPARED])
-                    ->orWhere(['order_status' => Order::STATUS_OUT_FOR_DELIVERY])
-                    ->orWhere(['order_status' => Order::STATUS_ACCEPTED])
-                    ->orWhere(['order_status' => Order::STATUS_COMPLETE])
-                    ->orWhere(['order_status' => Order::STATUS_CANCELED])
+                    ->andWhere([
+                        'IN',
+                        'order_status', [
+                            Order::STATUS_PENDING,
+                            Order::STATUS_BEING_PREPARED,
+                            Order::STATUS_OUT_FOR_DELIVERY,
+                            Order::STATUS_ACCEPTED,
+                            Order::STATUS_COMPLETE,
+                            Order::STATUS_CANCELED
+                        ]
+                    ])
                     ->andWhere(['order.restaurant_uuid' => $restaurant_uuid])
                     ->asArray()
                     ->all();

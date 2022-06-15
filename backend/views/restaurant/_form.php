@@ -9,6 +9,7 @@ use kartik\select2\Select2;
 use common\models\Currency;
 use common\models\Country;
 use common\models\RestaurantDelivery;
+use common\models\Partner;
 use common\models\RestaurantPaymentMethod;
 use common\models\PaymentMethod;
 use kartik\file\FileInput;
@@ -57,6 +58,9 @@ use borales\extensions\phoneInput\PhoneInput;
     $paymentMethodQuery = PaymentMethod::find()->asArray()->all();
     $paymentMethodArray = ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
 
+    $partnerMethodQuery = Partner::find()->asArray()->all();
+    $partnerMethodArray = ArrayHelper::map($partnerMethodQuery, 'referral_code', 'username');
+
     $countryQuery = Country::find()->asArray()->all();
     $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
 
@@ -71,7 +75,7 @@ use borales\extensions\phoneInput\PhoneInput;
         $sotredRestaurantPaymentMethod = RestaurantPaymentMethod::find()
                 ->select('payment_method_id')
                 ->asArray()
-                ->where(['restaurant_uuid' => $model->restaurant_uuid])
+                ->andWhere(['restaurant_uuid' => $model->restaurant_uuid])
                 ->all();
 
         $sotredRestaurantPaymentMethod = ArrayHelper::getColumn($sotredRestaurantPaymentMethod, 'payment_method_id');
@@ -81,6 +85,17 @@ use borales\extensions\phoneInput\PhoneInput;
     $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]);
     ?>
 
+
+    <?=
+    $form->field($model, 'referral_code')->widget(Select2::classname(), [
+        'data' => $partnerMethodArray,
+        'options' => [
+            'placeholder' => 'Select partner ...',
+            'multiple' => false,
+            'value' => $model->referral_code
+        ],
+    ]);
+    ?>
 
     <?=
     $form->field($model, 'currency_id')->widget(Select2::classname(), [
@@ -95,8 +110,30 @@ use borales\extensions\phoneInput\PhoneInput;
 
 
     <?=
+      $form->field($model, 'is_tap_enable')->dropDownList(
+              [
+                  1 => 'Yes',
+                  0 => 'No',
+              ]
+      );
+    ?>
+
+    <?=
+      $form->field($model, 'is_myfatoorah_enable')->dropDownList(
+              [
+                  1 => 'Yes',
+                  0 => 'No',
+              ]
+      );
+    ?>
+
+
+    <?=
       $form->field($model, 'country_id')->dropDownList(  $countryArray  );
     ?>
+
+
+
 
     <?=
     $form->field($model, 'restaurant_payments_method')->widget(Select2::classname(), [
@@ -112,6 +149,8 @@ use borales\extensions\phoneInput\PhoneInput;
         ],
     ]);
     ?>
+
+    <?= $form->field($model, 'payment_gateway_queue_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'version')->textInput(['maxlength' => true]) ?>
 
@@ -193,6 +232,15 @@ use borales\extensions\phoneInput\PhoneInput;
         );
         ?>
 
+        <?=
+          $form->field($model, 'business_type')->dropDownList(
+                  [
+                  'ind' => 'ind',
+                  'corp' => 'corp',
+                  ]
+          );
+        ?>
+
     <?=
        $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
           'jsOptions' => [
@@ -203,6 +251,7 @@ use borales\extensions\phoneInput\PhoneInput;
     ?>
 
     <?= $form->field($model, 'restaurant_email')->input('email') ?>
+
 
     <?= $form->field($model, 'iban')->textInput() ?>
     <?= $form->field($model, 'owner_first_name')->textInput() ?>
@@ -224,7 +273,9 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'platform_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Platform fee']) ?>
 
-    <?= $form->field($model, 'warehouse_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Warehouse fee']) ?>
+    <?= $form->field($model, 'warehouse_delivery_charges')->textInput([ 'maxlength' => true, 'placeholder' => 'Delivery charges']) ?>
+
+    <?= $form->field($model, 'warehouse_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Warehouse fulfilment fee']) ?>
 
     <?= $form->field($model, 'armada_api_key')->textInput(['maxlength' => true]) ?>
 
@@ -234,11 +285,15 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'facebook_pixil_id')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'snapchat_pixil_id')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
     <?= $form->field($model, 'identification_file_id_front_side')->textInput() ?>
 
     <?= $form->field($model, 'identification_file_id_back_side')->textInput() ?>
+
+    <?= $form->field($model, 'supplierCode')->textInput() ?>
 
     <?= $form->field($model, 'business_id')->textInput() ?>
 

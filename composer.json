@@ -28,7 +28,6 @@
         "wbraganca/yii2-dynamicform": "dev-master",
         "yiisoft/yii2-shell": "^2.0",
         "leandrogehlen/yii2-treegrid": "*",
-        "yiisoft/yii2-httpclient": "dev-master",
         "ajaxray/short-code": "^1.1",
         "liyunfang/yii2-widget-linkpager": "^1.0",
         "kartik-v/yii2-mpdf": "dev-master",
@@ -49,7 +48,9 @@
         "maksyutin/yii2-dual-list-box": "dev-master",
         "ssimpson/yii2-dual-list-box": "dev-master",
         "borales/yii2-phone-input": "*",
-        "segmentio/analytics-php": "^1.5"
+        "segmentio/analytics-php": "^1.5",
+        "yiisoft/yii2-redis": "~2.0.0",
+        "aws/aws-sdk-php": "^3.183"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -62,12 +63,16 @@
         "codeception/module-filesystem": "^1.0",
         "phpunit/phpunit": "~5.7.27 || ~6.5.5",
         "codeception/verify": "~0.5.0 || ~1.1.0",
-        "symfony/browser-kit": ">=2.7 <=4.2.4"
+        "symfony/browser-kit": ">=2.7 <=4.2.4",
+        "codeception/specify": "~0.4.6"
     },
     "config": {
         "process-timeout": 1800,
         "fxp-asset": {
             "enabled": false
+        },
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
         }
     },
     "repositories": [

@@ -58,7 +58,9 @@ $this->registerJs($js);
                     [
                         'attribute' => 'item_price',
                         "value" => function($data) {
-                                return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code);
+                                return Yii::$app->formatter->asCurrency($data->item_price, $data->currency->code, [
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                ]);
                         },
                     ],
                     'qty',
@@ -101,13 +103,15 @@ $this->registerJs($js);
                        [
                            'attribute' => 'extra_option_price',
                            "value" => function($data) {
-                                   return Yii::$app->formatter->asCurrency($data->extra_option_price, $data->currency->code);
+                                   return Yii::$app->formatter->asCurrency($data->extra_option_price, $data->currency->code, [
+                                       \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                   ]);
                            },
                        ],
                        [
                            'class' => 'yii\grid\ActionColumn',
                            'controller' => 'option',
-                           'template' => ' {view} {update} {delete}',
+                           'template' => '{delete}',
                            'buttons' => [
                                'delete' => function ($url, $model) {
                                    return Html::a(
@@ -130,7 +134,7 @@ $this->registerJs($js);
                        ],
                      ],
                      'layout' => '{summary}{items}{pager}',
-                     'tableOptions' => ['class' => 'table data-list-view'],
+                     'tableOptions' => ['class' => 'table dataTable data-list-view'],
                  ]);
                  ?>
 

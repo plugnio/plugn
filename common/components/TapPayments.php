@@ -181,8 +181,6 @@ class TapPayments extends Component
      */
     public function uploadFileToTap($file_path, $purpose, $title)
     {
-
-
         $fileEndpoint = $this->apiEndpoint . "/files";
 
         $fileParams = [
@@ -191,8 +189,8 @@ class TapPayments extends Component
             "file_link_create" => '0'
         ];
 
-
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($fileEndpoint)
@@ -214,7 +212,6 @@ class TapPayments extends Component
      */
     public function createBussiness($restaurant)
     {
-
         $bussinessEndpoint = $this->apiEndpoint . "/business";
 
         $bussinessParams = [
@@ -275,13 +272,9 @@ class TapPayments extends Component
             ],
         ];
 
-
-
         if (
-
-                $restaurant->authorized_signature_file_id &&
-
-                $restaurant->commercial_license_file_id
+            $restaurant->authorized_signature_file_id &&
+            $restaurant->commercial_license_file_id
         ) {
             $authorizedSignatureDocument = [
                 "type" => "Authorized Signature",
@@ -338,7 +331,7 @@ class TapPayments extends Component
      * @param type $iban
      * @return type
      */
-    public function createMergentAccount($company_name,$currency,  $business_id, $business_entity_id, $iban)
+    public function createMerchantAccount($company_name,$currency,  $business_id, $business_entity_id, $iban)
     {
         $merchantEndpoint = $this->apiEndpoint . "/merchant";
 
@@ -400,7 +393,12 @@ class TapPayments extends Component
     /**
      * Create a refund for a customer
      */
-    public function createRefund($chargeId, $amount, $currency , $reason="requested_by_customer")  {
+    public function createRefund(
+        $chargeId,
+        $amount,
+        $currency,
+        $reason="requested_by_customer"
+    ) {
 
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
@@ -409,10 +407,10 @@ class TapPayments extends Component
           "amount" => $amount,
           "currency" => $currency,
           "reason" => $reason,
-      ];
-
+        ];
 
         $client = new Client();
+
         $response = $client->createRequest()
                       ->setMethod('POST')
                       ->setUrl($refundEndpoint)
@@ -429,9 +427,8 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $gateway, $warehouse_fee)
+    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $webhookUrl , $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null)
     {
-
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $phone =  str_replace(' ', '', $phone);
@@ -468,12 +465,15 @@ class TapPayments extends Component
             ],
             "redirect" => [
                 "url" => $redirectUrl
+            ],
+            "post" => [
+                "url" => $webhookUrl
             ]
         ];
 
 
-        if($platform_fee > 0){
-           if($gateway == static::GATEWAY_KNET){
+        if($platform_fee > 0) {
+           if($gateway == static::GATEWAY_KNET) {
 
                  //if greater than 10KD
                 if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
@@ -501,6 +501,8 @@ class TapPayments extends Component
           else
                $charge_amount = $platform_fee;
 
+         if($warehouse_delivery_charges > 0 && $country_name != null && $country_name == 'Kuwait')
+           $charge_amount = $warehouse_delivery_charges + $charge_amount;
 
            $destination = [
                "id" => $this->destinationId,
@@ -508,12 +510,17 @@ class TapPayments extends Component
                "currency" => $currency,
            ];
 
-
            array_push($chargeParams['destinations']['destination'], $destination);
 
-         } else if ($platform_fee == 0 && $warehouse_fee > 0) {
+         } else if ($platform_fee == 0 && ($warehouse_fee > 0 || ($warehouse_delivery_charges > 0  && $country_name != null && $country_name == 'Kuwait'))) {
 
-           $charge_amount = $warehouse_fee;
+           $charge_amount = 0;
+
+           if($warehouse_fee > 0)
+             $charge_amount = $warehouse_fee + $charge_amount;
+
+           if($warehouse_delivery_charges > 0  && $country_name != null && $country_name == 'Kuwait')
+             $charge_amount = $warehouse_delivery_charges + $charge_amount;
 
            $destination = [
                "id" => $this->destinationId,
@@ -526,6 +533,7 @@ class TapPayments extends Component
          }
 
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($chargeEndpoint)
@@ -636,4 +644,20 @@ class TapPayments extends Component
 
         return $response;
     }
+
+
+    /**
+     * checkTapSignature
+     * @param  [type]  $id                           [description]
+     * @param  boolean $showUpdatedFlashNotification [description]
+     * @return self                                [description]
+     */
+     public function checkTapSignature($toBeHashedString, $headerSignature ) {
+         //***Generate The Signature*** :
+
+         $signature = hash_hmac('sha256', $toBeHashedString, $this->vendorSecretApiKey);
+
+         return $signature == $headerSignature;
+     }
+
 }

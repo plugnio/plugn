@@ -18,7 +18,6 @@ use common\models\PaymentMethod;
  */
 class MashkorDelivery extends Component {
 
-
     const USE_TEST_KEY = 1;
     const USE_LIVE_KEY = 2;
 
@@ -146,14 +145,14 @@ class MashkorDelivery extends Component {
     /**
      * Create Order
      */
-    public function createOrder($model) {
+    public function createOrder($model,$mashkorBranchId) {
 
       $phone =  str_replace(' ', '', $model->customer_phone_number);
       $phone =  str_replace('+'.$model->customer_phone_country_code, '', $phone);
 
 
         $mashkorParams = [
-              "branch_id" => $model->restaurant->mashkor_branch_id,
+              "branch_id" => $mashkorBranchId,
               "customer_name" => $model->customer_name,
               "payment_type" => $model->payment_method_id == 3 && $model->total_price > 0 ? self::PAYMENT_TYPE_COD : self::PAYMENT_TYPE_CARD,
               "mobile_number" =>  $phone,

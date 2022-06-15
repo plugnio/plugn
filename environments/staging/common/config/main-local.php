@@ -1,0 +1,107 @@
+<?php
+
+return [
+    'components' => [
+        'db' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'mysql:host=localhost;dbname=plugn',
+            'username' => 'root',
+            'password' => 'saoud',
+            'charset' => 'utf8mb4',
+            // Enable Caching of Schema to Reduce SQL Queries
+            'enableSchemaCache' => true,
+            // Duration of schema cache.
+            'schemaCacheDuration' => 60, // 1 minute
+            // Name of the cache component used to store schema information
+            'schemaCache' => 'cache',
+        ],
+
+        'resourceManager' => [
+            'class' => 'common\components\S3ResourceManager',
+            'region' => 'eu-west-2', // Bucket based in London
+            'key' => 'AKIAJXOMRCDE65WKBPUA',
+            'secret' => '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',
+            'bucket' => 'plugn-uploads-dev-server',
+            /**
+             * For Local Development, we access using key and secret
+             * For Dev and Production servers, access is via server embedded IAM roles so no key/secret required
+             *
+             * You can access the bucket with:
+             * https://plugn-uploads-dev-server.s3.amazonaws.com/
+             * https://plugn-uploads-dev-server.s3.amazonaws.com/folderName/fileName.jpg
+             */
+        ],
+        
+        'log' => [
+            'targets' => [
+                [
+                    'class' => 'notamedia\sentry\SentryTarget',
+                    'dsn' => 'https://f6033f8f46ba451abbf4fa2730e8305a:7266a5e7beca44ff96fb32294ca35557@o70039.ingest.sentry.io/5220572',
+                    'levels' => ['error', 'warning'],
+                    'except' => [
+                        'yii\web\BadRequestHttpException',
+                        'yii\web\UnauthorizedHttpException',
+                        'yii\web\NotFoundHttpException',
+                        'yii\web\HttpException:400',
+                        'yii\web\HttpException:401',
+                        'yii\web\HttpException:404',
+                    ],
+                    'clientOptions' => [
+                        //which environment are we running this on?
+                        'environment' => 'staging',
+                    ],
+                    'context' => true // Write the context information. The default is true.
+                ],
+                [
+                    'class' => 'common\components\SlackLogger',
+                    'logVars' => [],
+                    'levels' => ['info', 'warning','error'],
+                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','api\*','agent\*'],
+                ],
+            ],
+        ],
+        'mailer' => [
+             'class' => 'yii\swiftmailer\Mailer',
+             'viewPath' => '@common/mail',
+             'transport' => [
+                 'class' => 'Swift_SmtpTransport',
+                 'host' => 'smtp.sendgrid.net',
+                 'username' => 'apikey',
+                 'password' => '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',
+                 'port' => '587',
+                 'encryption' => 'tls',
+                 // 'plugins' => [
+                 //     [
+                 //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                 //     ],
+                 // ],
+            ],
+        ],
+        // 'cache' => [
+        //     // Use Redis as a cache
+        //     'class' => 'yii\redis\Cache',
+        //     'redis' => [
+        //         'hostname' => 'plugn-redis.0x1cgp.0001.euw2.cache.amazonaws.com',
+        //         'port' => 6379,
+        //         'database' => 2,
+        //     ]
+        // ],
+        'tapPayments' => [
+            'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
+        ],
+        'myFatoorahPayment' => [
+            'gatewayToUse' => \common\components\MyFatoorahPayment::USE_TEST_GATEWAY
+        ],
+        'armadaDelivery' => [
+            'keyToUse' => \common\components\ArmadaDelivery::USE_TEST_KEY,
+        ],
+        'mashkorDelivery' => [
+            'class' => 'common\components\MashkorDelivery',
+            'keyToUse' => \common\components\MashkorDelivery::USE_TEST_KEY,
+        ],
+        'githubComponent' => [
+            'class' => 'common\components\GithubComponent',
+            'branch' => 'develop'
+        ],
+    ],
+];

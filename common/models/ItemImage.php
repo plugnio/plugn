@@ -29,6 +29,7 @@ class ItemImage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['item_uuid', 'product_file_name'], 'required'],
             [['item_uuid'], 'string', 'max' => 300],
             [['product_file_name'], 'unique'],
             [['product_file_name'], 'string', 'max' => 255],
@@ -42,12 +43,11 @@ class ItemImage extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'item_image_id' => 'Item Image ID',
-            'item_uuid' => 'Item Uuid',
-            'product_file_name' => 'Product File Name',
+            'item_image_id' => Yii::t('app','Item Image ID'),
+            'item_uuid' => Yii::t('app','Item Uuid'),
+            'product_file_name' => Yii::t('app','Product File Name')
         ];
     }
-
 
     public function beforeDelete()
     {
@@ -66,19 +66,18 @@ class ItemImage extends \yii\db\ActiveRecord
         try {
             Yii::$app->cloudinaryManager->delete($imageURL);
         } catch (\Cloudinary\Error $err) {
-            Yii::error('Error while deleting item image to Cloudinry: ' . json_encode($err));
+           // Yii::error('Error while deleting item image to Cloudinry: ' . json_encode($err));
         }
     }
-
 
     /**
      * Gets query for [[ItemUu]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem()
+    public function getItem($modelClass = "\common\models\Item")
     {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**
@@ -86,8 +85,9 @@ class ItemImage extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->via('item');
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via('item');
     }
 }

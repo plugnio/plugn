@@ -30,12 +30,22 @@ use yii\web\NotFoundHttpException;
  * @property string $payment_created_at
  * @property string $payment_updated_at
  * @property boolean $received_callback
+ * @property double $partner_fee
+ * @property  double $payout_status
+ * @property string|null $partner_payout_uuid
  *
  * @property Subscription $subscription
  * @property Plan $plan
  * @property Restaurant $restaurant
+ * @property PartnerPayout $partnerPayout
  */
 class SubscriptionPayment extends \yii\db\ActiveRecord {
+
+
+    //Values for `payout_status`
+    const PAYOUT_STATUS_PENDING = 0;
+    const PAYOUT_STATUS_UNPAID = 1;
+    const PAYOUT_STATUS_PAID = 2;
 
     /**
      * {@inheritdoc}
@@ -49,15 +59,17 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['subscription_uuid', 'payment_amount_charged', 'restaurant_uuid'], 'required'],
-            [['received_callback'], 'integer'],
+            [['subscription_uuid', 'payment_amount_charged', 'restaurant_uuid', 'payment_mode'], 'required'],
+            [['received_callback','payout_status'], 'integer'],
+            ['payout_status', 'in', 'range' => [self::PAYOUT_STATUS_UNPAID, self::PAYOUT_STATUS_PAID,self::PAYOUT_STATUS_PENDING]],
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
-            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee'], 'number'],
+            [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee','partner_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message', 'payment_token'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
             [['subscription_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Subscription::className(), 'targetAttribute' => ['subscription_uuid' => 'subscription_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+            [['partner_payout_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => PartnerPayout::className(), 'targetAttribute' => ['partner_payout_uuid' => 'partner_payout_uuid']]
         ];
     }
 
@@ -88,6 +100,26 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     }
 
     /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getStatus(){
+        switch($this->payout_status){
+            case self::PAYOUT_STATUS_UNPAID:
+                return "Unpaid";
+                break;
+            case self::PAYOUT_STATUS_PENDING:
+                return "Pending";
+                break;
+            case self::PAYOUT_STATUS_PAID:
+                return "Paid";
+                break;
+        }
+
+        return "Couldnt find a status";
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels() {
@@ -112,9 +144,23 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             'payment_updated_at' => Yii::t('app', 'Last activity'),
             'received_callback' => Yii::t('app', 'Received Callback'),
             'response_message' => Yii::t('app', 'Response Message'),
+            'partner_fee' => Yii::t('app', 'Plugn fee'),
+            'payout_status' => Yii::t('app', 'Payout status'),
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function fields() {
+        $fields = parent::fields();
+
+        // remove fields that contain sensitive information
+        unset($fields['partner_fee']);
+        unset($fields['payout_status']);
+
+        return $fields;
+    }
 
     /**
      * Update Payment's Status from TAP Payments
@@ -123,17 +169,18 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      * @return self                                [description]
      */
     public static function updatePaymentStatusFromTap($id, $showUpdatedFlashNotification = false) {
+
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
+
         $responseContent = json_decode($response->content);
 
         // If there's an error from TAP, exit and display error
@@ -202,7 +249,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         } else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
                     . $paymentRecord->restaurant->name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => 10]) .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
@@ -213,8 +260,14 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
             $subscription_model = $paymentRecord->subscription;
             $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
+
+            $valid_for =  $subscription_model->plan->valid_for;
+
+            $subscription_model->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"));
+
             $subscription_model->save(false);
 
+            foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
 
               \Yii::$app->mailer->compose([
                      'html' => 'premium-upgrade',
@@ -223,13 +276,11 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                      'store' => $paymentRecord->restaurant,
                  ])
                  ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                 ->setTo([$paymentRecord->restaurant->restaurant_email])
+                 ->setTo([$agent->agent_email])
                  ->setBcc(\Yii::$app->params['supportEmail'])
                  ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
                  ->send();
-
-
-
+            }
         }
 
         if ($isError) {
@@ -243,39 +294,127 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     }
 
 
+
+
+
+
+    /**
+     * Update Payment's Status from TAP Payments
+     * @param  string  $id                         Charge id
+     * @param string $status                       transaction status
+     * @param string $destinations                 transaction's destination
+     * @param string $source                        transaction's source
+     * @param string $response_message
+     */
+    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
+    {
+        // Look for payment with same Payment Gateway Transaction ID
+        $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);
+        if (!$paymentRecord) {
+            throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
+        if($paymentRecord->received_callback && $paymentRecord->payment_current_status == $status )
+          return $paymentRecord;
+
+
+        $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
+        $paymentRecord->response_message = $response_message;
+
+
+        // On Successful Payments
+        if ($status == 'CAPTURED') {
+
+
+            // KNET Gateway Fee Calculation
+            if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee) > Yii::$app->tapPayments->minKnetGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->knetGatewayFee;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minKnetGatewayFee;
+            } // Creditcard Gateway Fee Calculation
+            else if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD) {
+
+                if (($paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage) > Yii::$app->tapPayments->minCreditcardGatewayFee)
+                    $paymentRecord->payment_gateway_fee = $paymentRecord->payment_amount_charged * Yii::$app->tapPayments->creditcardGatewayFeePercentage;
+                else
+                    $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
+            }
+
+
+
+            // Update payment method used and the order id assigned to it
+            if (isset($source->payment_method) && $source->payment_method)
+                $paymentRecord->payment_mode = $source->payment_method;
+            if (isset($reference->payment) && $reference->payment)
+                $paymentRecord->payment_gateway_order_id = $reference->payment;
+
+            // Net amount after deducting gateway fee
+            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+
+        } else {
+            Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
+                    . $paymentRecord->restaurant->name .
+                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
+                    ' and has failed at gateway. Maybe card issue.', __METHOD__);
+
+            Yii::info('[Response from TAP for Failed Payment] ' .
+                    print_r($responseContent, true), __METHOD__);
+        }
+
+
+
+        return $paymentRecord;
+    }
+
+
+
+
+
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getSubscription() {
-        return $this->hasOne(Subscription::className(), ['subscription_uuid' => 'subscription_uuid']);
+    public function getSubscription($modelClass = "\common\models\Subscription") {
+        return $this->hasOne($modelClass::className(), ['subscription_uuid' => 'subscription_uuid']);
     }
-
 
     /**
      * Gets query for [[Plan]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPlan() {
-        return $this->hasOne(Plan::className(), ['plan_id' => 'plan_id'])->via('subscription');
+    public function getPlan($modelClass = "\common\models\Plan") {
+        return $this->hasOne($modelClass::className(), ['plan_id' => 'plan_id'])->via('subscription');
     }
-
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant() {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    public function getRestaurant($modelClass = "\common\models\Restaurant") {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+
+    /**
+     * Gets query for [[PartnerPayout]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+     public function getPartnerPayout(){
+           return $this->hasOne(PartnerPayout::className(), ['partner_payout_uuid' => 'partner_payout_uuid']);
+     }
+
+
 
     /**
      * Gets query for [[Currency]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
+    public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
     }
 
 }

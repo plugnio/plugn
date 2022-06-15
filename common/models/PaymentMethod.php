@@ -10,6 +10,8 @@ use Yii;
  * @property int $payment_method_id
  * @property string|null $payment_method_name
  * @property string|null $payment_method_name_ar
+ * @property int $vat
+ * @property string $payment_method_code
  * @property string|null $source_id
  *
  * @property RestaurantPaymentMethod[] $restaurantPaymentMethods
@@ -17,6 +19,13 @@ use Yii;
  */
 class PaymentMethod extends \yii\db\ActiveRecord
 {
+    const CODE_FREE_CHECKOUT = 'free-checkout';
+    const CODE_BENEFIT = 'benefit';
+    const CODE_MADA = 'mada';
+    const CODE_CASH = 'cash';
+    const CODE_CREDIT_CARD = 'credit-card';
+    const CODE_KNET = 'kn';
+
     /**
      * {@inheritdoc}
      */
@@ -31,7 +40,9 @@ class PaymentMethod extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['payment_method_name' , 'payment_method_name_ar', 'source_id'], 'string', 'max' => 255],
+            [['payment_method_name'], 'required'],
+            [['payment_method_name' , 'payment_method_name_ar', 'source_id','payment_method_code'], 'string', 'max' => 255],
+            [['vat'], 'number']
         ];
     }
 
@@ -41,9 +52,9 @@ class PaymentMethod extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'payment_method_id' => 'Payment Method ID',
-            'payment_method_name' => 'Payment Method Name',
-            'payment_method_name_ar' => 'Payment Method Name [Arabic]',
+            'payment_method_id' => Yii::t('app','Payment Method ID'),
+            'payment_method_name' => Yii::t('app','Payment Method Name'),
+            'payment_method_name_ar' => Yii::t('app','Payment Method Name [Arabic]'),
         ];
     }
 
@@ -52,9 +63,9 @@ class PaymentMethod extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantPaymentMethods()
+    public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
     {
-        return $this->hasMany(RestaurantPaymentMethod::className(), ['payment_method_id' => 'payment_method_id']);
+        return $this->hasMany($modelClass::className(), ['payment_method_id' => 'payment_method_id']);
     }
 
     /**
@@ -62,8 +73,9 @@ class PaymentMethod extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantUus()
+    public function getRestaurants($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])->viaTable('restaurant_payment_method', ['payment_method_id' => 'payment_method_id']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->viaTable('restaurant_payment_method', ['payment_method_id' => 'payment_method_id']);
     }
 }

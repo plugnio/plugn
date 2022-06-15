@@ -1,7 +1,7 @@
 <?php
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $agent_model \frontend\models\ContactForm */
+/* @var $agent \frontend\models\ContactForm */
 
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
@@ -34,7 +34,19 @@ $this->params['breadcrumbs'][] = $this->title;
                         <p class="px-2">Fill the below form to create an online store.</p>
                         <div class="card-content">
                             <div class="card-body pt-0">
-                                <?php
+
+                                <?php if (Yii::$app->session->hasFlash('error')) { ?>
+                                    <div class="alert alert-danger alert-dismissable">
+                                        <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                                        <?php
+                                        foreach(Yii::$app->session->getFlash('error') as $errors) {
+                                            foreach($errors as $error) { ?>
+                                                <p><?= $error ?></p>
+                                            <?php
+                                            }
+                                        } ?>
+                                    </div>
+                                <?php }
 
                                       $form = ActiveForm::begin(['id' => 'store-form', 'enableClientScript' => false]);
 
@@ -42,6 +54,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                                       ->where(['iso' => 'KW'])
                                                       ->orWhere(['iso' => 'BH'])
                                                       ->orWhere(['iso' => 'SA'])
+                                                      ->orWhere(['iso' => 'QA'])
+                                                      ->orWhere(['iso' => 'AE'])
+                                                      ->orWhere(['iso' => 'EG'])
+                                                      ->orWhere(['iso' => 'OM'])
+                                                      ->orWhere(['iso' => 'JO'])
+                                                      ->orWhere(['iso' => 'LB'])
                                                       ->asArray()->all();
 
                                       $countryArray = ArrayHelper::map($countryQuery, 'country_id', 'country_name');
@@ -53,23 +71,23 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ?>
 
 
-                                <?= $form->field($agent_model, 'agent_name')->textInput(['maxlength' => true])->label('Your name *') ?>
+                                <?= $form->field($agent, 'agent_name')->textInput(['maxlength' => true])->label('Your name *') ?>
 
-                                <?= $form->field($agent_model, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Your email *') ?>
+                                <?= $form->field($agent, 'agent_email')->textInput(['maxlength' => true,'type' => 'email'])->label('Your email *') ?>
 
                                 <?=
-                                    $form->field($store_model, 'owner_number')->widget(PhoneInput::className(), [
+                                    $form->field($store, 'owner_number')->widget(PhoneInput::className(), [
                                          'jsOptions' => [
                                              'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
                                          ]
                                      ])->label('Phone Number *');
                                ?>
 
-                               <?= $form->field($store_model, 'name')->textInput(['maxlength' => true])->label('Your store name *') ?>
+                               <?= $form->field($store, 'name')->textInput(['maxlength' => true])->label('Your store name *') ?>
 
 
                                 <?=
-                                $form->field($store_model, 'restaurant_domain', [
+                                $form->field($store, 'restaurant_domain', [
                                     'template' => "{label}"
                                     . "<div class='input-group'>
                                            {input}
@@ -87,12 +105,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ])->label('Store URL *')
                                 ?>
 
-                                <?= $form->field($store_model, 'country_id')->dropDownList($countryArray,['value'=>'84'])->label('Business location *'); ?>
+                                <?= $form->field($store, 'country_id')->dropDownList($countryArray,['value'=>'84'])->label('Business location *'); ?>
 
 
-                                <?= $form->field($store_model, 'currency_id')->dropDownList($currencyArray,['value'=>'2'])->label('Store Currency *'); ?>
+                                <?= $form->field($store, 'currency_id')->dropDownList($currencyArray,['value'=>'2'])->label('Store Currency *'); ?>
 
-                                <?= $form->field($agent_model, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
+                                <?= $form->field($agent, 'tempPassword')->passwordInput(['maxlength' => true])->label('Password *') ?>
 
                                 <div class="form-group">
                                     <?= Html::submitButton('Create', ['class' => 'btn btn-primary  btn-inline', 'style' => 'width: 100%;',  'name' => 'register-button']) ?>

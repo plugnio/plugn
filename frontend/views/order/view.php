@@ -21,6 +21,19 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 
 
+
+
+if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message || $model->sender_name) {
+  $this->registerCss('
+  .content-header-title::after {
+    content: url(https://res.cloudinary.com/plugn/image/upload/v1649461316/icon_gift_gfapfu.svg);
+        vertical-align: middle;
+        padding:10px;
+  }
+  ');
+}
+
+
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
@@ -45,7 +58,23 @@ $this->registerJs($js);
         <h5><i class="icon fa fa-check"></i> Success!</h5>
         <?= (Yii::$app->session->getFlash('successResponse')) ?>
     </div>
-<?php } ?>
+<?php }
+
+
+$armadaApiKey = null;
+$mashkorBranchId = null;
+
+if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->armada_api_key != null)
+  $armadaApiKey = $model->deliveryZone->businessLocation->armada_api_key;
+
+if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->mashkor_branch_id != null)
+  $mashkorBranchId = $model->deliveryZone->businessLocation->mashkor_branch_id;
+
+if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->diggipack_customer_id != null)
+  $diggipack_customer_id = $model->deliveryZone->businessLocation->diggipack_customer_id;
+
+
+?>
 
 
 
@@ -71,13 +100,14 @@ $this->registerJs($js);
         ?>
 
         <?php
-        // if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
-        //     echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning', 'style'=>'margin-left: 5px;']) ;
-        // }
+        if ($orderItems->totalCount > 0 && $model->payment_uuid &&  $model->order_status != Order::STATUS_REFUNDED && $model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT ) {
+          if(($model->restaurant->is_myfatoorah_enable  && $model->payment->payment_gateway_invoice_id ) || ($model->restaurant->is_tap_enable  && $model->payment->payment_gateway_transaction_id ))
+            echo Html::a('Refund', ['refund-order', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid,], ['class' => 'btn btn-warning  mr-1 mb-1', 'style'=>'margin-left: 7px;']) ;
+        }
         ?>
 
         <?php
-        if ($model->delivery_zone_id || $model->pickup_location_id) {
+        if (  Yii::$app->user->identity->agent_id == 1  || ($model->delivery_zone_id || $model->pickup_location_id)) {
             echo Html::a('Delete', ['delete', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid], [
                 'class' => 'btn btn-danger mr-1 mb-1',
                 'data' => [
@@ -87,6 +117,20 @@ $this->registerJs($js);
                 'style' => 'margin-right: 7px;'
             ]);
         }
+
+
+        // if (  ($model->delivery_zone_id) && !$model->diggipack_awb_no) {
+            // echo Html::a('Request fulfillment', ['request-fulfillment', 'order_uuid' => $model->order_uuid, 'storeUuid' => $storeUuid], [
+            //     'class' => 'btn btn-dark mr-1 mb-1',
+            //     'data' => [
+            //         'confirm' => 'Are you sure you want to request fulfillment?',
+            //         'method' => 'post',
+            //     ],
+            //     'style' => 'margin-right: 7px;'
+            // ]);
+        // }
+
+
         ?>
 
     <div style="display: block">
@@ -96,18 +140,14 @@ $this->registerJs($js);
         $deliveryTime = strtotime($model->estimated_time_of_arrival);
         $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
 
+        if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-        if ($model->order_mode == Order::ORDER_MODE_DELIVERY && ( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait'))) {
+            if ( ( ($model->area_id && ($model->area->country->country_name == 'Kuwait' || $model->area->country->country_name == 'Bahrain')) || ($model->shipping_country_id && ($model->country->country_name == 'Kuwait' || $model->country->country_name == 'Bahrain'))    )  &&
+             $armadaApiKey != null && $model->armada_tracking_link == null
+           ) {
 
-            if ($model->restaurant->armada_api_key != null && $model->armada_tracking_link == null) {
-
-                if (
-                    $difference <= 1  &&
-                    $model->restaurant->hide_request_driver_button
-                    // $storeUuid != 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' &&
-                    // $storeUuid != 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
-                   ){
-                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                if ( $difference <= 1  && $model->restaurant->hide_request_driver_button && $model->area_id != 4007 ){
+                          echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'armadaApiKey' => $armadaApiKey], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
                               'data' => [
@@ -117,12 +157,8 @@ $this->registerJs($js);
                           ]);
                 }
 
-                if (
-                    !$model->restaurant->hide_request_driver_button
-                    // $storeUuid == 'rest_6a55139f-f340-11ea-808a-0673128d0c9c' ||
-                    // $storeUuid == 'rest_5d657108-c91f-11ea-808a-0673128d0c9c'
-                   )  {
-                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                if ( !$model->restaurant->hide_request_driver_button && $model->area_id != 4007 )  {
+                      echo Html::a('Request a driver from Armada', ['request-driver-from-armada', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid , 'armadaApiKey' => $armadaApiKey], [
                           'class' => 'btn btn-dark mr-1 mb-1',
                           'style' => 'margin-right: 7px;',
                           'data' => [
@@ -134,10 +170,11 @@ $this->registerJs($js);
 
             }
 
-            if ($model->restaurant->mashkor_branch_id != null && $model->mashkor_order_number == null) {
+            if (( ($model->area_id && $model->area->country->country_name == 'Kuwait') || ($model->shipping_country_id && $model->country->country_name == 'Kuwait' )    ) &&
+              $mashkorBranchId != null && $model->mashkor_order_number == null) {
 
                 if ($difference <= 1  && $model->restaurant->hide_request_driver_button ){
-                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                  echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'mashkorBranchId' => $mashkorBranchId], [
                       'class' => 'btn btn-dark mr-1 mb-1',
                       'style' => 'margin-right: 7px;',
                       'data' => [
@@ -149,7 +186,7 @@ $this->registerJs($js);
 
 
                 if (!$model->restaurant->hide_request_driver_button){
-                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid], [
+                          echo Html::a('Request a driver from Mashkor', ['request-driver-from-mashkor', 'storeUuid' => $storeUuid, 'order_uuid' => $model->order_uuid, 'mashkorBranchId' => $mashkorBranchId], [
                               'class' => 'btn btn-dark mr-1 mb-1',
                               'style' => 'margin-right: 7px;',
                               'data' => [
@@ -182,7 +219,7 @@ $this->registerJs($js);
             <p style="margin-top: 1rem">
 
 <?php
-if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $model->getOrderItems()->count()) {
+if (($model->order_status == Order::STATUS_DRAFT || $model->order_status == Order::STATUS_ABANDONED_CHECKOUT || $model->order_status == Order::STATUS_CANCELED ) && $orderItems->totalCount) {
     echo Html::a('Mark as pending', [
         'change-order-status',
         'order_uuid' => $model->order_uuid,
@@ -298,11 +335,31 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         ],
                         [
                             'attribute' => 'estimated_time_of_arrival',
+                            'label' => 'Estimated Delivery',
                             "format" => "raw",
                             "value" => function($model) {
-                                return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
+                                if($model->is_order_scheduled)
+                                  return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival)) .  date(' - h:i A', strtotime($model->scheduled_time_to));
+                                else
+                                  return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
                         ],
+                        // [
+                        //     'attribute' => 'diggipack_awb_no',
+                        //     'format' => 'raw',
+                        //     'value' => function ($data) {
+                        //         return $data->diggipack_awb_no;
+                        //     },
+                        //     'visible' => $model->diggipack_awb_no != null,
+                        // ],
+                        // [
+                        //     'label' => 'DiggiPacks tracking link',
+                        //     'format' => 'raw',
+                        //     'value' => function ($data) {
+                        //         return Html::a('https://track.diggipacks.com/result_detailfm/' . $data->diggipack_awb_no, \yii\helpers\Url::to('https://track.diggipacks.com/result_detailfm/' . $data->diggipack_awb_no, true), ['target' => '_blank']);
+                        //     },
+                        //     'visible' => $model->diggipack_awb_no != null,
+                        // ],
                         [
                             'attribute' => 'armada_tracking_link',
                             'format' => 'raw',
@@ -318,6 +375,14 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                 return Html::a($data->armada_delivery_code, \yii\helpers\Url::to($data->armada_delivery_code, true), ['target' => '_blank']);
                             },
                             'visible' => $model->armada_delivery_code != null,
+                        ],
+                        [
+                            'attribute' => 'armada_order_status',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return $data->armada_order_status ? '<span  style="font-size:20px; font-weight: 700" >' . $data->armada_order_status . '</span>' : null;
+                            },
+                            'visible' => $model->armada_order_status != null,
                         ],
                         [
                             'attribute' => 'mashkor_order_number',
@@ -346,14 +411,6 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             'visible' => $model->mashkor_tracking_link != null,
                         ],
                         [
-                            'attribute' => 'mashkor_driver_name',
-                            'format' => 'raw',
-                            'value' => function ($data) {
-                                return $data->mashkor_driver_name ? $data->mashkor_driver_name : null;
-                            },
-                            'visible' => $model->mashkor_driver_name != null,
-                        ],
-                        [
                             'attribute' => 'mashkor_driver_phone',
                             'format' => 'raw',
                             'value' => function ($data) {
@@ -377,7 +434,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             </div>
         </div>
     </div>
-    <?php if ($orderItems->totalCount > 0) { ?>
+    <?php if ($orderItems->totalCount) { ?>
         <section id="data-list-view" class="data-list-view-header">
 
             <div class="card">
@@ -405,7 +462,27 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             [
                 'label' => 'SKU',
                 'format' => 'raw',
-                'value' => 'item.sku',
+                'value' => function ($data) {
+
+                    if($data->variant) {
+                       return $data->variant->sku;
+                    }else if($data->item) {
+                        return $data->item->sku;
+                    }
+                },
+            ],
+            [
+                'label' => 'Barcode',
+                'format' => 'raw',
+                //'value' => 'item.barcode',
+                'value' => function ($data) {
+
+                    if($data->variant) {
+                        return $data->variant->barcode;
+                    }else if($data->item) {
+                        return $data->item->barcode;
+                    }
+                },
             ],
             // 'customer_instruction',
             [
@@ -441,8 +518,10 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             ],
             [
                 'label' => 'Subtotal',
-                'value' => function ($orderItem) {
-                    return Yii::$app->formatter->asCurrency($orderItem->item_price, $orderItem->currency->code);
+                'value' => function ($orderItem) use ($model)  {
+                    return Yii::$app->formatter->asCurrency($orderItem->item_price * $model->currency_rate, $orderItem->currency->code, [
+                        \NumberFormatter::MAX_FRACTION_DIGITS => $orderItem->currency->decimal_place
+                    ]);
                 }
             ],
         ],
@@ -483,7 +562,10 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody>
                         <tr>
                             <td colspan="2">Subtotal</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->subtotal, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->subtotal* $model->currency_rate, $model->currency->code, [
+                                    \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                ]) ?></td>
                         </tr>
                     </tbody>
                     <?php
@@ -494,7 +576,11 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         <tbody>
                             <tr>
                                 <td colspan="2">Voucher Discount (<?= $model->voucher->code ?>)</td>
-                                <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($voucherDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                                <td style="float: right;">-<?= Yii::$app->formatter->asCurrency(
+                                        $voucherDiscount* $model->currency_rate, $model->currency->code, [
+                                                \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                            \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                        ]) ?></td>
                             </tr>
                         </tbody>
                         <tbody>
@@ -505,7 +591,10 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
 
                                   $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ?  $subtotalAfterDiscount : 0;
 
-                                  echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3])
+                                  echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount* $model->currency_rate, $model->currency->code, [
+                                          \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                     \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
+                                  ])
 
                                   ?>
                                 </td>
@@ -519,7 +608,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                 <tbody>
                                     <tr>
                                         <td colspan="2">Bank Discount</td>
-                                        <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($bankDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                                        <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($bankDiscount* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -530,7 +619,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
 
                                             $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
 
-                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3])
+                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place])
                                           ?>
                                         </td>
                                     </tr>
@@ -541,7 +630,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody>
                         <tr>
                             <td colspan="2">Delivery fee</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->delivery_fee* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                         </tr>
                     </tbody>
 
@@ -550,14 +639,14 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         <tbody>
                             <tr>
                                 <td colspan="2">Voucher Discount (<?= $model->voucher->code ?>)</td>
-                                <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                                <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($model->delivery_fee* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                             </tr>
                         </tbody>
 
                         <tbody>
                             <tr>
                                 <td colspan="2">Delivery fee After Voucher</td>
-                                <td style="float: right;"><?= Yii::$app->formatter->asCurrency(0, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                                <td style="float: right;"><?= Yii::$app->formatter->asCurrency(0, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                             </tr>
                         </tbody>
     <?php } ?>
@@ -567,7 +656,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody>
                         <tr>
                             <td colspan="2">Tax</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->tax* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                         </tr>
                     </tbody>
                     <?php } ?>
@@ -576,7 +665,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody>
                         <tr>
                             <td colspan="2">Total</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                         </tr>
                     </tbody>
 
@@ -586,8 +675,8 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         </tr>
                     </tbody>
     <?php
-    if ($model->order_status == Order::STATUS_REFUNDED || $model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($refunds->count() > 0)) {
-        foreach ($refunds->all() as $refund) {
+    if ($model->order_status == Order::STATUS_REFUNDED || $model->order_status == Order::STATUS_PARTIALLY_REFUNDED && ($model->refunds > 0)) {
+        foreach ($model->refunds as $refund) {
             ?>
                             <tbody class="order-details__summary__refund-lines">
                                 <tr class="order-details__summary__detail-line-row">
@@ -595,7 +684,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                     <td class="type--subdued">
                                         Reason:  <?= $refund->reason ? $refund->reason : ' –' ?>
                                     </td>
-                                    <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($refund->refund_amount, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                                    <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($refund->refund_amount* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                                 </tr>
                             </tbody>
 
@@ -606,7 +695,10 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody class="order-details__summary__net-payment">
                         <tr>
                             <td class="type--bold" colspan="2">Net payment</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [NumberFormatter::MIN_FRACTION_DIGITS => 3, NumberFormatter::MAX_FRACTION_DIGITS => 3]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price* $model->currency_rate, $model->currency->code, [
+                                    \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place])
+                                ?></td>
                         </tr>
                     </tbody>
                 </table>
@@ -616,10 +708,6 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                 <?php } ?>
 
 <?php
-// order's Item
-$refundDataProvider = new \yii\data\ActiveDataProvider([
-    'query' => $model->getRefunds()
-        ]);
 
 
 if ($refundDataProvider->totalCount > 0 && $model->payment) {
@@ -627,22 +715,35 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
         <div class="card">
             <div class="card-body">
 
-                <h3 style="margin-bottom: 20px;"> Refunds  </h3>
-
-
+                <h3 style="margin-bottom: 20px;">
                 <?php
-                // GridView::widget([
-                //     'dataProvider' => $refundDataProvider,
-                //     'sorter' => false,
-                //     'columns' => [
-                //         'refund_id',
-                //         'refund_amount:currency',
-                //         'refund_status',
-                //     ],
-                //     'layout' => '{items}{pager} ',
-                //     'tableOptions' => ['class' => 'table table-bordered table-hover'],
-                // ]);
+                  if($refundDataProvider->totalCount == 1)
+                    echo 'Refund';
+                  else if($refundDataProvider->totalCount > 1)
+                    echo 'Refunds';
                 ?>
+                </h3>
+
+                <?= GridView::widget([
+                    'dataProvider' => $refundDataProvider,
+                    'columns' => [
+                      ['class' => 'yii\grid\SerialColumn'],
+
+                      [
+                          'attribute' => 'refund_amount',
+                          "value" => function($data) use ($model) {
+                                  return Yii::$app->formatter->asCurrency($data->refund_amount* $model->currency_rate, $data->currency->code, [
+                                      \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                                  ]);
+                          },
+                      ],
+                        'refund_status',
+                    ],
+                    'layout' => '{items}{pager} ',
+                    'tableOptions' => ['class' => 'table table-bordered table-hover'],
+
+
+                ]); ?>
             </div>
         </div>
 
@@ -656,8 +757,11 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
 
             <?php
 
-            if($model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
+            if($model->restaurant->is_tap_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
               echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
+
+            // if($model->restaurant->is_myfatoorah_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'Succss')
+            //   echo Html::a('Request Payment Status Update from MyFatoorah', ['update-payment-status','id' => $model->payment_uuid, 'storeUuid' => $storeUuid], ['class'=>'btn btn-outline-primary']);
 
             ?>
 
@@ -686,7 +790,7 @@ DetailView::widget([
             'format' => 'html',
             'value' => function ($data) {
                 if ($data->payment) {
-                    return $data->payment->payment_current_status == 'CAPTURED' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
+                    return $data->payment->payment_current_status == 'CAPTURED' || $data->payment->payment_current_status == 'SUCCESS' || $data->payment->payment_current_status == 'Paid'  || $data->payment->payment_current_status == 'Succss' ? '<span class="badge bg-success" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>' : '<span class="badge bg-danger" style="font-size:20px;" >' . $data->payment->payment_current_status . '</span>';
                 }
             },
             'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
@@ -695,11 +799,21 @@ DetailView::widget([
             'label' => 'Gateway ID',
             'format' => 'html',
             'value' => function ($data) {
-                if ($data->payment) {
+                if ($data->payment_uuid) {
                     return $data->payment->payment_gateway_order_id;
                 }
             },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'tap',
+        ],
+        [
+            'label' => 'Invoice ID',
+            'format' => 'html',
+            'value' => function ($data) {
+                if ($data->payment_uuid) {
+                    return $data->payment->payment_gateway_invoice_id;
+                }
+            },
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'myfatoorah',
         ],
         [
             'label' => 'Received Callback',
@@ -719,7 +833,17 @@ DetailView::widget([
                     return $data->payment->payment_gateway_transaction_id;
                 }
             },
-            'visible' => $model->payment_method_id != 3 && $model->payment_uuid,
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'tap',
+        ],
+        [
+            'label' => 'Payment ID',
+            'format' => 'html',
+            'value' => function ($data) {
+                if ($data->payment) {
+                    return $data->payment->payment_gateway_payment_id;
+                }
+            },
+            'visible' => $model->payment_method_id != 3 && $model->payment_uuid && $model->payment->payment_gateway_name == 'myfatoorah' && $model->payment->payment_gateway_payment_id,
         ],
     ],
     'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
@@ -874,6 +998,68 @@ DetailView::widget([
             </div>
         </div>
     </div>
+
+
+
+    <?php
+         if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message || $model->sender_name) {
+       ?>
+           <div class="card">
+               <div class="card-body">
+                   <h3>Gift details</h3>
+
+                   <div class="box-body table-responsive no-padding">
+
+                       <?=
+                       DetailView::widget([
+                           'model' => $model,
+                           'attributes' => [
+
+                               [
+                                   'attribute' => 'sender_name',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->sender_name;
+                                   },
+                                   'visible' => $model->sender_name != null && $model->sender_name,
+                               ],
+                               [
+                                   'attribute' => 'recipient_name',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->recipient_name;
+                                   },
+                                   'visible' => $model->recipient_name != null && $model->recipient_name,
+                               ],
+                               [
+                                   'attribute' => 'recipient_phone_number',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                       return $model->recipient_phone_number;
+                                   },
+                                   'visible' => $model->recipient_phone_number != null && $model->recipient_phone_number,
+                               ],
+                               [
+                                   'attribute' => 'gift_message',
+                                   "format" => "raw",
+                                   "value" => function($model) {
+                                     return '<span style="    white-space: normal;">' .$model->gift_message . '</span>';
+                                   },
+                                   'visible' => $model->gift_message != null && $model->gift_message,
+                               ],
+
+                           ],
+                           'options' => ['class' => 'table table-hover text-nowrap table-bordered'],
+                       ])
+                       ?>
+                   </div>
+               </div>
+           </div>
+         <?php } ?>
+
+
+
+
 
 </div>
 

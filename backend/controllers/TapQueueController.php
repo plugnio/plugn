@@ -2,8 +2,10 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
 use common\models\TapQueue;
+use backend\models\TapQueueSearch;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -30,6 +32,11 @@ class TapQueueController extends Controller
          'access' => [
              'class' => \yii\filters\AccessControl::className(),
              'rules' => [
+                 [
+                     'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                     'actions' => ['create', 'update', 'delete'],
+                     'roles' => ['@'],
+                 ],
                  [//allow authenticated users only
                      'allow' => true,
                      'roles' => ['@'],
@@ -46,13 +53,15 @@ class TapQueueController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => TapQueue::find()->orderBy(['queue_status' => SORT_ASC]),
-        ]);
 
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
+       $searchModel = new TapQueueSearch();
+       $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+       return $this->render('index', [
+           'searchModel' => $searchModel,
+           'dataProvider' => $dataProvider,
+       ]);
+
     }
 
     /**

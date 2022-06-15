@@ -27,7 +27,7 @@ $this->registerJs($js);
 <section id="data-list-view" class="data-list-view-header">
 
 <!-- Data list view starts -->
-<div class="action-btns d-none">
+<div class="action-btns">
     <div class="btn-dropdown mr-1 mb-1">
         <div class="btn-group dropdown actions-dropodown">
           <?= Html::a('<i class="feather icon-plus"></i> Invite Additional Agent', ['create', 'storeUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-primary']) ?>
@@ -36,37 +36,54 @@ $this->registerJs($js);
 </div>
 
 
-
     <!-- DataTable starts -->
     <div class="table-responsive">
 
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
-                  if ($model->agent_id != Yii::$app->user->identity->agent_id) {
-                $url = Url::to(['update', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid]);
+              //if ($model->agent_id != Yii::$app->user->identity->agent_id) {
+                $url = Url::to(['view', 'assignment_id' => $model->assignment_id, 'agent_id' => $model->agent_id, 'storeUuid' => $model->restaurant_uuid]);
 
                 return [
+                  'class' => 'clickable',
                     'onclick' => "window.location.href='{$url}'"
                 ];
-              }
+            //  }
             },
             'columns' => [
               ['class' => 'yii\grid\SerialColumn'],
-              'agent.agent_name',
+              [
+                'attribute' => 'agent_name',
+                'value' => 'agent.agent_name'
+              ],
               'assignment_agent_email:email',
               [
                   'attribute' => 'role',
                   'format' => 'html',
+                  'filter'=> [
+                        AgentAssignment::AGENT_ROLE_OWNER => "Owner",
+                        AgentAssignment::AGENT_ROLE_BRANCH_MANAGER => "Branch Manager",
+                        AgentAssignment::AGENT_ROLE_STAFF => "Staff"
+                  ],
                   'value' => function ($data) {
-                      return $data->role == AgentAssignment::AGENT_ROLE_OWNER ? 'Owner' : 'Staff';
+                      if($data->role == AgentAssignment::AGENT_ROLE_OWNER)
+                        $role = 'Owner';
+                      else  if($data->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
+                        $role = 'Branch Manager';
+                      else
+                        $role = 'Staff';
+
+                      return $role;
                   },
               ],
               'assignment_created_at',
             ],
+
             'layout' => '{summary}{items}{pager}',
-            'tableOptions' => ['class' => 'table data-list-view'],
+            'tableOptions' => ['class' => 'table data-list-view dataTable'],
         ]);
         ?>
 

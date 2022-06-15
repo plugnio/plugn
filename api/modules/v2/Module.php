@@ -19,7 +19,18 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        //Can Initialize / add params to this module here
-    }
+        $lang = \Yii::$app->request->headers->get('language');
 
+        $currency = \Yii::$app->request->headers->get('currency');
+
+        if ($lang && $lang != \Yii::$app->language)
+        {
+            \Yii::$app->language = $lang;
+        }
+
+        if ($currency)//&& $currency != \Yii::$app->currency->getCode()
+        {
+            \Yii::$app->currency->setCode($currency);
+        }
+    }
 }
