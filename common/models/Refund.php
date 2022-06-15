@@ -102,7 +102,7 @@ class Refund extends \yii\db\ActiveRecord
 
         $refundRecord->refund_status = $responseContent['RefundStatus'];
 
-        if(!$refundRecord->save()){
+        if(!$refundRecord->save()) {
            Yii::error("Error when updating refund status" . json_encode($refundRecord->errors));
         }
 
@@ -192,7 +192,7 @@ class Refund extends \yii\db\ActiveRecord
             //     );
             //
             //     if ($tapPaymentResponse->isOk) {
-            //         $this->refund_id = $tapPaymentResponse->data['id'];
+            //         $this->refund_reference = $tapPaymentResponse->data['id'];
             //         $this->refund_status = $tapPaymentResponse->data['status'];
             //     } else {
             //         return $this->addError('', print_r(json_encode($tapPaymentResponse->data['errors'][0]['description']), true));
