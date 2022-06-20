@@ -11,8 +11,6 @@ use common\models\Subscription;
  */
 class SubscriptionSearch extends Subscription
 {
-
-
       public $restaurant_name;
       public $plan_name;
       public $platform_fee;

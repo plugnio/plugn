@@ -5,7 +5,7 @@ namespace backend\controllers;
 use backend\models\Admin;
 use Yii;
 use yii\filters\AccessControl;
-use common\models\Agent;
+use backend\models\Agent;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
