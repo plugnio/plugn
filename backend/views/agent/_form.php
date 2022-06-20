@@ -22,6 +22,9 @@ use kartik\select2\Select2;
 
     <?= $form->field($model, 'agent_email')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'agent_email_verification')
+        ->checkbox(['checked' => $model->agent_email_verification > 0,  'value' => true]) ?>
+
     <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
 
 
