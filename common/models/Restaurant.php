@@ -1213,7 +1213,10 @@ class Restaurant extends \yii\db\ActiveRecord
         }
     }
 
-
+    /**
+     * @param $insert
+     * @return bool|void
+     */
     public function beforeSave($insert) {
 
         if($insert && $this->referral_code != null){
@@ -2328,6 +2331,16 @@ class Restaurant extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[Campaign]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCampaigns($modelClass = "\common\models\Campaign")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
