@@ -1637,7 +1637,7 @@ class SiteController extends Controller
 
             if ($agent && !$agent->agent_email_verification) {
                 
-                $verifyLink = Yii::$app->params['dashboardAppUrl'] . '/verify-email/' . urlencode($model->email);
+                $verifyLink = Yii::$app->params['newDashboardAppUrl'] . '/verify-email/' . urlencode($model->email);
 
                 return $this->redirect($verifyLink);//['site/verify-email', 'email' => $agent->agent_email]
             }
