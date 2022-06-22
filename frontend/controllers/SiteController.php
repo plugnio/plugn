@@ -1631,15 +1631,28 @@ class SiteController extends Controller
 
         $model = new LoginForm();
 
-        if ($model->load(Yii::$app->request->post()) && $managedRestaurant = $model->login()) {
-            return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
-        } else {
-            $model->password = '';
+        if ($model->load(Yii::$app->request->post())) {
 
-            return $this->render('login', [
-                'model' => $model,
-            ]);
-        }
+            $agent = $model->getAgent();
+
+            if ($agent && !$agent->agent_email_verification) {
+                
+                $verifyLink = Yii::$app->params['dashboardAppUrl'] . '/verify-email/' . urlencode($model->email);
+
+                return $this->redirect($verifyLink);//['site/verify-email', 'email' => $agent->agent_email]
+            }
+
+            if($managedRestaurant = $model->login()) {
+                return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
+            }
+
+        } 
+       
+        $model->password = '';
+
+        return $this->render('login', [
+            'model' => $model,
+        ]); 
     }
 
     /**
