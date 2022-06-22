@@ -18,7 +18,6 @@ use common\models\PaymentMethod;
  */
 class ArmadaDelivery extends Component {
 
-
     const USE_TEST_KEY = 1;
     const USE_LIVE_KEY = 2;
 
@@ -32,7 +31,6 @@ class ArmadaDelivery extends Component {
     public $testApiEndpoint = "https://api-simulation-env.herokuapp.com/v0/deliveries";
 
     private $apiEndpoint;
-
 
     /**
      * @inheritdoc

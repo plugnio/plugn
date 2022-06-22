@@ -43,6 +43,7 @@ class LoginForm extends Model {
     public function validatePassword($attribute, $params)
     {
         if (!$this->hasErrors()) {
+            
             $agent = $this->getAgent();
 
             if ($agent && !$agent->agent_email_verification) {
