@@ -333,9 +333,11 @@ class AuthController extends Controller {
     {
         $emailInput = Yii::$app->request->getBodyParam("email");
 
-        $agent = Agent::findOne([
-            'agent_email' => $emailInput,
-        ]);
+        $agent = Agent::find()->andWhere([
+            'OR',
+            ['agent_email' => $emailInput],
+            ['agent_new_email' => $emailInput],
+        ])->one();
 
         $errors = false;
         $errorCode = null; //error code
