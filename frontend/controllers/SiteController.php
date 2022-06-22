@@ -1776,7 +1776,7 @@ class SiteController extends Controller
                 ]);
             }
 
-            //$agent->sendVerificationEmail();
+            $agent->sendVerificationEmail();
 
             $transaction->commit();
 
