@@ -23,7 +23,7 @@ class m220420_140313_item_price extends Migration
                 ->after('item_name_ar'));
         }
 
-        $total = \common\models\OrderItem::find()
+        /*$total = \common\models\OrderItem::find()
             ->andWhere(new \yii\db\Expression('item_unit_price IS NULL or item_unit_price=0'))
             ->count();
 
@@ -48,7 +48,7 @@ class m220420_140313_item_price extends Migration
             }
         }
 
-        Console::updateProgress($n, $total);
+        Console::updateProgress($n, $total);*/
     }
 
     /**

@@ -38,7 +38,7 @@ $this->title = "Confirm " . $selectedPlan->name;
               }
           } ?>
       </div>
-  <?php }
+  <?php } ?>
 
   <div class="card" style=" padding-bottom:2.1rem;">
     <div class="card-header">
