@@ -169,13 +169,18 @@ class StoreController extends Controller
             return self::message("error",$store->getErrors());
         }
 
+        //log to slack
+
+        \Yii::info("[Store Domain Update Request] " . $store->name . " want to change domain from " .
+            $old_domain ." to " . $store->restaurant_domain, __METHOD__);
+
         \Yii::$app->mailer->compose([
             'html' => 'domain-update-request',
         ], [
-            'store_name' => $store->name,
-            'new_domain' => $store->restaurant_domain,
-            'old_domain' => $old_domain
-        ])
+                'store_name' => $store->name,
+                'new_domain' => $store->restaurant_domain,
+                'old_domain' => $old_domain
+            ])
             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
             ->setTo(Yii::$app->params['adminEmail'])
             ->setSubject('[Plugn] Agent updated DN')
