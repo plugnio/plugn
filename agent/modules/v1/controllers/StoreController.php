@@ -359,8 +359,17 @@ class StoreController extends Controller
             ->one();
 
         if (!$knet) {
+
+            $payment_method = PaymentMethod::find()
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_KNET])
+                ->one();
+
+            if(!$payment_method) {
+                return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            }
+
             $knet = new RestaurantPaymentMethod();
-            $knet->payment_method_id = 1; //K-net
+            $knet->payment_method_id = $payment_method->payment_method_id; //K-net
             $knet->restaurant_uuid = $model->restaurant_uuid;
 
             if (!$knet->save()) {
@@ -374,8 +383,17 @@ class StoreController extends Controller
         $creditCard = $model->getRestaurantPaymentMethods()->where(['payment_method_id' => 2])->one();
 
         if (!$creditCard) {
+
+            $payment_method = PaymentMethod::find()
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_CREDIT_CARD])
+                ->one();
+
+            if(!$payment_method) {
+                return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            }
+
             $creditCard = new RestaurantPaymentMethod();
-            $creditCard->payment_method_id = 2; //Credit Card
+            $creditCard->payment_method_id = $payment_method->payment_method_id; //Credit Card
             $creditCard->restaurant_uuid = $model->restaurant_uuid;
 
             if (!$creditCard->save()) {
@@ -431,8 +449,16 @@ class StoreController extends Controller
             return self::message("error",'Cash on delivery already enabled');
         }
 
+        $codPaymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_CASH])
+            ->one();
+
+        if(!$codPaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+        }
+
         $payments_method = new RestaurantPaymentMethod();
-        $payments_method->payment_method_id = 3; //Cash
+        $payments_method->payment_method_id = $codPaymentMethod->payment_method_id; //Cash
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
@@ -479,8 +505,16 @@ class StoreController extends Controller
             return self::message("error",'Free checkout already enabled');
         }
 
+        $freePaymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT])
+            ->one();
+
+        if(!$freePaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+        }
+
         $payments_method = new RestaurantPaymentMethod();
-        $payments_method->payment_method_id = 7; //Free checkout
+        $payments_method->payment_method_id = $freePaymentMethod->payment_method_id; //Free checkout
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
@@ -499,7 +533,7 @@ class StoreController extends Controller
 
         $payment_method = $model->getPaymentMethods()
             ->andWhere(['payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT])
-            ->exists();
+            ->one();
 
         if (!$payment_method) {
             throw new BadRequestHttpException('The requested record does not exist.');
