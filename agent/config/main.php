@@ -131,6 +131,20 @@ return [
                         'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
+                [// CampaignController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/campaign',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <id>' => 'update',
+                        'DELETE <id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// CategoryController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/category',

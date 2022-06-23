@@ -118,9 +118,7 @@ class AgentController extends Controller
                 "message" => $model->errors
             ];
         }
-
-        $model->sendVerificationEmail();
-
+        
         $agentAssignment->assignment_agent_email = Yii::$app->request->getBodyParam ("agent_email");
         $agentAssignment->email_notification = (int) Yii::$app->request->getBodyParam ("email_notification");
         $agentAssignment->reminder_email = (int) Yii::$app->request->getBodyParam ("reminder_email");
@@ -128,10 +126,21 @@ class AgentController extends Controller
 
         $agentAssignment->save (false);
 
+        //if new email 
+
+        $message = Yii::t('agent', "Agent profile updated successfully");
+        
+        if($model->agent_new_email) 
+        {
+            $model->sendVerificationEmail();
+
+            $message = Yii::t('agent', "Please click on the link sent to you by email to verify your account");
+        }
+
         return [
             'model' => $model,
             "operation" => "success",
-            "message" => Yii::t('agent', "Agent profile updated successfully")
+            "message" => $message
         ];
     }
 

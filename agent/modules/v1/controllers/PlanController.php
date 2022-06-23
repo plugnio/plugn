@@ -259,7 +259,7 @@ class PlanController extends Controller
             $this->_addCallbackCookies ("paymentFailed", $e->getMessage ());
         }
 
-        $url = Yii::$app->params['dashboardAppUrl'] . '/settings/payment-methods';
+        $url = Yii::$app->params['newDashboardAppUrl'] . '/settings/payment-methods';
 
         return $this->redirect ($url);
     }
@@ -275,7 +275,7 @@ class PlanController extends Controller
             'expire' => time () + 86400,
             'domain' => Yii::$app->params['dashboardCookieDomain'],
             'httpOnly' => false,
-            'secure' => str_contains (Yii::$app->params['dashboardAppUrl'], 'https://')? true: false,
+            'secure' => str_contains (Yii::$app->params['newDashboardAppUrl'], 'https://')? true: false,
         ]);
 
         $cookie->sameSite = PHP_VERSION_ID >= 70300 ? 'None' : null;

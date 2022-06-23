@@ -529,6 +529,8 @@ class OrderController extends Controller
         $order->restaurant_uuid = $store->restaurant_uuid;
 
         //Save Customer Info
+        $order->utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
+
         $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
         $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("phone_number")));
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
@@ -1600,6 +1602,7 @@ class OrderController extends Controller
         $model->restaurant_uuid = $restaurant->restaurant_uuid;
         $model->is_order_scheduled = 0;
 
+        $utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
         $order_mode = Yii::$app->request->getBodyParam('order_mode');
         $customer_name = Yii::$app->request->getBodyParam('customer_name');
         $area_name = Yii::$app->request->getBodyParam('area_name');
@@ -1652,6 +1655,7 @@ class OrderController extends Controller
             $model->store_currency_code = $model->restaurant->currency->code;
         }
 
+        $model->utm_uuid = $utm_uuid;
         $model->order_mode = $order_mode;
         $model->customer_name = $customer_name;
         $model->area_name = $area_name;

@@ -52,6 +52,7 @@ class OrderSearch extends Order {
                 'currency',
                 'customer'
             ])
+            ->joinWith('deliveryZone', true)
             ->orderBy(['order_created_at' => SORT_DESC]);
 
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
@@ -129,6 +130,7 @@ class OrderSearch extends Order {
 
         $query = Order::find()
             ->with(['payment','paymentMethod', 'currency', 'customer'])
+            ->joinWith('deliveryZone', true)
             ->orderBy(['order.order_created_at' => SORT_DESC]);
 
         if($agentAssignment && $agentAssignment->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER){
@@ -207,6 +209,7 @@ class OrderSearch extends Order {
     public function searchPendingOrders($params, $storeUuid, $agentAssignment) {
 
         $query = Order::find()
+            ->joinWith('deliveryZone', true)
             ->with([
                 'payment',
                 'paymentMethod',
