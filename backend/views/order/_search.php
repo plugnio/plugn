@@ -34,6 +34,14 @@ $this->registerJs($js);
                             <?= $form->field($model, 'order_uuid') ?>
                         </div>
 
+                        <div class="col-6">
+                            <?= $form->field($model, 'restaurant_uuid') ?>
+                        </div>
+
+                        <div class="col-6">
+                            <?= $form->field($model, 'customer_id') ?>
+                        </div>
+
 
                         <div class="col-6">
                             <?= $form->field($model, 'customer_phone_number') ?>

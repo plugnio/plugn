@@ -119,6 +119,14 @@ white-space: nowrap !important;
                         }
                     ],
                     [
+                        'attribute' => 'restaurant_uuid',
+                        'label' => 'Store',
+                        "format" => "raw",
+                        "value" => function($model) {
+                            return $model->restaurant_uuid ? $model->restaurant->name : '-';
+                        }
+                    ],
+                    [
                         'attribute' => 'customer_name',
                         /*'format' => 'raw',
                         'value' => function ($data) {
