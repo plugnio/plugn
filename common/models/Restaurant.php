@@ -2332,7 +2332,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere(['status'=>RestaurantPaymentMethod::STATUS_ACTIVE]);
     }
 
     /**
@@ -2353,7 +2354,10 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getPaymentMethods($modelClass = "\common\models\PaymentMethod")
     {
         return $this->hasMany ($modelClass::className (), ['payment_method_id' => 'payment_method_id'])
-            ->viaTable ('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
+            ->viaTable(RestaurantPaymentMethod::tableName(), ['restaurant_uuid' => 'restaurant_uuid'],
+                function($query) {
+                    $query->onCondition(['status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
+                });
     }
 
     /**
