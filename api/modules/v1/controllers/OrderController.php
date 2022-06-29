@@ -80,6 +80,7 @@ class OrderController extends Controller {
 
             //Save Customer Info
             $order->utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
+            $order->order_instruction = Yii::$app->request->getBodyParam("order_instruction");
             $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
             $order->customer_phone_country_code = '965';
             $order->customer_phone_number = '+' . $order->customer_phone_country_code . strval(Yii::$app->request->getBodyParam("phone_number"));
