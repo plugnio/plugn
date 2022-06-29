@@ -344,6 +344,9 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                   return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
                         ],
+                        [
+                            'attribute' => 'order_instruction',
+                        ],
                         // [
                         //     'attribute' => 'diggipack_awb_no',
                         //     'format' => 'raw',
