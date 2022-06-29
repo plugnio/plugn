@@ -78,6 +78,7 @@ use yii\web\BadRequestHttpException;
  * @property string $sender_name
  * @property string $recipient_phone_number
  * @property string $gift_message
+ * @property string $order_instruction
  * @property boolean $reminder_sent
  * @property boolean estimated_time_of_arrival
  * @property string $diggipack_awb_no
@@ -278,7 +279,7 @@ class Order extends \yii\db\ActiveRecord
             ['items_has_been_restocked', 'default', 'value' => false],
             [['voucher_id'], 'validateVoucherId', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['payment_uuid'], 'string', 'max' => 36],
-            [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude', 'restaurant_branch_id'], 'safe'],
+            [['estimated_time_of_arrival', 'scheduled_time_start_from', 'scheduled_time_to', 'latitude', 'longitude', 'restaurant_branch_id','order_instruction'], 'safe'],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
 
             [
@@ -662,6 +663,7 @@ class Order extends \yii\db\ActiveRecord
             'sender_name' => Yii::t('app','Sender name'),
             'recipient_phone_number' => Yii::t('app','Recipient phone number'),
             'gift_message' => Yii::t('app','Gift Message'),
+            'order_instruction' => Yii::t('app','Order Instruction'),
             'bank_discount_id' => Yii::t('app','Bank discount ID'),
             'mashkor_order_number' => Yii::t('app','Mashkor order number'),
             'mashkor_tracking_link' => Yii::t('app','Mashkor order tracking link'),

@@ -176,7 +176,7 @@ class   OrderController extends Controller {
             }
 
             $response = [];
-
+            $order->order_instruction = Yii::$app->request->getBodyParam("order_instruction");
             if ($order->save()) {
 
                 if($order->restaurant->enable_gift_message) {
