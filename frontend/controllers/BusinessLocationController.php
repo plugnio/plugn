@@ -46,18 +46,17 @@ class BusinessLocationController extends Controller
      */
     public function actionIndex($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $businessLocations = BusinessLocation::find()->where(['restaurant_uuid' => $store_model->restaurant_uuid])->all();
-
+        $businessLocations = BusinessLocation::find()
+            ->where(['restaurant_uuid' => $store->restaurant_uuid])
+            ->all();
 
         return $this->render('index', [
             'businessLocations' => $businessLocations,
-            'store' => $store_model
+            'store' => $store
         ]);
     }
-
-
 
     /**
      * Creates a new BusinessLocation model.
@@ -66,9 +65,10 @@ class BusinessLocationController extends Controller
      */
     public function actionCreate($storeUuid)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($storeUuid);
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
         $model = new BusinessLocation();
-        $model->restaurant_uuid = $store_model->restaurant_uuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
 
 
         if ($model->load(Yii::$app->request->post()) ) {
@@ -157,58 +157,102 @@ class BusinessLocationController extends Controller
             }
           }
 
-
-          if($model->save())
-            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
-
+          if($model->save()) {
+              return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+          } else {
+              Yii::$app->session->setFlash('error', $model->errors);
+          }
         }
 
         return $this->render('create', [
             'model' => $model,
-            'store_model' => $store_model
+            'store' => $store
         ]);
     }
 
-
+    /**
+     * @param $id
+     * @param $storeUuid
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionEnablePickup($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
         $model->support_pick_up = 1;
-        $model->save();
 
+        $model->setScenario(BusinessLocation::SCENARIO_UPDATE_PICK_UP);
+
+        if(!$model->save())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index',  'storeUuid' => $storeUuid]);
 
     }
 
+    /**
+     * @param $id
+     * @param $storeUuid
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionDisablePickup($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
-        $model->support_pick_up = 0;
-        $model->save();
 
+        $model->setScenario(BusinessLocation::SCENARIO_UPDATE_PICK_UP);
+
+        $model->support_pick_up = 0;
+
+        if(!$model->save())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index',  'storeUuid' => $storeUuid]);
-
     }
 
-
-
+    /**
+     * @param $id
+     * @param $storeUuid
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionRemoveTax($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
+
+        $model->setScenario(BusinessLocation::SCENARIO_UPDATE_TAX);
+
         $model->business_location_tax = 0;
-        $model->save();
+
+        if(!$model->save())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index',  'storeUuid' => $storeUuid]);
     }
 
+    /**
+     * @param $id
+     * @param $storeUuid
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionConfigureTax($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index',  'storeUuid' => $storeUuid]);
+        }
+
+        if($model->errors)
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
         }
 
         return $this->render('_set-tax', [
@@ -312,17 +356,16 @@ class BusinessLocationController extends Controller
             }
           }
 
-
-
-          if($model->save())
-            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+          if($model->save()) {
+              return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+          } else {
+              Yii::$app->session->setFlash('error', $model->errors);
+          }
         }
-
-
 
         return $this->render('update', [
             'model' => $model,
-            'store_model' => Restaurant::findOne($storeUuid)
+            'store' => Restaurant::findOne($storeUuid)
         ]);
     }
 
@@ -335,7 +378,12 @@ class BusinessLocationController extends Controller
      */
     public function actionDelete($id, $storeUuid)
     {
-        $this->findModel($id, $storeUuid)->delete();
+        $model = $this->findModel($id, $storeUuid);
+
+        if(!$model->delete())
+        {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
     }
@@ -349,7 +397,6 @@ class BusinessLocationController extends Controller
      */
     protected function findModel($id, $storeUuid)
     {
-
         if (($model = BusinessLocation::find()->where(['business_location_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
             return $model;
         }

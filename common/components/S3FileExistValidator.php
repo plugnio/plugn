@@ -66,7 +66,7 @@ class S3FileExistValidator extends Validator
             if(!in_array(strtolower($extension), $allowdExtensions) &&
                     !in_array(strtoupper($extension), $allowdExtensions)) 
             {
-                $this->addError($model, $attribute, Yii::t('app', 'Invalid file type'));
+                $this->addError($model, $attribute, Yii::t('app','Invalid file type'));
             }
         }
         

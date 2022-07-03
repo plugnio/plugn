@@ -66,12 +66,12 @@ class PartnerPayout extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'partner_payout_uuid' => 'Partner Payout Uuid',
-            'partner_uuid' => 'Partner Uuid',
-            'amount' => 'Amount',
-            'payout_status' => 'Payout Status',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'partner_payout_uuid' => Yii::t('app','Partner Payout Uuid'),
+            'partner_uuid' => Yii::t('app','Partner Uuid'),
+            'amount' => Yii::t('app','Amount'),
+            'payout_status' => Yii::t('app','Payout Status'),
+            'created_at' => Yii::t('app','Created At'),
+            'updated_at' => Yii::t('app','Updated At')
         ];
     }
 

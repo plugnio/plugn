@@ -80,14 +80,18 @@ return [
                     'controller' => 'v2/item',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET view/<slug>' => 'view',
                         'GET detail' => 'item-data',
                         'GET items' => 'items',
                         'GET' => 'restaurant-menu',
+                        'GET category/<slug>' => 'category-products',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS items' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS view/<slug>' => 'options',
+                        'OPTIONS category/<slug>' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
@@ -135,11 +139,13 @@ return [
                         'POST get-delivery-time' => 'get-delivery-time',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
+                        'GET <id>' => 'view',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',
                         'OPTIONS get-delivery-time' => 'options',
                         'OPTIONS locations/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
+                        'OPTIONS <id>' => 'options',
                     ]
                 ],
                 [// RestaurantDeliveryController
@@ -190,8 +196,8 @@ return [
                         'GET callback' => 'callback',
                         'GET apply-promo-code' => 'apply-promo-code',
                         'GET apply-bank-discount' => 'apply-bank-discount',
-                        'GET <id>/<restaurant_uuid>' => 'order-details',
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
+                        'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',

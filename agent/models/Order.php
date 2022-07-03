@@ -22,7 +22,7 @@ class Order extends \common\models\Order
 
         $fields['total_price_txt'] = function ($model) {
             if ($model->currency)
-                return Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [
+                return Yii::$app->formatter->asCurrency($model->total_price * $model->currency_rate, $model->currency_code, [
                     \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                 ]);
             else
@@ -31,7 +31,7 @@ class Order extends \common\models\Order
 
         $fields['delivery_fee_txt'] = function ($model) {
             if ($model->currency)
-                return Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [
+                return Yii::$app->formatter->asCurrency($model->delivery_fee * $model->currency_rate, $model->currency_code, [
                     \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                 ]);
             else
@@ -68,6 +68,7 @@ class Order extends \common\models\Order
             'refunds',
             'area',
             'currency',
+            'customer',
             'itemImage'//first image in first order item 
         ];
     }

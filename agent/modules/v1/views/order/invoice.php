@@ -287,7 +287,7 @@
                                                 </TD>
                                             </tr>
 
-                                            <?php if($order->voucher && $order->voucher->discount_type !== 3) { ?>
+                                            <?php if($voucherDiscount) { ?>
                                                 <tr>
                                                     <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
                                                     <td align="end">
@@ -324,7 +324,7 @@
 
                                             <?php } ?>
 
-                                            <?php if($order->bankDiscount) { ?>
+                                            <?php if($bankDiscount > 0) { ?>
 
                                                 <tr>
                                                     <td align="start" colspan="3">Bank Discount</td>
@@ -378,7 +378,7 @@
 
                                                 </td>
                                             </tr>
-                                            <?php if($order->voucher && $order->voucher->discount_type == 3) { ?>
+                                            <?php if($order->discount_type == 3) { ?>
 
                                                 <tr>
                                                     <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>

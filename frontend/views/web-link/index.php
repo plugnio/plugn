@@ -44,6 +44,7 @@ $this->registerJs($js);
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'rowOptions' => function($model) {
                 $url = Url::to(['web-link/update', 'id' => $model->web_link_id, 'storeUuid' => $model->restaurant_uuid]);
 
@@ -55,6 +56,16 @@ $this->registerJs($js);
               ['class' => 'yii\grid\SerialColumn'],
               [
                   'label' => 'Type',
+                  'attribute' => 'web_link_type',
+                  'filter' => [
+                    WebLink::WEB_LINK_TYPE_WEBSITE_URL => 'Website',
+                    WebLink::WEB_LINK_TYPE_FACEBOOK => 'Facebook',
+                    WebLink::WEB_LINK_TYPE_INSTAGRAM => 'Instagram',
+                    WebLink::WEB_LINK_TYPE_TWITTER => 'Twitter',
+                    WebLink::WEB_LINK_TYPE_SNAPCHAT => 'Snapchat',
+                    WebLink::WEB_LINK_TYPE_WHATSAPP => 'WhatsApp',
+                    WebLink::WEB_LINK_TYPE_EMAIL => 'Email'
+                  ],
                   "format" => "raw",
                   "value" => function($model) {
                       return $model->getWebLinkType();

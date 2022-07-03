@@ -344,6 +344,9 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                   return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
                         ],
+                        [
+                            'attribute' => 'order_instruction',
+                        ],
                         // [
                         //     'attribute' => 'diggipack_awb_no',
                         //     'format' => 'raw',
@@ -462,12 +465,27 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             [
                 'label' => 'SKU',
                 'format' => 'raw',
-                'value' => 'item.sku',
+                'value' => function ($data) {
+
+                    if($data->variant) {
+                       return $data->variant->sku;
+                    }else if($data->item) {
+                        return $data->item->sku;
+                    }
+                },
             ],
             [
                 'label' => 'Barcode',
                 'format' => 'raw',
-                'value' => 'item.barcode',
+                //'value' => 'item.barcode',
+                'value' => function ($data) {
+
+                    if($data->variant) {
+                        return $data->variant->barcode;
+                    }else if($data->item) {
+                        return $data->item->barcode;
+                    }
+                },
             ],
             // 'customer_instruction',
             [
@@ -503,8 +521,8 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
             ],
             [
                 'label' => 'Subtotal',
-                'value' => function ($orderItem) {
-                    return Yii::$app->formatter->asCurrency($orderItem->item_price, $orderItem->currency->code, [
+                'value' => function ($orderItem) use ($model)  {
+                    return Yii::$app->formatter->asCurrency($orderItem->item_price * $model->currency_rate, $orderItem->currency->code, [
                         \NumberFormatter::MAX_FRACTION_DIGITS => $orderItem->currency->decimal_place
                     ]);
                 }
@@ -547,7 +565,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody>
                         <tr>
                             <td colspan="2">Subtotal</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->subtotal, $model->currency->code, [
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->subtotal* $model->currency_rate, $model->currency->code, [
                                     \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                     \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                 ]) ?></td>
@@ -562,7 +580,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             <tr>
                                 <td colspan="2">Voucher Discount (<?= $model->voucher->code ?>)</td>
                                 <td style="float: right;">-<?= Yii::$app->formatter->asCurrency(
-                                        $voucherDiscount, $model->currency->code, [
+                                        $voucherDiscount* $model->currency_rate, $model->currency->code, [
                                                 \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                             \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                         ]) ?></td>
@@ -576,7 +594,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
 
                                   $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ?  $subtotalAfterDiscount : 0;
 
-                                  echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [
+                                  echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount* $model->currency_rate, $model->currency->code, [
                                           \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                      \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                   ])
@@ -593,7 +611,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                 <tbody>
                                     <tr>
                                         <td colspan="2">Bank Discount</td>
-                                        <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($bankDiscount, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
+                                        <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($bankDiscount* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -604,7 +622,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
 
                                             $subtotalAfterDiscount = $subtotalAfterDiscount > 0 ? $subtotalAfterDiscount : 0;
 
-                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place])
+                                            echo Yii::$app->formatter->asCurrency($subtotalAfterDiscount* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place])
                                           ?>
                                         </td>
                                     </tr>
@@ -615,7 +633,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody>
                         <tr>
                             <td colspan="2">Delivery fee</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->delivery_fee* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                         </tr>
                     </tbody>
 
@@ -624,7 +642,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                         <tbody>
                             <tr>
                                 <td colspan="2">Voucher Discount (<?= $model->voucher->code ?>)</td>
-                                <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($model->delivery_fee, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
+                                <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($model->delivery_fee* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                             </tr>
                         </tbody>
 
@@ -641,7 +659,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody>
                         <tr>
                             <td colspan="2">Tax</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->tax, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->tax* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                         </tr>
                     </tbody>
                     <?php } ?>
@@ -650,7 +668,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody>
                         <tr>
                             <td colspan="2">Total</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                         </tr>
                     </tbody>
 
@@ -669,7 +687,7 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                                     <td class="type--subdued">
                                         Reason:  <?= $refund->reason ? $refund->reason : ' –' ?>
                                     </td>
-                                    <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($refund->refund_amount, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
+                                    <td style="float: right;">-<?= Yii::$app->formatter->asCurrency($refund->refund_amount* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                                 </tr>
                             </tbody>
 
@@ -680,9 +698,10 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                     <tbody class="order-details__summary__net-payment">
                         <tr>
                             <td class="type--bold" colspan="2">Net payment</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code, [
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price* $model->currency_rate, $model->currency->code, [
                                     \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
-                                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
+                                    \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place])
+                                ?></td>
                         </tr>
                     </tbody>
                 </table>
@@ -715,8 +734,8 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
 
                       [
                           'attribute' => 'refund_amount',
-                          "value" => function($data) {
-                                  return Yii::$app->formatter->asCurrency($data->refund_amount, $data->currency->code, [
+                          "value" => function($data) use ($model) {
+                                  return Yii::$app->formatter->asCurrency($data->refund_amount* $model->currency_rate, $data->currency->code, [
                                       \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                   ]);
                           },

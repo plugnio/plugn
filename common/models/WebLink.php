@@ -19,7 +19,6 @@ use Yii;
  */
 class WebLink extends \yii\db\ActiveRecord
 {
-
       //Values for `web_link_type`
       const WEB_LINK_TYPE_WEBSITE_URL = 1;
       const WEB_LINK_TYPE_FACEBOOK = 2;
@@ -48,7 +47,9 @@ class WebLink extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             ['url', 'url', 'when' => function($model) {
                 return $model->web_link_type == self::WEB_LINK_TYPE_WEBSITE_URL;
-            }],
+            }, 'whenClient' => "function (attribute, value) {
+                return $('#webLinkTypeInput').val() == 1;
+            }"],
             [['url', 'web_link_title','web_link_title_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -60,12 +61,12 @@ class WebLink extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'web_link_id' => 'Web Link ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'web_link_type' => 'Web Link Type',
-            'url' => 'URL',
-            'web_link_title' => 'Title in English',
-            'web_link_title_ar' => 'Title in Arabic',
+            'web_link_id' => Yii::t('app','Web Link ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'web_link_type' => Yii::t('app','Web Link Type'),
+            'url' => Yii::t('app','URL'),
+            'web_link_title' => Yii::t('app','Title in English'),
+            'web_link_title_ar' => Yii::t('app','Title in Arabic')
         ];
     }
 
@@ -100,8 +101,6 @@ class WebLink extends \yii\db\ActiveRecord
 
         return "Couldnt find a web link type";
     }
-
-
 
     /**
     * @param type $insert

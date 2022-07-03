@@ -61,7 +61,7 @@ class ExtraOption extends \yii\db\ActiveRecord {
                 'range' => [self::UPDATE_TYPE_CREATE, self::UPDATE_TYPE_UPDATE, self::UPDATE_TYPE_DELETE],
                 'on' => self::SCENARIO_BATCH_UPDATE
             ],
-            [['extra_option_name', 'extra_option_name_ar', 'extra_option_price'], 'required'],
+            [['extra_option_name', 'extra_option_name_ar'], 'required'],
             [['option_id'], 'integer'],
             [['extra_option_price', 'stock_qty'], 'number', 'min' => 0],
             [['extra_option_price'], 'default', 'value' => 0],
@@ -76,12 +76,12 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'extra_option_id' => 'Extra Option ID',
-            'option_id' => 'Option ID',
-            'extra_option_name' => 'Extra Option Name',
-            'extra_option_name_ar' => 'Extra Option Name in Arabic',
-            'extra_option_price' => 'Extra Option Price',
-            'stock_qty' => 'Stock Quantity',
+            'extra_option_id' => Yii::t('app', 'Extra Option ID'),
+            'option_id' => Yii::t('app', 'Option ID'),
+            'extra_option_name' => Yii::t('app', 'Extra Option Name'),
+            'extra_option_name_ar' => Yii::t('app', 'Extra Option Name in Arabic'),
+            'extra_option_price' => Yii::t('app', 'Extra Option Price'),
+            'stock_qty' => Yii::t('app', 'Stock Quantity')
         ];
     }
 
@@ -91,6 +91,14 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function increaseStockQty($qty)
     {
+        if($this->option && $this->option->item && (
+                !$this->option->item->track_quantity ||
+                $this->option->item->item_type == Item::TYPE_CONFIGURABLE
+            )
+        ) {
+            return true;
+        }
+
         if($this->stock_qty !== null && $this->stock_qty >= 0 ){
           $this->stock_qty += $qty;
 
@@ -106,6 +114,14 @@ class ExtraOption extends \yii\db\ActiveRecord {
      */
     public function decreaseStockQty($qty)
     {
+        if($this->option && $this->option->item && (
+            !$this->option->item->track_quantity ||
+            $this->option->item->item_type == Item::TYPE_CONFIGURABLE
+            )
+        ) {
+            return true;
+        }
+
         if($this->stock_qty !== null && $this->stock_qty > 0 ){
             $this->stock_qty -= $qty;
 

@@ -21,7 +21,14 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'rate')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'sort_order')->textInput(['maxlength' => true]) ?>
-    
+
+    <?= $form->field($model, 'status')->dropDownList(
+        [
+            1 => 'Active',
+            0 => 'Inactive',
+        ]
+    ); ?>
+
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

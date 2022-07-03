@@ -145,7 +145,7 @@ class AuthCest {
     /**
      * Try to check if email verified
      * @param FunctionalTester $I
-     *
+     */
     public function tryToCheckIfEmailVerified(FunctionalTester $I) {
         $agent = Agent::findOne(['agent_email_verification'=>0]);
         $I->wantTo('Validate auth > is-email-verified api');
@@ -161,7 +161,7 @@ class AuthCest {
     /**
      * Try to update email
      * @param FunctionalTester $I
-     *
+     */
     public function tryToUpdateEmail(FunctionalTester $I) {
         $I->wantTo('Validate auth > update-email api');
         $I->sendPOST('v1/auth/update-email', [
@@ -177,7 +177,7 @@ class AuthCest {
     /**
      * Try to get verification email
      * @param FunctionalTester $I
-     *
+     */
     public function tryToGetVerificationEmail(FunctionalTester $I) {
         $I->wantTo('Validate auth > resend-verification-email api');
         $I->sendPOST('v1/auth/resend-verification-email', [
@@ -194,7 +194,7 @@ class AuthCest {
     /**
      * Try to verify email
      * @param FunctionalTester $I
-     *
+     */
     public function tryToVerifyEmail(FunctionalTester $I) {
         $I->wantTo('Validate auth > verify-email api');
         $I->sendPOST('v1/auth/verify-email', [
@@ -205,6 +205,6 @@ class AuthCest {
         $I->seeResponseContainsJson([
             'email' => $this->agent->agent_email
         ]);
-    }*/
+    }
 }
 

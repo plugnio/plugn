@@ -42,7 +42,7 @@ class m130524_201442_init extends Migration
 
         Yii::$app->db->createCommand($sql)->execute();
 
-          /**
+        /**
          * Create Agent Table
          */
         $this->createTable('{{%agent}}', [

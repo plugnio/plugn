@@ -38,8 +38,9 @@ class Category extends \common\models\Category
 
 
        } catch (\Cloudinary\Error $err) {
-           Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
-           Yii::error ("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode ($imageURL));
+            //todo: notify vendor?
+          // Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+          // Yii::error ("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode ($imageURL));
        }
    }
 

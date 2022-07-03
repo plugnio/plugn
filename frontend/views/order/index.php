@@ -10,7 +10,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->params['restaurant_uuid'] = $restaurant_model->restaurant_uuid;
+$this->params['restaurant_uuid'] = $restaurant->restaurant_uuid;
 
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
@@ -18,6 +18,10 @@ $this->params['breadcrumbs'][] = $this->title;
 $js = "
 $(function () {
   $('.summary').insertAfter('.top');
+
+  $('input[name=\"OrderSearch[order_created_at]\"]').datepicker({
+    format: 'd M yyyy',
+  });
 
   $('table.data-list-view.dataTable tbody td').css('padding', '10px');
 
@@ -61,20 +65,20 @@ white-space: nowrap !important;
 <section id="data-list-view" class="data-list-view-header">
 
 
-      <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant_model->restaurant_uuid]); ?>
+      <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant->restaurant_uuid]); ?>
 
-    <?php if ($dataProvider->getCount() > 0) { ?>
+    <?php if ($count > 0) { ?>
 
 
         <!-- Data list view starts -->
         <div class="action-btns ">
             <div class="btn-dropdown mr-1 mb-1">
                 <div class="btn-group dropdown actions-dropodown">
-                    <?= Html::a('Create order ', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+                    <?= Html::a('Create order ', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
                 </div>
                 <?php if(\Yii::$app->user->identity->agent_id == 404 || \Yii::$app->user->identity->agent_id == 1){  ?>
                 <div class="btn-group dropdown actions-dropodown">
-                    <?= Html::a('Print Pending Orders For Mashkor', ['download-pending-orders-for-mashkor', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-success']) ?>
+                    <?= Html::a('Print Pending Orders For Mashkor', ['download-pending-orders-for-mashkor', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-success']) ?>
                 </div>
               <?php } ?>
             </div>
@@ -169,9 +173,9 @@ white-space: nowrap !important;
                     ],
                     [
                         'attribute' => 'total_price',
-                        "value" => function($data) {
-                            return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code, [
-                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                        "value" => function($model) {
+                            return Yii::$app->formatter->asCurrency($model->total_price * $model->currency_rate, $model->currency_code, [
+                                \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency? $model->currency->decimal_place: 3
                             ]);
                         },
                     ],
@@ -254,7 +258,7 @@ white-space: nowrap !important;
                   'prevPageCssClass' => 'paginate_button page-item previous',
                   'nextPageCssClass' => 'paginate_button page-item next',
               ],
-                'tableOptions' => ['class' => 'table data-list-view'],
+                'tableOptions' => ['class' => 'table dataTable data-list-view'],
 
         ]);
         ?>
@@ -276,7 +280,7 @@ white-space: nowrap !important;
                 <p>
                     This is where you’ll fulfill orders, collect payments, and track order progress.
                 </p>
-    <?= Html::a('Create order', ['create', 'storeUuid' => $restaurant_model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+    <?= Html::a('Create order', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
 

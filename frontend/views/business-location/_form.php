@@ -26,9 +26,9 @@ if ($model->business_location_id) {
       $location = 'Riyadh';
   }
 }else {
-  if($store_model->country_id == 12) // Bahrain
+  if($store->country_id == 12) // Bahrain
     $location = 'Manama';
-  else if($store_model->country_id == 129) // KSA
+  else if($store->country_id == 129) // KSA
     $location = 'Riyadh';
 }
 

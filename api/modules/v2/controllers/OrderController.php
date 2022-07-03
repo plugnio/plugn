@@ -2,6 +2,7 @@
 
 namespace api\modules\v2\controllers;
 
+use agent\models\PaymentMethod;
 use Yii;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
@@ -20,7 +21,8 @@ use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
 
-class OrderController extends Controller {
+
+class   OrderController extends Controller {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -74,9 +76,15 @@ class OrderController extends Controller {
 
             $order = new Order();
 
+            //as we will calculate after items get saved
+            $order->total_price = 0;
+            $order->subtotal = 0;
+
             $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
 
             //Save Customer Info
+
+            $order->utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
             $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
             $order->customer_phone_number = str_replace(' ','',strval(Yii::$app->request->getBodyParam("phone_number")));
             $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
@@ -94,6 +102,16 @@ class OrderController extends Controller {
             //payment method
             $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
 
+            /**
+             *
+            $paymentMethod = PaymentMethod::find()
+            ->andWhere (['payment_method_id' => $order->payment_method_id])
+            ->one();
+
+            $order->payment_method_name = $paymentMethod->payment_method_name;
+            $order->payment_method_name_ar = $paymentMethod->payment_method_name_ar;
+
+             */
             //save Customer address
             $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
 
@@ -158,10 +176,10 @@ class OrderController extends Controller {
             }
 
             $response = [];
-
+            $order->order_instruction = Yii::$app->request->getBodyParam("order_instruction");
             if ($order->save()) {
 
-                if($order->restaurant->enable_gift_message){
+                if($order->restaurant->enable_gift_message) {
 
                   //save gift message
                   $order->sender_name = Yii::$app->request->getBodyParam("sender_name");
@@ -181,7 +199,9 @@ class OrderController extends Controller {
                         $orderItem = new OrderItem;
 
                         $orderItem->order_uuid = $order->order_uuid;
+                        $orderItem->restaurant_uuid = $order->restaurant_uuid;
                         $orderItem->item_uuid = $item["item_uuid"];
+                        $orderItem->item_variant_uuid = isset($item["item_variant_uuid"])? $item["item_variant_uuid"]: null;
                         $orderItem->qty = (int) $item["qty"];
 
                         //optional field
@@ -201,7 +221,11 @@ class OrderController extends Controller {
 
                                         $orderItemExtraOption = new OrderItemExtraOption;
                                         $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                                        $orderItemExtraOption->extra_option_id = $extraOption['extra_option_id'];
+                                        $orderItemExtraOption->extra_option_name= isset($extraOption['extra_option_name'])? $extraOption['extra_option_name']: null;
+                                        $orderItemExtraOption->extra_option_name_ar = isset($extraOption['extra_option_name_ar'])? $extraOption['extra_option_name_ar']: null;
+
+                                        $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
+                                        $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
                                         $orderItemExtraOption->qty = (int) $item["qty"];
 
                                         if (!$orderItemExtraOption->save()) {
@@ -254,6 +278,31 @@ class OrderController extends Controller {
 
 
 
+                /**
+                 * payment method should be free checkout if total is zero
+                 */
+                if($order->total_price == 0) {
+
+                    $freeCheckout = $order->restaurant->getPaymentMethods()
+                        //->joinWith('payment')
+                        ->andWhere (['payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT])
+                        ->one();
+
+                    if(!$freeCheckout) {
+                        $response = [
+                            'operation' => 'error',
+                            'message' => "Free checkout not enabled on this store!"
+                        ];
+                    }
+                    else if($order->payment_method_id != $freeCheckout->payment_method_id)
+                    {
+                        $response = [
+                            'operation' => 'error',
+                            'message' => "Invalid payment method for free order!"
+                        ];
+                    }
+                }
+
                 if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
                     $response = [
                         'operation' => 'error',
@@ -261,9 +310,9 @@ class OrderController extends Controller {
                     ];
                 }
 
-
                 //if payment method not cash redirect customer to payment gateway
-                if ($response == null && $order->payment_method_id != 3) {
+
+                if ($response == null &&  !in_array ($order->payment_method_id, [3, 7])) {
 
                     // Create new payment record
                     $payment = new Payment;
@@ -281,7 +330,10 @@ class OrderController extends Controller {
 
                       if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
-                          Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+                          Yii::$app->tapPayments->setApiKeys(
+                              $order->restaurant->live_api_key,
+                              $order->restaurant->test_api_key
+                          );
 
                           $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
 
@@ -292,7 +344,8 @@ class OrderController extends Controller {
                               // Validate that theres no error from TAP gateway
                               if (isset($responseContent->status) && $responseContent->status == "fail") {
                                   $errorMessage = "Error: Invalid Token ID";
-                                  \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+
+                                  //\Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
                                   return [
                                       'operation' => 'error',
@@ -323,7 +376,7 @@ class OrderController extends Controller {
                                   $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
                               }
                           } catch (\Exception $e) {
-                              Yii::error('[TAP Payment Issue > Invalid Token ID]' . json_encode($responseContent), __METHOD__);
+                              //Yii::error('[TAP Payment Issue > Invalid Token ID]' . json_encode($responseContent), __METHOD__);
 
                               $response = [
                                   'operation' => 'error',
@@ -337,6 +390,7 @@ class OrderController extends Controller {
                           //Update payment_uuid in order
                           $order->payment_uuid = $payment->payment_uuid;
                           $order->save(false);
+                          
                           if (!$order->updateOrderTotalPrice()) {
                               $response = [
                                   'operation' => 'error',
@@ -369,15 +423,16 @@ class OrderController extends Controller {
                                   $order->area_id ? $order->area->country->country_name : ''
                           );
 
-
                           $responseContent = json_decode($response->content);
 
                           try {
 
                               // Validate that theres no error from TAP gateway
                               if (isset($responseContent->errors)) {
+
                                   $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
-                                  \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+                                  
+                                  //\Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
                                   return [
                                       'operation' => 'error',
@@ -394,7 +449,7 @@ class OrderController extends Controller {
 
                                   if (!$payment->save(false)) {
 
-                                      \Yii::error($payment->errors, __METHOD__); // Log error faced by user
+                                      //\Yii::error($payment->errors, __METHOD__); // Log error faced by user
 
                                       return [
                                           'operation' => 'error',
@@ -402,7 +457,12 @@ class OrderController extends Controller {
                                       ];
                                   }
                               } else {
-                                  \Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
+                                return [
+                                  'operation' => 'success',
+                                  'message' => 'Payment Issue > Charge id is missing'
+                                ];
+                                  
+                                //\Yii::error('[Payment Issue > Charge id is missing ]' . $responseContent, __METHOD__); // Log error faced by user
                               }
 
 
@@ -411,12 +471,13 @@ class OrderController extends Controller {
                                   'redirectUrl' => $redirectUrl,
                               ];
                           } catch (\Exception $e) {
-                            Yii::error('[Error when converting to BHD Currency]222' , __METHOD__);
 
+                              /* todo: notify admin?  
                               if ($payment)
                                   Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
 
                               Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
+                                */
 
                               $response = [
                                   'operation' => 'error',
@@ -443,6 +504,7 @@ class OrderController extends Controller {
                             //Update payment_uuid in order
                             $order->payment_uuid = $payment->payment_uuid;
                             $order->save(false);
+
                             if (!$order->updateOrderTotalPrice()) {
                                 $response = [
                                     'operation' => 'error',
@@ -458,8 +520,8 @@ class OrderController extends Controller {
 
                             if (!$initiatePaymentResponse->IsSuccess) {
                                 $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-                                \Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
+                                //\Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
                                 return [
                                     'operation' => 'error',
@@ -506,7 +568,8 @@ class OrderController extends Controller {
 
                                 if (!$responseContent->IsSuccess) {
                                     $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors[0]->Error) :  $responseContent->Message;
-                                    \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+
+                                    //\Yii::error($errorMessage, __METHOD__); // Log error faced by user
 
 
                                     return [
@@ -525,7 +588,7 @@ class OrderController extends Controller {
 
                                     if (!$payment->save(false)) {
 
-                                        \Yii::error($payment->errors, __METHOD__); // Log error faced by user
+                                        //\Yii::error($payment->errors, __METHOD__); // Log error faced by user
 
                                         return [
                                             'operation' => 'error',
@@ -534,10 +597,13 @@ class OrderController extends Controller {
                                     }
                                 } else {
 
-                                if ($payment)
+                                    //todo: notify admin     
+                                    /*
+                                    if ($payment)
                                     Yii::error('[MyFatoorah Payment Issue > InvoiceId]' . json_encode($payment->getErrors()), __METHOD__);
 
-                                  Yii::error('[MyFatoorah Payment Issue]' . json_encode($responseContent), __METHOD__);
+                                    Yii::error('[MyFatoorah Payment Issue]' . json_encode($responseContent), __METHOD__);
+                                    */
 
                                   $response = [
                                       'operation' => 'error',
@@ -571,8 +637,7 @@ class OrderController extends Controller {
 
                 } else {
 
-
-                    //pay by Cash
+                    //pay by Cash or Free checkout
                     if ($response == null) {
 
                         //Change order status to pending
@@ -580,7 +645,6 @@ class OrderController extends Controller {
                         $order->sendPaymentConfirmationEmail();
 
                         Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
-
 
                         $response = [
                             'operation' => 'success',
@@ -591,17 +655,18 @@ class OrderController extends Controller {
                 }
             }
 
-
             if (array_key_exists('operation', $response) && $response['operation'] == 'error') {
 
                 //either object of payment result or not stock validation error
 
-              // if(!is_array($response['message']) || !isset($response['message']['qty']))
-              //    \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
+                //todo: notiy admin/vendor? 
 
-               \Yii::error(json_encode($response), __METHOD__); // Log error faced by user
+              //if(!is_array($response['message']) || !isset($response['message']['qty']))
+              //   \Yii::error(json_encode($response['message']), __METHOD__); // Log error faced by user
 
-                $order->delete();
+               // \Yii::error(json_encode($response), __METHOD__); // Log error faced by user
+
+               $order->delete();
             }
 
         } else {
@@ -652,7 +717,9 @@ class OrderController extends Controller {
 
             } else {
               $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-              \Yii::error('[Payment Issue]' .$errorMessage, __METHOD__); // Log error faced by user
+
+              //\Yii::error('[Payment Issue]' .$errorMessage, __METHOD__); // Log error faced by user
+
               throw new NotFoundHttpException(json_encode($errorMessage));
             }
 
@@ -679,7 +746,12 @@ class OrderController extends Controller {
             // Redirect back to app
             // $paymentRecord->order->changeOrderStatusToPending();
             return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid);
+            
         } catch (\Exception $e) {
+            //todo: notify vendor/admin?
+
+            //Yii::error($e->getMessage());
+
             throw new NotFoundHttpException($e->getMessage());
         }
     }
@@ -730,8 +802,6 @@ class OrderController extends Controller {
       //Check If Enabled Secret Key and If The header has request
        if ($headerSignature != null)  {
 
-
-
          $response_message  = null;
 
          if(isset($acquirer)){
@@ -753,7 +823,11 @@ class OrderController extends Controller {
 
                   $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
                   if (!$isValidSignature){
-                    Yii::error('Invalid Signature', __METHOD__);
+
+                    //todo: notify vendor/admin?
+
+                    //Yii::error('Invalid Signature', __METHOD__);
+
                     throw new ForbiddenHttpException('Invalid Signature');
                   }
            }
@@ -944,6 +1018,8 @@ class OrderController extends Controller {
 
           if(  $order_model ) {
 
+              $order_model->setScenario(Order::SCENARIO_UPDATE_MASHKOR_STATUS);
+
             $order_model->mashkor_driver_name = Yii::$app->request->getBodyParam("driver_name");
             $order_model->mashkor_driver_phone = Yii::$app->request->getBodyParam("driver_phone");
             $order_model->mashkor_tracking_link = Yii::$app->request->getBodyParam("tracking_link");
@@ -961,7 +1037,7 @@ class OrderController extends Controller {
                 ];
             } else {
 
-              Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+              //Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
 
 
               return [
@@ -972,7 +1048,7 @@ class OrderController extends Controller {
 
           } else {
 
-            Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+            //Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
 
 
             return [
@@ -983,7 +1059,7 @@ class OrderController extends Controller {
 
         } else {
 
-          Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
+          //Yii::error('[Mashkor (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
 
 
           return [
@@ -1017,8 +1093,9 @@ class OrderController extends Controller {
 
           if($order_model) {
 
-            $order_model->armada_order_status = Yii::$app->request->getBodyParam("orderStatus");
+              $order_model->setScenario(Order::SCENARIO_UPDATE_ARMADA_STATUS);
 
+            $order_model->armada_order_status = Yii::$app->request->getBodyParam("orderStatus");
 
             if( $order_model->armada_order_status == 'en_route' ) // In delivery
                 $order_model->order_status = Order::STATUS_OUT_FOR_DELIVERY;
@@ -1026,14 +1103,15 @@ class OrderController extends Controller {
             else if( $order_model->armada_order_status == 'completed' ) // Delivered
                 $order_model->order_status = Order::STATUS_COMPLETE;
 
-
-            if ($order_model->save()) {
+            if ($order_model->save())
+            {
                 return [
                     'operation' => 'success'
                 ];
-            } else {
-              Yii::error('[Armada (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
-
+            }
+            else
+            {
+              //Yii::error('[Armada (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
 
               return [
                   'operation' => 'error',
@@ -1043,8 +1121,7 @@ class OrderController extends Controller {
 
           } else {
 
-            Yii::error('[Armada (Webhook): Error while changing order status ]' . json_encode($order_model->getErrors()), __METHOD__);
-
+           // Yii::error('[Armada (Webhook): Error while changing order status ]', __METHOD__);
 
             return [
                 'operation' => 'error',

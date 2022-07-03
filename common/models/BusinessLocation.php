@@ -28,6 +28,8 @@ use Yii;
 class BusinessLocation extends \yii\db\ActiveRecord
 {
     const SCENARIO_DELETE = 'delete';
+    const SCENARIO_UPDATE_TAX = 'update-tax';
+    const SCENARIO_UPDATE_PICK_UP = 'update-pick-up';
 
     /**
      * {@inheritdoc}
@@ -62,14 +64,14 @@ class BusinessLocation extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'business_location_id' => 'Business Location ID',
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'country_id' => 'Located in',
-            'business_location_name' => 'Location Name',
-            'business_location_name_ar' => 'Location Name in Arabic',
-            'support_pick_up' => 'Support Pick Up',
-            'business_location_tax' => 'Tax / VAT',
-            'max_num_orders' => 'Maximum number of orders'
+            'business_location_id' => Yii::t('app','Business Location ID'),
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'country_id' => Yii::t('app','Located in'),
+            'business_location_name' => Yii::t('app','Location Name'),
+            'business_location_name_ar' => Yii::t('app','Location Name in Arabic'),
+            'support_pick_up' => Yii::t('app','Support Pick Up'),
+            'business_location_tax' => Yii::t('app','Tax / VAT'),
+            'max_num_orders' => Yii::t('app','Maximum number of orders')
         ];
     }
 
@@ -77,6 +79,10 @@ class BusinessLocation extends \yii\db\ActiveRecord
         $scenarios = parent::scenarios();
 
         $scenarios['delete'] = ['is_deleted'];
+
+        $scenarios[self::SCENARIO_UPDATE_TAX] = ['business_location_tax'];
+
+        $scenarios[self::SCENARIO_UPDATE_PICK_UP] = ['support_pick_up'];
 
         return $scenarios;
     }
@@ -93,7 +99,6 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'totalDeliveryZoneCountry'
         ];
     }
-
 
     /**
      *

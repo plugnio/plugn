@@ -17,12 +17,16 @@ use yii\db\Expression;
  * @property string $rate
  * @property integer $decimal_place
  * @property integer $sort_order
+ * @property integer $status
  * @property string $datetime
  *
  * @property Restaurant[] $restaurants
  */
 class Currency extends \yii\db\ActiveRecord
 {
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 0;
+
     /**
      * {@inheritdoc}
      */
@@ -37,7 +41,7 @@ class Currency extends \yii\db\ActiveRecord
     public function rules() {
         return [
             [['title', 'code', 'rate'], 'required'],
-            [['rate', 'decimal_place'], 'number'],
+            [['rate', 'decimal_place', 'status'], 'number'],
             [['sort_order'], 'number', 'max' => 100],
             [['title', 'code'], 'string']
         ];
@@ -86,6 +90,7 @@ class Currency extends \yii\db\ActiveRecord
             'rate' => Yii::t('app', 'Rate'),
             'decimal_place' => Yii::t('app', 'Decimal Place'),
             'sort_order' => Yii::t('app', 'Sort Order'),
+            'status' => Yii::t('app', 'Status'),
             'datetime' => Yii::t('app', 'Date Time'),
         ];
     }

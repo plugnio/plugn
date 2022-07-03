@@ -40,7 +40,7 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['refund_id', 'order_item_id', 'order_uuid', 'qty'], 'required'],
+            [['refund_id', 'order_item_id', 'order_uuid', 'item_uuid', 'item_name', 'item_price', 'qty'], 'required'],
             [['order_item_id', 'qty'], 'integer'],
             ['qty', 'validateQty'],
             [['item_price'], 'number'],
@@ -59,7 +59,7 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function validateQty($attribute, $params, $validator)
     {
         if ($this->orderItem->qty < $this->qty)
-            $this->addError($attribute, 'Invalid Qty');
+            $this->addError($attribute, Yii::t('app','Invalid Qty'));
 
     }
 
@@ -105,15 +105,15 @@ class RefundedItem extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-          'refunded_item_id' => 'Refunded Item ID',
-          'refund_id' => 'Refund ID',
-          'order_item_id' => 'Order Item ID',
-          'order_uuid' => 'Order Uuid',
-          'item_uuid' => 'Item Uuid',
-          'item_name' => 'Item Name',
-          'item_name_ar' => 'Item Name - Arabic',
-          'item_price' => 'Item Price',
-          'qty' => 'Qty',
+          'refunded_item_id' => Yii::t('app','Refunded Item ID'),
+          'refund_id' => Yii::t('app','Refund ID'),
+          'order_item_id' => Yii::t('app','Order Item ID'),
+          'order_uuid' => Yii::t('app','Order Uuid'),
+          'item_uuid' => Yii::t('app','Item Uuid'),
+          'item_name' => Yii::t('app','Item Name'),
+          'item_name_ar' => Yii::t('app','Item Name - Arabic'),
+          'item_price' => Yii::t('app','Item Price'),
+          'qty' => Yii::t('app','Qty')
         ];
     }
 

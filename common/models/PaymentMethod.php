@@ -19,6 +19,13 @@ use Yii;
  */
 class PaymentMethod extends \yii\db\ActiveRecord
 {
+    const CODE_FREE_CHECKOUT = 'free-checkout';
+    const CODE_BENEFIT = 'benefit';
+    const CODE_MADA = 'mada';
+    const CODE_CASH = 'cash';
+    const CODE_CREDIT_CARD = 'credit-card';
+    const CODE_KNET = 'kn';
+
     /**
      * {@inheritdoc}
      */
@@ -33,6 +40,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['payment_method_name'], 'required'],
             [['payment_method_name' , 'payment_method_name_ar', 'source_id','payment_method_code'], 'string', 'max' => 255],
             [['vat'], 'number']
         ];
@@ -44,9 +52,9 @@ class PaymentMethod extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'payment_method_id' => 'Payment Method ID',
-            'payment_method_name' => 'Payment Method Name',
-            'payment_method_name_ar' => 'Payment Method Name [Arabic]',
+            'payment_method_id' => Yii::t('app','Payment Method ID'),
+            'payment_method_name' => Yii::t('app','Payment Method Name'),
+            'payment_method_name_ar' => Yii::t('app','Payment Method Name [Arabic]'),
         ];
     }
 

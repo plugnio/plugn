@@ -18,6 +18,7 @@ use common\models\PaymentMethod;
 class NetlifyComponent extends Component {
 
     private $apiEndpoint = 'https://api.netlify.com/api/v1';
+
     public $token;
 
     /**
@@ -92,7 +93,6 @@ class NetlifyComponent extends Component {
 
         $deploySiteEndpoint = $this->apiEndpoint . "/sites/" . $site_id ;
 
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('GET')
@@ -116,8 +116,8 @@ class NetlifyComponent extends Component {
 
         $deploySiteEndpoint = $this->apiEndpoint . "/sites/" . $site_id . '/ssl';
 
-
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($deploySiteEndpoint)
@@ -129,5 +129,4 @@ class NetlifyComponent extends Component {
 
         return $response;
     }
-
 }

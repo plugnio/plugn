@@ -70,8 +70,8 @@ return [
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
                         'PATCH refund/<order_uuid>' => 'refund',
                         'PATCH update-order-status/<order_uuid>' => 'update-order-status',
-                        'PATCH <order_uuid>/<store_uuid>' => 'update',
                         'PATCH <order_uuid>' => 'update',
+                        'PATCH <order_uuid>/<store_uuid>' => 'update',
                         'DELETE soft-delete/<order_uuid>/<store_uuid>' => 'soft-delete',
                         'DELETE soft-delete/<order_uuid>' => 'soft-delete',
                         'DELETE <order_uuid>/<store_uuid>' => 'delete',
@@ -131,6 +131,20 @@ return [
                         'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
+                [// CampaignController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/campaign',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <id>' => 'update',
+                        'DELETE <id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// CategoryController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/category',
@@ -152,6 +166,16 @@ return [
                         'OPTIONS <category_id>/<store_uuid>' => 'options',
                         'OPTIONS update-position' => 'options',
                         'OPTIONS item-list' => 'options',
+                    ]
+                ],
+                [ // SitemapController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/sitemap',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
                     ]
                 ],
                 [// StaffController
@@ -216,6 +240,22 @@ return [
                         'OPTIONS detail' => 'options'
                     ]
                 ],
+                [// TicketController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/ticket',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET comments/<id>' => 'comments',
+                        'GET <id>' => 'view',
+                        'POST' => 'create',
+                        'PATCH comment/<ticket_uuid>' => 'comment',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS comment/<ticket_uuid>' => 'options',
+                        'OPTIONS comments/<id>' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// AreaController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/area',
@@ -234,8 +274,11 @@ return [
                     'patterns' => [
                         'GET' => 'detail',
                         //todo: update-email
+
                         'GET store-profile' => 'store-profile',
                         'GET stores' => 'stores',
+                        'GET language-pref' => 'language-pref',
+                        'PATCH language-pref' => 'language-pref',
                         'PUT update' => 'update-agent-profile',
                         'POST change-password' => 'change-password',
                         // OPTIONS VERBS
@@ -244,6 +287,7 @@ return [
                         'OPTIONS stores' => 'options',
                         'OPTIONS update' => 'options',
                         'OPTIONS change-password' => 'options',
+                        'OPTIONS language-pref' => 'options'
                     ]
                 ],
                 [// VoucherController
@@ -413,6 +457,8 @@ return [
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
                         'POST disable-cod/<id>' => 'disable-cod',
+                        'POST enable-free-checkout/<id>' => 'enable-free-checkout',
+                        'POST disable-free-checkout/<id>' => 'disable-free-checkout',
                         'POST update-layout' => 'update-layout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
@@ -430,6 +476,8 @@ return [
                         'OPTIONS disable-online-payment/<id>' => 'options',
                         'OPTIONS enable-cod/<id>' => 'options',
                         'OPTIONS disable-cod/<id>' => 'options',
+                        'OPTIONS enable-free-checkout/<id>' => 'options',
+                        'OPTIONS disable-free-checkout/<id>' => 'options',
                         'OPTIONS update-layout' => 'options',
                         'OPTIONS update-status/<id>/<status>' => 'options',
                         'OPTIONS status' => 'options'
@@ -442,19 +490,24 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
+                        'POST signup-step-one' => 'signup-step-one',
                         'POST signup' => 'signup',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
+                        'POST is-email-verified' => 'is-email-verified',
+                        'POST update-email' => 'update-email',
+                        'POST resend-verification-email' => 'resend-verification-email',
+                        'POST verify-email' => 'verify-email',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
                         'OPTIONS update-password' => 'options',
                         'OPTIONS request-reset-password' => 'options',
-                        'OPTIONS signup' => 'signup'
-/*todo: implement for email verification
-  public _urlresendVerificationEmail = '/auth/resend-verification-email';
-  public _urlUpdateEmail = '/auth/update-email';
-  public _urlIsEmailVerified = '/auth/is-email-verified';
-  public _urlVerifyEmail = '/auth/verify-email';*/
+                        'OPTIONS signup' => 'options',
+                        'OPTIONS is-email-verified' => 'options',
+                        'OPTIONS update-email' => 'options',
+                        'OPTIONS resend-verification-email' => 'options',
+                        'OPTIONS verify-email' => 'options',
+                        'OPTIONS signup-step-one' => 'options'
                     ]
                 ],
                 [ // StatsController
@@ -476,6 +529,17 @@ return [
                        'POST confirm' => 'confirm',
                        // OPTIONS VERBS
                        'OPTIONS <id>' => 'options'
+                   ]
+               ],
+                [ // RestaurantPaymentMethod
+                   'class' => 'yii\rest\UrlRule',
+                   'controller' => 'v1/restaurant-payment-method',
+                   'patterns' => [
+                       'GET' => 'index',
+                       'GET all' => 'list-all',
+                       // OPTIONS VERBS
+                       'OPTIONS' => 'options',
+                       'OPTIONS all' => 'options'
                    ]
                ],
             ],

@@ -9,12 +9,15 @@ use Yii;
  *
  * @property string $restaurant_uuid
  * @property int $payment_method_id
+ * @property int $status
  *
  * @property PaymentMethod $paymentMethod
  * @property Restaurant $restaurantUu
  */
 class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
 
+    const STATUS_ACTIVE = '1';
+    const STATUS_INACTIVE = '0';
     /**
      * {@inheritdoc}
      */
@@ -28,11 +31,18 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
     public function rules() {
         return [
             [['restaurant_uuid', 'payment_method_id'], 'required'],
-            [['payment_method_id'], 'integer'],
+            [['payment_method_id','status'], 'integer'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid', 'payment_method_id'], 'unique', 'targetAttribute' => ['restaurant_uuid', 'payment_method_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
+        ];
+    }
+
+    public function extraFields()
+    {
+        return [
+            'paymentMethod'
         ];
     }
 
@@ -41,8 +51,9 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
      */
     public function attributeLabels() {
         return [
-            'restaurant_uuid' => 'Restaurant Uuid',
-            'payment_method_id' => 'Payment Method ID',
+            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
+            'payment_method_id' => Yii::t('app','Payment Method ID'),
+            'status' => Yii::t('app','Status'),
         ];
     }
 

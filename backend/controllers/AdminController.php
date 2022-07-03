@@ -31,6 +31,11 @@ class AdminController extends Controller {
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
+                    [
+                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'actions' => ['create', 'update', 'delete'],
+                        'roles' => ['@'],
+                    ],
                     [//allow authenticated users only
                         'allow' => true,
                         'roles' => ['@'],

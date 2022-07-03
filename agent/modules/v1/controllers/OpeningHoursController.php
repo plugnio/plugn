@@ -119,6 +119,12 @@ class OpeningHoursController extends Controller
                 $model->open_at = date('H:i:s', strtotime ($opening_hour['open_at']));
                 $model->close_at = date('H:i:s', strtotime ($opening_hour['close_at']));
 
+                if (strtotime ($opening_hour['close_at']) <= strtotime ($opening_hour['open_at']) ) {
+                    return [
+                        "operation" => "error",
+                        "message" => Yii::t ('agent', "Close time should be greater than Open time")
+                    ];
+                }
                 if (!$model->save ()) {
                     if (isset($model->errors)) {
                         return [
@@ -168,6 +174,14 @@ class OpeningHoursController extends Controller
              $model->day_of_week = $day_of_week;
              $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
              $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
+
+            if (strtotime ($opening_hour['close_at']) <= strtotime ($opening_hour['open_at']) ) {
+                return [
+                    "operation" => "error",
+                    "message" => Yii::t ('agent', "Close time should be greater than Open time")
+                ];
+            }
+
              if (!$model->save ()) {
                  if (isset($model->errors)) {
                      return [

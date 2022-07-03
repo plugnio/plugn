@@ -13,7 +13,6 @@ use yii\web\NotFoundHttpException;
 
 class CustomerController extends Controller
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors ();
@@ -127,6 +126,9 @@ class CustomerController extends Controller
      */
     public function actionExportToExcel()
     {
+        //5 min
+        set_time_limit(60 * 5);
+
         $restaurant_model = Yii::$app->accountManager->getManagedAccount ();
 
         $start_date = Yii::$app->request->get('start_date');
@@ -141,7 +143,32 @@ class CustomerController extends Controller
                 DATE(customer.customer_created_at) <= DATE("'.$end_date.'")'));
         }
 
-        $model = $query->all();
+        $models = $query
+            ->asArray()
+            ->all();
+
+        $result = [];
+
+        foreach ($models as $model)
+        {
+            $orderResult = Order::find()
+                ->andWhere(['customer_id' => $model['customer_id']])
+                ->andWhere([
+                    'NOT IN',
+                    'order_status', [
+                        Order::STATUS_DRAFT,
+                        Order::STATUS_ABANDONED_CHECKOUT,
+                        Order::STATUS_REFUNDED,
+                        Order::STATUS_PARTIALLY_REFUNDED,
+                        Order::STATUS_CANCELED
+                    ]
+                ])
+                ->select(new Expression('SUM(`total_price`) as totalSpent, COUNT(*) as totalOrder'))
+                ->asArray()
+                ->one();
+
+            $result[] = array_merge($model, $orderResult);
+        }
 
         header ('Access-Control-Allow-Origin: *');
         header ("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -150,66 +177,60 @@ class CustomerController extends Controller
 
         \moonland\phpexcel\Excel::export ([
             'isMultipleSheet' => false,
-            'models' => $model,
+            'models' => $result,
             'columns' => [
-                'customer_name',
-                'customer_email',
                 [
-                    'attribute' => 'customer_phone_number',
+                    'header' => 'Customer Name',
                     "format" => "raw",
                     "value" => function ($model) {
-                        return str_replace (' ', '', strval ($model->customer_phone_number));
+                        return $model['customer_name'];
+                    },
+                ],
+                [
+                    'header' => 'Customer Email',
+                    "format" => "raw",
+                    "value" => function ($model) {
+                        return $model['customer_email']? $model['customer_email']: '';
                     }
                 ],
                 [
-                    'attribute' => 'Total spent',
+                    'header' => 'Customer Phone Number',
+                    "format" => "raw",
+                    "value" => function ($model) {
+                        return str_replace (' ', '', strval ($model['customer_phone_number']));
+                    }
+                ],
+                [
+                    'header' => 'Total spent',
                     "format" => "raw",
                     "value" => function ($data) {
 
-                        $total_spent = $data->getOrders ()
-                            ->andWhere ([
-                                'NOT IN',
-                                'order_status', [
-                                    Order::STATUS_DRAFT,
-                                    Order::STATUS_ABANDONED_CHECKOUT,
-                                    Order::STATUS_REFUNDED,
-                                    Order::STATUS_PARTIALLY_REFUNDED,
-                                    Order::STATUS_CANCELED
-                                ]
-                            ])
-                            ->sum ('total_price');
+                        if (is_numeric($data['totalSpent'])) {
 
-                        $total_spent = \Yii::$app->formatter->asDecimal ($total_spent ? $total_spent : 0, 3);
+                            //todo: update for multi currency
 
-                        if($data->currency)
-                            return Yii::$app->formatter->asCurrency ($total_spent ? $total_spent : 0, $data->currency->code);
+                            //if ($data['currency_code']) {
+                                return Yii::$app->formatter->asCurrency($data['totalSpent'], 'KWD');
+                            //}
 
-                        return $total_spent ? $total_spent : 0;
+                            return \Yii::$app->formatter->asDecimal($data['totalSpent'], 3);
+                        } else {
+                            return \Yii::$app->formatter->asDecimal(0, 3);
+                        }
                     }
                 ],
                 [
-                    'attribute' => 'Number of orders',
+                    'header' => 'Number of orders',
                     "format" => "raw",
                     "value" => function ($model) {
-                        return $model->getOrders ()
-                            ->andWhere ([
-                                'NOT IN',
-                                'order_status', [
-                                    Order::STATUS_DRAFT,
-                                    Order::STATUS_ABANDONED_CHECKOUT,
-                                    Order::STATUS_REFUNDED,
-                                    Order::STATUS_PARTIALLY_REFUNDED,
-                                    Order::STATUS_CANCELED
-                                ]
-                            ])
-                            ->count ();
+                        return $model['totalOrder'];
                     }
                 ],
                 [
                     'header' => Yii::t('agent', 'Account created at'),
                     "format" => "raw",
                     "value" => function ($data) {
-                        return $data->customer_created_at;
+                        return $data['customer_created_at'];
                     }
                 ]
             ]

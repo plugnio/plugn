@@ -65,19 +65,32 @@ class DeliveryZoneController extends Controller {
 
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
-            $deliveryZones = $store_model->getDeliveryZones()->with('country')->asArray()->all();
+            $deliveryZones = $store_model->getDeliveryZones()
+                ->with('country')
+                ->asArray()
+                ->all();
+
             $shipping_countries = [];
 
             foreach ($deliveryZones as $key => $deliveryZone) {
-              if(!array_search($deliveryZone['country']['country_id'], array_column($shipping_countries, 'country_id')))
 
-              $isExist = false;
+                if(empty($deliveryZone['country']))
+                {
+                    continue;
+                }
 
-              foreach ($shipping_countries as  $shipping_country) {
-                if($deliveryZone['country']['country_id'] == $shipping_country['country_id'])
-                $isExist = true;
-              }
+              if(
+                  !array_search(
+                      $deliveryZone['country']['country_id'],
+                      array_column($shipping_countries, 'country_id')
+                  )
+              )
+                $isExist = false;
 
+                  foreach ($shipping_countries as  $shipping_country) {
+                      if($deliveryZone['country']['country_id'] == $shipping_country['country_id'])
+                          $isExist = true;
+                  }
 
               if(!$isExist)
                 $shipping_countries[] = $deliveryZone['country'];
