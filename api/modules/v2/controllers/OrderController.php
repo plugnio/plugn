@@ -71,6 +71,7 @@ class   OrderController extends Controller {
     public function actionPlaceAnOrder($id) {
 
         $restaurant_model = Restaurant::findOne($id);
+
         if (!$restaurant_model) {
             return [
                 'operation' => 'error',
@@ -290,6 +291,7 @@ class   OrderController extends Controller {
         }
 
         //if payment method not cash redirect customer to payment gateway
+
         if (!in_array ($order->payment_method_id, [3, 7])) {
 
             // Create new payment record
@@ -318,6 +320,7 @@ class   OrderController extends Controller {
                         // Validate that theres no error from TAP gateway
                         if (isset($responseContent->status) && $responseContent->status == "fail") {
                             $transaction->rollBack();
+
                             return [
                                 'operation' => 'error',
                                 'message' => 'Invalid Token ID'
@@ -356,7 +359,9 @@ class   OrderController extends Controller {
                 }
 
                 if (!$payment->save()) {
+
                     $transaction->rollBack();
+
                     return [
                         'operation' => 'error',
                         'message' => $payment->getErrors()
@@ -368,7 +373,9 @@ class   OrderController extends Controller {
                 $order->save(false);
 
                 if (!$order->updateOrderTotalPrice()) {
+
                     $transaction->rollBack();
+
                     return [
                         'operation' => 'error',
                         'message' => $order->getErrors()
@@ -398,12 +405,17 @@ class   OrderController extends Controller {
                       $order->restaurant->warehouse_delivery_charges,
                       $order->area_id ? $order->area->country->country_name : ''
                 );
+
                 $responseContent = json_decode($response->content);
 
                 try {
                       // Validate that theres no error from TAP gateway
                       if (isset($responseContent->errors)) {
+
+                          $transaction->rollBack();
+
                           $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+
                           return [
                               'operation' => 'error',
                               'message' => $errorMessage
@@ -418,18 +430,25 @@ class   OrderController extends Controller {
                           $payment->payment_gateway_transaction_id = $chargeId;
 
                           if (!$payment->save(false)) {
+
                               $transaction->rollBack();
+
                               return [
                                   'operation' => 'error',
                                   'message' => $payment->getErrors()
                               ];
                           }
                       } else {
+
+                          $transaction->commit();
+
                           return [
                               'operation' => 'success',
                               'message' => 'Payment Issue > Charge id is missing'
                           ];
                       }
+
+                      $transaction->commit();
 
                       return [
                           'operation' => 'redirecting',
@@ -445,6 +464,7 @@ class   OrderController extends Controller {
                       Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
                         */
                     $transaction->rollBack();
+
                     return [
                         'operation' => 'error',
                         'message' => $responseContent
@@ -498,6 +518,9 @@ class   OrderController extends Controller {
                 }
 
                 if($paymentMethodId == null){
+
+                    $transaction->rollBack();
+
                   return [
                       'operation' => 'error',
                       'message' =>  'This payment method is not supported'
@@ -554,6 +577,9 @@ class   OrderController extends Controller {
                         'message' => $responseContent
                     ];
                 }
+
+                $transaction->commit();
+
                 return [
                     'operation' => 'redirecting',
                     'redirectUrl' => $redirectUrl,
@@ -562,6 +588,9 @@ class   OrderController extends Controller {
             }
 
           else {
+
+              $transaction->rollBack();
+
             return [
                 'operation' => 'error',
                 'message' => 'Sorry we are not able to process your request Please try again later'
@@ -575,6 +604,8 @@ class   OrderController extends Controller {
             $order->sendPaymentConfirmationEmail();
 
             Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
+
+            $transaction->commit();
 
             return [
                 'operation' => 'success',
