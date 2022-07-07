@@ -33,6 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_uuid',
             'restaurant.name',
             'queue_status',
+            'queue_response',
             'queue_created_at',
             'queue_updated_at',
             'queue_start_at',
