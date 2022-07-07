@@ -71,6 +71,8 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
                 'name' => Yii::$app->language != 'ar'? $this->extraOption->extra_option_name: $this->extraOption->extra_option_name_ar
             ]));
         }
+
+        return true;
     }
 
     /**
