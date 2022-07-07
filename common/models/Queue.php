@@ -11,6 +11,7 @@ use yii\db\Expression;
  * @property int $queue_id
  * @property string $restaurant_uuid
  * @property int|null $queue_status
+ * @property string|null $queue_response
  * @property string|null $queue_created_at
  * @property string|null $queue_updated_at
  * @property string|null $queue_start_at
@@ -39,7 +40,7 @@ class Queue extends \yii\db\ActiveRecord {
         return [
             [['restaurant_uuid', 'queue_status'], 'required'],
             [['queue_status'], 'integer'],
-            [['queue_start_at', 'queue_end_at'], 'safe'],
+            [['queue_start_at', 'queue_end_at','queue_response'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -103,16 +104,19 @@ class Queue extends \yii\db\ActiveRecord {
                             $store_model->save(false);
 
                         } else {
+                            $this->queue_response = json_encode($createNewSiteResponse);
                             Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
                             return false;
                         }
 
                 } else{
+                    $this->queue_response = json_encode($createBranchResponse);
                   Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                   return false;
                 }
 
             } else {
+                $this->queue_response = json_encode($getLastCommitResponse);
                 Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                 return false;
             }
@@ -132,6 +136,7 @@ class Queue extends \yii\db\ActiveRecord {
             'queue_id' => Yii::t('app','Queue ID'),
             'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
             'queue_status' => Yii::t('app','Queue Status'),
+            'queue_response' => Yii::t('app','Queue response'),
             'queue_created_at' => Yii::t('app','Queue Created At'),
             'queue_updated_at' => Yii::t('app','Queue Updated At'),
             'queue_start_at' => Yii::t('app','Queue Start At'),
