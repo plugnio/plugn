@@ -28,8 +28,20 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             // ['class' => 'yii\grid\SerialColumn'],
-
-            'name',
+            [
+                'attribute' => 'name',
+                'format' => 'raw',
+                'value' => function ($data) {
+                    if ($data->queue->queue_status == 1) {
+                        $icon = Html::a('<i class="glyphicon glyphicon-minus-sign" style="color:red"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Pending']);
+                    } else if ($data->queue->queue_status == 2) {
+                        $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign" style="color:orange"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Creating']);
+                    } else if ($data->queue->queue_status == 3) {
+                        $icon = Html::a('<i class="glyphicon glyphicon-ok-sign" style="color:green"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Published']);
+                    }
+                    return $data->name .' '. $data->queue->queue_status.'&nbsp;&nbsp;'.$icon;
+                }
+            ],
             'restaurant_domain',
             [
               'attribute' => 'country_name',
@@ -44,11 +56,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'warehouse_fee',
             'warehouse_delivery_charges',
             'version',
-
             'restaurant_created_at:datetime',
             'referral_code',
-
-
             [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'restaurant',

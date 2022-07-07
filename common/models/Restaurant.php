@@ -2500,6 +2500,11 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    public function getQueue($modelClass = "\common\models\Queue")
+    {
+        return $this->hasOne($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->orderBy('queue_id DESC');
+    }
+
     /**
      * Gets query for [[RestaurantTheme]].
      *
