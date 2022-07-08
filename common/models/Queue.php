@@ -107,6 +107,8 @@ class Queue extends \yii\db\ActiveRecord {
                             $site_id = $createNewSiteResponse->data['site_id'];
                             $store_model->site_id = $site_id;
                             $store_model->save(false);
+                            $this->queue_response = json_encode($createNewSiteResponse);
+                            $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
 
                         } else {
                             $this->queue_response = json_encode($createNewSiteResponse);
@@ -128,9 +130,6 @@ class Queue extends \yii\db\ActiveRecord {
                 Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
                 return false;
             }
-
-            $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
-
         }
 
         return parent::beforeSave($insert);
