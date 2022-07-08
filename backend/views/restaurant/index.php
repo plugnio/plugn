@@ -26,6 +26,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'rowOptions'=>function($model){
+            if ($model->queue->queue_status  == \common\models\Queue::QUEUE_STATUS_PENDING) {
+                return ['class' => 'danger'];
+            }
+        },
         'columns' => [
             // ['class' => 'yii\grid\SerialColumn'],
             [
