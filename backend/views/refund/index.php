@@ -26,9 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'refund_id',
-
             'payment_uuid',
             [
               'attribute' => 'store_name',
@@ -45,6 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                     ]);
                 }
+            ],
+            [
+                'attribute' => 'refund_created_at',
+                'value' => function ($data) {
+                    return Yii::$app->formatter->asDate($data->refund_created_at);
+                },
+                'filter'=>false
             ],
             //'reason',
             //'refund_created_at',
