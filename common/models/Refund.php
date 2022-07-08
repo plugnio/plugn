@@ -244,18 +244,19 @@ class Refund extends \yii\db\ActiveRecord
                 $this->store->owner_email
             ];
         }
-
-        \Yii::$app->mailer->compose([
+        $message = \Yii::$app->mailer->compose([
             'html' => 'refund-failure-html',
         ], [
             'refund' => $this,
             'errorMessage' => $errorMessage
-        ])
-            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-            ->setTo($replyTo)
-            ->setCc([$this->order->customer_email])
-            ->setSubject('Refund was not processed successfully for Order #' . $this->order_uuid)
-            ->send();
+        ]);
+        $message->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name]);
+        $message->setTo($replyTo);
+        if ($this->order->customer_email) {
+            $message->setCc([$this->order->customer_email]);
+        }
+        $message->setSubject('Refund was not processed successfully for Order #' . $this->order_uuid);
+        $message->send();
     }
 
     /**
