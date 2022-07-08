@@ -235,13 +235,13 @@ class Refund extends \yii\db\ActiveRecord
     public function notifyFailure($errorMessage)
     {
         $replyTo = [];
-        if ($this->restaurant->restaurant_email) {
+        if ($this->store->restaurant_email) {
             $replyTo = [
-                $this->restaurant->restaurant_email
+                $this->store->restaurant_email
             ];
-        } else if ($this->restaurant->owner_email) {
+        } else if ($this->store->owner_email) {
             $replyTo = [
-                $this->restaurant->owner_email
+                $this->store->owner_email
             ];
         }
 
