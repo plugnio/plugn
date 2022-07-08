@@ -67,6 +67,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                 }
             ],
+            [
+                'attribute' => 'refund_created_at',
+                'value' => function ($data) {
+                    return Yii::$app->formatter->asDate($data->refund_created_at);
+                },
+                'filter'=>false
+            ],
             //'reason',
             //'refund_created_at',
             //'refund_updated_at',
