@@ -15,36 +15,35 @@ use yii\filters\VerbFilter;
  */
 class QueueController extends Controller
 {
-  public $enableCsrfValidation = false;
+    public $enableCsrfValidation = false;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function behaviors() {
-      return [
-          'verbs' => [
-              'class' => VerbFilter::className(),
-              'actions' => [
-                  'delete' => ['POST'],
+      /**
+       * {@inheritdoc}
+       */
+    public function behaviors() {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'actions' => ['create', 'update', 'delete','publish-store'],
+                        'roles' => ['@'],
+                    ],
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
               ],
-          ],
-          'access' => [
-              'class' => \yii\filters\AccessControl::className(),
-              'rules' => [
-                  [
-                      'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
-                      'actions' => ['create', 'update', 'delete'],
-                      'roles' => ['@'],
-                  ],
-                  [//allow authenticated users only
-                      'allow' => true,
-                      'roles' => ['@'],
-                  ],
-              ],
-          ],
-      ];
-  }
-
+            ],
+        ];
+    }
 
     /**
      * Lists all Queue models.
@@ -126,6 +125,30 @@ class QueueController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     */
+    public function actionPublishStore($id) {
+        $queue = Queue::find()
+            ->joinWith('restaurant')
+            ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+            ->andWhere(['queue.restaurant_uuid' => $id])
+            ->orderBy(['queue_created_at' => SORT_ASC])
+            ->one();
+
+        if ($queue && $queue->restaurant_uuid) {
+            $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
+            if (!$queue->save()) {
+                echo "<pre>";
+                print_r($queue->getErrors());
+                die('error');
+                return $this->redirect(['queue/view','id'=>$queue->queue_id]);
+
+            }
+            return $this->redirect(['queue/view','id'=>$queue->queue_id]);
+        }
+    }
     /**
      * Finds the Queue model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
