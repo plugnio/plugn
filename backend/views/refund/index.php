@@ -35,7 +35,11 @@ $this->params['breadcrumbs'][] = $this->title;
               'value' =>     'store.name'
             ],
             'order_uuid',
-            'refund_status',
+            [
+                'attribute' => 'refund_status',
+                'filter' => ['Initiated'=>'Initiated','CANCELLED'=>'CANCELLED','PENDING'=>'PENDING','REFUNDED'=>'REFUNDED'],
+                'filterInputOptions' => ['class' => 'form-control', 'id' => null, 'prompt' => 'All']
+            ],
             'refund_amount',
             [
                 'attribute' => 'refund_amount',

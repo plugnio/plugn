@@ -208,11 +208,8 @@ class CronController extends \yii\console\Controller
                             ->send();
 
                     }
-
                 }
-
             }
-
         }
 
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
@@ -517,7 +514,7 @@ class CronController extends \yii\console\Controller
             ->where(['refund.refund_reference' => null])
             ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
             ->andWhere(['NOT', ['refund.payment_uuid' => null]])
-            ->andWhere(new Expression('refund_status IS NULL OR refund_status=""'))
+            ->andWhere(new Expression('refund_status IS NULL OR refund_status="" or refund_status = "Initiated"'))
             ->all();
 
         foreach ($refunds as $refund) {
