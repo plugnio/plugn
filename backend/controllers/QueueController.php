@@ -140,9 +140,6 @@ class QueueController extends Controller
         if ($queue && $queue->restaurant_uuid) {
             $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
             if (!$queue->save()) {
-                echo "<pre>";
-                print_r($queue->getErrors());
-                die('error');
                 return $this->redirect(['queue/view','id'=>$queue->queue_id]);
 
             }

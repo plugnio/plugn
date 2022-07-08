@@ -120,14 +120,14 @@ class Queue extends \yii\db\ActiveRecord {
                 } else{
                     $this->queue_response = json_encode($createBranchResponse);
                     Yii::$app->session->setFlash('error','[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid);
-                    Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                    Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name, __METHOD__);
                     return false;
                 }
 
             } else {
                 $this->queue_response = json_encode($getLastCommitResponse);
                 Yii::$app->session->setFlash('error','[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid);
-                Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name, __METHOD__);
                 return false;
             }
         }
