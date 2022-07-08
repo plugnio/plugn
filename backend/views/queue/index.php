@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use common\models\Queue;
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\QueueSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -16,6 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Create Queue', ['create'], ['class' => 'btn btn-success btn-create']) ?>
+        <?= Html::a('Reset Filter', ['queue/index'], ['class' => 'btn btn-success btn-create']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -23,6 +24,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'rowOptions'=>function($model){
+            if ($model->queue_status  == Queue::QUEUE_STATUS_PENDING) {
+                return ['class' => 'danger'];
+            }
+        },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
@@ -31,7 +37,20 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'store_name',
               'value' =>     'restaurant.name'
             ],
-            'queue_status',
+            [
+                'attribute' => 'queue_status',
+                'value' =>     function($data) {
+                    if ($data->queue_status  == Queue::QUEUE_STATUS_PENDING) {
+                        return 'Pending';
+                    } else if ($data->queue_status  == Queue::QUEUE_STATUS_CREATING) {
+                        return 'Created';
+                    } else if ($data->queue_status  == Queue::QUEUE_STATUS_COMPLETE) {
+                        return 'Published';
+                    }
+                },
+                'filter' => [Queue::QUEUE_STATUS_PENDING=>'Pending',Queue::QUEUE_STATUS_CREATING=>'Creating',Queue::QUEUE_STATUS_COMPLETE=>'Published'],
+                'filterInputOptions' => ['class' => 'form-control', 'id' => null, 'prompt' => 'All']
+            ],
             'queue_created_at',
             'queue_updated_at',
             //'queue_start_at',
