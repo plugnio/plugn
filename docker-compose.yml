@@ -23,10 +23,11 @@ services:
   phpmyadmin:
     image: phpmyadmin
     restart: always
-    ports:
-      - 8080:80
+    #ports:
+    #  - 8080:8080
     environment:
       - PMA_HOST=mysql
+      - PMA_PORT=8888
     depends_on:
       - "mysql"
 
@@ -87,7 +88,7 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "db-migration"
+      - "load-fixture"
 
   backend:
     build: backend
@@ -99,9 +100,9 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "cron"
+      - "load-fixture"
 
-  store-dashboard:
+  frontend:
     build: frontend
     ports:
       - 22080:80
@@ -111,10 +112,10 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "cron"
+      - "load-fixture"
 
-  store-dashboard-api:
-    build: frontend
+  agent:
+    build: agent
     ports:
       - 23080:80
     volumes:
@@ -123,10 +124,10 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "cron"
+      - "load-fixture"
 
-  storefront-api:
-    build: api
+  crmapi:
+    build: crmapi
     ports:
       - 24080:80
     volumes:
@@ -135,10 +136,10 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "cron"
+      - "load-fixture"
 
-  shortner:
-    build: shortner
+  api:
+    build: api
     ports:
       - 25080:80
     volumes:
@@ -147,7 +148,19 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "cron"
+      - "load-fixture"
+
+  shortner:
+    build: shortner
+    ports:
+      - 26080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - "load-fixture"
 
 volumes:
   mysql-data:
