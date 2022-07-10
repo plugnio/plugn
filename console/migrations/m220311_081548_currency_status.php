@@ -12,8 +12,15 @@ class m220311_081548_currency_status extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('currency', 'status', $this->tinyInteger(1)
-            ->defaultValue(1)->after('sort_order'));
+        $table = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('currency');
+            
+        if (!isset($table->columns['status'])) {
+            $this->addColumn('currency', 'status', $this->tinyInteger(1)
+                ->defaultValue(1)->after('sort_order'));
+        }
 
         $arr = [
             'KWD',
