@@ -33,7 +33,7 @@ class m220419_165447_order_discount extends Migration
             $this->addColumn ('order', 'bank_discount', $this->decimal(10, 3)->after('bank_discount_id'));
         }
 
-        $query = \common\models\Order::find();
+        /*$query = \common\models\Order::find();
 
         $total = \common\models\Order::find()->count();
 
@@ -63,7 +63,7 @@ class m220419_165447_order_discount extends Migration
             }
 
             Console::updateProgress($n, $total);
-        }
+        }*/
     }
 
     /**
