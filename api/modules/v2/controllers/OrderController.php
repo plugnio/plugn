@@ -75,9 +75,11 @@ class   OrderController extends Controller {
         if (!$restaurant_model) {
             return [
                 'operation' => 'error',
-                'message' => 'Invalid Store'
+                'message' => 'Invalid Store',
+                'code' => 1
             ];
         }
+
         $transaction = Yii::$app->db->beginTransaction();
 //        $transaction->rollBack();
 //        $transaction->commit();
@@ -170,6 +172,7 @@ class   OrderController extends Controller {
             return [
                 'operation' => 'error',
                 'message' => $order->getErrors(),
+                'code' => 2
             ];
         }
 
@@ -187,7 +190,8 @@ class   OrderController extends Controller {
             $transaction->rollBack();
             return [
                 'operation' => 'error',
-                'message' => 'Item not available.'
+                'message' => 'Item not available.',
+                'code' => 3
             ];
         }
 
@@ -209,7 +213,8 @@ class   OrderController extends Controller {
                 $transaction->rollBack();
                 return [
                     'operation' => 'error',
-                    'message' => $orderItem->getErrors()
+                    'message' => $orderItem->getErrors(),
+                    'code' => 4
                 ];
             }
 
@@ -235,6 +240,7 @@ class   OrderController extends Controller {
                             return [
                                 'operation' => 'error',
                                 'message' => $orderItemExtraOption->getErrors(),
+                                'code' => 5
                             ];
                         }
                     }
@@ -247,6 +253,7 @@ class   OrderController extends Controller {
             return [
                 'operation' => 'error',
                 'message' => $restaurant_model->name . ' is currently closed and is not accepting orders at this time',
+                'code' => 6
             ];
         }
 
@@ -254,7 +261,8 @@ class   OrderController extends Controller {
             $transaction->rollBack();
             return [
                 'operation' => 'error',
-                'message' => $order->getErrors()
+                'message' => $order->getErrors(),
+                'code' => 7
             ];
         }
 
@@ -271,13 +279,15 @@ class   OrderController extends Controller {
                 $transaction->rollBack();
                 return [
                     'operation' => 'error',
-                    'message' => "Free checkout not enabled on this store!"
+                    'message' => "Free checkout not enabled on this store!",
+                    'code' => 8
                 ];
             } else if($order->payment_method_id != $freeCheckout->payment_method_id) {
                 $transaction->rollBack();
                 return [
                     'operation' => 'error',
-                    'message' => "Invalid payment method for free order!"
+                    'message' => "Invalid payment method for free order!",
+                    'code' => 9
                 ];
             }
         }
@@ -286,7 +296,8 @@ class   OrderController extends Controller {
             $transaction->rollBack();
             return [
                 'operation' => 'error',
-                'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place])
+                'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]),
+                'code' => 10
             ];
         }
 
@@ -323,8 +334,10 @@ class   OrderController extends Controller {
 
                             return [
                                 'operation' => 'error',
-                                'message' => 'Invalid Token ID'
+                                'message' => 'Invalid Token ID',
+                                'code' => 11
                             ];
+
                         } else if (isset($responseContent->id) && $responseContent->id) {
 
                             $bank_name = Yii::$app->request->getBodyParam("bank_name");
@@ -355,7 +368,8 @@ class   OrderController extends Controller {
 
                         return [
                             'operation' => 'error',
-                            'message' => 'Invalid Token id'
+                            'message' => 'Invalid Token id',
+                            'code' => 12
                         ];
                     }
                 }
@@ -366,7 +380,8 @@ class   OrderController extends Controller {
 
                     return [
                         'operation' => 'error',
-                        'message' => $payment->getErrors()
+                        'message' => $payment->getErrors(),
+                        'code' => 13
                     ];
                 }
 
@@ -380,7 +395,8 @@ class   OrderController extends Controller {
 
                     return [
                         'operation' => 'error',
-                        'message' => $order->getErrors()
+                        'message' => $order->getErrors(),
+                        'code' => 14
                     ];
                 }
 
@@ -442,7 +458,8 @@ class   OrderController extends Controller {
                           return [
                               'operation' => 'error',
                               'message' => $errorMessage,
-                              'rerquestSent' => $requestBody
+                              'rerquestSent' => $requestBody,
+                              'code' => 15
                           ];
                       }
 
@@ -459,7 +476,8 @@ class   OrderController extends Controller {
 
                               return [
                                   'operation' => 'error',
-                                  'message' => $payment->getErrors()
+                                  'message' => $payment->getErrors(),
+                                  'code' => 16
                               ];
                           }
                       } else {
@@ -468,7 +486,8 @@ class   OrderController extends Controller {
 
                           return [
                               'operation' => 'success',
-                              'message' => 'Payment Issue > Charge id is missing'
+                              'message' => 'Payment Issue > Charge id is missing',
+                              'code' => 17
                           ];
                       }
 
@@ -491,7 +510,8 @@ class   OrderController extends Controller {
 
                     return [
                         'operation' => 'error',
-                        'message' => $responseContent
+                        'message' => $responseContent,
+                        'code' => 18
                     ];
                 }
             } else if ($restaurant_model->is_myfatoorah_enable){
@@ -503,7 +523,8 @@ class   OrderController extends Controller {
                     $transaction->rollBack();
                     return [
                         'operation' => 'error',
-                        'message' => $payment->getErrors()
+                        'message' => $payment->getErrors(),
+                        'code' => 19
                     ];
                 }
 
@@ -515,7 +536,8 @@ class   OrderController extends Controller {
                     $transaction->rollBack();
                     return [
                         'operation' => 'error',
-                        'message' => $order->getErrors()
+                        'message' => $order->getErrors(),
+                        'code' => 20
                     ];
                 }
 
@@ -530,7 +552,8 @@ class   OrderController extends Controller {
                     $errorMessage = "Error: " . $initiatePaymentResponse->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                     return [
                         'operation' => 'error',
-                        'message' =>  $errorMessage
+                        'message' =>  $errorMessage,
+                        'code' => 21
                     ];
                 }
 
@@ -547,7 +570,8 @@ class   OrderController extends Controller {
 
                   return [
                       'operation' => 'error',
-                      'message' =>  'This payment method is not supported'
+                      'message' =>  'This payment method is not supported',
+                      'code' => 22
                   ];
                 }
 
@@ -578,7 +602,8 @@ class   OrderController extends Controller {
                     $transaction->rollBack();
                     return [
                         'operation' => 'error',
-                        'message' =>  $errorMessage
+                        'message' =>  $errorMessage,
+                        'code' => 23
                     ];
                 }
 
@@ -591,14 +616,16 @@ class   OrderController extends Controller {
                         $transaction->rollBack();
                         return [
                             'operation' => 'error',
-                            'message' => $payment->getErrors()
+                            'message' => $payment->getErrors(),
+                            'code' => 24
                         ];
                     }
                 } else {
                     $transaction->rollBack();
                     return [
                         'operation' => 'error',
-                        'message' => $responseContent
+                        'message' => $responseContent,
+                        'code' => 25
                     ];
                 }
 
