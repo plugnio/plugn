@@ -337,6 +337,7 @@ class   OrderController extends Controller {
                                 ->one();
 
                             if ($bank_discount_model) {
+
                                 if ($bank_discount_model->isValid($order->customer_phone_number)) {
                                     $customerBankDiscount = new CustomerBankDiscount();
                                     $customerBankDiscount->customer_id = $order->customer_id;
@@ -348,6 +349,7 @@ class   OrderController extends Controller {
 
                             $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
                         }
+
                     } catch (\Exception $e) {
                         $transaction->rollBack();
 
@@ -416,9 +418,31 @@ class   OrderController extends Controller {
 
                           $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
 
+                          $requestBody = [
+                                  $order->currency->code,
+                                  "Order placed from: " . $order->customer_name, // Description
+                                  $order->restaurant->name, //Statement Desc.
+                                  $payment->payment_uuid, // Reference
+                                  $order->total_price,
+                                   $order->customer_name,
+                                   $order->customer_email,
+                                   $order->customer_phone_country_code,
+                                   $order->customer_phone_number,
+                                   $order->restaurant->platform_fee,
+                                   Url::to(['order/callback'], true),
+                                   Url::to(['order/payment-webhook'], true),
+                                  $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
+                                  $order->restaurant->warehouse_fee,
+                                  $order->restaurant->warehouse_delivery_charges,
+                                  $order->area_id ? $order->area->country->country_name : ''
+                            ];
+
+                        Yii::error($requestBody, 'application');
+
                           return [
                               'operation' => 'error',
-                              'message' => $errorMessage
+                              'message' => $errorMessage,
+                              'rerquestSent' => $requestBody
                           ];
                       }
 
