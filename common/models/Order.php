@@ -880,6 +880,7 @@ class Order extends \yii\db\ActiveRecord
             }
 
             \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+            
             \Segment::track([
                 'userId' => $this->restaurant_uuid,
                 'event' => 'Order Completed',
