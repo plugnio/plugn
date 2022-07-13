@@ -109,6 +109,7 @@ class Queue extends \yii\db\ActiveRecord {
                             $store_model->save(false);
                             $this->queue_response = json_encode($createNewSiteResponse->data);
                             $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+                            return true;
 
                         } else {
                             $this->queue_response = json_encode($createNewSiteResponse);
