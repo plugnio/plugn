@@ -415,6 +415,7 @@ class CronController extends \yii\console\Controller
         if ($queue && $queue->restaurant_uuid) {
             $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
             if (!$queue->save()) {
+                Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
                 $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
                 return false;
             }
