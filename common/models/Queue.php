@@ -25,6 +25,7 @@ class Queue extends \yii\db\ActiveRecord {
     const QUEUE_STATUS_PENDING = 1;
     const QUEUE_STATUS_CREATING = 2;
     const QUEUE_STATUS_COMPLETE = 3;
+    const QUEUE_STATUS_HOLD = 4; // IN CASE OF multiple account to confirm from client
 
     /**
      * {@inheritdoc}
