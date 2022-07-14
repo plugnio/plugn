@@ -29,6 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
         'rowOptions'=>function($model){
             if ($model->queue->queue_status  == \common\models\Queue::QUEUE_STATUS_PENDING) {
                 return ['class' => 'danger'];
+            } else if ($model->queue->queue_status  == \common\models\Queue::QUEUE_STATUS_HOLD) {
+                return ['style' => 'background:orange','title'=>'Hold'];
             }
         },
         'columns' => [
@@ -43,6 +45,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign" style="color:orange"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Creating']);
                     } else if ($data->queue->queue_status == 3) {
                         $icon = Html::a('<i class="glyphicon glyphicon-ok-sign" style="color:green"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Published']);
+                    } else if ($data->queue->queue_status == 4) {
+                        $icon = Html::a('<i class="glyphicon glyphicon glyphicon-time" style="color:black"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Hold']);
                     }
                     return $data->name .' '. $data->queue->queue_status.'&nbsp;&nbsp;'.$icon;
                 }
