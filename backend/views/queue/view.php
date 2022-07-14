@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
             echo Html::a('Delete', ['delete', 'id' => $model->queue_id], [
                 'class' => 'btn btn-danger btn-delete',
                 'data' => [
-                    'confirm' => 'Are you sure you want to delete this item?',
+                    'confirm' => 'Are you sure you want to delete this store?',
                     'method' => 'post',
                 ],
             ]);
@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
             echo "&nbsp;".Html::a('Put Hold', ['status-hold', 'id' => $model->queue_id], [
                 'class' => 'btn btn-danger btn-delete',
                 'data' => [
-                    'confirm' => 'Are you sure you want to delete this item?',
+                    'confirm' => 'Are you sure you want to put on hold this store?',
                     'method' => 'post',
                 ],
             ]);
