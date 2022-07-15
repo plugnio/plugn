@@ -82,7 +82,46 @@ return [
             ]
         ], 
 
-        /*'mailer' => [
+        //mailgun
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@common/mail',
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.eu.mailgun.org',
+                'username' => 'postmaster@plugn.io',
+                'password' => '2d43d23b68911184532de9f81810f5ca-18e06deb-d74119cb',
+                'port' => '587',
+                'encryption' => 'tls',
+                // 'plugins' => [
+                //     [
+                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                //     ],
+                // ],
+            ],
+        ],
+
+        /*
+        //aws
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@common/mail',
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'email-smtp.eu-west-2.amazonaws.com',
+                'username' => 'AKIAWMITDJRKVJNYXGPM',
+                'password' => 'BFw0ksQWzNB8u1StCraky82wp9nJbXfo5E7KWQGF9c5R',
+                'port' => '587',//465
+                'encryption' => 'tls',
+                // 'plugins' => [
+                //     [
+                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                //     ],
+                // ],
+            ],
+        ],
+        //sendgrid
+        'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
             'transport' => [

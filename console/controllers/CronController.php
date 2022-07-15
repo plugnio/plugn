@@ -821,7 +821,7 @@ class CronController extends \yii\console\Controller
         ])
             ->setFrom(['krushnkathrecha@gmail.com' => 'Plugn'])//\Yii::$app->params['supportEmail']
             ->setTo(['kathrechakrushn@gmail.com'])
-            ->setSubject('Weekly Store Summary')
+            ->setSubject('Test email')
             ->send();
 
         var_dump($a);
