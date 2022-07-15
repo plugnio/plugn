@@ -409,9 +409,9 @@ class CronController extends \yii\console\Controller
             ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
             ->orderBy(['queue_created_at' => SORT_ASC])
             ->one();
-        $this->stdout("File is creating for ".$queue->restaurant_uuid."! \n", Console::FG_RED, Console::BOLD);
 
         if ($queue && $queue->restaurant_uuid) {
+            $this->stdout("File is creating for ".$queue->restaurant_uuid."! \n", Console::FG_RED, Console::BOLD);
             $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
             if (!$queue->save()) {
                 Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
