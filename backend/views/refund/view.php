@@ -17,6 +17,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->refund_id], ['class' => 'btn btn-primary btn-update']) ?>
+        <?php
+        if ( $model->refund_status != "REFUNDED" && $model->refund_status != "REJECTED") {
+            echo Html::a('Refund', ['make-refund', 'id' => $model->refund_id], ['class' => 'btn btn-success btn-update']);
+        }
+
+        ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->refund_id], [
             'class' => 'btn btn-danger btn-delete',
             'data' => [

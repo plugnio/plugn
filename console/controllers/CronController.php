@@ -404,7 +404,6 @@ class CronController extends \yii\console\Controller
 
     public function actionCreateBuildJsFile()
     {
-
         $queue = Queue::find()
             ->joinWith('restaurant')
             ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
@@ -412,12 +411,19 @@ class CronController extends \yii\console\Controller
             ->one();
 
         if ($queue && $queue->restaurant_uuid) {
+            $this->stdout("File is creating for ".$queue->restaurant_uuid."! \n", Console::FG_RED, Console::BOLD);
             $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-            $queue->save();
+            if (!$queue->save()) {
+                Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+                $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
+                echo "<pre>";
+                print_r($queue->getErrors());
+                exit;
+                return false;
+            }
+
+            $this->stdout("File has created! \n", Console::FG_RED, Console::BOLD);
         }
-
-        $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
-
     }
 
     public function actionUpdateSitemap()
