@@ -482,8 +482,8 @@ class OrderController extends Controller
     {
         $order = $this->findModel($order_uuid, $storeUuid);
 
-        if($order_model->businessLocation)
-            $armadaApiKey = $order_model->businessLocation->armada_api_key;
+        if($order->businessLocation)
+            $armadaApiKey = $order->businessLocation->armada_api_key;
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order, $armadaApiKey);
 
@@ -514,7 +514,7 @@ class OrderController extends Controller
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
                // Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
-              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
+              Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
             }
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
@@ -696,15 +696,12 @@ class OrderController extends Controller
 
                 if ($areaDeliveryZone)
                     $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
-
             }
-
 
             if ($model->validate() && $model->save())
                 return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
 
         }
-
         return $this->render('create', [
             'model' => $model,
             'restaurant' => $restaurant
@@ -747,12 +744,10 @@ class OrderController extends Controller
                 $model->area_id = null;
             }
 
-
             if ($model->validate() && $model->save())
                 return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
 
         }
-
 
         return $this->render('update', [
             'model' => $model,

@@ -525,6 +525,12 @@ class CronController extends \yii\console\Controller
 
         foreach ($refunds as $refund) {
 
+            // in case order is deleted but still exist
+            if (!$refund->payment) {
+                Yii::error('Refund Error > Payment id not found for refund id (' . $refund->refund_id. '): ');
+                continue;
+            }
+
             if ($refund->store->is_myfatoorah_enable) {
 
                 Yii::$app->myFatoorahPayment->setApiKeys($refund->currency->code);
