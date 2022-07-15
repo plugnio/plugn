@@ -805,4 +805,20 @@ class CronController extends \yii\console\Controller
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }
+
+
+    public function actionTest() 
+    {
+
+        $a = \Yii::$app->mailer->compose([
+            'message' => 'test',
+        ])
+            ->setFrom(['krushnkathrecha@gmail.com' => 'Plugn'])//\Yii::$app->params['supportEmail']
+            ->setTo(['kathrechakrushn@gmail.com'])
+            ->setSubject('Weekly Store Summary')
+            ->send();
+
+        var_dump($a);
+        die();    
+    }
 }

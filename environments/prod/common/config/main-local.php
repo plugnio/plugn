@@ -80,8 +80,9 @@ return [
                 'port' => 6379,
                 'database' => 1,
             ]
-        ],
-        'mailer' => [
+        ], 
+
+        /*'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
             'transport' => [
@@ -97,7 +98,7 @@ return [
                 //     ],
                 // ],
             ],
-        ],
+        ],*/
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
         ],
