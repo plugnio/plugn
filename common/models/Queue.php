@@ -11,6 +11,7 @@ use yii\db\Expression;
  * @property int $queue_id
  * @property string $restaurant_uuid
  * @property int|null $queue_status
+ * @property string|null $queue_response
  * @property string|null $queue_created_at
  * @property string|null $queue_updated_at
  * @property string|null $queue_start_at
@@ -24,6 +25,7 @@ class Queue extends \yii\db\ActiveRecord {
     const QUEUE_STATUS_PENDING = 1;
     const QUEUE_STATUS_CREATING = 2;
     const QUEUE_STATUS_COMPLETE = 3;
+    const QUEUE_STATUS_HOLD = 4; // IN CASE OF multiple account to confirm from client
 
     /**
      * {@inheritdoc}
@@ -39,7 +41,7 @@ class Queue extends \yii\db\ActiveRecord {
         return [
             [['restaurant_uuid', 'queue_status'], 'required'],
             [['queue_status'], 'integer'],
-            [['queue_start_at', 'queue_end_at'], 'safe'],
+            [['queue_start_at', 'queue_end_at','queue_response'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -72,10 +74,16 @@ class Queue extends \yii\db\ActiveRecord {
 
             $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
 
-            if ($getLastCommitResponse->isOk) {
+            if($getLastCommitResponse->headers['http-code'] == 200) { // success
 
                 $sha = $getLastCommitResponse->data['sha'];
 
+                if (!$sha) {
+                    $this->queue_response = 'Invalid SSH';
+                    $this->addError('restaurant_uuid', 'Invalid SSH');
+                    Yii::error('Invalid SSH key while fetching gihub result', __METHOD__);
+                    return false;
+                }
                 //Replace test with store branch name
                 $branchName = 'refs/heads/' . $store_model->store_branch_name;
 
@@ -88,7 +96,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                 }*/
 
-                if ($createBranchResponse->isOk) {
+                if($createBranchResponse->headers['http-code'] == 201) { // Created
 
                     sleep(1);
 
@@ -101,24 +109,39 @@ class Queue extends \yii\db\ActiveRecord {
                             $site_id = $createNewSiteResponse->data['site_id'];
                             $store_model->site_id = $site_id;
                             $store_model->save(false);
+                            $this->queue_response = json_encode($createNewSiteResponse->data);
+                            $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+                            return true;
 
                         } else {
+                            $this->queue_response = json_encode($createNewSiteResponse);
+                            if (isset(Yii::$app->session->id)) {
+                                Yii::$app->session->setFlash('error', '[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data));
+                            }
+                            $this->addError('restaurant_uuid', '[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data));
                             Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
                             return false;
                         }
 
                 } else{
-                  Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
-                  return false;
+                    $this->queue_response = json_encode($createBranchResponse);
+                    if (isset(Yii::$app->session->id)) {
+                        Yii::$app->session->setFlash('error', '[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: ' . $store_model->restaurant_uuid);
+                    }
+                    $this->addError('restaurant_uuid', '[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name);
+                    Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name, __METHOD__);
+                    return false;
                 }
 
             } else {
-                Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid, __METHOD__);
+                $this->queue_response = json_encode($getLastCommitResponse);
+                if (isset(Yii::$app->session->id)) {
+                    Yii::$app->session->setFlash('error', '[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: ' . $store_model->restaurant_uuid);
+                }
+                $this->addError('restaurant_uuid', '[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name);
+                Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name, __METHOD__);
                 return false;
             }
-
-            $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
-
         }
 
         return parent::beforeSave($insert);
@@ -132,6 +155,7 @@ class Queue extends \yii\db\ActiveRecord {
             'queue_id' => Yii::t('app','Queue ID'),
             'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
             'queue_status' => Yii::t('app','Queue Status'),
+            'queue_response' => Yii::t('app','Queue response'),
             'queue_created_at' => Yii::t('app','Queue Created At'),
             'queue_updated_at' => Yii::t('app','Queue Updated At'),
             'queue_start_at' => Yii::t('app','Queue Start At'),

@@ -5,6 +5,7 @@ namespace common\models;
 use api\models\Item;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\Exception;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
@@ -1652,10 +1653,31 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function beforeDelete()
     {
-        $this->deleteRestaurantThumbnailImage ();
-        $this->deleteRestaurantLogo ();
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            Queue::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            Category::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            RestaurantTheme::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            Subscription::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            AreaDeliveryZone::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            DeliveryZone::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            AgentAssignment::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            BusinessLocation::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            RestaurantPaymentMethod::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            OpeningHour::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            RestaurantCurrency::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            Restaurant::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
 
-        return parent::beforeDelete ();
+            $this->deleteRestaurantThumbnailImage ();
+            $this->deleteRestaurantLogo ();
+            $transaction->commit();
+            return parent::beforeDelete ();
+        }
+        catch(Exception $e) {
+            $transaction->rollBack();
+            die($e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -2498,6 +2520,11 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getQueues($modelClass = "\common\models\Queue")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    public function getQueue($modelClass = "\common\models\Queue")
+    {
+        return $this->hasOne($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->orderBy('queue_id DESC');
     }
 
     /**

@@ -208,11 +208,8 @@ class CronController extends \yii\console\Controller
                             ->send();
 
                     }
-
                 }
-
             }
-
         }
 
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
@@ -407,7 +404,6 @@ class CronController extends \yii\console\Controller
 
     public function actionCreateBuildJsFile()
     {
-
         $queue = Queue::find()
             ->joinWith('restaurant')
             ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
@@ -415,12 +411,19 @@ class CronController extends \yii\console\Controller
             ->one();
 
         if ($queue && $queue->restaurant_uuid) {
+            $this->stdout("File is creating for ".$queue->restaurant_uuid."! \n", Console::FG_RED, Console::BOLD);
             $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-            $queue->save();
+            if (!$queue->save()) {
+                Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+                $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
+                echo "<pre>";
+                print_r($queue->getErrors());
+                exit;
+                return false;
+            }
+
+            $this->stdout("File has created! \n", Console::FG_RED, Console::BOLD);
         }
-
-        $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
-
     }
 
     public function actionUpdateSitemap()
@@ -517,10 +520,16 @@ class CronController extends \yii\console\Controller
             ->where(['refund.refund_reference' => null])
             ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
             ->andWhere(['NOT', ['refund.payment_uuid' => null]])
-            ->andWhere(new Expression('refund_status IS NULL OR refund_status=""'))
+            ->andWhere(new Expression('refund_status IS NULL OR refund_status="" or refund_status = "Initiated"'))
             ->all();
 
         foreach ($refunds as $refund) {
+
+            // in case order is deleted but still exist
+            if (!$refund->payment) {
+                Yii::error('Refund Error > Payment id not found for refund id (' . $refund->refund_id. '): ');
+                continue;
+            }
 
             if ($refund->store->is_myfatoorah_enable) {
 
@@ -807,5 +816,20 @@ class CronController extends \yii\console\Controller
         $response = Currency::getDataFromApi();
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
+    }
+
+
+    public function actionTest() 
+    {
+        $a = \Yii::$app->mailer->compose([
+            'message' => 'test',
+        ])
+            ->setFrom(['krushnkathrecha@gmail.com' => 'Plugn'])//\Yii::$app->params['supportEmail']
+            ->setTo(['kathrechakrushn@gmail.com'])
+            ->setSubject('Test email')
+            ->send();
+
+        var_dump($a);
+        die();    
     }
 }

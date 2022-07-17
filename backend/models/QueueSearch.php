@@ -43,15 +43,17 @@ class QueueSearch extends Queue
      */
     public function search($params)
     {
-        $query = Queue::find()->joinWith(['restaurant']);;
+        $query = Queue::find()->joinWith(['restaurant']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-        ]);
-
-
+            'sort' => [
+                'defaultOrder' => [
+                    'queue_id' => SORT_DESC,
+                ],
+        ]]);
 
         $dataProvider->sort->attributes['store_name'] = [
             'asc' => ['restaurant.name' => SORT_ASC],
