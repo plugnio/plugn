@@ -821,7 +821,6 @@ class CronController extends \yii\console\Controller
 
     public function actionTest() 
     {
-
         $a = \Yii::$app->mailer->compose([
             'message' => 'test',
         ])
