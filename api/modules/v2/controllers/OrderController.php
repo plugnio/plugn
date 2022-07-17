@@ -459,7 +459,8 @@ class   OrderController extends Controller {
                               'operation' => 'error',
                               'message' => $errorMessage,
                               'rerquestSent' => $requestBody,
-                              'code' => 15
+                              'code' => 15,
+                              'errors' => $responseContent->errors
                           ];
                       }
 
