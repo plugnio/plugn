@@ -68,88 +68,92 @@ $this->params['breadcrumbs'][] = $this->title;
     <hr/>
     <h1>Payment Detail</h1>
 
-    <?= DetailView::widget([
-        'model' => $model->payment,
-        'attributes' => [
-            'payment_uuid',
-            'restaurant_uuid',
-            [
-                'label' => 'Store Name',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return $data->restaurant->name ;
-                }
+    <?php
+    if ($model->payment) {
+        echo DetailView::widget([
+            'model' => $model->payment,
+            'attributes' => [
+                'payment_uuid',
+                'restaurant_uuid',
+                [
+                    'label' => 'Store Name',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return $data->restaurant->name;
+                    }
+                ],
+                [
+                    'label' => 'Customer Name',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return $data->customer->customer_name;
+                    }
+                ],
+                'order_uuid',
+                'payment_gateway_order_id',
+                'payment_gateway_transaction_id',
+                'payment_gateway_payment_id',
+                'payment_gateway_invoice_id',
+                'payment_mode',
+                'payment_current_status:ntext',
+                [
+                    'attribute' => 'payment_amount_charged',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return Yii::$app->formatter->asCurrency($data->payment_amount_charged, $data->currency->code, [
+                            \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                        ]);
+                    }
+                ],
+                [
+                    'attribute' => 'payment_gateway_fee',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return Yii::$app->formatter->asCurrency($data->payment_gateway_fee, $data->currency->code, [
+                            \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                        ]);
+                    }
+                ],
+                [
+                    'attribute' => 'plugn_fee',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return Yii::$app->formatter->asCurrency($data->plugn_fee, $data->currency->code, [
+                            \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                        ]);
+                    }
+                ],
+                [
+                    'attribute' => 'partner_fee',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code, [
+                            \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                        ]);
+                    }
+                ],
+                [
+                    'attribute' => 'payment_net_amount',
+                    'format' => 'raw',
+                    'value' => function ($data) {
+                        return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code, [
+                            \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
+                            \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
+                        ]);
+                    }
+                ],
+                'payment_created_at',
+                'payment_updated_at',
+                'received_callback',
+                'response_message',
+                'payment_token',
+                'payment_gateway_name',
             ],
-            [
-                'label' => 'Customer Name',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return $data->customer->customer_name ;
-                }
-            ],
-            'order_uuid',
-            'payment_gateway_order_id',
-            'payment_gateway_transaction_id',
-            'payment_gateway_payment_id',
-            'payment_gateway_invoice_id',
-            'payment_mode',
-            'payment_current_status:ntext',
-            [
-                'attribute' => 'payment_amount_charged',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->payment_amount_charged, $data->currency->code,[
-                        \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
-                        \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                    ]);
-                }
-            ],
-            [
-                'attribute' => 'payment_gateway_fee',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->payment_gateway_fee, $data->currency->code,[
-                        \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
-                        \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                    ]);
-                }
-            ],
-            [
-                'attribute' => 'plugn_fee',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->plugn_fee, $data->currency->code,[
-                        \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
-                        \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                    ]);
-                }
-            ],
-            [
-                'attribute' => 'partner_fee',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->partner_fee, $data->currency->code,[
-                        \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
-                        \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                    ]);
-                }
-            ],
-            [
-                'attribute' => 'payment_net_amount',
-                'format' => 'raw',
-                'value' => function ($data) {
-                    return Yii::$app->formatter->asCurrency($data->payment_net_amount, $data->currency->code,[
-                        \NumberFormatter::MIN_FRACTION_DIGITS => $data->currency->decimal_place,
-                        \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
-                    ]);
-                }
-            ],
-            'payment_created_at',
-            'payment_updated_at',
-            'received_callback',
-            'response_message',
-            'payment_token',
-            'payment_gateway_name',
-        ],
-    ]) ?>
+        ]);
+    }
+    ?>
 </div>
