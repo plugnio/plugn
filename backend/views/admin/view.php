@@ -39,6 +39,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => 'Status',
                 'value' => $model->status,
             ],
+            [
+                'label' => 'admin_role',
+                'value' => function($data){
+                    $list = \backend\models\Admin::getRoleList();
+                    return ($data->admin_role) ? $list[$data->admin_role] :$data->admin_role;
+                }
+            ],
             'admin_created_at:datetime',
             'admin_updated_at:datetime',
         ],
