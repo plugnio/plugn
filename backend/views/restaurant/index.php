@@ -39,16 +39,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'name',
                 'format' => 'raw',
                 'value' => function ($data) {
-                    if ($data->queue->queue_status == 1) {
-                        $icon = Html::a('<i class="glyphicon glyphicon-minus-sign" style="color:red"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Pending']);
-                    } else if ($data->queue->queue_status == 2) {
-                        $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign" style="color:orange"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Creating']);
-                    } else if ($data->queue->queue_status == 3) {
-                        $icon = Html::a('<i class="glyphicon glyphicon-ok-sign" style="color:green"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Published']);
-                    } else if ($data->queue->queue_status == 4) {
-                        $icon = Html::a('<i class="glyphicon glyphicon glyphicon-time" style="color:black"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Hold']);
+                    if ($data->queue) {
+                        if ($data->queue->queue_status == 1) {
+                            $icon = Html::a('<i class="glyphicon glyphicon-minus-sign" style="color:red"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Pending']);
+                        } else if ($data->queue->queue_status == 2) {
+                            $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign" style="color:orange"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Creating']);
+                        } else if ($data->queue->queue_status == 3) {
+                            $icon = Html::a('<i class="glyphicon glyphicon-ok-sign" style="color:green"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Published']);
+                        } else if ($data->queue->queue_status == 4) {
+                            $icon = Html::a('<i class="glyphicon glyphicon glyphicon-time" style="color:black"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Hold']);
+                        }
+                        return $data->name . ' ' . $data->queue->queue_status . '&nbsp;&nbsp;' . $icon;
+                    } else {
+                        return $data->name;
                     }
-                    return $data->name .' '. $data->queue->queue_status.'&nbsp;&nbsp;'.$icon;
                 }
             ],
             'restaurant_domain',
