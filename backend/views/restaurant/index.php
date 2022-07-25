@@ -27,10 +27,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'rowOptions'=>function($model){
-            if ($model->queue->queue_status  == \common\models\Queue::QUEUE_STATUS_PENDING) {
-                return ['class' => 'danger'];
-            } else if ($model->queue->queue_status  == \common\models\Queue::QUEUE_STATUS_HOLD) {
-                return ['style' => 'background:orange','title'=>'Hold'];
+            if ($model->queue) {
+                if ($model->queue->queue_status == \common\models\Queue::QUEUE_STATUS_PENDING) {
+                    return ['class' => 'danger'];
+                } else if ($model->queue->queue_status == \common\models\Queue::QUEUE_STATUS_HOLD) {
+                    return ['style' => 'background:orange', 'title' => 'Hold'];
+                }
             }
         },
         'columns' => [
