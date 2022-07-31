@@ -110,7 +110,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string|null $default_language
  * @property string|null $annual_revenue
  * @property boolean $demand_delivery
- *
+ * @property number $custom_subscription_price
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -348,6 +348,7 @@ class Restaurant extends \yii\db\ActiveRecord
                     return $model->schedule_order;
                 }
             ],
+            [['custom_subscription_price'], 'number', 'min' => 0],
             [['referral_code'], 'string', 'max' => 6],
             [['referral_code'], 'default', 'value' => null],
             ['restaurant_email', 'email'],
@@ -510,7 +511,8 @@ class Restaurant extends \yii\db\ActiveRecord
             'identification_file_purpose' => Yii::t('app','Identification File Purpose'),
             'live_api_key' => Yii::t('app','Live secret key'),
             'test_api_key' => Yii::t('app','Test secret key'),
-            'default_language' => Yii::t('app','Default Language')
+            'default_language' => Yii::t('app','Default Language'),
+            'custom_subscription_price'  => Yii::t('app','Custom Subscription Price'),
         ];
     }
 
