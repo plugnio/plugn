@@ -82,8 +82,10 @@ class TicketController extends Controller
     public function actionCreate() {
  
         $model = new Ticket();
+        $model->staff_id = Yii::$app->request->getBodyParam("staff_id");
         $model->restaurant_uuid = Yii::$app->request->getBodyParam("restaurant_uuid");
-        $model->staff_id =  Yii::$app->user->getId();
+        $model->agent_id =  $model->restaurant->getAgentAssignments()->andWhere(['role'=>1])->one()->agent_id;
+//        $model->staff_id =  Yii::$app->user->getId();
         $model->ticket_detail =  Yii::$app->request->getBodyParam("detail");
         $model->ticket_status = Ticket::STATUS_PENDING;
         $model->attachments = ArrayHelper::getColumn(
@@ -137,8 +139,12 @@ class TicketController extends Controller
 
         //validate access
 
-        $this->findModel($ticket_uuid);
-
+        $ticket = $this->findModel($ticket_uuid);
+        $status = Yii::$app->request->getBodyParam("status");
+        if ($ticket->ticket_status != $status) {
+            $ticket->ticket_status = $status;
+            $ticket->save(false);
+        }
         $model = new TicketComment();
         $model->ticket_uuid = $ticket_uuid;
         $model->staff_id =  Yii::$app->user->getId();

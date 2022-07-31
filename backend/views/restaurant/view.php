@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ])
         ?>
-
+        <?= Html::a('List Payment Method', ['restaurant-payment-method/index', 'uuid' => $model->restaurant_uuid], ['class' => 'btn btn-default']) ?>
         <br/>
         <br/>
 

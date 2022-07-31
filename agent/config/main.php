@@ -447,6 +447,7 @@ return [
                     'patterns' => [
                         'GET' => 'detail',
                         'GET status' => 'status',
+                        'GET settings/<code>' => 'settings',
                         'POST' => 'update',
                         'POST connect-domain' => 'connect-domain',
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
@@ -462,6 +463,7 @@ return [
                         'POST update-layout' => 'update-layout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
+                        'POST update-email-settings' => 'update-email-settings',
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -480,7 +482,9 @@ return [
                         'OPTIONS disable-free-checkout/<id>' => 'options',
                         'OPTIONS update-layout' => 'options',
                         'OPTIONS update-status/<id>/<status>' => 'options',
-                        'OPTIONS status' => 'options'
+                        'OPTIONS status' => 'options',
+                        'OPTIONS settings/<code>' => 'options',
+                        'OPTIONS update-email-settings' => 'options',
                     ]
                 ],
 
