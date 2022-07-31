@@ -689,6 +689,32 @@ class Order extends \yii\db\ActiveRecord
             ];
         }
 
+        //mailer : override transport if store smtp settings available
+
+        $host = Setting::getConfig($this->restaurant_uuid, 'mail', 'host');
+        $username = Setting::getConfig($this->restaurant_uuid, 'mail', 'username');
+        $password = Setting::getConfig($this->restaurant_uuid, 'mail', 'password');
+        $port = Setting::getConfig($this->restaurant_uuid, 'mail', 'port');
+        $encryption = Setting::getConfig($this->restaurant_uuid, 'mail', 'encryption');
+
+        if($host && $username && $password && $port && $encryption)
+        {
+            $fromEmail = $this->restaurant->restaurant_email? $this->restaurant->restaurant_email: \Yii::$app->params['supportEmail'];
+
+            \Yii::$app->mailer->setTransport([
+                'class' => 'Swift_SmtpTransport',
+                'host' => $host,
+                'username' => $username,
+                'password' => $password,
+                'port' => $port,
+                'encryption' => $encryption
+            ]);
+        }
+        else
+        {
+            $fromEmail = \Yii::$app->params['supportEmail'];
+        }
+
         if ($this->customer_email) {
 
             \Yii::$app->mailer->compose([
@@ -696,7 +722,7 @@ class Order extends \yii\db\ActiveRecord
             ], [
                 'order' => $this
             ])
-                ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
+                ->setFrom([$fromEmail => $this->restaurant->name])
                 ->setTo($this->customer_email)
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                 ->setReplyTo($replyTo)
@@ -712,7 +738,7 @@ class Order extends \yii\db\ActiveRecord
                 ], [
                     'order' => $this
                 ])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
+                    ->setFrom([$fromEmail => $this->restaurant->name])
                     ->setTo($agentAssignment->agent->agent_email)
                     ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                     ->setReplyTo($replyTo)
@@ -727,7 +753,7 @@ class Order extends \yii\db\ActiveRecord
                 ], [
                     'order' => $this
                 ])
-                ->setFrom([\Yii::$app->params['supportEmail'] => $this->restaurant->name])
+                ->setFrom([$fromEmail => $this->restaurant->name])
                 ->setTo($this->restaurant->restaurant_email)
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                 ->setReplyTo($replyTo)
