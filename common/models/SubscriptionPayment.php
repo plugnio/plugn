@@ -256,14 +256,20 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                     print_r($responseContent, true), __METHOD__);
         }
 
-        if($paymentRecord->save() && $paymentRecord->payment_current_status == 'CAPTURED' ){
+        if($paymentRecord->save() && $paymentRecord->payment_current_status == 'CAPTURED')
+        {
             Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
+
             $subscription_model = $paymentRecord->subscription;
             $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
 
             $valid_for =  $subscription_model->plan->valid_for;
 
-            $subscription_model->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"));
+            $subscription_model->subscription_end_at = date(
+                'Y-m-d', strtotime(
+                    date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"
+                )
+            );
 
             $subscription_model->save(false);
 
@@ -292,11 +298,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         return $paymentRecord;
     }
-
-
-
-
-
 
     /**
      * Update Payment's Status from TAP Payments

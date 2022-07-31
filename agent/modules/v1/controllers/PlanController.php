@@ -126,6 +126,8 @@ class PlanController extends Controller
             ];
         }
 
+        //for free-tier
+
         if ($selectedPlan->price == 0) {
             return [
                 "operation" => 'success',
@@ -137,7 +139,7 @@ class PlanController extends Controller
         $payment->restaurant_uuid = $store->restaurant_uuid;
         $payment->payment_mode = $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
         $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
-        $payment->payment_amount_charged = $subscription_model->plan->price;
+        $payment->payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price: $subscription_model->plan->price;
         $payment->payment_current_status = "Redirected to payment gateway";
 
         if (!$payment->save ()) {
@@ -159,7 +161,7 @@ class PlanController extends Controller
             "Upgrade $store->name's plan to " . $subscription_model->plan->name, // Description
             'Plugn', //Statement Desc.
             $payment->payment_uuid, // Reference
-            $subscription_model->plan->price,
+            $payment->payment_amount_charged,
             $store->name,
             $store->getAgents ()->one ()->agent_email,
             $store->country->country_code,
