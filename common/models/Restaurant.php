@@ -2317,6 +2317,16 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Setting]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSettings($modelClass = "\common\models\Setting")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[RestaurantDeliveryAreas]].
      *
      * @return \yii\db\ActiveQuery
