@@ -65,6 +65,13 @@ return [
              'viewPath' => '@common/mail',
              'transport' => [
                  'class' => 'Swift_SmtpTransport',
+                 'host' => 'email-smtp.eu-west-1.amazonaws.com',
+                 'username' => 'AKIAWMITDJRKTH5HBB2O',
+                 'password' => 'BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ',
+                 'port' => '587',
+                 'encryption' => 'tls',
+                 /*
+                 'class' => 'Swift_SmtpTransport',
                  'host' => 'smtp.sendgrid.net',
                  'username' => 'apikey',
                  'password' => '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',
@@ -74,7 +81,7 @@ return [
                  //     [
                  //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
                  //     ],
-                 // ],
+                 // ],*/
             ],
         ],
         // 'cache' => [

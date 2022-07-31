@@ -48,6 +48,9 @@ return [
             'api_key' => '699963168546398',
             'api_secret' => 'SH2PbVsEsRT9Db257Pn9ZDgHGAU'
         ],
+        'config' => [
+            'class' => 'common\components\Config'
+        ],
         'temporaryBucketResourceManager' => [
             'class' => 'common\components\S3ResourceManager',
             'region' => 'eu-west-2', // Bucket based in London

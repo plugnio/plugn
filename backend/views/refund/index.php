@@ -26,13 +26,37 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
+//            'refund_id',
             'payment_uuid',
             [
               'attribute' => 'store_name',
               'value' =>     'store.name'
             ],
             'order_uuid',
-            'refund_status',
+            [
+                'attribute' => 'refund_status',
+                'filter' => ['Initiated'=>'Initiated','CANCELLED'=>'CANCELLED','PENDING'=>'PENDING','REFUNDED'=>'REFUNDED'],
+                'filterInputOptions' => ['class' => 'form-control', 'id' => null, 'prompt' => 'All']
+            ],
+            [
+                'label' => 'Payment Status',
+                'value' => function($data) {
+                    return ($data->payment) ? $data->payment->payment_current_status : '-';
+                }
+            ],
+            [
+                'label' => 'Payment Gateway',
+                'format' => 'html',
+                'value' => function($data) {
+                    if ($data->payment) {
+                        $str = $data->payment->payment_gateway_name;
+                        $str .= ($data->store->is_myfatoorah_enable) ? '(myfatoorah)' : '(tap_enable)';
+                        return $str;
+                    } else {
+                        return '-';
+                    }
+                }
+            ],
             'refund_amount',
             [
                 'attribute' => 'refund_amount',

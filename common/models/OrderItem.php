@@ -246,6 +246,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         $order_model = Order::findOne($this->order_uuid);
 
         //Update order total price
+
         $order_model->updateOrderTotalPrice();
 
         if(!$this->restaurant_uuid && $this->order) {
@@ -264,8 +265,6 @@ class OrderItem extends \yii\db\ActiveRecord {
 
             $this->item_name = $item_model->item_name;
             $this->item_name_ar = $item_model->item_name_ar;
-
-            $this->item->decreaseStockQty($this->qty);
         }
 
         $this->item_price = $this->calculateOrderItemPrice();
@@ -296,7 +295,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         //Update product inventory
         
-        if ($insert){
+        if ($insert) {
           if ($item_model) {
               $this->item_name = $item_model->item_name;
               $this->item_name_ar = $item_model->item_name_ar;

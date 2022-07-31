@@ -1,5 +1,6 @@
 <?php
 return [
+    "Mail settings updated successfully" => "",
     "This email verification link is no longer valid, please login to send a new one" => "لم يعد رابط التحقق من البريد الإلكتروني هذا صالحًا ، يرجى تسجيل الدخول لإرسال رابط جديد",
     "Please click on the link sent to you by email to verify your account" => "الرجاء النقر فوق الارتباط المرسل إليك عبر البريد الإلكتروني للتحقق من حسابك",
     "You have verified your email" => "لقد تحققت من بريدك الإلكتروني",
@@ -134,5 +135,6 @@ return [
     "Net Amount" => "كمية الشبكة",
     "Plugn fee" => "رسوم Plugn",
     "Payment Gateway fee" => "رسوم بوابة الدفع",
-    "Status changed successfully" => "تم تغيير الوضع بنجاح"
+    "Status changed successfully" => "تم تغيير الوضع بنجاح",
+    "Close time should be greater than Open time" => "يجب أن يكون وقت الإغلاق أكبر من وقت الفتح"
 ];
