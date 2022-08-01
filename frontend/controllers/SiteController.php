@@ -2,9 +2,9 @@
 
 namespace frontend\controllers;
 
+use Yii;
 use agent\models\Currency;
 use frontend\models\VerifyEmailForm;
-use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
@@ -216,6 +216,8 @@ class SiteController extends Controller
 
         $selectedPlan = Plan::findOne($selectedPlanId);
 
+        $fees = $managedRestaurant->custom_subscription_price > 0 ? $managedRestaurant->custom_subscription_price: $selectedPlan->price;
+
         $subscription = new Subscription();
         $subscription->restaurant_uuid = $managedRestaurant->restaurant_uuid;
         $subscription->plan_id = $selectedPlan->plan_id;
@@ -230,7 +232,7 @@ class SiteController extends Controller
                 $payment->restaurant_uuid = $managedRestaurant->restaurant_uuid;
                 $payment->payment_mode = $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
                 $payment->subscription_uuid = $subscription->subscription_uuid; //subscription_uuid
-                $payment->payment_amount_charged = $subscription->plan->price;
+                $payment->payment_amount_charged = $fees;
                 $payment->payment_current_status = "Redirected to payment gateway";
 
                 if ($managedRestaurant->referral_code) {
@@ -252,7 +254,7 @@ class SiteController extends Controller
                         "Upgrade $managedRestaurant->name's plan to " . $subscription->plan->name, // Description
                         'Plugn', //Statement Desc.
                          $payment->payment_uuid, // Reference
-                        $subscription->plan->price,
+                        $payment->payment_amount_charged,
                          $managedRestaurant->name,
                          $managedRestaurant->getAgents()->one()->agent_email,
                          $managedRestaurant->country->country_code,
@@ -338,7 +340,8 @@ class SiteController extends Controller
             'restaurant' => $managedRestaurant,
             'selectedPlan' => Plan::findOne($selectedPlanId),
             'subscription' => $subscription,
-            'paymentMethods' => $payment_methods
+            'paymentMethods' => $payment_methods,
+            'fees' => $fees
         ]);
     }
 
