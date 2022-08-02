@@ -738,7 +738,7 @@ class   OrderController extends Controller {
         } catch (\Exception $e) {
             //todo: notify vendor/admin?
 
-            //Yii::error($e->getMessage());
+            Yii::error($e->getMessage());
 
             throw new NotFoundHttpException($e->getMessage());
         }
