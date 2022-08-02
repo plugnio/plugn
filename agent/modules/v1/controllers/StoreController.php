@@ -5,7 +5,9 @@ namespace agent\modules\v1\controllers;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
+use common\models\Setting;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
@@ -203,6 +205,46 @@ class StoreController extends Controller
         ]);
 
         return self::message("success",'Payment method disabled successfully');
+    }
+
+    /**
+     * Update mail settings
+     * @return mixed
+     */
+    public function actionUpdateEmailSettings()
+    {
+        $model = $this->findModel();
+
+        $host = Yii::$app->request->getBodyParam('host');
+        $username = Yii::$app->request->getBodyParam('username');
+        $password = Yii::$app->request->getBodyParam('password');
+        $port = Yii::$app->request->getBodyParam('port');
+        $encryption = Yii::$app->request->getBodyParam('encryption');
+
+        Setting::setConfig($model->restaurant_uuid, 'mail', 'host', $host);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'username', $username);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'password', $password);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'port', $port);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'encryption', $encryption);
+
+        return self::message("success",'Mail settings updated successfully');
+    }
+
+    /**
+     * return settings for specific module
+     * @param $code
+     * @return array|\yii\db\ActiveRecord[]
+     * @throws NotFoundHttpException
+     */
+    public function actionSettings($code)
+    {
+        $model = $this->findModel();
+
+        $settings = $model->getSettings()
+            ->andWhere(['code' => $code])
+            ->all();
+
+        return ArrayHelper::map($settings, 'key', 'value');
     }
 
     /**
@@ -739,7 +781,7 @@ class StoreController extends Controller
      * @return Restaurant the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($store_uuid)
+    protected function findModel($store_uuid =  null)
     {
         $model = Yii::$app->accountManager->getManagedAccount($store_uuid);
 

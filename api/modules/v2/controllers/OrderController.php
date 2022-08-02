@@ -733,8 +733,11 @@ class   OrderController extends Controller {
 
             // Redirect back to app
             // $paymentRecord->order->changeOrderStatusToPending();
-            return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid);
-            
+            $url = $paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid;
+//            return $this->redirect($paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid);
+            return Yii::$app->getResponse()->redirect($url)->send(301);
+
+
         } catch (\Exception $e) {
             //todo: notify vendor/admin?
 

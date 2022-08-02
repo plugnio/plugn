@@ -151,7 +151,7 @@ class Ticket extends \yii\db\ActiveRecord
             ], [
                 'model' => $this
             ])
-            ->setFrom ([$this->agent->agent_email])
+            ->setFrom ([Yii::$app->params['supportEmail']])
             ->setTo (Yii::$app->params['supportEmail'])
             ->setCc ($staffEmails)
             ->setSubject ('New ticket generated for ' . $this->restaurant->name)

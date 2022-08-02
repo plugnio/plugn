@@ -28,6 +28,9 @@ $this->params['breadcrumbs'][] = $this->title;
             if ($model->queue_status  == Queue::QUEUE_STATUS_PENDING) {
                 return ['class' => 'danger'];
             }
+            if ($model->queue_status  == Queue::QUEUE_STATUS_HOLD) {
+                return ['style' => 'background:orange'];
+            }
         },
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
@@ -46,9 +49,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         return 'Created';
                     } else if ($data->queue_status  == Queue::QUEUE_STATUS_COMPLETE) {
                         return 'Published';
+                    } else if ($data->queue_status  == Queue::QUEUE_STATUS_HOLD) {
+                        return 'Hold';
                     }
                 },
-                'filter' => [Queue::QUEUE_STATUS_PENDING=>'Pending',Queue::QUEUE_STATUS_CREATING=>'Creating',Queue::QUEUE_STATUS_COMPLETE=>'Published'],
+                'filter' => [Queue::QUEUE_STATUS_PENDING=>'Pending',Queue::QUEUE_STATUS_CREATING=>'Creating',Queue::QUEUE_STATUS_COMPLETE=>'Published',Queue::QUEUE_STATUS_HOLD=>'Hold'],
                 'filterInputOptions' => ['class' => 'form-control', 'id' => null, 'prompt' => 'All']
             ],
             'queue_created_at',

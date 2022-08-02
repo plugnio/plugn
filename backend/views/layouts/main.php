@@ -72,8 +72,8 @@ AppAsset::register($this);
                   ['label' => 'Plans', 'url' => ['/plan/index']],
                   ['label' => 'Bank', 'url' => ['/bank/index']],
                   ['label' => 'Opening Hours', 'url' => ['/opening-hour/index']],
-
                   ['label' => 'Admins', 'url' => ['/admin/index']],
+                  ['label' => 'Restaurant Payment Method', 'url' => ['/restaurant-payment-method/index']],
 
                 ],
             ],
