@@ -55,6 +55,11 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         ];
     }
 
+    /**
+     * validate option qty
+     * @param $attribute
+     * @return bool
+     */
     public function validateQty($attribute)
     {
         if(
@@ -65,7 +70,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
             return true;
         }
 
-        if($this->qty > $this->extraOption->stock_qty)
+        if($this->extraOption && $this->qty > $this->extraOption->stock_qty)
         {
             $this->addError($attribute, Yii::t('app', "{name} is currently out of stock and unavailable.", [
                 'name' => Yii::$app->language != 'ar'? $this->extraOption->extra_option_name: $this->extraOption->extra_option_name_ar
