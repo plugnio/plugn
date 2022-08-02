@@ -699,21 +699,26 @@ class CronController extends \yii\console\Controller
         }
     }
 
-
+    /**
+     * TODO: replace with stock deduction only after successfull payment or order confirmed by vendor
+     * @return void
+     */
     public function actionUpdateStockQty()
     {
         $now = new DateTime('now');
 
         $payments = Payment::find()
-            ->joinWith('order')
+            ->innerJoinWith('order')
             ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
             ->andWhere(['!=', 'payment.payment_current_status', 'Paid'])
             ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
             ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
             ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
 
-        foreach ($payments->all() as $payment) {
-            $payment->order->restockItems();
+        foreach ($payments->all() as $payment)
+        {
+            if($payment->order)
+                $payment->order->restockItems();
         }
     }
 
