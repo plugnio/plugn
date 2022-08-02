@@ -315,6 +315,8 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'test_public_key')->textInput() ?>
 
+    <?= $form->field($model, 'custom_subscription_price')->textInput() ?>
+    
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

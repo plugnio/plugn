@@ -404,7 +404,6 @@ class CronController extends \yii\console\Controller
 
     public function actionCreateBuildJsFile()
     {
-
         $queue = Queue::find()
             ->joinWith('restaurant')
             ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
@@ -412,12 +411,19 @@ class CronController extends \yii\console\Controller
             ->one();
 
         if ($queue && $queue->restaurant_uuid) {
+            $this->stdout("File is creating for ".$queue->restaurant_uuid."! \n", Console::FG_RED, Console::BOLD);
             $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-            $queue->save();
+            if (!$queue->save()) {
+                Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+                $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
+                echo "<pre>";
+                print_r($queue->getErrors());
+                exit;
+                return false;
+            }
+
+            $this->stdout("File has created! \n", Console::FG_RED, Console::BOLD);
         }
-
-        $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
-
     }
 
     public function actionUpdateSitemap()
@@ -518,6 +524,12 @@ class CronController extends \yii\console\Controller
             ->all();
 
         foreach ($refunds as $refund) {
+
+            // in case order is deleted but still exist
+            if (!$refund->payment) {
+                Yii::error('Refund Error > Payment id not found for refund id (' . $refund->refund_id. '): ');
+                continue;
+            }
 
             if ($refund->store->is_myfatoorah_enable) {
 
@@ -687,21 +699,26 @@ class CronController extends \yii\console\Controller
         }
     }
 
-
+    /**
+     * TODO: replace with stock deduction only after successfull payment or order confirmed by vendor
+     * @return void
+     */
     public function actionUpdateStockQty()
     {
         $now = new DateTime('now');
 
         $payments = Payment::find()
-            ->joinWith('order')
+            ->innerJoinWith('order')
             ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
             ->andWhere(['!=', 'payment.payment_current_status', 'Paid'])
             ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
             ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
             ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
 
-        foreach ($payments->all() as $payment) {
-            $payment->order->restockItems();
+        foreach ($payments->all() as $payment)
+        {
+            if($payment->order)
+                $payment->order->restockItems();
         }
     }
 
@@ -804,5 +821,20 @@ class CronController extends \yii\console\Controller
         $response = Currency::getDataFromApi();
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
+    }
+
+
+    public function actionTest() 
+    {
+        $a = \Yii::$app->mailer->compose([
+            'message' => 'test',
+        ])
+            ->setFrom(['krushnkathrecha@gmail.com' => 'Plugn'])//\Yii::$app->params['supportEmail']
+            ->setTo(['kathrechakrushn@gmail.com'])
+            ->setSubject('Test email')
+            ->send();
+
+        var_dump($a);
+        die();    
     }
 }

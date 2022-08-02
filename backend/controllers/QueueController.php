@@ -32,8 +32,8 @@ class QueueController extends Controller
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [
-                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
-                        'actions' => ['create', 'update', 'delete','publish-store'],
+                        'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'actions' => ['create', 'update', 'delete','publish-store','status-hold'],
                         'roles' => ['@'],
                     ],
                     [//allow authenticated users only
@@ -111,6 +111,18 @@ class QueueController extends Controller
         ]);
     }
 
+    public function actionStatusHold($id)
+    {
+        $model = $this->findModel($id);
+        $model->queue_status = Queue::QUEUE_STATUS_HOLD;
+        if (!$model->save()) {
+            Yii::$app->session->setFlash('error','error while update status');
+        } else {
+            Yii::$app->session->setFlash('success', 'status updated successfully');
+        }
+        return $this->redirect(['view', 'id' => $model->queue_id]);
+    }
+
     /**
      * Deletes an existing Queue model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -132,7 +144,7 @@ class QueueController extends Controller
     public function actionPublishStore($id) {
         $queue = Queue::find()
             ->joinWith('restaurant')
-            ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
+            ->andWhere(new \yii\db\Expression("queue.queue_status ='".Queue::QUEUE_STATUS_PENDING."' OR queue.queue_status ='".Queue::QUEUE_STATUS_HOLD."'"))
             ->andWhere(['queue.restaurant_uuid' => $id])
             ->orderBy(['queue_created_at' => SORT_ASC])
             ->one();
@@ -144,6 +156,8 @@ class QueueController extends Controller
 
             }
             return $this->redirect(['queue/view','id'=>$queue->queue_id]);
+        } else {
+            die('invalid store');
         }
     }
     /**

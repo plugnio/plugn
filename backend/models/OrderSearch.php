@@ -78,7 +78,8 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', 'customer_phone_number', $this->customer_phone_number])
             ->andFilterWhere(['like', 'customer_email', $this->customer_email])
             ->andFilterWhere(['like', 'payment_method_name', $this->payment_method_name])
-            ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar]);
+            ->andFilterWhere(['like', 'payment_method_name_ar', $this->payment_method_name_ar])
+            ->orderBy('order_created_at DESC');
 
         return $dataProvider;
     }

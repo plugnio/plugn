@@ -25,6 +25,7 @@ class Queue extends \yii\db\ActiveRecord {
     const QUEUE_STATUS_PENDING = 1;
     const QUEUE_STATUS_CREATING = 2;
     const QUEUE_STATUS_COMPLETE = 3;
+    const QUEUE_STATUS_HOLD = 4; // IN CASE OF multiple account to confirm from client
 
     /**
      * {@inheritdoc}
@@ -79,6 +80,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                 if (!$sha) {
                     $this->queue_response = 'Invalid SSH';
+                    $this->addError('restaurant_uuid', 'Invalid SSH');
                     Yii::error('Invalid SSH key while fetching gihub result', __METHOD__);
                     return false;
                 }
@@ -109,24 +111,34 @@ class Queue extends \yii\db\ActiveRecord {
                             $store_model->save(false);
                             $this->queue_response = json_encode($createNewSiteResponse->data);
                             $this->queue_status = Queue::QUEUE_STATUS_COMPLETE;
+                            return true;
 
                         } else {
                             $this->queue_response = json_encode($createNewSiteResponse);
-                            Yii::$app->session->setFlash('error','[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data));
+                            if (isset(Yii::$app->session->id)) {
+                                Yii::$app->session->setFlash('error', '[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data));
+                            }
+                            $this->addError('restaurant_uuid', '[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data));
                             Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
                             return false;
                         }
 
                 } else{
                     $this->queue_response = json_encode($createBranchResponse);
-                    Yii::$app->session->setFlash('error','[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid);
+                    if (isset(Yii::$app->session->id)) {
+                        Yii::$app->session->setFlash('error', '[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: ' . $store_model->restaurant_uuid);
+                    }
+                    $this->addError('restaurant_uuid', '[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name);
                     Yii::error('[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name, __METHOD__);
                     return false;
                 }
 
             } else {
                 $this->queue_response = json_encode($getLastCommitResponse);
-                Yii::$app->session->setFlash('error','[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid);
+                if (isset(Yii::$app->session->id)) {
+                    Yii::$app->session->setFlash('error', '[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: ' . $store_model->restaurant_uuid);
+                }
+                $this->addError('restaurant_uuid', '[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name);
                 Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name, __METHOD__);
                 return false;
             }

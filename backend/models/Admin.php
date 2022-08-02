@@ -261,4 +261,15 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
     {
         $this->admin_password_reset_token = null;
     }
+
+    /**
+     * @return string[]
+     */
+    public static function getRoleList() {
+        return [
+            self::ROLE_ADMIN => 'Admin',
+            self::ROLE_CUSTOMER_SERVICE_AGENT => 'Customer Service Agent',
+            self::ROLE_DEVELOPER => 'Developer'
+        ];
+    }
 }

@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "Custom Subscription Price" => "",
     "Please verify email to use it" => "",
     "Ticket comment added successfully" => "",
     "Ticket created successfully" => "",
