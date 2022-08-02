@@ -81,6 +81,7 @@ $this->registerJs($js);
               ],
               'assignment_created_at',
             ],
+
             'layout' => '{summary}{items}{pager}',
             'tableOptions' => ['class' => 'table data-list-view dataTable'],
         ]);

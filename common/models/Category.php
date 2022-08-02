@@ -26,7 +26,6 @@ use yii\behaviors\SluggableBehavior;
  */
 class Category extends \yii\db\ActiveRecord
 {
-
     public $image;
 
     /**
@@ -138,7 +137,7 @@ class Category extends \yii\db\ActiveRecord
             $this->category_image = null;
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
+            //Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
         }
     }
 
@@ -189,8 +188,10 @@ class Category extends \yii\db\ActiveRecord
                 unlink ($imageURL);
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
-            Yii::error ("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode ($imageURL));
+            //todo: notify vendor in api response?
+
+            //Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+            //Yii::error ("Error when uploading category image to Cloudinry: ImageUrl Value " . json_encode ($imageURL));
         }
     }
 
@@ -230,7 +231,9 @@ class Category extends \yii\db\ActiveRecord
             return true;
 
         } catch (\Cloudinary\Error $err) {
-            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+            //todo: notify vendor?
+            //Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+
         }
     }
 
@@ -264,7 +267,7 @@ class Category extends \yii\db\ActiveRecord
 
             $this->addError ('category_image', Yii::t ('app', 'Please try again.'));
 
-            Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
+            //Yii::error ("Error when uploading category image to Cloudinry: " . json_encode ($err));
 
             return false;
 

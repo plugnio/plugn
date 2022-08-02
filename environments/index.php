@@ -16,6 +16,8 @@ return [
             'api/web/assets',
             'agent/runtime',
             'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -31,6 +33,7 @@ return [
             'frontend/config/main-local.php',
             'api/config/main-local.php',
             'agent/config/main-local.php',
+            'crm/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],
@@ -50,6 +53,8 @@ return [
             'api/web/assets',
             'agent/runtime',
             'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -64,6 +69,7 @@ return [
             'frontend/config/main-local.php',
             'api/config/main-local.php',
             'agent/config/main-local.php',
+            'crm/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],
@@ -83,6 +89,8 @@ return [
             'api/web/assets',
             'agent/runtime',
             'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -98,6 +106,7 @@ return [
             'frontend/config/main-local.php',
             'api/config/main-local.php',
             'agent/config/main-local.php',
+            'crm/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],
@@ -115,6 +124,8 @@ return [
             'api/web/assets',
             'agent/runtime',
             'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -130,6 +141,7 @@ return [
             'frontend/config/main-local.php',
             'api/config/main-local.php',
             'agent/config/main-local.php',
+            'crm/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],
@@ -149,6 +161,8 @@ return [
             'api/web/assets',
             'agent/runtime',
             'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -163,6 +177,7 @@ return [
             'frontend/config/main-local.php',
             'api/config/main-local.php',
             'agent/config/main-local.php',
+            'crm/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],
@@ -182,6 +197,8 @@ return [
             'api/web/assets',
             'agent/runtime',
             'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -196,6 +213,7 @@ return [
             'frontend/config/main-local.php',
             'api/config/main-local.php',
             'agent/config/main-local.php',
+            'crm/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],
@@ -215,6 +233,8 @@ return [
             'api/web/assets',
             'agent/runtime',
             'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
             'shortner/runtime'
         ],
         'setExecutable' => [
@@ -226,6 +246,7 @@ return [
             'frontend/config/main-local.php',
             'api/config/main-local.php',
             'agent/config/main-local.php',
+            'crm/config/main-local.php',
             'shortner/config/main-local.php',
         ],
     ],

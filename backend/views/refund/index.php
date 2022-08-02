@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Refund', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Refund', ['create'], ['class' => 'btn btn-success btn-create']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -26,16 +26,37 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'refund_id',
-
+//            'refund_id',
             'payment_uuid',
             [
               'attribute' => 'store_name',
               'value' =>     'store.name'
             ],
             'order_uuid',
-            'refund_status',
+            [
+                'attribute' => 'refund_status',
+                'filter' => ['Initiated'=>'Initiated','CANCELLED'=>'CANCELLED','PENDING'=>'PENDING','REFUNDED'=>'REFUNDED'],
+                'filterInputOptions' => ['class' => 'form-control', 'id' => null, 'prompt' => 'All']
+            ],
+            [
+                'label' => 'Payment Status',
+                'value' => function($data) {
+                    return ($data->payment) ? $data->payment->payment_current_status : '-';
+                }
+            ],
+            [
+                'label' => 'Payment Gateway',
+                'format' => 'html',
+                'value' => function($data) {
+                    if ($data->payment) {
+                        $str = $data->payment->payment_gateway_name;
+                        $str .= ($data->store->is_myfatoorah_enable) ? '(myfatoorah)' : '(tap_enable)';
+                        return $str;
+                    } else {
+                        return '-';
+                    }
+                }
+            ],
             'refund_amount',
             [
                 'attribute' => 'refund_amount',
@@ -45,6 +66,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                     ]);
                 }
+            ],
+            [
+                'attribute' => 'refund_created_at',
+                'value' => function ($data) {
+                    return Yii::$app->formatter->asDate($data->refund_created_at);
+                },
+                'filter'=>false
             ],
             //'reason',
             //'refund_created_at',

@@ -515,6 +515,22 @@ $restaurant = Restaurant::find()->where(['restaurant_uuid' => $this->params['res
                     </div>
                 </div>
                 <div class="content-body">
+
+                    <!-- todo: move flash messages here -->
+
+                    <div class="alert alert-warning" role="alert">
+                        <b>Important:</b>
+
+                        <p>This is deprecated version of plugn dashboard, please use new dashboard for uninterrupted service. </p>
+
+                        <?=
+                        Html::a(
+                            Html::tag('span', 'Try the new Plugn'), 'https://dash.plugn.io/?utm_source=old-dashboard&utm_medium=poweredbylink', ['class' => 'menu-title', 'target'=>'_blank']
+                        )
+                        ?>
+
+                    </div>
+
                     <?= $content ?>
                 </div>
             </div>

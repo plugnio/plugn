@@ -391,7 +391,6 @@ Sitemap:  `+ domainName +`/sitemap.xml
                                   " . '"optimization"' . ": true,
                                   " . '"outputHashing"' . ": " . '"all"' . ",
                                   " . '"sourceMap"' . ": false,
-                                  " . '"extractCss"' . ": true,
                                   " . '"namedChunks"' . ": false,
                                   " . '"aot"' . ": true,
                                   " . '"extractLicenses"' . ": true,

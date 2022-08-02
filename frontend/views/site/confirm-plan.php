@@ -1,6 +1,6 @@
 <?php
 
-use Yii;
+
 use common\models\Restaurant;
 use yii\helpers\Html;
 use common\models\Order;
@@ -38,7 +38,7 @@ $this->title = "Confirm " . $selectedPlan->name;
               }
           } ?>
       </div>
-  <?php }
+  <?php } ?>
 
   <div class="card" style=" padding-bottom:2.1rem;">
     <div class="card-header">
@@ -82,7 +82,7 @@ $this->title = "Confirm " . $selectedPlan->name;
 
 
         <div class="form-group">
-            <?= Html::submitButton('Make Payment ('.  \Yii::$app->formatter->asCurrency($selectedPlan->price, 'KWD') .')', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
+            <?= Html::submitButton('Make Payment ('.  \Yii::$app->formatter->asCurrency($fees, 'KWD') .')', ['class' => 'btn btn-success', 'style' => '    float: left;']) ?>
         </div>
 
 

@@ -529,6 +529,8 @@ class OrderController extends Controller
         $order->restaurant_uuid = $store->restaurant_uuid;
 
         //Save Customer Info
+        $order->utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
+
         $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
         $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("phone_number")));
         $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
@@ -630,7 +632,7 @@ class OrderController extends Controller
         if (!$order->save()) {
             $transaction->rollBack();
 
-            \Yii::error(json_encode($order->errors), __METHOD__);
+            //\Yii::error(json_encode($order->errors), __METHOD__);
 
             return [
                 'operation' => 'error',
@@ -667,7 +669,10 @@ class OrderController extends Controller
                 $transaction->rollBack();
 
                 if (!isset($orderItem->errors['qty']))
-                    \Yii::error(json_encode($orderItem->errors), __METHOD__);
+                {
+                        //todo: notify vendor?
+                    //\Yii::error(json_encode($orderItem->errors), __METHOD__);
+                }
 
                 return [
                     'operation' => 'error',
@@ -695,7 +700,8 @@ class OrderController extends Controller
 
                             if (!isset($orderItemExtraOption->errors['qty']))
                             {   
-                                \Yii::error(json_encode($orderItemExtraOption->errors), __METHOD__);
+                                //todo: notiy vendor?
+                                //\Yii::error(json_encode($orderItemExtraOption->errors), __METHOD__);
 
                                 $response = [
                                     'operation' => 'error',
@@ -1204,10 +1210,11 @@ class OrderController extends Controller
     {
         $model = $this->findModel($order_uuid, $store_uuid);
 
-        //Update order status
+        $model->setScenario(Order::SCENARIO_UPDATE_STATUS);
+
         $model->order_status = Yii::$app->request->getBodyParam("order_status");
 
-        if (!$model->save(false)) {
+        if (!$model->save()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -1240,20 +1247,25 @@ class OrderController extends Controller
 
         $model = $this->findModel($order_uuid, $store_uuid);
 
-        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($model, $armadaApiKey);
+        $model->setScenario(Order::SCENARIO_UPDATE_ARMADA);
 
+        if($model->businessLocation)
+            $armadaApiKey = $model->businessLocation->armada_api_key;
 
-        if ($createDeliveryApiResponse->isOk) {
+        $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery ($model, $armadaApiKey);
 
+        if ($createDeliveryApiResponse->isOk)
+        {
             $model->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $model->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $model->armada_delivery_code = $createDeliveryApiResponse->data['code'];
-
 
         } else {
 
             return [
                 "operation" => "error",
+                "code" => 1,
+                "apiResponse" => $createDeliveryApiResponse->getContent(),
                 "message" => Yii::t('agent', "We've faced a problem requesting driver from Armada")
             ];
         }
@@ -1268,6 +1280,7 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
+                    "code" => 2,
                     "message" => Yii::t('agent', "We've faced a problem requesting driver from Armada")
                 ];
             }
@@ -1275,6 +1288,9 @@ class OrderController extends Controller
 
         return [
             "operation" => "success",
+            "armada_tracking_link" => $model->armada_tracking_link,
+            "armada_qr_code_link" => $model->armada_qr_code_link,
+            "armada_delivery_code" => $model->armada_delivery_code,
             "message" => Yii::t('agent', "Your request has been successfully submitted")
         ];
     }
@@ -1290,7 +1306,12 @@ class OrderController extends Controller
 
         $model = $this->findModel($order_uuid, $store_uuid);
 
-        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($model, $mashkorBranchId);
+        $model->setScenario(Order::SCENARIO_UPDATE_MASHKOR);
+
+        if($model->businessLocation)
+            $mashkorBranchId = $model->businessLocation->mashkor_branch_id;
+
+        $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder ($model, $mashkorBranchId);
 
         if ($createDeliveryApiResponse->isOk) {
 
@@ -1301,6 +1322,8 @@ class OrderController extends Controller
 
             return [
                 "operation" => "error",
+                "code" => 1,
+                "apiResponse" => $createDeliveryApiResponse->getContent(),
                 "message" => Yii::t('agent', "We've faced a problem requesting driver from Mashkor")
             ];
         }
@@ -1314,6 +1337,7 @@ class OrderController extends Controller
             } else {
                 return [
                     "operation" => "error",
+                    "code" => 2,
                     "message" => Yii::t('agent', "We've faced a problem requesting driver from Mashkor")
                 ];
             }
@@ -1321,6 +1345,8 @@ class OrderController extends Controller
 
         return [
             "operation" => "success",
+            "mashkor_order_number" => $model->mashkor_order_number,
+            "mashkor_order_status" => $model->mashkor_order_status,
             "message" => Yii::t('agent', "Your request has been successfully submitted")
         ];
     }
@@ -1384,7 +1410,7 @@ class OrderController extends Controller
     {
         $model = $this->findModel($order_uuid, $store_uuid);
 
-        $model->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
+        $model->setScenario(Order::SCENARIO_DELETE);
 
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -1392,7 +1418,7 @@ class OrderController extends Controller
 
         $model->is_deleted = 1;
 
-        if (!$model->save(false)) {
+        if (!$model->save()) {
             $transaction->rollBack();
             if (isset($model->errors)) {
                 return [
@@ -1576,6 +1602,7 @@ class OrderController extends Controller
         $model->restaurant_uuid = $restaurant->restaurant_uuid;
         $model->is_order_scheduled = 0;
 
+        $utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
         $order_mode = Yii::$app->request->getBodyParam('order_mode');
         $customer_name = Yii::$app->request->getBodyParam('customer_name');
         $area_name = Yii::$app->request->getBodyParam('area_name');
@@ -1628,6 +1655,7 @@ class OrderController extends Controller
             $model->store_currency_code = $model->restaurant->currency->code;
         }
 
+        $model->utm_uuid = $utm_uuid;
         $model->order_mode = $order_mode;
         $model->customer_name = $customer_name;
         $model->area_name = $area_name;

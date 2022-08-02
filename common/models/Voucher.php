@@ -44,6 +44,9 @@ class Voucher extends \yii\db\ActiveRecord {
     const VOUCHER_STATUS_ACTIVE = 1;
     const VOUCHER_STATUS_EXPIRED = 2;
 
+    const SCENARIO_UPDATE_STATUS = 'update-status';
+    const SCENARIO_DELETE = 'delete';
+
     /**
      * {@inheritdoc}
      */
@@ -225,6 +228,16 @@ class Voucher extends \yii\db\ActiveRecord {
         };
 
         return $fields;
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        return array_merge($scenarios, [
+            self::SCENARIO_UPDATE_STATUS => ['restaurant_status'],
+            self::SCENARIO_DELETE => ['is_deleted']
+        ]);
     }
 
     /**

@@ -51,9 +51,13 @@ class VoucherController extends Controller
 
         $searchModel = new VoucherSearch();
 
-        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+        $count = $searchModel->search([], $restaurant->restaurant_uuid)
+            ->getCount();
 
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $restaurant->restaurant_uuid);
+        $dataProvider = $searchModel->search(
+            Yii::$app->request->queryParams,
+            $restaurant->restaurant_uuid
+        );
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -79,8 +83,13 @@ class VoucherController extends Controller
 
           if ($model->load(Yii::$app->request->post())) {
 
-            if( $model->duration && $model->duration != null )
-              list($model->valid_from, $model->valid_until) = explode(' - ', $model->duration);
+            if( $model->duration && $model->duration != null ) {
+                $durationArr = explode(' - ', $model->duration);
+                if (isset($durationArr[0]) && isset($durationArr[1])){
+                    $model->valid_from = $durationArr[0];
+                    $model->valid_until = $durationArr[1];
+                }
+            }
 
 
               if($model->save()){
@@ -164,8 +173,13 @@ class VoucherController extends Controller
     {
         $model = $this->findModel($id, $storeUuid);
 
+        $model->setScenario(Voucher::SCENARIO_UPDATE_STATUS);
+
         $model->voucher_status = $model->voucher_status == Voucher::VOUCHER_STATUS_ACTIVE ? Voucher::VOUCHER_STATUS_EXPIRED  : Voucher::VOUCHER_STATUS_ACTIVE;
-        $model->save();
+
+        if(!$model->save()) {
+            Yii::$app->session->setFlash('error', $model->errors);
+        }
 
         return $this->redirect(['index', 'storeUuid' => $storeUuid]);
 
@@ -181,6 +195,8 @@ class VoucherController extends Controller
     public function actionDelete($id, $storeUuid)
     {
         $model = $this->findModel($id, $storeUuid);
+
+        $model->setScenario(Voucher::SCENARIO_DELETE);
 
         $model->is_deleted = 1;
 

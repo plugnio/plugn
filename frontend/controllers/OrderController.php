@@ -444,19 +444,25 @@ class OrderController extends Controller
      */
     public function actionRequestDriverFromMashkor($order_uuid, $storeUuid, $mashkorBranchId)
     {
-
         $order = $this->findModel($order_uuid, $storeUuid);
+
+        if($order->businessLocation)
+            $mashkorBranchId = $order->businessLocation->mashkor_branch_id;
 
         $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder($order, $mashkorBranchId);
 
-
         if ($createDeliveryApiResponse->isOk) {
+
+            $order->setScenario(Order::SCENARIO_UPDATE_MASHKOR);
 
             $order->mashkor_order_number = $createDeliveryApiResponse->data['data']['order_number'];
             $order->mashkor_order_status = Order::MASHKOR_ORDER_STATUS_CONFIRMED;
-            $order->save(false);
 
-            Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+            if($order->save()) {
+                Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+            } else {
+                Yii::$app->session->setFlash('error', $order->errors);
+            }
 
         } else {
 
@@ -475,14 +481,13 @@ class OrderController extends Controller
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
 
 
-            Yii::error('Error while requesting driver from Mashkor  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
+            //Yii::error('Error while requesting driver from Mashkor  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->data));
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
         }
 
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
-
 
     /**
      * Request a driver from Armada
@@ -491,35 +496,41 @@ class OrderController extends Controller
      */
     public function actionRequestDriverFromArmada($order_uuid, $storeUuid, $armadaApiKey)
     {
-
         $order = $this->findModel($order_uuid, $storeUuid);
+
+        if($order->businessLocation)
+            $armadaApiKey = $order->businessLocation->armada_api_key;
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order, $armadaApiKey);
 
-
         if ($createDeliveryApiResponse->isOk) {
+
+            $order->setScenario(Order::SCENARIO_UPDATE_ARMADA);
 
             $order->armada_tracking_link = $createDeliveryApiResponse->data['trackingLink'];
             $order->armada_qr_code_link = $createDeliveryApiResponse->data['qrCodeLink'];
             $order->armada_delivery_code = $createDeliveryApiResponse->data['code'];
             $order->armada_order_status = $createDeliveryApiResponse->data['orderStatus'];
 
-            $order->save(false);
-            Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+            if($order->save()) {
+                Yii::$app->session->setFlash('successResponse', "Your request has been successfully submitted");
+            } else {
+                Yii::$app->session->setFlash('error', $order->errors);
+            }
 
         } else {
 
             if ($createDeliveryApiResponse->content) {
 
-
                 Yii::$app->session->setFlash('errorResponse', json_encode($createDeliveryApiResponse->content));
-                Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
+               // Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse->content));
 
             } else {
 
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
-                Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
+               // Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
+              Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
             }
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
@@ -528,14 +539,12 @@ class OrderController extends Controller
         return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
     }
 
-
     /**
      * Update payment's status
      * @return mixed
      */
     public function actionUpdatePaymentStatus($id, $storeUuid)
     {
-
         try {
             $payment = Payment::findOne($id);
 
@@ -569,20 +578,25 @@ class OrderController extends Controller
     {
         $order = $this->findModel($order_uuid, $storeUuid);
 
+        $order->setScenario(Order::SCENARIO_UPDATE_STATUS);
+
         $previousOrderStatus = $order->order_status;
 
         $order->order_status = $status;
 
-        if ($order->save(false)) {
-
+        if ($order->save())
+        {
             if ($previousOrderStatus == Order::STATUS_DRAFT && $order->order_status == Order::STATUS_PENDING) {
                 $order->sendPaymentConfirmationEmail();
             }
         }
+        else
+        {
+            Yii::$app->session->setFlash('error', $order->errors);
+        }
 
         if ($redirect)
             return $this->redirect(['index', 'storeUuid' => $storeUuid]);
-
         else
             return $this->redirect(['view', 'id' => $order->order_uuid, 'storeUuid' => $storeUuid]);
     }
@@ -628,9 +642,7 @@ class OrderController extends Controller
 
         $order = Order::find()->where(['order_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->with(['currency', 'country', 'deliveryZone.country', 'pickupLocation', 'deliveryZone.businessLocation'])->one();
 
-
         if ($order) {
-
             // Item
             $orderItems = new \yii\data\ActiveDataProvider([
                 'query' => $order->getOrderItems()->with(['orderItemExtraOptions', 'item', 'currency']),
@@ -646,7 +658,7 @@ class OrderController extends Controller
 
             // order's Item
             $refundDataProvider = new \yii\data\ActiveDataProvider([
-                'query' => $order->getRefunds(),
+                'query' => $order->getRefunds()->with('orderItem'),
                 'sort' => false
             ]);
 
@@ -655,7 +667,6 @@ class OrderController extends Controller
                 'query' => $order->getRefundedItems()->with('item'),
                 'sort' => false
             ]);
-
 
             return $this->render('view', [
                 'model' => $order,
@@ -852,12 +863,12 @@ class OrderController extends Controller
             if (isset($model->errors)) {
 
                 Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
-                Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
+               // Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ' . json_encode($model->errors));
 
             } else {
 
-                Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
-                Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
+               Yii::$app->session->setFlash('errorResponse', "We've faced a problem deleting the order");
+              //  Yii::error('Error while deleting the order   [' . $model->restaurant->name . '] ');
 
             }
         } else {

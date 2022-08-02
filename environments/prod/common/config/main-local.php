@@ -28,6 +28,22 @@ return [
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
+
+        'resourceManager' => [
+            'class' => 'common\components\S3ResourceManager',
+            'authMethod' => \common\components\S3ResourceManager::AUTH_VIA_IAM_ROLE,
+            'region' => 'eu-west-2', // Bucket based in London
+            'bucket' => 'plugn-uploads',
+            /**
+             * For Local Development, we access using key and secret
+             * For Dev and Production servers, access is via server embedded IAM roles so no key/secret required
+             *
+             * You can access the bucket with:
+             * https://plugn-uploads.s3.amazonaws.com/
+             * https://plugn-uploads.s3.amazonaws.com/folderName/fileName.jpg
+             */
+        ],
+
         'log' => [
             'targets' => [
                 [
@@ -52,7 +68,7 @@ return [
                     'class' => 'common\components\SlackLogger',
                     'logVars' => [],
                     'levels' => ['info', 'warning','error'],
-                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','api\*','agent\*'],
+                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','crm\*','api\*','agent\*'],
                 ],
             ],
         ],
@@ -64,7 +80,42 @@ return [
                 'port' => 6379,
                 'database' => 1,
             ]
+        ], 
+
+        //aws
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@common/mail',
+            'transport' => [
+                    'class' => 'Swift_SmtpTransport',
+                    'host' => 'email-smtp.eu-west-1.amazonaws.com',
+                    'username' => 'AKIAWMITDJRKTH5HBB2O',
+                    'password' => 'BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ',
+                    'port' => '587',
+                    'encryption' => 'tls',
+            ],
         ],
+        /*
+
+        //mailgun
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@common/mail',
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.eu.mailgun.org',
+                'username' => 'postmaster@plugn.io',
+                'password' => '2d43d23b68911184532de9f81810f5ca-18e06deb-d74119cb',
+                'port' => '587',
+                'encryption' => 'tls',
+                // 'plugins' => [
+                //     [
+                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                //     ],
+                // ],
+            ],
+        ],
+        //sendgrid
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
@@ -81,7 +132,7 @@ return [
                 //     ],
                 // ],
             ],
-        ],
+        ],*/
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
         ],

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
 use common\models\Payment;
 use common\models\PartnerPayout;
@@ -35,6 +36,11 @@ class PartnerController extends Controller
           'access' => [
               'class' => \yii\filters\AccessControl::className(),
               'rules' => [
+                  [
+                      'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                      'actions' => ['create', 'update', 'delete', 'mark-as-paid', 'create-payout'],
+                      'roles' => ['@'],
+                  ],
                   [//allow authenticated users only
                       'allow' => true,
                       'roles' => ['@'],
@@ -193,8 +199,11 @@ class PartnerController extends Controller
 
 
             $partner_payout_model->amount = $payout_amount;
-            if(!$partner_payout_model->save()){
+            
+            if(!$partner_payout_model->save())
+            {
               Yii::$app->session->setFlash('error', print_r($partner_payout_model->errors, true));
+              
               Yii::error('[Error while Creating payout]' . json_encode($partner_payout_model->errors), __METHOD__);
             }
 

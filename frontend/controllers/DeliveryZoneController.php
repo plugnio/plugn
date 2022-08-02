@@ -26,7 +26,6 @@ use yii\helpers\ArrayHelper;
  */
 class DeliveryZoneController extends Controller
 {
-
     public $enableCsrfValidation = false;
 
     /**
@@ -209,7 +208,6 @@ class DeliveryZoneController extends Controller
      */
     public function actionUpdate($id, $storeUuid)
     {
-
         $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = $this->findModel($id, $storeUuid);
@@ -293,7 +291,7 @@ class DeliveryZoneController extends Controller
 
         //return $this->goBack();
 
-        return $this->redirect(['delivery-zone/update-areas?storeUuid=1&=1&id=1',
+        return $this->redirect(['delivery-zone/update-areas',
             'storeUuid' => $storeUuid,
             'city_id' => $delivery_zone_area->area->city_id,
             'id' => $id
@@ -328,7 +326,7 @@ class DeliveryZoneController extends Controller
 
         //return $this->goBack();
 
-        return $this->redirect(['delivery-zone/update-areas?storeUuid=1&=1&id=1',
+        return $this->redirect(['delivery-zone/update-areas',
             'storeUuid' => $storeUuid,
             'city_id' => $delivery_zone_area->area->city_id,
             'id' => $id
@@ -385,7 +383,7 @@ class DeliveryZoneController extends Controller
 
         //return $this->goBack();
 
-        return $this->redirect(['delivery-zone/update-areas?storeUuid=1&=1&id=1',
+        return $this->redirect(['delivery-zone/update-areas',
             'storeUuid' => $storeUuid,
             'city_id' => $city_id,
             'id' => $id
@@ -412,7 +410,7 @@ class DeliveryZoneController extends Controller
 
         //return $this->goBack();
 
-        return $this->redirect(['delivery-zone/update-areas?storeUuid=1&=1&id=1',
+        return $this->redirect(['delivery-zone/update-areas',
             'storeUuid' => $storeUuid,
             'city_id' => $city_id,
             'id' => $id

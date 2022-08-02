@@ -131,6 +131,20 @@ return [
                         'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
                     ]
                 ],
+                [// CampaignController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/campaign',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <id>' => 'update',
+                        'DELETE <id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// CategoryController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/category',
@@ -224,6 +238,22 @@ return [
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// TicketController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/ticket',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET comments/<id>' => 'comments',
+                        'GET <id>' => 'view',
+                        'POST' => 'create',
+                        'PATCH comment/<ticket_uuid>' => 'comment',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS comment/<ticket_uuid>' => 'options',
+                        'OPTIONS comments/<id>' => 'options',
+                        'OPTIONS <id>' => 'options',
                     ]
                 ],
                 [// AreaController
@@ -417,6 +447,7 @@ return [
                     'patterns' => [
                         'GET' => 'detail',
                         'GET status' => 'status',
+                        'GET settings/<code>' => 'settings',
                         'POST' => 'update',
                         'POST connect-domain' => 'connect-domain',
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
@@ -432,6 +463,7 @@ return [
                         'POST update-layout' => 'update-layout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
+                        'POST update-email-settings' => 'update-email-settings',
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -450,7 +482,9 @@ return [
                         'OPTIONS disable-free-checkout/<id>' => 'options',
                         'OPTIONS update-layout' => 'options',
                         'OPTIONS update-status/<id>/<status>' => 'options',
-                        'OPTIONS status' => 'options'
+                        'OPTIONS status' => 'options',
+                        'OPTIONS settings/<code>' => 'options',
+                        'OPTIONS update-email-settings' => 'options',
                     ]
                 ],
 
@@ -460,6 +494,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
+                        'POST signup-step-one' => 'signup-step-one',
                         'POST signup' => 'signup',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
@@ -475,7 +510,8 @@ return [
                         'OPTIONS is-email-verified' => 'options',
                         'OPTIONS update-email' => 'options',
                         'OPTIONS resend-verification-email' => 'options',
-                        'OPTIONS verify-email' => 'options'
+                        'OPTIONS verify-email' => 'options',
+                        'OPTIONS signup-step-one' => 'options'
                     ]
                 ],
                 [ // StatsController

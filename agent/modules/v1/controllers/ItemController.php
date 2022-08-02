@@ -164,15 +164,30 @@ class ItemController extends Controller
             }
 
             if ($itemOptions && count($itemOptions) > 0) {
+
                 foreach ($itemOptions as $option) {
+
+                    $min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
+
+                    //for radio button
+
+                    if(isset($option['option_type']) && in_array($option['option_type'], [2, '2'])) {
+
+                        if($option['is_required'])
+                            $min_qty = 1;
+
+                        $max_qty = 1;
+                    }
+
                     $optionModel = new Option();
                     $optionModel->item_uuid = $model->item_uuid;
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
-                    $optionModel->max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
-                    $optionModel->min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $optionModel->max_qty = $max_qty;
+                    $optionModel->min_qty = $min_qty;
                     $optionModel->is_required = $option['is_required'];
-                    $optionModel->option_type = $option['option_type'];
+                    $optionModel->option_type = isset($option['option_type'])? $option['option_type']: 1;
 
                     if (!$optionModel->save()) {
                         $transaction->rollBack();
@@ -351,6 +366,19 @@ class ItemController extends Controller
 
                 foreach ($itemOptions as $option) {
 
+                    $min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
+
+                    //for radio button
+
+                    if(isset($option['option_type']) && in_array($option['option_type'], [2, '2'])) {
+
+                        if($option['is_required'])
+                            $min_qty = 1;
+
+                        $max_qty = 1;
+                    }
+
                     if(empty($option['option_id'])) {
                         $optionModel = new Option();
                     } else {
@@ -364,9 +392,9 @@ class ItemController extends Controller
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
                     $optionModel->is_required = $option['is_required'];
-                    $optionModel->option_type = $option['option_type'];
-                    $optionModel->max_qty = (isset($option['max_qty'])) ? $option['max_qty'] : 0;
-                    $optionModel->min_qty = (isset($option['min_qty'])) ? $option['min_qty'] : 0;
+                    $optionModel->option_type = isset($option['option_type'])? $option['option_type']: 1;
+                    $optionModel->max_qty = $max_qty;
+                    $optionModel->min_qty = $min_qty;
 
                     if (!$optionModel->save()) {
                         $transaction->rollBack();
@@ -430,7 +458,9 @@ class ItemController extends Controller
             ]);
 
             // save images
+
             $itemImages = Yii::$app->request->getBodyParam ("itemImages");
+
             $model->saveItemImages($itemImages);
 
             //save categories
@@ -574,10 +604,12 @@ class ItemController extends Controller
 
         $model = $this->findModel($id);
 
+        $model->setScenario(Item::SCENARIO_UPDATE_STOCK);
+
         $model->stock_qty = (int) $stock_qty;
         $model->track_quantity = (int) $track_quantity;
 
-        if (!$model->save(false))
+        if (!$model->save())
         {
             return [
                 "operation" => "error",
@@ -601,14 +633,17 @@ class ItemController extends Controller
         $items = Yii::$app->request->getBodyParam('items');
 
         foreach ($items as $key => $value) {
+
             $model = $this->findModel($value);
 
             if(!$model) {
                 continue;
             }
-            
-            $model->sort_number = (int)$key+1;
-            $model->save(false);
+
+            $model->setScenario(Item::SCENARIO_UPDATE_SORT);
+
+            $model->sort_number = (int) $key+1;
+            $model->save();
         }
 
         return [
@@ -684,6 +719,7 @@ class ItemController extends Controller
      */
     public function actionItemsReport()
     {
+        ini_set('memory_limit', '-1');
         $store_model = Yii::$app->accountManager->getManagedAccount();
 
         $start_date = Yii::$app->request->get('start_date');
@@ -784,9 +820,11 @@ class ItemController extends Controller
     public function actionChangeStatus($id, $store_uuid)
     {
         $model = $this->findModel($id, $store_uuid);
+
         $model->scenario = Item::SCENARIO_UPDATE_STATUS;
 
         $model->item_status = ($model->item_status == Item::ITEM_STATUS_PUBLISH) ? Item::ITEM_STATUS_UNPUBLISH : Item::ITEM_STATUS_PUBLISH;
+
         if (!$model->save ()) {
             if (isset($model->errors)) {
                 return [

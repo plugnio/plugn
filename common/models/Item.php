@@ -62,6 +62,8 @@ class Item extends \yii\db\ActiveRecord
     const TYPE_CONFIGURABLE = 2;
 
     const SCENARIO_UPDATE_STATUS = 'update-status';
+    const SCENARIO_UPDATE_STOCK = 'update-stock';
+    const SCENARIO_UPDATE_SORT = 'update-sort-number';
 
     /**
      * {@inheritdoc}
@@ -113,6 +115,16 @@ class Item extends \yii\db\ActiveRecord
         $parent = parent::scenarios();
 
         $parent[self::SCENARIO_UPDATE_STATUS] = ['item_status'];
+
+        $parent[self::SCENARIO_UPDATE_STOCK] = [
+            'stock_qty',
+            'track_quantity'
+        ];
+
+        $parent[self::SCENARIO_UPDATE_SORT] = [
+            'sort_number'
+        ];
+
         return $parent;
     }
 
@@ -384,7 +396,6 @@ class Item extends \yii\db\ActiveRecord
 
         foreach ($imagesPath as $key => $path) {
 
-
             $filename = Yii::$app->security->generateRandomString();
 
             $itemName = str_replace(' ', '', $this->item_name);
@@ -407,8 +418,10 @@ class Item extends \yii\db\ActiveRecord
                 unlink($path['file']);
 
             } catch (\Cloudinary\Error $err) {
-                Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
-                Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));
+                //todo: notify vendor
+                
+                //Yii::error("Error when uploading item's image to Cloudinry: " . json_encode($err));
+                //Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($imagesPath));
 
             }
         }

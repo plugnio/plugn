@@ -51,6 +51,7 @@ $this->title = 'Plugn Dashboard';
                                     'template' => '{input}<div class="form-control-position"> <i class="feather icon-lock"></i> </div>{error}{hint}'
                                 ])->passwordInput(['placeholder' => 'Password', 'required' => true])
                                 ?>
+                                
                                 <div class="form-group" style="margin-bottom: 10px;">
                                     <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'style' => 'width: 100%;','name' => 'login-button']) ?>
                                 </div>

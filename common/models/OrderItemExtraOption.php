@@ -70,7 +70,11 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
             $this->addError($attribute, Yii::t('app', "{name} is currently out of stock and unavailable.", [
                 'name' => Yii::$app->language != 'ar'? $this->extraOption->extra_option_name: $this->extraOption->extra_option_name_ar
             ]));
+
+            return false;
         }
+
+        return true;
     }
 
     /**

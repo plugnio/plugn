@@ -105,6 +105,20 @@ class Option extends \yii\db\ActiveRecord {
         ];
     }
 
+    public function fields()
+    {
+        $fields = parent::fields();
+
+        $fields['max_qty'] = function($model) {
+            if($model->max_qty == 0) {
+                $model->max_qty = 1;//to unhide options for old stores
+            }
+        };
+
+        return $fields;
+    }
+
+
     /**
      * @return string[]
      */

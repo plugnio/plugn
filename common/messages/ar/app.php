@@ -17,6 +17,10 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "Custom Subscription Price" => "",
+    "Please verify email to use it" => "",
+    "Ticket comment added successfully" => "",
+    "Ticket created successfully" => "",
     'Item Unit Price' => "سعر وحدة الصنف",
     'Min selection must be less than or equal to max selection' => "يجب أن يكون متوسط ​​التحديد أقل من أو يساوي الحد الأقصى للتحديد",
     "Maximum number of orders" => "الحد الأقصى لعدد الطلبات",

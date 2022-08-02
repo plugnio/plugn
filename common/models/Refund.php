@@ -85,9 +85,6 @@ class Refund extends \yii\db\ActiveRecord
         ];
     }
 
-
-
-
     /**
      * Update refund's Status from Myfatoorah Payments
      * @param  [type]  $id                           [description]
@@ -98,22 +95,19 @@ class Refund extends \yii\db\ActiveRecord
 
         // Look for refund with same refund_reference
         $refundRecord = \common\models\Refund::findOne(['refund_reference' => $refundReference]);
+
         if (!$refundRecord) {
             throw new yii\web\NotFoundHttpException('The requested refund does not exist in our database.');
         }
 
         $refundRecord->refund_status = $responseContent['RefundStatus'];
 
-        if(!$refundRecord->save()){
+        if(!$refundRecord->save()) {
            Yii::error("Error when updating refund status" . json_encode($refundRecord->errors));
         }
 
         return true;
     }
-
-
-
-
 
     /**
      * {@inheritdoc}
@@ -128,10 +122,17 @@ class Refund extends \yii\db\ActiveRecord
             'refund_reference' =>Yii::t('app', 'Refund Reference'),
             'refund_amount' => Yii::t('app','Refund amount'),
             'refund_status' => Yii::t('app','Refund Status'),
-            'reason' => Yii::t('app','Reason for refund')
+            'reason' => Yii::t('app','Reason for refund'),
+            'refund_message' => Yii::t('app','Refund Note'),
         ];
     }
 
+    /**
+     * validate refund amount
+     * @param $attribute
+     * @param $params
+     * @param $validator
+     */
     public function validateRefundAmount($attribute, $params, $validator)
     {
 
@@ -191,7 +192,7 @@ class Refund extends \yii\db\ActiveRecord
             //     );
             //
             //     if ($tapPaymentResponse->isOk) {
-            //         $this->refund_id = $tapPaymentResponse->data['id'];
+            //         $this->refund_reference = $tapPaymentResponse->data['id'];
             //         $this->refund_status = $tapPaymentResponse->data['status'];
             //     } else {
             //         return $this->addError('', print_r(json_encode($tapPaymentResponse->data['errors'][0]['description']), true));
@@ -225,6 +226,37 @@ class Refund extends \yii\db\ActiveRecord
         }
 
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * notify refund failure to customer and vendor
+     * @param $errorMessage
+     */
+    public function notifyFailure($errorMessage)
+    {
+        $replyTo = [];
+        if ($this->store->restaurant_email) {
+            $replyTo = [
+                $this->store->restaurant_email
+            ];
+        } else if ($this->store->owner_email) {
+            $replyTo = [
+                $this->store->owner_email
+            ];
+        }
+        $message = \Yii::$app->mailer->compose([
+            'html' => 'refund-failure-html',
+        ], [
+            'refund' => $this,
+            'errorMessage' => $errorMessage
+        ]);
+        $message->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name]);
+        $message->setTo($replyTo);
+        if ($this->order->customer_email) {
+            $message->setCc([$this->order->customer_email]);
+        }
+        $message->setSubject('Refund was not processed successfully for Order #' . $this->order_uuid);
+        $message->send();
     }
 
     /**
@@ -267,7 +299,6 @@ class Refund extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Currency::className(), ['currency_id' => 'currency_id'])->via('store');
     }
-
 
     /**
      * Gets query for [[RefundedItems]].

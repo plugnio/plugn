@@ -5,7 +5,9 @@ namespace agent\modules\v1\controllers;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
+use common\models\Setting;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
@@ -169,13 +171,18 @@ class StoreController extends Controller
             return self::message("error",$store->getErrors());
         }
 
+        //log to slack
+
+        \Yii::info("[Store Domain Update Request] " . $store->name . " want to change domain from " .
+            $old_domain ." to " . $store->restaurant_domain, __METHOD__);
+
         \Yii::$app->mailer->compose([
             'html' => 'domain-update-request',
         ], [
-            'store_name' => $store->name,
-            'new_domain' => $store->restaurant_domain,
-            'old_domain' => $old_domain
-        ])
+                'store_name' => $store->name,
+                'new_domain' => $store->restaurant_domain,
+                'old_domain' => $old_domain
+            ])
             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
             ->setTo(Yii::$app->params['adminEmail'])
             ->setSubject('[Plugn] Agent updated DN')
@@ -198,6 +205,46 @@ class StoreController extends Controller
         ]);
 
         return self::message("success",'Payment method disabled successfully');
+    }
+
+    /**
+     * Update mail settings
+     * @return mixed
+     */
+    public function actionUpdateEmailSettings()
+    {
+        $model = $this->findModel();
+
+        $host = Yii::$app->request->getBodyParam('host');
+        $username = Yii::$app->request->getBodyParam('username');
+        $password = Yii::$app->request->getBodyParam('password');
+        $port = Yii::$app->request->getBodyParam('port');
+        $encryption = Yii::$app->request->getBodyParam('encryption');
+
+        Setting::setConfig($model->restaurant_uuid, 'mail', 'host', $host);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'username', $username);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'password', $password);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'port', $port);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'encryption', $encryption);
+
+        return self::message("success",'Mail settings updated successfully');
+    }
+
+    /**
+     * return settings for specific module
+     * @param $code
+     * @return array|\yii\db\ActiveRecord[]
+     * @throws NotFoundHttpException
+     */
+    public function actionSettings($code)
+    {
+        $model = $this->findModel();
+
+        $settings = $model->getSettings()
+            ->andWhere(['code' => $code])
+            ->all();
+
+        return ArrayHelper::map($settings, 'key', 'value');
     }
 
     /**
@@ -359,8 +406,17 @@ class StoreController extends Controller
             ->one();
 
         if (!$knet) {
+
+            $payment_method = PaymentMethod::find()
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_KNET])
+                ->one();
+
+            if(!$payment_method) {
+                return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            }
+
             $knet = new RestaurantPaymentMethod();
-            $knet->payment_method_id = 1; //K-net
+            $knet->payment_method_id = $payment_method->payment_method_id; //K-net
             $knet->restaurant_uuid = $model->restaurant_uuid;
 
             if (!$knet->save()) {
@@ -374,8 +430,17 @@ class StoreController extends Controller
         $creditCard = $model->getRestaurantPaymentMethods()->where(['payment_method_id' => 2])->one();
 
         if (!$creditCard) {
+
+            $payment_method = PaymentMethod::find()
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_CREDIT_CARD])
+                ->one();
+
+            if(!$payment_method) {
+                return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            }
+
             $creditCard = new RestaurantPaymentMethod();
-            $creditCard->payment_method_id = 2; //Credit Card
+            $creditCard->payment_method_id = $payment_method->payment_method_id; //Credit Card
             $creditCard->restaurant_uuid = $model->restaurant_uuid;
 
             if (!$creditCard->save()) {
@@ -431,8 +496,16 @@ class StoreController extends Controller
             return self::message("error",'Cash on delivery already enabled');
         }
 
+        $codPaymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_CASH])
+            ->one();
+
+        if(!$codPaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+        }
+
         $payments_method = new RestaurantPaymentMethod();
-        $payments_method->payment_method_id = 3; //Cash
+        $payments_method->payment_method_id = $codPaymentMethod->payment_method_id; //Cash
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
@@ -471,20 +544,29 @@ class StoreController extends Controller
     {
         $model = $this->findModel($id);
 
-        $payment_method = $model->getPaymentMethods()
+        $freePaymentMethod = PaymentMethod::find()
             ->andWhere(['payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT])
-            ->exists();
+            ->one();
 
-        if ($payment_method) {
-            return self::message("error",'Free checkout already enabled');
+        if(!$freePaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
         }
 
-        $payments_method = new RestaurantPaymentMethod();
-        $payments_method->payment_method_id = 7; //Free checkout
-        $payments_method->restaurant_uuid = $model->restaurant_uuid;
+        $restaurantPaymentMethod = RestaurantPaymentMethod::find()
+            ->andWhere(['payment_method_id' => $freePaymentMethod->payment_method_id])
+            ->andWhere(['restaurant_uuid' => $id])
+            ->one();
 
-        if (!$payments_method->save()) {
-            return self::message("error",$payments_method->getErrors());
+        if (!$restaurantPaymentMethod) {
+            $restaurantPaymentMethod = new RestaurantPaymentMethod();
+            $restaurantPaymentMethod->payment_method_id = $freePaymentMethod->payment_method_id; //Free checkout
+            $restaurantPaymentMethod->restaurant_uuid = $model->restaurant_uuid;
+        }
+
+        $restaurantPaymentMethod->status = RestaurantPaymentMethod::STATUS_ACTIVE;
+
+        if (!$restaurantPaymentMethod->save()) {
+            return self::message("error",$restaurantPaymentMethod->getErrors());
         }
 
         return self::message("success","Free checkout enabled successfully");
@@ -499,14 +581,24 @@ class StoreController extends Controller
 
         $payment_method = $model->getPaymentMethods()
             ->andWhere(['payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT])
-            ->exists();
+            ->one();
 
         if (!$payment_method) {
             throw new BadRequestHttpException('The requested record does not exist.');
         }
 
-        if (!$payment_method->delete()) {
-            return self::message("error", $payment_method->getErrors());
+        $restaurantPaymentMethod = $model->getRestaurantPaymentMethods()
+            ->andWhere(['payment_method_id' => $payment_method->payment_method_id])
+            ->one();
+
+        if (!$restaurantPaymentMethod) {
+            throw new BadRequestHttpException('The requested record does not exist.');
+        }
+
+        $restaurantPaymentMethod->status = RestaurantPaymentMethod::STATUS_INACTIVE;
+
+        if (!$restaurantPaymentMethod->save(false)) {
+            return self::message("error", $restaurantPaymentMethod->getErrors());
         }
 
         return self::message("success","Free checkout disabled successfully");
@@ -671,7 +763,10 @@ class StoreController extends Controller
             $model->markAsOpen();
         } else if ($status == Restaurant::RESTAURANT_STATUS_BUSY) {
             $model->markAsBusy();
-        } else  {
+        }
+        else
+        {
+            $model->setScenario(Restaurant::SCENARIO_UPDATE_STATUS);
             $model->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSED;
             $model->save(false);
         }
@@ -686,7 +781,7 @@ class StoreController extends Controller
      * @return Restaurant the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($store_uuid)
+    protected function findModel($store_uuid =  null)
     {
         $model = Yii::$app->accountManager->getManagedAccount($store_uuid);
 

@@ -18,7 +18,6 @@ use common\models\PaymentMethod;
  */
 class MashkorDelivery extends Component {
 
-
     const USE_TEST_KEY = 1;
     const USE_LIVE_KEY = 2;
 

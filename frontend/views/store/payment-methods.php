@@ -23,10 +23,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     $today = new DateTime();
 
-    $expiry = new DateTime($model->activeSubscription->subscription_end_at);
-
-    $interval = $today->diff($expiry);
-
 ?>
 <style>
   @media only screen and (min-width:700px) {
@@ -173,11 +169,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
 
 
-                    <?php  if($model->plan->plan_id == 1){ ?>
+                    <?php  if(!$model->activeSubscription || !$model->plan || $model->plan->plan_id == 1){ ?>
                       Want better rates?<br/>
                       <?php
                       echo Html::a('Upgrade to our premium plan', ['site/confirm-plan', 'id' => $model->restaurant_uuid, 'selectedPlanId' => 2 ], ['style' => 'color: #4CAF50;']);
                     } else {
+
+                        $expiry = new DateTime($model->activeSubscription->subscription_end_at);
+
+                        $interval = $today->diff($expiry);
 
                       ?>
 

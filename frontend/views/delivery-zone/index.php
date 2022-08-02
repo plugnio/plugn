@@ -13,6 +13,8 @@ $this->params['breadcrumbs'][] = ['label' => 'Business Locations', 'url' => ['bu
 $this->params['breadcrumbs'][] = $this->title;
 $this->params['restaurant_uuid'] = $store->restaurant_uuid;
 
+$totalDeliveryAreas = $business_location->country->getAreas()->count();
+
 ?>
 
 <style>
@@ -167,8 +169,8 @@ $this->params['restaurant_uuid'] = $store->restaurant_uuid;
 
                   <p>
                     <?=
-                        sizeof($deliveryZone->country->areas) > 0 ?
-                        $deliveryZone->getAreaDeliveryZones()->count() . ' out of ' . sizeof($deliveryZone->country->areas) .' areas in ' . $deliveryZone->country->country_name :
+                        $totalDeliveryAreas > 0 ?
+                        $deliveryZone->getAreaDeliveryZones()->count() . ' out of ' . $totalDeliveryAreas.' areas in ' . $deliveryZone->country->country_name :
                         'All over ' . $deliveryZone->country->country_name
                     ?>
                   </p>

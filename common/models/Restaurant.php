@@ -5,6 +5,7 @@ namespace common\models;
 use api\models\Item;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\Exception;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
@@ -109,7 +110,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string|null $default_language
  * @property string|null $annual_revenue
  * @property boolean $demand_delivery
- *
+ * @property number $custom_subscription_price
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -161,16 +162,20 @@ class Restaurant extends \yii\db\ActiveRecord
     const STORE_LAYOUT_GRID_HALFWIDTH = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
 
+    const SCENARIO_UPDATE_DESIGN_LAYOUT = 'update_design_layout';
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
     const SCENARIO_CREATE_MYFATOORAH_ACCOUNT = 'myfatoorah_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
     const SCENARIO_CONNECT_DOMAIN = 'domain';
     const SCENARIO_UPDATE = 'update';
+    const SCENARIO_UPDATE_LOGO = 'update-logo';
+    const SCENARIO_UPDATE_THUMBNAIL = 'update-thumbnail';
     const SCENARIO_UPDATE_LAYOUT = 'layout';
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
     const SCENARIO_CURRENCY = 'currency';
+    const SCENARIO_UPDATE_STATUS = '';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -343,6 +348,7 @@ class Restaurant extends \yii\db\ActiveRecord
                     return $model->schedule_order;
                 }
             ],
+            [['custom_subscription_price'], 'number', 'min' => 0],
             [['referral_code'], 'string', 'max' => 6],
             [['referral_code'], 'default', 'value' => null],
             ['restaurant_email', 'email'],
@@ -361,6 +367,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return array_merge($scenarios, [
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
+            self::SCENARIO_UPDATE_STATUS => ['restaurant_status'],
             self::SCENARIO_UPDATE_ANALYTICS => [
                 'google_analytics_id',
                 'facebook_pixil_id',
@@ -368,10 +375,32 @@ class Restaurant extends \yii\db\ActiveRecord
                 'sitemap_require_update'
             ],
             self::SCENARIO_CREATE_STORE_BY_AGENT => [
-                'name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'
+                'name',
+                'owner_number',
+                'restaurant_domain',
+                'currency_id',
+                'country_id'
+            ],
+            self::SCENARIO_UPDATE_LOGO => [
+                'logo'
+            ],
+            self::SCENARIO_UPDATE_THUMBNAIL => [
+                'thumbnail_image'
             ],
             self::SCENARIO_UPDATE_LAYOUT => [
-                'default_language', 'store_layout', 'phone_number_display', 'logo', 'thumbnail_image'
+                'default_language',
+                'store_layout',
+                'phone_number_display',
+                'logo',
+                'thumbnail_image'
+            ],
+            self::SCENARIO_UPDATE_DESIGN_LAYOUT => [
+                'logo',
+                'thumbnail_image',
+                'restaurant_logo',
+                'restaurant_thumbnail_image',
+                'phone_number_display',
+                'sitemap_require_update'
             ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
@@ -482,7 +511,8 @@ class Restaurant extends \yii\db\ActiveRecord
             'identification_file_purpose' => Yii::t('app','Identification File Purpose'),
             'live_api_key' => Yii::t('app','Live secret key'),
             'test_api_key' => Yii::t('app','Test secret key'),
-            'default_language' => Yii::t('app','Default Language')
+            'default_language' => Yii::t('app','Default Language'),
+            'custom_subscription_price'  => Yii::t('app','Custom Subscription Price'),
         ];
     }
 
@@ -576,7 +606,7 @@ class Restaurant extends \yii\db\ActiveRecord
                     return true;
                 }
             } catch (\Cloudinary\Error $err) {
-              Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
+              //Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
               $this->addError($attribute, $err->getMessage());
               return false;
             }
@@ -605,7 +635,8 @@ class Restaurant extends \yii\db\ActiveRecord
                     $this[$attribute] = basename($result['url']);
                 }
             } catch (\Cloudinary\Error $err) {
-                Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+                //todo: notify vendor?
+                //Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
             }
 
     }
@@ -795,9 +826,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                 return Yii::error('Error when uploading civil id (back side): ' . $errorMessage);
             }
-
         }
-
     }
 
     /**
@@ -807,7 +836,6 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getCivilIdFrontSidePhoto()
     {
         $photo_url = [];
-
 
         if ($this->identification_file_front_side) {
 
@@ -887,20 +915,23 @@ class Restaurant extends \yii\db\ActiveRecord
         Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
 
         $response = Yii::$app->myFatoorahPayment->createSupplier($this);
+
         $supplierApiResponse = json_decode($response->content);
 
         if ($supplierApiResponse->IsSuccess) {
 
             $this->supplierCode = $supplierApiResponse->Data->SupplierCode;
+
             \Yii::info($this->name . " has just created MyFatooraha account", __METHOD__);
 
-          if ($this->supplierCode){
+          if ($this->supplierCode) {
             $this->is_myfatoorah_enable = 1;
             $this->is_tap_enable = 0;
           }
           else
-            $this->is_myfatoorah_enable = 0;
-
+          {
+              $this->is_myfatoorah_enable = 0;
+          }
             if($this->save()){
                 // //Upload documents file on our server before we create an account on MyFatoorah we gonaa delete them
                 $this->uploadDocumentsToMyFatoorah();
@@ -1129,6 +1160,7 @@ class Restaurant extends \yii\db\ActiveRecord
             );
 
             if ($result || count ($result) > 0) {
+                //todo: refactor
                 $this->logo = basename ($result['url']);
                 $this->save ();
             }
@@ -1169,6 +1201,7 @@ class Restaurant extends \yii\db\ActiveRecord
             );
 
             if ($result || count ($result) > 0) {
+                //todo: refactor
                 $this->thumbnail_image = basename ($result['url']);
                 $this->save ();
             }
@@ -1183,7 +1216,10 @@ class Restaurant extends \yii\db\ActiveRecord
         }
     }
 
-
+    /**
+     * @param $insert
+     * @return bool|void
+     */
     public function beforeSave($insert) {
 
         if($insert && $this->referral_code != null){
@@ -1196,7 +1232,19 @@ class Restaurant extends \yii\db\ActiveRecord
             $store_name = strtolower(str_replace(' ', '_', $this->name));
             $store_domain = strtolower(str_replace(' ', '_', $this->restaurant_domain));
             $this->app_id = 'store.plugn.' . $store_domain;
-            $this->store_branch_name = $store_name;
+
+            /**
+             * if we change this to use store domain name as git branch name,
+             * it would be hard for us to keep track of branch and store relation,
+             * in case someone keep changing store domain ?
+             */
+            $this->store_branch_name = $store_domain;// $store_name;
+
+            $isBranchExists = Yii::$app->githubComponent->isBranchExists($this->store_branch_name);
+
+            if($isBranchExists) {
+                return  $this->addError('restaurant_domain', Yii::t('app','Another store is already using this domain'));
+            }
 
             $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
 
@@ -1259,7 +1307,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
         if ($insert) {
 
-            $freePlan = Plan::find ()->where (['valid_for' => 0])->one ();
+            $freePlan = Plan::find ()
+                ->where (['valid_for' => 0])
+                ->one ();
 
             $subscription = new Subscription();
             $subscription->restaurant_uuid = $this->restaurant_uuid;
@@ -1272,7 +1322,9 @@ class Restaurant extends \yii\db\ActiveRecord
             $restaurant_theme->save ();
 
             //Add opening hrs
-            for ($i = 0; $i < 7; ++$i) {
+            
+            for ($i = 0; $i < 7; ++$i) 
+            {
                 $opening_hour = new OpeningHour();
                 $opening_hour->restaurant_uuid = $this->restaurant_uuid;
                 $opening_hour->day_of_week = $i;
@@ -1349,8 +1401,8 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function isOpen($asap = null) {
 
-        if(!$this->demand_delivery)
-          return false;
+       // if(!$this->demand_delivery)
+       //   return false;
 
         $opening_hour_model = OpeningHour::find()
                                 ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
@@ -1369,9 +1421,7 @@ class Restaurant extends \yii\db\ActiveRecord
                   return true;
           }
 
-
-
-        return false;
+          return false;
     }
 
     /**
@@ -1605,10 +1655,31 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function beforeDelete()
     {
-        $this->deleteRestaurantThumbnailImage ();
-        $this->deleteRestaurantLogo ();
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            Queue::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            Category::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            RestaurantTheme::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            Subscription::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            AreaDeliveryZone::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            DeliveryZone::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            AgentAssignment::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            BusinessLocation::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            RestaurantPaymentMethod::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            OpeningHour::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            RestaurantCurrency::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            Restaurant::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
 
-        return parent::beforeDelete ();
+            $this->deleteRestaurantThumbnailImage ();
+            $this->deleteRestaurantLogo ();
+            $transaction->commit();
+            return parent::beforeDelete ();
+        }
+        catch(Exception $e) {
+            $transaction->rollBack();
+            die($e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -2248,6 +2319,16 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Setting]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSettings($modelClass = "\common\models\Setting")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[RestaurantDeliveryAreas]].
      *
      * @return \yii\db\ActiveQuery
@@ -2285,6 +2366,17 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
     {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere(['status'=>RestaurantPaymentMethod::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Gets query for [[Campaign]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCampaigns($modelClass = "\common\models\Campaign")
+    {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
@@ -2296,7 +2388,10 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getPaymentMethods($modelClass = "\common\models\PaymentMethod")
     {
         return $this->hasMany ($modelClass::className (), ['payment_method_id' => 'payment_method_id'])
-            ->viaTable ('restaurant_payment_method', ['restaurant_uuid' => 'restaurant_uuid']);
+            ->viaTable(RestaurantPaymentMethod::tableName(), ['restaurant_uuid' => 'restaurant_uuid'],
+                function($query) {
+                    $query->onCondition(['status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
+                });
     }
 
     /**
@@ -2328,6 +2423,16 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->activeOrders ($this->restaurant_uuid);;
+    }
+    
+    /**
+     * Gets query for [[Tickets]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTickets($modelClass = "\common\models\Ticket")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
@@ -2427,6 +2532,11 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getQueues($modelClass = "\common\models\Queue")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    public function getQueue($modelClass = "\common\models\Queue")
+    {
+        return $this->hasOne($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->orderBy('queue_id DESC');
     }
 
     /**

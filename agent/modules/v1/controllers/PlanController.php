@@ -126,6 +126,8 @@ class PlanController extends Controller
             ];
         }
 
+        //for free-tier
+
         if ($selectedPlan->price == 0) {
             return [
                 "operation" => 'success',
@@ -137,7 +139,7 @@ class PlanController extends Controller
         $payment->restaurant_uuid = $store->restaurant_uuid;
         $payment->payment_mode = $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
         $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
-        $payment->payment_amount_charged = $subscription_model->plan->price;
+        $payment->payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price: $subscription_model->plan->price;
         $payment->payment_current_status = "Redirected to payment gateway";
 
         if (!$payment->save ()) {
@@ -159,7 +161,7 @@ class PlanController extends Controller
             "Upgrade $store->name's plan to " . $subscription_model->plan->name, // Description
             'Plugn', //Statement Desc.
             $payment->payment_uuid, // Reference
-            $subscription_model->plan->price,
+            $payment->payment_amount_charged,
             $store->name,
             $store->getAgents ()->one ()->agent_email,
             $store->country->country_code,
@@ -167,7 +169,9 @@ class PlanController extends Controller
             0, //Comission
             Url::to (['plans/callback'], true),
             $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
-            0
+            0,
+            0,
+            ''
         );
 
         $responseContent = json_decode ($response->content);
@@ -179,7 +183,8 @@ class PlanController extends Controller
 
                 $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
 
-                \Yii::error ($errorMessage, __METHOD__); // Log error faced by user
+                //todo: notify vendor?
+                //\Yii::error ($errorMessage, __METHOD__); // Log error faced by user
 
                 return [
                     'operation' => 'error',
@@ -196,7 +201,7 @@ class PlanController extends Controller
 
                 if (!$payment->save (false)) {
 
-                    \Yii::error ($payment->errors, __METHOD__); // Log error faced by user
+                    //\Yii::error ($payment->errors, __METHOD__); // Log error faced by user
 
                     return [
                         'operation' => 'error',
@@ -204,7 +209,8 @@ class PlanController extends Controller
                     ];
                 }
             } else {
-                \Yii::error ('[Payment Issue > Charge id is missing ]' . json_encode ($responseContent), __METHOD__); // Log error faced by user
+
+                //\Yii::error ('[Payment Issue > Charge id is missing ]' . json_encode ($responseContent), __METHOD__); // Log error faced by user
 
                 return [
                     'operation' => 'error',
@@ -257,7 +263,7 @@ class PlanController extends Controller
             $this->_addCallbackCookies ("paymentFailed", $e->getMessage ());
         }
 
-        $url = Yii::$app->params['dashboardAppUrl'] . '/settings/payment-methods';
+        $url = Yii::$app->params['newDashboardAppUrl'] . '/settings/payment-methods';
 
         return $this->redirect ($url);
     }
@@ -273,7 +279,7 @@ class PlanController extends Controller
             'expire' => time () + 86400,
             'domain' => Yii::$app->params['dashboardCookieDomain'],
             'httpOnly' => false,
-            'secure' => str_contains (Yii::$app->params['dashboardAppUrl'], 'https://')? true: false,
+            'secure' => str_contains (Yii::$app->params['newDashboardAppUrl'], 'https://')? true: false,
         ]);
 
         $cookie->sameSite = PHP_VERSION_ID >= 70300 ? 'None' : null;

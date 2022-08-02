@@ -91,7 +91,7 @@ $js = <<< JS
 // enable fileuploader plugin
 $('input[class="document-upload"]').fileuploader({
 	limit: 1,
-	fileMaxSize: 30,
+	fileMaxSize: 5,
 	extensions: ['image/*'],
 	addMore: true,
 	thumbnails: {

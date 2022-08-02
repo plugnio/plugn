@@ -61,6 +61,7 @@ class WebLinkController extends Controller {
      * @return mixed
      */
     public function actionCreate($storeUuid) {
+
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         if ($restaurant) {

@@ -13,11 +13,27 @@ class m220419_165447_order_discount extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn ('order', 'discount_type', $this->decimal(10, 3)->after('voucher_code'));
-        $this->addColumn ('order', 'voucher_discount', $this->decimal(10, 3)->after('discount_type'));
-        $this->addColumn ('order', 'bank_discount', $this->decimal(10, 3)->after('bank_discount_id'));
+        $table = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('order');
 
-        $query = \common\models\Order::find();
+        if (!isset($table->columns['discount_type'])) 
+        {
+            $this->addColumn ('order', 'discount_type', $this->decimal(10, 3)->after('voucher_code'));
+        }
+
+        if (!isset($table->columns['voucher_discount'])) 
+        {
+            $this->addColumn ('order', 'voucher_discount', $this->decimal(10, 3)->after('discount_type'));
+        }
+         
+        if (!isset($table->columns['bank_discount'])) 
+        {
+            $this->addColumn ('order', 'bank_discount', $this->decimal(10, 3)->after('bank_discount_id'));
+        }
+
+        /*$query = \common\models\Order::find();
 
         $total = \common\models\Order::find()->count();
 
@@ -47,7 +63,7 @@ class m220419_165447_order_discount extends Migration
             }
 
             Console::updateProgress($n, $total);
-        }
+        }*/
     }
 
     /**

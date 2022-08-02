@@ -28,6 +28,8 @@ use Yii;
 class BusinessLocation extends \yii\db\ActiveRecord
 {
     const SCENARIO_DELETE = 'delete';
+    const SCENARIO_UPDATE_TAX = 'update-tax';
+    const SCENARIO_UPDATE_PICK_UP = 'update-pick-up';
 
     /**
      * {@inheritdoc}
@@ -78,6 +80,10 @@ class BusinessLocation extends \yii\db\ActiveRecord
 
         $scenarios['delete'] = ['is_deleted'];
 
+        $scenarios[self::SCENARIO_UPDATE_TAX] = ['business_location_tax'];
+
+        $scenarios[self::SCENARIO_UPDATE_PICK_UP] = ['support_pick_up'];
+
         return $scenarios;
     }
 
@@ -93,7 +99,6 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'totalDeliveryZoneCountry'
         ];
     }
-
 
     /**
      *

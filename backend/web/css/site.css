@@ -118,3 +118,9 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+.role-2 .btn-create,
+.role-2 .btn-delete,
+.role-2 .btn-update {
+    display: none;
+}

@@ -100,34 +100,11 @@ class OpeningHourController extends Controller
      */
     public function actionUpdate($storeUuid, $dayOfWeek)
     {
-
-        // $models = $this->findModel($storeUuid, $dayOfWeek);
-        //
-        // if(!$models){
-        //   $models = [new OpeningHour()];
-        //   $models[0]->restaurant_uuid = $storeUuid;
-        // }
-        //
-        //
-        // if (Model::loadMultiple($models, Yii::$app->request->post()) && Model::validateMultiple($models)) {
-        //       foreach ($models as $opening_hour) {
-        //           $opening_hour->restaurant_uuid = $storeUuid;
-        //           $opening_hour->save(false);
-        //       }
-        //
-        //       return $this->redirect(['index', 'storeUuid' => $storeUuid]);
-        //
-        //   }
-        //
-        // return $this->render('update', [
-        //     'models' => $models,
-        //     'storeUuid' => $storeUuid
-        // ]);
-        //
-
+        if (!$storeUuid) {
+            return $this->redirect(['index', 'storeUuid' => $storeUuid]);
+        }
 
         $openingHours = $this->findModel($storeUuid, $dayOfWeek);
-
 
         switch ($dayOfWeek) {
             case OpeningHour::DAY_OF_WEEK_SATURDAY:
@@ -152,14 +129,6 @@ class OpeningHourController extends Controller
                 $day = 'Friday';
                 break;
         }
-
-
-        // if(!$openingHours){
-        //   $openingHours = [new OpeningHour()];
-        //   $openingHours[0]->restaurant_uuid = $storeUuid;
-        //   $openingHours[0]->day_of_week = $dayOfWeek;
-        // }
-
 
         $formDetails = Yii::$app->request->post('OpeningHour', []);
         foreach ($formDetails as $i => $formDetail) {
@@ -207,10 +176,7 @@ class OpeningHourController extends Controller
                     //new or updated records go here
                     $modelDetail->day_of_week = $dayOfWeek;
                     $modelDetail->restaurant_uuid = $storeUuid;
-
                     $modelDetail->save();
-
-
                 }
             }
             return $this->redirect(['index', 'storeUuid' => $storeUuid]);

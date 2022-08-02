@@ -133,7 +133,6 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id']);
     }
 
-
     /**
      * @return \yii\db\ActiveQuery
      */

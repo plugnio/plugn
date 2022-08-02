@@ -86,6 +86,7 @@ class AuthController extends Controller {
             'request-reset-password',
             'update-password',
             'signup',
+            'signup-step-one',
             'update-email',
             'resend-verification-email',
             'verify-email',
@@ -122,9 +123,45 @@ class AuthController extends Controller {
     public function actionLogin() {
         $agent = Yii::$app->user->identity;
 
+        // Email and password are correct, check if his email has been verified
+        // If agent email has been verified, then allow him to log in
+        if($agent->agent_email_verification != \common\models\Agent::EMAIL_VERIFIED) {
+
+            return [
+                "operation" => "error",
+                "errorType" => "email-not-verified",
+                "message" => Yii::t('candidate',"Please click the verification link sent to you by email to activate your account"),
+                "unVerifiedToken" => $this->_loginResponse($agent)
+            ];
+        }
+
         return $this->_loginResponse($agent);
     }
 
+    /**
+     * signup
+     * @return array|string[]
+     */
+    public function actionSignupStepOne()
+    {
+        $agent = new Agent();
+        $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
+        $agent->agent_name = Yii::$app->request->getBodyParam('name');
+        $agent->agent_email = Yii::$app->request->getBodyParam('email');
+        $agent->setPassword(Yii::$app->request->getBodyParam('password'));
+        $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
+
+        if (!$agent->validate()) {
+            return [
+                "operation" => "error",
+                "message" => $agent->errors
+            ];
+        } else {
+            return [
+                "operation" => "success"
+            ];
+        }
+    }
     /**
      * register user with store
      * @return mixed
@@ -263,17 +300,16 @@ class AuthController extends Controller {
                 ]);
             }
 
-            //$agent->sendVerificationEmail();
+            $agent->sendVerificationEmail();
 
             $transaction->commit();
 
-            /*
             return [
                 "operation" => "success",
                 "agent_id" => $agent->agent_id,
                 "message" => Yii::t('agent', "Please click on the link sent to you by email to verify your account"),
                 "unVerifiedToken" => $this->_loginResponse($agent)
-            ];*/
+            ];
 
             //return $this->_loginResponse($agent);
 
@@ -285,7 +321,7 @@ class AuthController extends Controller {
             ];
         }*/
 
-        return $this->_loginResponse ($agent);
+        //return $this->_loginResponse ($agent);
 
     }
 
@@ -297,9 +333,11 @@ class AuthController extends Controller {
     {
         $emailInput = Yii::$app->request->getBodyParam("email");
 
-        $agent = Agent::findOne([
-            'agent_email' => $emailInput,
-        ]);
+        $agent = Agent::find()->andWhere([
+            'OR',
+            ['agent_email' => $emailInput],
+            ['agent_new_email' => $emailInput],
+        ])->one();
 
         $errors = false;
         $errorCode = null; //error code
@@ -574,6 +612,7 @@ class AuthController extends Controller {
             "username" => $agent->agent_id,
             "agent_name" => $agent->agent_name,
             "agent_email" => $agent->agent_email,
+            "agent_new_email" => $agent->agent_new_email,
             "language_pref" => $agent->agent_language_pref,
             "role" => (int) $assignment->role,
             "selectedStore" => $selectedStore,

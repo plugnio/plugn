@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
 use common\models\Restaurant;
 use common\models\TapQueue;
@@ -33,6 +34,11 @@ class RestaurantController extends Controller {
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
+                    [
+                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'actions' => ['create', 'update', 'delete'],
+                        'roles' => ['@'],
+                    ],
                     [//allow authenticated users only
                         'allow' => true,
                         'roles' => ['@'],
@@ -99,12 +105,16 @@ class RestaurantController extends Controller {
 
             if (!$deleteBuildJs->isOk) {
               Yii::error('[Github > Error While deleting'. $filePath . ']' . json_encode($deleteBuildJs->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
               Yii::$app->session->setFlash('errorResponse', json_encode($deleteBuildJs->data['message']));
+              
               return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
             }
       } else {
         Yii::error('[Github > Error while getting file sha]' . json_encode($getBuildJsSHA->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+        
         Yii::$app->session->setFlash('errorResponse', json_encode($getBuildJsSHA->data['message']));
+        
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
       }
 
