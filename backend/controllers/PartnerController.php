@@ -37,7 +37,7 @@ class PartnerController extends Controller
               'class' => \yii\filters\AccessControl::className(),
               'rules' => [
                   [
-                      'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                      'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
                       'actions' => ['create', 'update', 'delete', 'mark-as-paid', 'create-payout'],
                       'roles' => ['@'],
                   ],
