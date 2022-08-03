@@ -124,7 +124,7 @@ class StoreController extends Controller
         $store->name_ar = Yii::$app->request->getBodyParam('name_ar');
         $store->schedule_interval = Yii::$app->request->getBodyParam('schedule_interval');
         $store->schedule_order = Yii::$app->request->getBodyParam('schedule_order');
-        $store->restaurant_email = Yii::$app->request->getBodyParam('store_email');
+        $store->restaurant_email = Yii::$app->request->getBodyParam('restaurant_email');
         $store->tagline = Yii::$app->request->getBodyParam('tagline');
         $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
         $store->meta_description = Yii::$app->request->getBodyParam("meta_description");
