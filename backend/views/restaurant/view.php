@@ -172,6 +172,7 @@ $this->params['breadcrumbs'][] = $this->title;
             // ],
             'phone_number',
             'restaurant_email:email',
+            'restaurant_email_notification',
             'instagram_url:url',
             'iban',
             'restaurant_created_at',
