@@ -65,19 +65,4 @@ class OrderItem extends \common\models\OrderItem
     {
         return parent::getOrderItemExtraOptions($modelClass);
     }
-
-    public function getOrderExtraOptionsText()
-    {
-        $value = [];
-        if (count($this->orderItemExtraOptions) > 0) {
-            foreach ($this->orderItemExtraOptions as $extra) {
-                $value[] = $extra['extra_option_name'];
-            }
-            if (count($value) > 0) {
-                return implode(',', $value);
-            }
-
-            return '(NOT SET)';
-        }
-    }
 }
