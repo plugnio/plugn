@@ -459,9 +459,9 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord->received_callback = 1;
 
         // On Successful Payments
-        if ($responseContent['TransactionStatus'] != 'SUCCESS') {
+        /*if ($responseContent['TransactionStatus'] != 'SUCCESS') {
             $paymentRecord->order->restockItems();
-        }
+        }*/
 
         // Update payment method used and the order id assigned to it
         if ($responseContent['PaymentMethod'])
