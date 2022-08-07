@@ -747,6 +747,10 @@ class OrderController extends Controller
             ];
         }
 
+        //for manual orders
+
+        $order->deductStock();
+
         $transaction->commit();
 
         return [
@@ -1781,6 +1785,10 @@ class OrderController extends Controller
                 }
             }
         }
+
+        //for manual orders
+
+        $model->deductStock();
 
         $transaction->commit();
 

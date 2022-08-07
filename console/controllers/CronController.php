@@ -56,7 +56,6 @@ class CronController extends \yii\console\Controller
 
         foreach ($stores as $key => $store) {
 
-
             //Revenue generated
             $lastWeekRevenue = $store
                 ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
@@ -133,7 +132,6 @@ class CronController extends \yii\console\Controller
                 $customerGainedPercentage = $decrease / $lastWeekCustomerGained * -100;
             }
 
-
             if ($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
                 $agentAssignments = $store->getAgentAssignments()
@@ -158,7 +156,6 @@ class CronController extends \yii\console\Controller
                             'thisWeekRevenue' => $thisWeekRevenue,
                             'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
                             'thisWeekCustomerGained' => $thisWeekCustomerGained,
-
                         ])
                             ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                             ->setTo([$agentAssignment->agent->agent_email])
@@ -170,18 +167,13 @@ class CronController extends \yii\console\Controller
                         $weeklyStoreSummaryEmail->send();
 
                     }
-
                 }
-
             }
-
         }
-
     }
 
     public function actionSiteStatus()
     {
-
         $restaurants = Restaurant::find()
             ->andWhere(['has_deployed' => 0])
             ->all();
@@ -224,6 +216,8 @@ class CronController extends \yii\console\Controller
      */
     public function actionRetentionEmailsWhoPassedTwoDaysAndNoProducts()
     {
+        //todo: why processing all stores, when need only with no orders
+
         $stores = Restaurant::find()
             ->joinWith(['items', 'ownerAgent'])
             ->andWhere(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
@@ -259,6 +253,7 @@ class CronController extends \yii\console\Controller
 
     public function actionRetentionEmailsWhoPassedFiveDaysAndNoSales()
     {
+        //todo: why processing all stores, when need only with no orders
 
         $stores = Restaurant::find()
             ->joinWith(['orders', 'ownerAgent'])
@@ -296,7 +291,6 @@ class CronController extends \yii\console\Controller
 
     public function actionDowngradedStoreSubscription()
     {
-
         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d")));
         $end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d")));
 
@@ -304,13 +298,11 @@ class CronController extends \yii\console\Controller
             ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
             // ->andWhere(['notified_email' => 1])
             ->andWhere(['not', ['subscription_end_at' => null]])
-            ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
+            ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])//todo: try DATE mysql function
             ->with(['plan', 'restaurant'])
             ->all();
 
-
         foreach ($subscriptions as $subscription) {
-
 
             if (date('Y-m-d', strtotime($subscription->subscription_end_at)) == date('Y-m-d')) {
 
@@ -344,7 +336,6 @@ class CronController extends \yii\console\Controller
 
     public function actionNotifyAgentsForSubscriptionThatWillExpireSoon()
     {
-
         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") + 5));
         $end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") + 5));
 
@@ -355,7 +346,6 @@ class CronController extends \yii\console\Controller
             ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
             ->with(['plan', 'restaurant'])
             ->all();
-
 
         foreach ($subscriptions as $subscription) {
 
@@ -386,9 +376,11 @@ class CronController extends \yii\console\Controller
 
     }
 
+    /**
+     * todo: why cron? when can just proccess form submit
+     */
     public function actionCreatePaymentGatewayAccount()
     {
-
         $queue = PaymentGatewayQueue::find()
             ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
             ->orderBy(['queue_created_at' => SORT_ASC])
@@ -398,9 +390,7 @@ class CronController extends \yii\console\Controller
             $queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_CREATING;
             $queue->save();
         }
-
     }
-
 
     public function actionCreateBuildJsFile()
     {
@@ -410,15 +400,22 @@ class CronController extends \yii\console\Controller
             ->orderBy(['queue_created_at' => SORT_ASC])
             ->one();
 
-        if ($queue && $queue->restaurant_uuid) {
+        if ($queue && $queue->restaurant_uuid)
+        {
             $this->stdout("File is creating for ".$queue->restaurant_uuid."! \n", Console::FG_RED, Console::BOLD);
+
             $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
+
             if (!$queue->save()) {
+
                 Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+
                 $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
+
                 echo "<pre>";
                 print_r($queue->getErrors());
                 exit;
+
                 return false;
             }
 
@@ -428,7 +425,6 @@ class CronController extends \yii\console\Controller
 
     public function actionUpdateSitemap()
     {
-
         $stores = Restaurant::find()
             ->andWhere(['sitemap_require_update' => 1])
             ->andWhere(['or',
@@ -436,12 +432,10 @@ class CronController extends \yii\console\Controller
                 ['version' => 3],
                 ['version' => 4]
             ])
-            ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
+            ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])//todo: extra load on server just for 1 store?
             ->all();
 
-
-        if ($stores) {
-            foreach ($stores as $key => $store) {
+        foreach ($stores as $key => $store) {
 
                 if ($store && $store->getItems()->count() > 0) {
 
@@ -504,7 +498,6 @@ class CronController extends \yii\console\Controller
 
                 }
             }
-        }
 
         return self::EXIT_CODE_NORMAL;
     }
@@ -645,6 +638,8 @@ class CronController extends \yii\console\Controller
 
         foreach ($refunds as $refund)
         {
+            //todo: what if fatoorah used? instead of tap
+
             Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
 
             $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
@@ -675,6 +670,7 @@ class CronController extends \yii\console\Controller
     }
 
     /**
+     * todo: remove and auto expire
      * Update voucher status
      */
     public function actionUpdateVoucherStatus()
@@ -700,29 +696,6 @@ class CronController extends \yii\console\Controller
     }
 
     /**
-     * TODO: replace with stock deduction only after successfull payment or order confirmed by vendor
-     * @return void
-     */
-    public function actionUpdateStockQty()
-    {
-        $now = new DateTime('now');
-
-        $payments = Payment::find()
-            ->innerJoinWith('order')
-            ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
-            ->andWhere(['!=', 'payment.payment_current_status', 'Paid'])
-            ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
-            ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
-            ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
-
-        foreach ($payments->all() as $payment)
-        {
-            if($payment->order)
-                $payment->order->restockItems();
-        }
-    }
-
-    /**
      * Method called to find old transactions that haven't received callback and force a callback
      */
     public function actionUpdateTransactions()
@@ -734,7 +707,6 @@ class CronController extends \yii\console\Controller
             ->andWhere(['payment_gateway_name' => 'tap'])
             ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
             ->all();
-
 
         if ($payments) {
             foreach ($payments as $payment) {
@@ -763,14 +735,13 @@ class CronController extends \yii\console\Controller
      */
     public function actionSendReminderEmail()
     {
-
         $now = new DateTime('now');
+
         $orders = Order::find()
             ->andWhere(['order_status' => Order::STATUS_PENDING])
             ->andWhere(['reminder_sent' => 0])
             ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
             ->all();
-
 
         if ($orders) {
 
@@ -789,8 +760,7 @@ class CronController extends \yii\console\Controller
                             }
                         }
 
-
-                        $result = \Yii::$app->mailer->compose([
+                        \Yii::$app->mailer->compose([
                             'html' => 'order-reminder-html',
                         ], [
                             'order' => $order,
@@ -821,20 +791,5 @@ class CronController extends \yii\console\Controller
         $response = Currency::getDataFromApi();
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
-    }
-
-
-    public function actionTest() 
-    {
-        $a = \Yii::$app->mailer->compose([
-            'message' => 'test',
-        ])
-            ->setFrom(['krushnkathrecha@gmail.com' => 'Plugn'])//\Yii::$app->params['supportEmail']
-            ->setTo(['kathrechakrushn@gmail.com'])
-            ->setSubject('Test email')
-            ->send();
-
-        var_dump($a);
-        die();    
     }
 }
