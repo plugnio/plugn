@@ -261,10 +261,11 @@ return [
                     'controller' => 'v1/area',
                     'patterns' => [
                         'GET' => 'list',
+                        'GET delivery-areas' => 'delivery-areas',
                         'GET <id>' => 'detail',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
+                        'OPTIONS <id>' => 'options'
                     ]
                 ],
                 [// AgentController
