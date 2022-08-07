@@ -111,6 +111,7 @@ class AreaDeliveryZoneController extends Controller
     public function actionList()
     {
         $this->ownerCheck();
+
         $page = Yii::$app->request->get ('page');
         $keyword = Yii::$app->request->get ('keyword');
         $city_id = Yii::$app->request->get ('city_id');

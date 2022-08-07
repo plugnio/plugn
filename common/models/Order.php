@@ -981,14 +981,22 @@ class Order extends \yii\db\ActiveRecord
     {
         $totalPrice = $this->calculateOrderItemsTotalPrice();
 
-        if ($totalPrice > 0) {
-            if ($this->voucher) {
-                $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount / 100)) : $this->voucher->discount_amount;
+        if ($totalPrice > 0)
+        {
+            if ($this->voucher)
+            {
+                $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ?
+                    ($totalPrice * ($this->voucher->discount_amount / 100)) : $this->voucher->discount_amount;
+
                 $totalPrice -= $discountAmount;
 
                 $totalPrice = $totalPrice > 0 ? $totalPrice : 0;
-            } else if ($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice) {
-                $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount / 100)) : $this->bankDiscount->discount_amount;
+            }
+            else if ($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice)
+            {
+                $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ?
+                    ($totalPrice * ($this->bankDiscount->discount_amount / 100)) : $this->bankDiscount->discount_amount;
+
                 $totalPrice -= $discountAmount;
 
                 $totalPrice = $totalPrice > 0 ? $totalPrice : 0;
@@ -996,21 +1004,30 @@ class Order extends \yii\db\ActiveRecord
             }
         }
 
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))) {
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY &&
+            (
+                !$this->voucher ||
+                ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)
+            )
+        ) {
             $totalPrice += $this->deliveryZone->delivery_fee;
         }
 
-        if ($this->delivery_zone_id) {
-            if ($this->deliveryZone->delivery_zone_tax) {
+        if ($this->delivery_zone_id)
+        {
+            if ($this->deliveryZone->delivery_zone_tax)
+            {
                 $this->tax = $totalPrice * ($this->deliveryZone->delivery_zone_tax / 100);
                 $totalPrice += $this->tax;
-            } else if ($this->deliveryZone->businessLocation->business_location_tax) {
+            }
+            else if ($this->deliveryZone->businessLocation->business_location_tax)
+            {
                 $this->tax = $totalPrice * ($this->deliveryZone->businessLocation->business_location_tax / 100);
                 $totalPrice += $this->tax;
-
             }
-
-        } else if (!$this->delivery_zone_id && $this->pickup_location_id && $this->pickupLocation->business_location_tax) {
+        }
+        else if (!$this->delivery_zone_id && $this->pickup_location_id && $this->pickupLocation->business_location_tax)
+        {
             $this->tax = $totalPrice * ($this->pickupLocation->business_location_tax / 100);
             $totalPrice += $this->tax;
         }
@@ -1018,6 +1035,10 @@ class Order extends \yii\db\ActiveRecord
         return $totalPrice;
     }
 
+    /**
+     * @return bool
+     * @throws \yii\db\StaleObjectException
+     */
     public function beforeDelete()
     {
         if (!$this->items_has_been_restocked) {
@@ -1045,7 +1066,8 @@ class Order extends \yii\db\ActiveRecord
 
         if (!$this->currency_code) {
 
-            if (!$this->restaurant || !$this->restaurant->currency) {
+            if (!$this->restaurant || !$this->restaurant->currency)
+            {
                 return $this->addError(
                     'currency_code',
                     Yii::t('yii', "{attribute} is invalid.", [
