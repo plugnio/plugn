@@ -539,7 +539,6 @@ class TapPayments extends Component
            ];
 
            array_push($chargeParams['destinations']['destination'], $destination);
-
          }
 
          //for debug
