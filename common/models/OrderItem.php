@@ -299,13 +299,9 @@ class OrderItem extends \yii\db\ActiveRecord {
           if ($item_model) {
               $this->item_name = $item_model->item_name;
               $this->item_name_ar = $item_model->item_name_ar;
-          } else
-              return false;
-
-          $this->item->decreaseStockQty($this->qty);
-
-          if($this->variant)
-            $this->variant->decreaseStockQty($this->qty);
+          } else {
+              return false; //if custom item
+          }
         }
 
         $this->item_price = $this->calculateOrderItemPrice();
@@ -326,7 +322,8 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         $item_model = Item::findOne($this->item_uuid);
 
-        if (!$insert && isset($changedAttributes['qty']) && $item_model) {
+        if (!$insert && isset($changedAttributes['qty']) && $item_model && $item_model->track_quantity) {
+
             $item_model->increaseStockQty($changedAttributes['qty']);
             $item_model->decreaseStockQty($this->qty);
 
@@ -334,8 +331,18 @@ class OrderItem extends \yii\db\ActiveRecord {
                 $this->variant->increaseStockQty($changedAttributes['qty']);
                 $this->variant->decreaseStockQty($this->qty);
             }
-        }
+            else
+            {
+                $orderItemExtraOptions = $this->getOrderItemExtraOptions()
+                    ->with(['extraOption'])
+                    ->all();
 
+                foreach ($orderItemExtraOptions as $orderItemExtraOption) {
+                    $orderItemExtraOption->extraOption->increaseStockQty($changedAttributes['qty']);
+                    $orderItemExtraOption->extraOption->decreaseStockQty($this->qty);
+                }
+            }
+        }
       }
 
         $order_model = Order::findOne($this->order_uuid);

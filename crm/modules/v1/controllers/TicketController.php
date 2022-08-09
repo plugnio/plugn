@@ -125,6 +125,8 @@ class TicketController extends Controller
             ];
         }
 
+        $model->sendTicketAssignedMail();
+
         return [
             "operation" => "success",
             "message" => Yii::t('app', "Staff assigned successfully"),

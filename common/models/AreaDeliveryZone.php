@@ -90,7 +90,8 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
         return [
             'area',
             'city',
-            'deliveryZone'
+            'deliveryZone',
+            'businessLocation'
         ];
     }
 
@@ -144,6 +145,9 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
         return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
     }
 
+    /**
+     * @return query\AreaDeliveryZoneQuery
+     */
     public static function find() {
         return new query\AreaDeliveryZoneQuery(get_called_class());
     }

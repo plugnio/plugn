@@ -98,6 +98,45 @@ class AreaController extends Controller {
     }
 
     /**
+     * @return ActiveDataProvider
+     */
+    public function actionDeliveryAreas() {
+
+        $keyword = Yii::$app->request->get('keyword');
+        $city_id = Yii::$app->request->get('city_id');
+        $store_id = Yii::$app->request->get('store_id');
+
+        //valdiate access
+
+        $store = Yii::$app->accountManager->getManagedAccount($store_id);
+
+        $query = $store->getAreaDeliveryZones();
+
+        if ($city_id) {
+            $query->andWhere(['city_id' => $city_id]);
+        }
+
+        if ($store_id) {
+            //$query->joinWith('restaurant');
+            $query->andWhere(['restaurant_uuid' => $store_id]);
+        }
+
+        if ($keyword) {
+            $query
+                ->joinWith('area')
+            ->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
      * Return Area detail
      * @param integer $area_id
      * @return Area
