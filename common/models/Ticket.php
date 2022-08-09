@@ -129,9 +129,30 @@ class Ticket extends \yii\db\ActiveRecord
 
         //notify staff
 
-        $this->sendTicketGeneratedMail();
+        if($insert) {
+            $this->sendTicketGeneratedMail();
+        }
 
         $this->_moveAttachments();
+    }
+
+    /**
+     * notify staff for new ticket
+     */
+    public function sendTicketAssignedMail() {
+
+        \Yii::$app->mailer->htmlLayout = "layouts/text";
+
+        \Yii::$app->mailer->compose ([
+            'html' => 'agent/ticket-assigned-html',
+            'text' => 'agent/ticket-assigned-text',
+        ], [
+            'model' => $this
+        ])
+            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setTo ($this->staff->staff_email)
+            ->setSubject ('Ticket assigned for ' . $this->restaurant->name)
+            ->send ();
     }
 
     /**
