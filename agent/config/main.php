@@ -178,6 +178,19 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [// AddonController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/addon',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET callback' => 'callback',
+                        'GET <id>' => 'detail',
+                        'POST confirm' => 'confirm',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options'
+                    ]
+                ],
                 [// StaffController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/staff',
