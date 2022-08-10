@@ -12,11 +12,9 @@ class m210803_132951_add_partner_fee_field_to_subscription_payment_table extends
      */
     public function safeUp()
     {
-
       //drop payment_uuid field from partner_payout table
       $this->dropForeignKey('fk-partner_payout-payment_uuid', 'partner_payout');
       $this->dropIndex('idx-partner_payout-payment_uuid', 'partner_payout');
-
 
       $this->dropColumn('partner_payout', 'payment_uuid');
 
