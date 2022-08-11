@@ -2,16 +2,17 @@
 
 namespace agent\modules\v1\controllers;
 
-use agent\models\Plan;
-use agent\models\Subscription;
-use agent\models\SubscriptionPayment;
+use agent\models\Currency;
+use common\models\RestaurantAddon;
+use Yii;
 use common\components\TapPayments;
-use common\models\Addon;
+use agent\models\Addon;
 use common\models\AddonPayment;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\web\Cookie;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 
@@ -46,7 +47,7 @@ class AddonController extends Controller
             'class' => \yii\filters\auth\HttpBearerAuth::className(),
         ];
         // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
+        $behaviors['authenticator']['except'] = ['options', 'callback', 'payment-webhook'];
 
         return $behaviors;
     }
@@ -133,6 +134,7 @@ class AddonController extends Controller
             $store->owner_number ? $store->owner_number : null,
             0, //Comission
             Url::to (['addons/callback'], true),
+            Url::to(['addons/payment-webhook'], true),
             $payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
             0,
             0,
@@ -153,7 +155,8 @@ class AddonController extends Controller
 
             return [
                 'operation' => 'error',
-                'message' => $errorMessage
+                'message' => $errorMessage,
+                "response" => $responseContent
             ];
         }
 
@@ -164,13 +167,14 @@ class AddonController extends Controller
 
             $payment->payment_gateway_transaction_id = $chargeId;
 
-            if (!$payment->save (false)) {
+            if (!$payment->save ()) {
 
                 //\Yii::error ($payment->errors, __METHOD__); // Log error faced by user
 
                 return [
                     'operation' => 'error',
-                    'message' => $payment->getErrors ()
+                    'message' => $payment->getErrors (),
+                    "response" => $responseContent
                 ];
             }
         } else {
@@ -209,7 +213,8 @@ class AddonController extends Controller
      */
     public function actionCallback()
     {
-        try {
+        //http://localhost/plugn/agent/web/v1/addons/callback?tap_id=chg_TS021920221604Yu671108847
+        //try {
 
             $id = Yii::$app->request->get('tap_id');
 
@@ -218,21 +223,139 @@ class AddonController extends Controller
             $paymentRecord->save(false);
 
             if ($paymentRecord->payment_current_status == 'CAPTURED') {
-                $this->_addCallbackCookies ("paymentSuccess", "There seems to be an issue with your payment, please try again.");
+                $this->_addCallbackCookies ("addonPaymentSuccess", $paymentRecord->addon->name . ' has been activated');
             } else {
-                $this->_addCallbackCookies ("paymentFailed", $paymentRecord->plan->name . ' has been activated');
+                $this->_addCallbackCookies ("paymentFailed", "There seems to be an issue with your payment, please try again.");
             }
 
-        } catch (\Exception $e) {
+       // } catch (\Exception $e) {
 
-            $this->_addCallbackCookies ("paymentFailed", $e->getMessage ());
-        }
+       //     $this->_addCallbackCookies ("paymentFailed", $e->getMessage ());
+       // }
 
         //todo: show success/failed message in addon page
 
-        $url = Yii::$app->params['newDashboardAppUrl'] . '/addons';
+        $url = Yii::$app->params['newDashboardAppUrl'] . '/addon-list';
 
-        return $this->redirect ($url);
+        return $this->redirect ($url);//Yii::$app->getResponse()->send();
+    }
+
+    /**
+     * Process callback from TAP payment gateway
+     * @param string $tap_id
+     * @return mixed
+     */
+    public function actionPaymentWebhook() {
+
+        $headers = Yii::$app->request->headers;
+        $headerSignature = $headers->get('hashstring');
+
+        $charge_id = Yii::$app->request->getBodyParam("id");
+        $status = Yii::$app->request->getBodyParam("status");
+        $amount = Yii::$app->request->getBodyParam("amount");
+        $currency = Yii::$app->request->getBodyParam("currency");
+        $reference = Yii::$app->request->getBodyParam("reference");
+        $destinations = Yii::$app->request->getBodyParam("destinations");
+        $response = Yii::$app->request->getBodyParam("response");
+        $source = Yii::$app->request->getBodyParam("source");
+        $transaction = Yii::$app->request->getBodyParam("transaction");
+        $acquirer = Yii::$app->request->getBodyParam("acquirer");
+
+        if($currency_mode = Currency::find()->where(['code' => $currency])->one()) {
+            $decimal_place = $currency_mode->decimal_place;
+        } else {
+            throw new ForbiddenHttpException('Invalid Currency code');
+        }
+
+        if (isset($reference)){
+            $gateway_reference = $reference['gateway'];
+            $payment_reference = $reference['payment'];
+        }
+
+        if(isset($transaction)){
+            $created = $transaction['created'];
+        }
+
+        $amountCharged = \Yii::$app->formatter->asDecimal($amount, $decimal_place);
+        $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amountCharged.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
+
+        $isValidSignature = true;
+
+        //Check If Enabled Secret Key and If The header has request
+        if ($headerSignature != null)  {
+            $response_message  = null;
+
+            if(isset($acquirer) && isset($acquirer['response'])){
+                $response_message = $acquirer['response']['message'];
+            } else if(isset($response)) {
+                $response_message = $response['message'];
+            }
+
+            $isValidSignature = false;
+
+            if (!$isValidSignature) {
+                Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+
+                $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
+
+                if (!$isValidSignature) {
+                    Yii::error('Invalid Signature', __METHOD__);
+                    throw new ForbiddenHttpException('Invalid Signature');
+                }
+            }
+
+            $paymentRecord = \common\models\SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+            $paymentRecord->received_callback = true;
+            $paymentRecord->save(false);
+
+            if($paymentRecord->payment_current_status == 'CAPTURED')
+            {
+                if(YII_ENV == 'prod') {
+                    //Send event to Segment
+                    \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+                    \Segment::track([
+                        'userId' => $paymentRecord->restaurant_uuid,
+                        'event' => 'Addon Purchase',
+                        'properties' => [
+                            'addon_uuid' => $paymentRecord->addon_uuid,
+                            'addon' => $paymentRecord->addon->name,
+                            'paymentMethod' => $paymentRecord->payment_mode,
+                            'charged' => $paymentRecord->payment_amount_charged,
+                            'revenue' => $paymentRecord->payment_net_amount,
+                            'currency' => 'KWD'
+                        ]
+                    ]);
+                }
+
+                $model = new RestaurantAddon();
+                $model->addon_uuid = $paymentRecord->addon_uuid;
+                $model->restaurant_uuid = $paymentRecord->restaurant_uuid;
+                $model->save();
+
+                foreach ($paymentRecord->restaurant->getOwnerAgent()->all() as $agent ) {
+
+                    \Yii::$app->mailer->compose([
+                        'html' => 'addon-purchased',
+                    ], [
+                        'paymentRecord' => $paymentRecord,
+                        'addon' => $paymentRecord->addon,
+                        'store' => $paymentRecord->restaurant,
+                    ])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                        ->setTo([$agent->agent_email])
+                        ->setBcc(\Yii::$app->params['supportEmail'])
+                        ->setSubject('Thank you for your purchase')
+                        ->send();
+                }
+            }
+
+            if($paymentRecord) {
+                return [
+                    'operation' => 'success',
+                    'message' => 'Payment status has been updated successfully'
+                ];
+            }
+        }
     }
 
     /**
@@ -249,7 +372,7 @@ class AddonController extends Controller
             'secure' => str_contains (Yii::$app->params['newDashboardAppUrl'], 'https://')? true: false,
         ]);
 
-        $cookie->sameSite = PHP_VERSION_ID >= 70300 ? 'None' : null;
+        $cookie->sameSite = 'None';//PHP_VERSION_ID >= 70300 ? 'None' : null;
 
         \Yii::$app->getResponse ()->getCookies ()->add ($cookie);
     }

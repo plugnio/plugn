@@ -444,7 +444,7 @@
                                                                 <div
                                                                     style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
                                                                 >
-                                                                    Paid by: <?= $paymentRecord->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD ? 'Credit Card' : 'Knet' ?>
+                                                                    Paid by: <?= $paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_VISA_MASTERCARD ? 'Credit Card' : 'Knet' ?>
                                                                 </div>
 
                                                             </td>

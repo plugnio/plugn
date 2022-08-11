@@ -127,6 +127,29 @@ class Addon extends \yii\db\ActiveRecord
         ];
     }
 
+    public function extraFields()
+    {
+        $fields = parent::extraFields ();
+
+        $fields['paymentMethods'] =  function ($model) {
+            return PaymentMethod::find ()
+                ->andWhere (['in', 'payment_method_id', ['1', '2']])
+                ->all ();
+        };
+
+        $fields['formatedPrice'] = function ($model) {
+
+            //$store = \Yii::$app->accountManager->getManagedAccount();
+            //$store->currency->code
+
+            $price = $model->special_price > 0? $model->special_price: $model->price;
+
+            return \Yii::$app->formatter->asCurrency($price, 'KWD');
+        };
+
+        return $fields;
+    }
+
     /**
      * Gets query for [[CreatedBy]].
      *
@@ -165,5 +188,13 @@ class Addon extends \yii\db\ActiveRecord
     public function getRestaurantAddons($modelClass = "\common\models\RestaurantAddon")
     {
         return $this->hasMany($modelClass::className(), ['addon_uuid' => 'addon_uuid']);
+    }
+
+    /**
+     * @return query\AddonQuery
+     */
+    public static function find()
+    {
+        return new query\AddonQuery(get_called_class());
     }
 }

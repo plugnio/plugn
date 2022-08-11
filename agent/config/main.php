@@ -184,8 +184,11 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET callback' => 'callback',
+                        //'GET payment-webhook' => 'payment-webhook',
                         'GET <id>' => 'detail',
                         'POST confirm' => 'confirm',
+                        'POST payment-webhook' => 'payment-webhook',
+                        'PATCH payment-webhook' => 'payment-webhook',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options'
@@ -545,6 +548,8 @@ return [
                        'GET callback' => 'callback',
                        'GET <id>' => 'view',
                        'POST confirm' => 'confirm',
+                       'POST payment-webhook' => 'payment-webhook',
+                       'PATCH payment-webhook' => 'payment-webhook',
                        // OPTIONS VERBS
                        'OPTIONS <id>' => 'options'
                    ]
