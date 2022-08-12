@@ -2,7 +2,7 @@
 
 
 namespace agent\models;
-
+ 
 
 class Plan extends \common\models\Plan
 {

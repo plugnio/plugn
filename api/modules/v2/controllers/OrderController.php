@@ -943,8 +943,8 @@ class OrderController extends Controller
 
             $isValidSignature = false;
 
-
-            if (!$isValidSignature) {
+            if (!$isValidSignature)
+            {
                 Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
 
                 $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString, $headerSignature);

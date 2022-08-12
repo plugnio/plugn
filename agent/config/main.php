@@ -178,6 +178,22 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [// AddonController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/addon',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET callback' => 'callback',
+                        //'GET payment-webhook' => 'payment-webhook',
+                        'GET <id>' => 'detail',
+                        'POST confirm' => 'confirm',
+                        'POST payment-webhook' => 'payment-webhook',
+                        'PATCH payment-webhook' => 'payment-webhook',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options'
+                    ]
+                ],
                 [// StaffController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/staff',
@@ -532,6 +548,8 @@ return [
                        'GET callback' => 'callback',
                        'GET <id>' => 'view',
                        'POST confirm' => 'confirm',
+                       'POST payment-webhook' => 'payment-webhook',
+                       'PATCH payment-webhook' => 'payment-webhook',
                        // OPTIONS VERBS
                        'OPTIONS <id>' => 'options'
                    ]

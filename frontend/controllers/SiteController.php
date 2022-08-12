@@ -374,8 +374,6 @@ class SiteController extends Controller
         }
     }
 
-
-
     /**
      * Process callback from TAP payment gateway
      * @param string $tap_id
