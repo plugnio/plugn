@@ -1406,6 +1406,17 @@ class Order extends \yii\db\ActiveRecord
             //$this->save(false);
         }
 
+        /**
+         * when order status get update from non cancelled to canelled
+         */
+        if (
+            $this->scenario == self::SCENARIO_UPDATE_STATUS &&
+            $this->items_has_been_restocked == false &&
+            $changedAttributes['order_status'] != self::STATUS_CANCELED && $this->order_status == self::STATUS_CANCELED
+        ) {
+            $this->restockItems();
+        }
+
         //Send SMS To customer
 
         if ($this->customer_phone_country_code == 965 && !$insert &&
