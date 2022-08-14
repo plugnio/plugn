@@ -3,19 +3,20 @@
 namespace agent\modules\v1\controllers;
 
 use agent\models\Currency;
+use common\models\RestaurantAddon;
 use Yii;
 use common\components\TapPayments;
-use agent\models\Plan;
-use agent\models\Subscription;
-use agent\models\SubscriptionPayment;
+use agent\models\Addon;
+use common\models\AddonPayment;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
 use yii\rest\Controller;
+use yii\web\Cookie;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\web\Cookie;
 
 
-class PlanController extends Controller
+class AddonController extends Controller
 {
     public function behaviors() {
         $behaviors = parent::behaviors();
@@ -66,40 +67,28 @@ class PlanController extends Controller
     }
 
     /**
-     * only owner will have access
+     * @return ActiveDataProvider
      */
-    public function beforeAction($action)
-    {
-        parent::beforeAction ($action);
+    public function actionList() {
 
-        if(in_array($action->id, ['payment-webhook', 'options', 'callback'])) {
-            return true;
-        }
+        $keyword = Yii::$app->request->get('keyword');
 
-        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['view'])) {
-            throw new \yii\web\BadRequestHttpException(
-                Yii::t('agent', 'You are not allowed to manage plan. Please contact with store owner')
-            );
+        $query =  Addon::find()
+            ->filterKeyword($keyword)
+            ->orderBy('sort_number');
 
-            return false;
-        }
-
-        //should have access to store
-
-        Yii::$app->accountManager->getManagedAccount();
-
-        return true;
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
     }
 
     /**
-     * return plan detail
-     * @param $id
-     * @return Plan|null
-     * @throws NotFoundHttpException
+     * Return Addon detail
+     * @param integer $addon_uuid
+     * @return Addon
      */
-    public function actionView($id)
-    {
-        return $this->findModel ($id);
+    public function actionDetail($id) {
+        return $this->findModel($id);
     }
 
     /**
@@ -109,39 +98,18 @@ class PlanController extends Controller
      */
     public function actionConfirm()
     {
-        $store = Yii::$app->accountManager->getManagedAccount ();
-
-        $plan_id = Yii::$app->request->getBodyParam ('plan_id');
+        $addon_uuid = Yii::$app->request->getBodyParam ('addon_uuid');
         $payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
 
-        $selectedPlan = Plan::findOne ($plan_id);
+        $addon = $this->findModel($addon_uuid);
 
-        $subscription_model = new Subscription();
-        $subscription_model->restaurant_uuid = $store->restaurant_uuid;
-        $subscription_model->plan_id = $selectedPlan->plan_id;
-        $subscription_model->payment_method_id = $payment_method_id;
+        $store = Yii::$app->accountManager->getManagedAccount ();
 
-        if (!$subscription_model->save ()) {
-            return [
-                "operation" => 'error',
-                "message" => $subscription_model->getErrors ()
-            ];
-        }
-
-        //for free-tier
-
-        if ($selectedPlan->price == 0) {
-            return [
-                "operation" => 'success',
-                "message" => Yii::t('agent', 'Subscribed successfully')
-            ];
-        }
-
-        $payment = new SubscriptionPayment;
+        $payment = new AddonPayment;
         $payment->restaurant_uuid = $store->restaurant_uuid;
-        $payment->payment_mode = $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
-        $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
-        $payment->payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price: $subscription_model->plan->price;
+        $payment->payment_mode = $payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+        $payment->addon_uuid = $addon_uuid;
+        $payment->payment_amount_charged = $addon->special_price > 0 ? $addon->special_price: $addon->price;
         $payment->payment_current_status = "Redirected to payment gateway";
 
         if (!$payment->save ()) {
@@ -151,17 +119,13 @@ class PlanController extends Controller
             ];
         }
 
-        //Update payment_uuid in order
-        $subscription_model->payment_uuid = $payment->payment_uuid;
-        $subscription_model->save (false);
-
         // Redirect to payment gateway
         Yii::$app->tapPayments->setApiKeys (\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
 
         $response = Yii::$app->tapPayments->createCharge (
             "KWD",
-            "Upgrade $store->name's plan to " . $subscription_model->plan->name, // Description
-            'Plugn', //Statement Desc.
+            $addon->name . " for " . $store->name, // Description
+            'Plugn - ' . $addon->name, //Statement Desc.
             $payment->payment_uuid, // Reference
             $payment->payment_amount_charged,
             $store->name,
@@ -169,9 +133,9 @@ class PlanController extends Controller
             $store->country->country_code,
             $store->owner_number ? $store->owner_number : null,
             0, //Comission
-            Url::to (['plans/callback'], true),
-            Url::to(['plans/payment-webhook'], true),
-            $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
+            Url::to (['addons/callback'], true),
+            Url::to(['addons/payment-webhook'], true),
+            $payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
             0,
             0,
             ''
@@ -181,50 +145,52 @@ class PlanController extends Controller
 
         //try {
 
-            // Validate that theres no error from TAP gateway
-            if (isset($responseContent->errors)) {
+        // Validate that theres no error from TAP gateway
+        if (isset($responseContent->errors)) {
 
-                $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
+            $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
 
-                //todo: notify vendor?
-                //\Yii::error ($errorMessage, __METHOD__); // Log error faced by user
-
-                return [
-                    'operation' => 'error',
-                    'message' => $errorMessage
-                ];
-            }
-
-            if ($responseContent->id) {
-
-                $chargeId = $responseContent->id;
-                $redirectUrl = $responseContent->transaction->url;
-
-                $payment->payment_gateway_transaction_id = $chargeId;
-
-                if (!$payment->save (false)) {
-
-                    //\Yii::error ($payment->errors, __METHOD__); // Log error faced by user
-
-                    return [
-                        'operation' => 'error',
-                        'message' => $payment->getErrors ()
-                    ];
-                }
-            } else {
-
-                //\Yii::error ('[Payment Issue > Charge id is missing ]' . json_encode ($responseContent), __METHOD__); // Log error faced by user
-
-                return [
-                    'operation' => 'error',
-                    'message' => Yii::t('agent','Payment Issue > Charge id is missing')
-                ];
-            }
+            //todo: notify vendor?
+            //\Yii::error ($errorMessage, __METHOD__); // Log error faced by user
 
             return [
-                'operation' => 'success',
-                'redirect' => $redirectUrl
+                'operation' => 'error',
+                'message' => $errorMessage,
+                "response" => $responseContent
             ];
+        }
+
+        if ($responseContent->id) {
+
+            $chargeId = $responseContent->id;
+            $redirectUrl = $responseContent->transaction->url;
+
+            $payment->payment_gateway_transaction_id = $chargeId;
+
+            if (!$payment->save ()) {
+
+                //\Yii::error ($payment->errors, __METHOD__); // Log error faced by user
+
+                return [
+                    'operation' => 'error',
+                    'message' => $payment->getErrors (),
+                    "response" => $responseContent
+                ];
+            }
+        } else {
+
+            //\Yii::error ('[Payment Issue > Charge id is missing ]' . json_encode ($responseContent), __METHOD__); // Log error faced by user
+
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent','Payment Issue > Charge id is missing')
+            ];
+        }
+
+        return [
+            'operation' => 'success',
+            'redirect' => $redirectUrl
+        ];
 
         /*} catch (\Exception $e) {
 
@@ -247,47 +213,31 @@ class PlanController extends Controller
      */
     public function actionCallback()
     {
-        try {
+        //http://localhost/plugn/agent/web/v1/addons/callback?tap_id=chg_TS021920221604Yu671108847
+        //try {
 
             $id = Yii::$app->request->get('tap_id');
 
-            $paymentRecord = SubscriptionPayment::updatePaymentStatusFromTap($id);
+            $paymentRecord = AddonPayment::updatePaymentStatusFromTap($id);
             $paymentRecord->received_callback = true;
             $paymentRecord->save(false);
 
             if ($paymentRecord->payment_current_status == 'CAPTURED') {
-                $this->_addCallbackCookies ("paymentSuccess", "There seems to be an issue with your payment, please try again.");
+                $this->_addCallbackCookies ("addonPaymentSuccess", $paymentRecord->addon->name . ' has been activated');
             } else {
-                $this->_addCallbackCookies ("paymentFailed", $paymentRecord->plan->name . ' has been activated');
+                $this->_addCallbackCookies ("paymentFailed", "There seems to be an issue with your payment, please try again.");
             }
 
-        } catch (\Exception $e) {
+       // } catch (\Exception $e) {
 
-            $this->_addCallbackCookies ("paymentFailed", $e->getMessage ());
-        }
+       //     $this->_addCallbackCookies ("paymentFailed", $e->getMessage ());
+       // }
 
-        $url = Yii::$app->params['newDashboardAppUrl'] . '/settings/payment-methods';
+        //todo: show success/failed message in addon page
 
-        return $this->redirect ($url);
-    }
+        $url = Yii::$app->params['newDashboardAppUrl'] . '/addon-list';
 
-    /**
-     * add cookies to show error message in front app
-     */
-    private function _addCallbackCookies($name, $msg)
-    {
-        $cookie = new Cookie([
-            'name' => $name,
-            'value' => $msg,
-            'expire' => time () + 86400,
-            'domain' => Yii::$app->params['dashboardCookieDomain'],
-            'httpOnly' => false,
-            'secure' => str_contains (Yii::$app->params['newDashboardAppUrl'], 'https://')? true: false,
-        ]);
-
-        $cookie->sameSite = PHP_VERSION_ID >= 70300 ? 'None' : null;
-
-        \Yii::$app->getResponse ()->getCookies ()->add ($cookie);
+        return $this->redirect ($url);//Yii::$app->getResponse()->send();
     }
 
     /**
@@ -345,7 +295,9 @@ class PlanController extends Controller
 
             if (!$isValidSignature) {
                 Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+
                 $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
+
                 if (!$isValidSignature) {
                     Yii::error('Invalid Signature', __METHOD__);
                     throw new ForbiddenHttpException('Invalid Signature');
@@ -353,51 +305,51 @@ class PlanController extends Controller
             }
 
             $paymentRecord = \common\models\SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
-
             $paymentRecord->received_callback = true;
+            $paymentRecord->save(false);
 
-            if ($paymentRecord->save(false) && $paymentRecord->payment_current_status == 'CAPTURED' ) {
-
-                \common\models\Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
-
-                $subscription_model = $paymentRecord->subscription;
-                $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
-                $valid_for =  $subscription_model->plan->valid_for;
-                $subscription_model->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"));
-                $subscription_model->save(false);
-
-                foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
-
-                    \Yii::$app->mailer->compose([
-                        'html' => 'premium-upgrade',
-                    ], [
-                        'subscription' => $subscription_model,
-                        'store' => $paymentRecord->restaurant,
-                    ])
-                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                        ->setTo([$agent->agent_email])
-                        ->setBcc(\Yii::$app->params['supportEmail'])
-                        ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
-                        ->send();
-                }
-
+            if($paymentRecord->payment_current_status == 'CAPTURED')
+            {
                 if(YII_ENV == 'prod') {
                     //Send event to Segment
                     \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
                     \Segment::track([
                         'userId' => $paymentRecord->restaurant_uuid,
-                        'event' => 'Premium Plan Purchase',
+                        'event' => 'Addon Purchase',
                         'properties' => [
-                            'order_id' => $paymentRecord->payment_uuid,
-                            'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
+                            'addon_uuid' => $paymentRecord->addon_uuid,
+                            'addon' => $paymentRecord->addon->name,
                             'paymentMethod' => $paymentRecord->payment_mode,
-                            'currency' => 'USD'
+                            'charged' => $paymentRecord->payment_amount_charged,
+                            'revenue' => $paymentRecord->payment_net_amount,
+                            'currency' => 'KWD'
                         ]
                     ]);
                 }
+
+                $model = new RestaurantAddon();
+                $model->addon_uuid = $paymentRecord->addon_uuid;
+                $model->restaurant_uuid = $paymentRecord->restaurant_uuid;
+                $model->save();
+
+                foreach ($paymentRecord->restaurant->getOwnerAgent()->all() as $agent ) {
+
+                    \Yii::$app->mailer->compose([
+                        'html' => 'addon-purchased',
+                    ], [
+                        'paymentRecord' => $paymentRecord,
+                        'addon' => $paymentRecord->addon,
+                        'store' => $paymentRecord->restaurant,
+                    ])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                        ->setTo([$agent->agent_email])
+                        ->setBcc(\Yii::$app->params['supportEmail'])
+                        ->setSubject('Thank you for your purchase')
+                        ->send();
+                }
             }
 
-            if($paymentRecord){
+            if($paymentRecord) {
                 return [
                     'operation' => 'success',
                     'message' => 'Payment status has been updated successfully'
@@ -407,14 +359,34 @@ class PlanController extends Controller
     }
 
     /**
-     * Finds the Plan model based on its primary key value.
+     * add cookies to show error message in front app
+     */
+    private function _addCallbackCookies($name, $msg)
+    {
+        $cookie = new Cookie([
+            'name' => $name,
+            'value' => $msg,
+            'expire' => time () + 86400,
+            'domain' => Yii::$app->params['dashboardCookieDomain'],
+            'httpOnly' => false,
+            'secure' => str_contains (Yii::$app->params['newDashboardAppUrl'], 'https://')? true: false,
+        ]);
+
+        $cookie->sameSite = 'None';//PHP_VERSION_ID >= 70300 ? 'None' : null;
+
+        \Yii::$app->getResponse ()->getCookies ()->add ($cookie);
+    }
+
+    /**
+     * Finds the Area  model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
+     * @return Addon the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($addon_uuid)
     {
-        if (($model = Plan::findOne ($id)) !== null) {
+        if (($model = Addon::findOne ($addon_uuid)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');
