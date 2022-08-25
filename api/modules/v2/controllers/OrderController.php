@@ -324,7 +324,12 @@ class OrderController extends Controller
 
                 if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
-                    Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+                    Yii::$app->tapPayments->setApiKeys(
+                        $order->restaurant->live_api_key,
+                        $order->restaurant->test_api_key,
+                        $order->restaurant->is_sandbox
+                    );
+
                     $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
 
                     $responseContent = json_decode($response->content);
@@ -407,7 +412,11 @@ class OrderController extends Controller
 
                 // Redirect to payment gateway
 
-                Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+                Yii::$app->tapPayments->setApiKeys(
+                    $order->restaurant->live_api_key,
+                    $order->restaurant->test_api_key,
+                    $order->restaurant->is_sandbox
+                );
 
                 $response = Yii::$app->tapPayments->createCharge(
                     $order->currency->code,
@@ -500,6 +509,7 @@ class OrderController extends Controller
 
                     return [
                         'operation' => 'redirecting',
+                        'is_sandbox' => $order->restaurant->is_sandbox,
                         'redirectUrl' => $redirectUrl,
                     ];
 
@@ -552,7 +562,7 @@ class OrderController extends Controller
 
                 Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
-                Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code);
+                Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code, $order->restaurant->is_sandbox);
 
                 $initiatePayment = Yii::$app->myFatoorahPayment->initiatePayment($order->total_price, $order->currency->code);
                 $initiatePaymentResponse = json_decode($initiatePayment->content);
@@ -587,7 +597,7 @@ class OrderController extends Controller
                     ];
                 }
 
-                Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code);
+                Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code, $order->restaurant->is_sandbox);
 
                 $response = Yii::$app->myFatoorahPayment->createCharge(
                     $order->currency->code,
@@ -688,6 +698,8 @@ class OrderController extends Controller
     public function actionMyFatoorahCallback($paymentId)
     {
         //todo: what if not KWD or SAR
+
+        //todo: setApiKeys with sandbox status?
 
         Yii::$app->myFatoorahPayment->setApiKeys('KWD');
 
@@ -945,7 +957,11 @@ class OrderController extends Controller
 
             if (!$isValidSignature)
             {
-                Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
+                Yii::$app->tapPayments->setApiKeys(
+                    $paymentRecord->restaurant->live_api_key,
+                    $paymentRecord->restaurant->test_api_key,
+                    $paymentRecord->restaurant->is_sandbox
+                );
 
                 $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString, $headerSignature);
 

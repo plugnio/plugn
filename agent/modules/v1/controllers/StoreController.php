@@ -116,6 +116,7 @@ class StoreController extends Controller
 
         $store->setScenario(Restaurant::SCENARIO_UPDATE);
 
+        $store->is_sandbox = Yii::$app->request->getBodyParam('is_sandbox');
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
         $store->phone_number_country_code = (int) Yii::$app->request->getBodyParam('mobile_country_code');
