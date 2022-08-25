@@ -190,6 +190,7 @@ return [
                     'controller' => 'v1/order',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
@@ -215,6 +216,7 @@ return [
                     'controller' => 'v2/order',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'POST payment-webhook' => 'payment-webhook',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST update-armada-order-status' => 'update-armada-order-status',

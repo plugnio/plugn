@@ -973,6 +973,41 @@ class OrderController extends Controller
     }
 
     /**
+     * list all orders
+     * @return ActiveDataProvider
+     */
+    public function actionList()
+    {
+        $store_uuid = Yii::$app->request->get('restaurant_uuid');
+        $phone_number = Yii::$app->request->get('phone_number');
+        $email = Yii::$app->request->get('email');
+
+        $query = Order::find()
+            ->andWhere(['restaurant_uuid' => $store_uuid])
+            /*->andWhere(
+                [
+                    'order_status' => [
+                        Order::STATUS_PENDING,
+                        Order::STATUS_ACCEPTED,
+                        Order::STATUS_BEING_PREPARED
+                    ]
+                ]
+            )*/
+            ->andWhere(['order.is_deleted' => 0])
+            ->orderBy(['order_created_at' => SORT_DESC]);
+
+        $query->andWhere([
+            'OR',
+            ['customer_email' => $email],
+            ['customer_phone_number' => $phone_number]
+        ]);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
      * Get Order detail
      * WIll delete this fun after we merge with all stores
      * @param type $id
