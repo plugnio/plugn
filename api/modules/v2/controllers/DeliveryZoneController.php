@@ -202,6 +202,7 @@ class DeliveryZoneController extends Controller {
 
               Yii::$app->formatter->language = 'ar-KW';
               $deliveryZone['delivery_time_ar'] = Yii::$app->formatter->asDuration(intval($deliveryTime));
+
               $deliveryZone['tax'] = $deliveryZone['delivery_zone_tax'] ? $deliveryZone['delivery_zone_tax']  : $deliveryZone['businessLocation']['business_location_tax'] ;
 
               return $deliveryZone;

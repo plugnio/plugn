@@ -517,9 +517,8 @@ class OrderController extends Controller
     public function actionPlaceAnOrder($store_uuid = null)
     {
         $area_id = Yii::$app->request->getBodyParam("area_id");
-        $delivery_zone_id = Yii::$app->request->getBodyParam("area_delivery_zone");
+        $delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
         $country_id = Yii::$app->request->getBodyParam("country_id");
-        $area_delivery_zone = Yii::$app->request->getBodyParam("area_delivery_zone");
 
         $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
@@ -585,7 +584,8 @@ class OrderController extends Controller
 
             if ($area_id) {
 
-                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
+
                 $order->area_id = $area_id;
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
                 $order->block = Yii::$app->request->getBodyParam("block");
@@ -603,8 +603,9 @@ class OrderController extends Controller
                     $order->office = Yii::$app->request->getBodyParam("office");
 
             } //Delivery other countries
-            else if ($country_id && !$area_id) {
-                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+            else if ($country_id && !$area_id)
+            {
+                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
@@ -746,6 +747,10 @@ class OrderController extends Controller
             ];
         }
 
+        //for manual orders
+
+        $order->deductStock();
+
         $transaction->commit();
 
         return [
@@ -762,6 +767,7 @@ class OrderController extends Controller
     {
         $area_id = Yii::$app->request->getBodyParam("area_id");
         $country_id = Yii::$app->request->getBodyParam("country_id");
+        $delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
 
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -853,8 +859,11 @@ class OrderController extends Controller
                 ];
             }
 
-            if ($area_id) {
-                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+            if ($area_id)
+            {
+                //if delivery zone not specified
+
+                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
 
                 if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
                     $order->floor = Yii::$app->request->getBodyParam("floor");
@@ -866,8 +875,9 @@ class OrderController extends Controller
                     $order->office = Yii::$app->request->getBodyParam("office");
 
             } //Delivery other countries
-            else if ($country_id && !$area_id) {
-                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+            else if ($country_id && !$area_id)
+            {
+                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
@@ -1607,6 +1617,7 @@ class OrderController extends Controller
         $customer_name = Yii::$app->request->getBodyParam('customer_name');
         $area_name = Yii::$app->request->getBodyParam('area_name');
         $area_id = Yii::$app->request->getBodyParam('area_id');
+        $delivery_zone_id = Yii::$app->request->getBodyParam('delivery_zone_id');
         $unit_type = Yii::$app->request->getBodyParam('unit_type');
         $street = Yii::$app->request->getBodyParam('street');
         $avenue = Yii::$app->request->getBodyParam('avenue');
@@ -1660,6 +1671,7 @@ class OrderController extends Controller
         $model->customer_name = $customer_name;
         $model->area_name = $area_name;
         $model->area_id = $area_id;
+        $model->delivery_zone_id = $delivery_zone_id;
         $model->unit_type = $unit_type;
         $model->street = $street;
         $model->avenue = $avenue;
@@ -1672,17 +1684,28 @@ class OrderController extends Controller
         $model->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($estimated_time_of_arrival));
         $model->special_directions = $special_directions;
 
-        if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
-
-            $areaDeliveryZone = AreaDeliveryZone::find()
+        if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
+        {
+            $query = AreaDeliveryZone::find()
                 ->andWhere([
                     'restaurant_uuid' => $restaurant->restaurant_uuid,
                     'area_id' => $model->area_id
-                ])
-                ->one();
+                ]);
 
-            if ($areaDeliveryZone)
-                $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+            if($model->delivery_zone_id) {
+                $query->andWhere(['delivery_zone_id' => $model->delivery_zone_id]);
+            }
+
+            $areaDeliveryZone = $query->one();
+
+            if (!$areaDeliveryZone) {
+                return [
+                    'operation' => 'error',
+                    'message' => Yii::t('app', "Store does not deliver to this delivery zone.")
+                ];
+            }
+
+            $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
         }
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -1763,6 +1786,10 @@ class OrderController extends Controller
             }
         }
 
+        //for manual orders
+
+        $model->deductStock();
+
         $transaction->commit();
 
         return [
@@ -1771,6 +1798,13 @@ class OrderController extends Controller
         ];
     }
 
+    /**
+     * refresh payment status from tap api response
+     * @param $order_uuid
+     * @param $store_uuid
+     * @return string[]|void
+     * @throws NotFoundHttpException
+     */
     public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid)
     {
         try {

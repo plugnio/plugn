@@ -172,6 +172,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);
+
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
@@ -233,6 +234,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         if(YII_ENV == 'prod') {
             //Send event to Segment
             \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+
             \Segment::track([
                   'userId' => $paymentRecord->restaurant_uuid,
                   'event' => 'Premium Plan Purchase',
@@ -311,13 +313,13 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);
+
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
         if($paymentRecord->received_callback && $paymentRecord->payment_current_status == $status )
           return $paymentRecord;
-
 
         $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
         $paymentRecord->response_message = $response_message;
