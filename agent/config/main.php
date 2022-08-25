@@ -466,6 +466,7 @@ return [
                         'GET status' => 'status',
                         'GET settings/<code>' => 'settings',
                         'POST' => 'update',
+                        'POST upgrade' => 'upgrade',
                         'POST connect-domain' => 'connect-domain',
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
                         'POST enable-payment-method/<id>/<paymentMethodId>' => 'enable-payment-method',
@@ -484,6 +485,7 @@ return [
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS upgrade' => 'options',
                         'OPTIONS connect-domain' => 'options',
                         'OPTIONS update-delivery-integration/<id>' => 'options',
                         'OPTIONS update-analytics-integration/<id>' => 'options',
