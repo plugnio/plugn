@@ -160,12 +160,12 @@ class TapPayments extends Component
      * @param  [type] $testKey [description]
      * @return [type]          [description]
      */
-    public function setApiKeys($liveKey, $testKey)
+    public function setApiKeys($liveKey, $testKey, $is_sandbox = false)
     {
         $this->vendoerLiveApiKey = $liveKey;
         $this->vendorTestApiKey = $testKey;
 
-        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+        if (!$is_sandbox && $this->gatewayToUse == self::USE_LIVE_GATEWAY) {
             $this->vendorSecretApiKey = $this->vendoerLiveApiKey;
         } else {
             $this->vendorSecretApiKey = $this->vendorTestApiKey;
