@@ -792,4 +792,28 @@ class CronController extends \yii\console\Controller
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }
+
+    /**
+     * https://docs.github.com/en/rest/branches/branches#merge-a-branch
+     */
+    public function actionUpgrade()
+    {
+        $commitMessage = "testing merge";
+
+        //foreach ()
+
+        $head = "master";
+
+        $base = "develop";
+
+        $response = Yii::$app->githubComponent->mergeABranch($commitMessage, $base, $head);
+
+        if($response->statusCode == 201) {
+            echo 'merged';
+        }
+        else if($response->statusCode == 409) {
+            echo 'conflict';
+        }
+
+    }
 }
