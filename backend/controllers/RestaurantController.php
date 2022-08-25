@@ -133,9 +133,13 @@ class RestaurantController extends Controller {
         $store = $this->findModel($id);
 
         //Delete src/environments/environment.develop.ts file
+
         $getDevEnvFile = Yii::$app->githubComponent->getFileSHA('src/environments/environment.develop.ts', $store->store_branch_name);
+
         if ($getDevEnvFile->isOk && $getDevEnvFile->data) {
+
             $deleteDevEnvFile = Yii::$app->githubComponent->deleteFile('src/environments/environment.develop.ts', $getDevEnvFile->data['sha'],  $store->store_branch_name);
+
             if (!$deleteDevEnvFile->isOk){
               Yii::error('[Github > Error While deleting environment.develop.ts]' . json_encode($deleteDevEnvFile->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
               Yii::$app->session->setFlash('errorResponse', json_encode($deleteDevEnvFile->data['message']));
@@ -145,6 +149,7 @@ class RestaurantController extends Controller {
 
         //Delete branch-name.txt file
         $getBranchNameFile = Yii::$app->githubComponent->getFileSHA('branch-name.txt', $store->store_branch_name);
+
         if ($getBranchNameFile->isOk && $getBranchNameFile->data) {
             $deleteBranchNameFile = Yii::$app->githubComponent->deleteFile('branch-name.txt', $getBranchNameFile->data['sha'],  $store->store_branch_name);
             if (!$deleteBranchNameFile->isOk){
@@ -187,17 +192,43 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
           }
 
-
         } else {
           Yii::error('[Github > Error While merging with Master-staging]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
           Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
           return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
 
-
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
     }
 
+    /**
+     * upgrade store
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionUpgrade($id)
+    {
+        $store = $this->findModel($id);
+
+        $response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        if ($response->isOk)
+        {
+            //$store->sitemap_require_update = 1;
+            $store->version = Yii::$app->params['storeVersion'];
+            $store->save(false);
+
+            Yii::$app->session->setFlash('successResponse', "Success: Store will be updated in 2-5 min!");
+        }
+        else
+        {
+            Yii::error('[Github > Error While merging with master]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+            Yii::$app->session->setFlash('errorResponse', json_encode($response->data['message']));
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
 
     /**
      * Update sitemap

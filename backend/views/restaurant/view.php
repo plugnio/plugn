@@ -16,11 +16,22 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="restaurant-view">
     <h1>
         <?= Html::encode($this->title) ?>
-
-
     </h1>
-    <?= Yii::$app->session->getFlash('errorResponse') ? '<h2>'. Yii::$app->session->getFlash('errorResponse') . '</h2>' : '' ?>
 
+    <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
+
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fa fa-ban"></i> Error!</h5>
+        <?= (Yii::$app->session->getFlash('errorResponse')) ?>
+    </div>
+    <?php } elseif (Yii::$app->session->getFlash('successResponse') != null) { ?>
+    <div class="alert alert-success alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fa fa-check"></i> Success!</h5>
+        <?= (Yii::$app->session->getFlash('successResponse')) ?>
+    </div>
+    <?php } ?>
 
     <p>
 
@@ -31,6 +42,8 @@ $this->params['breadcrumbs'][] = $this->title;
          , 'id' => $model->restaurant_uuid], ['class' => $model->hide_request_driver_button == 0 ? 'btn btn-success' : 'btn btn-danger'])
          ?>
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
+
+
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger btn-delete',
@@ -68,6 +81,17 @@ $this->params['breadcrumbs'][] = $this->title;
           ?>
         <?php } ?>
 
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
+            <?=
+            Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to upgrade store to latest codebase?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+        <?php } ?>
 
 
         <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>

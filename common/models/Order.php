@@ -1251,7 +1251,7 @@ class Order extends \yii\db\ActiveRecord
 
 
 
-                      if($this->restaurant->version == 4){
+                      if($this->restaurant->version == 4) {
 
                           $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival))  ));
                           $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival)) ));
