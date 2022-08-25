@@ -427,8 +427,10 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $webhookUrl , $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null)
-    {
+    public function createCharge(
+        $currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee,
+        $redirectUrl, $webhookUrl , $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null
+    ) {
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $phone =  str_replace(' ', '', $phone);
@@ -539,7 +541,6 @@ class TapPayments extends Component
            ];
 
            array_push($chargeParams['destinations']['destination'], $destination);
-
          }
 
          //for debug

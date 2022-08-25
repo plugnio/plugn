@@ -791,35 +791,37 @@ class Order extends \yii\db\ActiveRecord
     //
     // }
 
-
     /**
-     * Update order status to pending
+     * todo: Restock if order cancel
      */
     public function restockItems()
     {
         $orderItems = $this->getOrderItems();
         //$orderItemExtraOptions = $this->getOrderItemExtraOptions();
 
-        foreach ($orderItems->all() as $orderItem) {
-            if (!$orderItem->item_uuid) {
+        foreach ($orderItems->all() as $orderItem)
+        {
+            //if custom item or not tracking
+
+            if (!$orderItem->item || !$orderItem->item->track_quantity) {
                 continue;
             }
+
+            //for simple product
 
             if(!$orderItem->variant) {
 
                 $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
 
                 foreach ($orderItemExtraOptions->all() as $orderItemExtraOption) {
-                    if (
-                        $orderItemExtraOption->order_item_extra_option_id &&
-                        $orderItemExtraOption->order_item_extra_option_id &&
-                        $orderItemExtraOption->extra_option_id
-                    )
+                    if ($orderItemExtraOption->extraOption)
                         $orderItemExtraOption->extraOption->increaseStockQty($orderItem->qty);
                 }
             }
 
             $orderItem->item->increaseStockQty($orderItem->qty);
+
+            //if variant
 
             if ($orderItem->variant) {
                 $orderItem->variant->increaseStockQty($orderItem->qty);
@@ -831,6 +833,48 @@ class Order extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * deduct stock
+     * 1) on payment success
+     * 2) on COD orders
+     * 3) Free checkout
+     */
+    public function deductStock()
+    {
+        $orderItems = $this->getOrderItems()
+            ->with(['item']);
+
+        //$orderItemExtraOptions = $this->getOrderItemExtraOptions();
+
+        foreach ($orderItems->all() as $orderItem)
+        {
+            //if custom item or not tracking
+
+            if (!$orderItem->item || !$orderItem->item->track_quantity) {
+                continue;
+            }
+
+            //for simple product
+
+            if(!$orderItem->variant) {
+
+                $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
+
+                foreach ($orderItemExtraOptions->all() as $orderItemExtraOption) {
+                    if ($orderItemExtraOption->extraOption)
+                        $orderItemExtraOption->extraOption->decreaseStockQty($orderItem->qty);
+                }
+            }
+
+            $orderItem->item->decreaseStockQty($orderItem->qty);
+
+            //if variant
+
+            if ($orderItem->variant) {
+                $orderItem->variant->decreaseStockQty($orderItem->qty);
+            }
+        }
+    }
 
     /**
      * Update order status to pending
@@ -839,6 +883,8 @@ class Order extends \yii\db\ActiveRecord
     {
         $this->order_status = self::STATUS_PENDING;
         $this->save(false);
+
+        $this->deductStock();
 
         $productsList = null;
 
@@ -981,14 +1027,22 @@ class Order extends \yii\db\ActiveRecord
     {
         $totalPrice = $this->calculateOrderItemsTotalPrice();
 
-        if ($totalPrice > 0) {
-            if ($this->voucher) {
-                $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->voucher->discount_amount / 100)) : $this->voucher->discount_amount;
+        if ($totalPrice > 0)
+        {
+            if ($this->voucher)
+            {
+                $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ?
+                    ($totalPrice * ($this->voucher->discount_amount / 100)) : $this->voucher->discount_amount;
+
                 $totalPrice -= $discountAmount;
 
                 $totalPrice = $totalPrice > 0 ? $totalPrice : 0;
-            } else if ($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice) {
-                $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ? ($totalPrice * ($this->bankDiscount->discount_amount / 100)) : $this->bankDiscount->discount_amount;
+            }
+            else if ($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice)
+            {
+                $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ?
+                    ($totalPrice * ($this->bankDiscount->discount_amount / 100)) : $this->bankDiscount->discount_amount;
+
                 $totalPrice -= $discountAmount;
 
                 $totalPrice = $totalPrice > 0 ? $totalPrice : 0;
@@ -996,21 +1050,30 @@ class Order extends \yii\db\ActiveRecord
             }
         }
 
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY && (!$this->voucher || ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY))) {
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY &&
+            (
+                !$this->voucher ||
+                ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)
+            )
+        ) {
             $totalPrice += $this->deliveryZone->delivery_fee;
         }
 
-        if ($this->delivery_zone_id) {
-            if ($this->deliveryZone->delivery_zone_tax) {
+        if ($this->delivery_zone_id)
+        {
+            if ($this->deliveryZone->delivery_zone_tax)
+            {
                 $this->tax = $totalPrice * ($this->deliveryZone->delivery_zone_tax / 100);
                 $totalPrice += $this->tax;
-            } else if ($this->deliveryZone->businessLocation->business_location_tax) {
+            }
+            else if ($this->deliveryZone->businessLocation->business_location_tax)
+            {
                 $this->tax = $totalPrice * ($this->deliveryZone->businessLocation->business_location_tax / 100);
                 $totalPrice += $this->tax;
-
             }
-
-        } else if (!$this->delivery_zone_id && $this->pickup_location_id && $this->pickupLocation->business_location_tax) {
+        }
+        else if (!$this->delivery_zone_id && $this->pickup_location_id && $this->pickupLocation->business_location_tax)
+        {
             $this->tax = $totalPrice * ($this->pickupLocation->business_location_tax / 100);
             $totalPrice += $this->tax;
         }
@@ -1018,6 +1081,10 @@ class Order extends \yii\db\ActiveRecord
         return $totalPrice;
     }
 
+    /**
+     * @return bool
+     * @throws \yii\db\StaleObjectException
+     */
     public function beforeDelete()
     {
         if (!$this->items_has_been_restocked) {
@@ -1045,7 +1112,8 @@ class Order extends \yii\db\ActiveRecord
 
         if (!$this->currency_code) {
 
-            if (!$this->restaurant || !$this->restaurant->currency) {
+            if (!$this->restaurant || !$this->restaurant->currency)
+            {
                 return $this->addError(
                     'currency_code',
                     Yii::t('yii', "{attribute} is invalid.", [
@@ -1338,6 +1406,17 @@ class Order extends \yii\db\ActiveRecord
             //$this->save(false);
         }
 
+        /**
+         * when order status get update from non cancelled to canelled
+         */
+        if (
+            $this->scenario == self::SCENARIO_UPDATE_STATUS &&
+            $this->items_has_been_restocked == false &&
+            $changedAttributes['order_status'] != self::STATUS_CANCELED && $this->order_status == self::STATUS_CANCELED
+        ) {
+            $this->restockItems();
+        }
+
         //Send SMS To customer
 
         if ($this->customer_phone_country_code == 965 && !$insert &&
@@ -1441,73 +1520,6 @@ class Order extends \yii\db\ActiveRecord
                     }
                 }
             }
-        }
-
-        if (
-            !$insert && $this->payment && $this->items_has_been_restocked && isset($changedAttributes['order_status'])
-            && $changedAttributes['order_status'] == self::STATUS_ABANDONED_CHECKOUT
-        ) {
-            $orderItems = $this->getOrderItems();
-
-            foreach ($orderItems->all() as $orderItem) {
-
-                if ($orderItem->item_uuid) {
-
-                    if (($orderItem->item->track_quantity && $orderItem->item->stock_qty >= $orderItem->qty) || !$orderItem->item->track_quantity) {
-                        $orderItemExtraOptions = $orderItem->getOrderItemExtraOptions();
-
-                        if ($orderItemExtraOptions->count() > 0) {
-                            foreach ($orderItemExtraOptions->all() as $orderItemExtraOption) {
-                                if ($orderItemExtraOption->extraOption && $orderItemExtraOption->extraOption->stock_qty >= $orderItemExtraOption->qty)
-                                    $orderItemExtraOption->extraOption->decreaseStockQty($orderItemExtraOption->qty);
-                                else {
-
-                                    if (!$orderItemExtraOption->extraOption) {
-                                        return $this->addError(
-                                            'extraOption',
-                                            Yii::t('yii', "{attribute} is invalid.", [
-                                                'attribute' => Yii::t('app', 'Product Variant is not available anymore')
-                                            ])
-                                        );
-                                    }
-
-                                    if ($orderItemExtraOption->extraOption->stock_qty !== null) {
-
-                                        \Yii::$app->mailer->compose([
-                                            'html' => 'out-of-stock-order-html',
-                                        ], [
-                                            'order' => $this
-                                        ])
-                                            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                                            ->setTo([$this->restaurant->restaurant_email])
-                                            ->setSubject('Order #' . $this->order_uuid)
-                                            ->send();
-                                    }
-                                }
-                            }
-                        }
-
-                        $orderItem->item->decreaseStockQty($orderItem->qty);
-
-                        if($orderItem->variant)
-                            $orderItem->variant->decreaseStockQty($orderItem->qty);
-
-                    } else {
-                        \Yii::$app->mailer->compose([
-                            'html' => 'out-of-stock-order-html',
-                        ], [
-                            'order' => $this
-                        ])
-                            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
-                            ->setTo([$this->restaurant->restaurant_email])
-                            ->setSubject('Order #' . $this->order_uuid)
-                            ->send();
-                    }
-                }
-            }
-
-            $this->items_has_been_restocked = false;
-            //$this->save(false);
         }
 
         if (!$insert && $this->customer_id) {
