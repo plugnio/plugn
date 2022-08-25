@@ -111,6 +111,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property string|null $annual_revenue
  * @property boolean $demand_delivery
  * @property number $custom_subscription_price
+ * @property boolean $is_sandbox
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts

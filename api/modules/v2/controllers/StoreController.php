@@ -14,7 +14,6 @@ use yii\web\NotFoundHttpException;
 
 class StoreController extends Controller
 {
-
     public function behaviors()
     {
         $behaviors = parent::behaviors();
