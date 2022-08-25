@@ -1,6 +1,7 @@
 <?php
 return [
-    "Mail settings updated successfully" => "",
+    "Mail settings updated successfully" => "تم تحديث إعدادات البريد بنجاح",
+    "Store will be updated in 2-5 min!" => "سيتم تحديث المتجر في 2-5 دقائق!",
     "This email verification link is no longer valid, please login to send a new one" => "لم يعد رابط التحقق من البريد الإلكتروني هذا صالحًا ، يرجى تسجيل الدخول لإرسال رابط جديد",
     "Please click on the link sent to you by email to verify your account" => "الرجاء النقر فوق الارتباط المرسل إليك عبر البريد الإلكتروني للتحقق من حسابك",
     "You have verified your email" => "لقد تحققت من بريدك الإلكتروني",
@@ -8,7 +9,7 @@ return [
     "You reached your limit to verify email. Please try again after an hour." => "لقد وصلت إلى الحد الخاص بك للتحقق من البريد الإلكتروني. يرجى المحاولة مرة أخرى بعد ساعة.",
     "Sorry, we are unable to reset a password for email provided." => "عذرًا ، لا يمكننا إعادة تعيين كلمة المرور للبريد الإلكتروني المقدم.",
     "Email was sent previously, you may request another one in {numMinutes, number} minutes and {numSeconds, number} seconds" => "تم إرسال بريد إلكتروني سابقًا ، يمكنك طلب بريد آخر في {numMinutes, number} دقيقة و {numSeconds, number} ثانية",
-    'Invalid email verification code.' => "",
+    'Invalid email verification code.' => "رمز التحقق من البريد الإلكتروني غير صالح.",
     "Language Preferency Updated Successfully" => "تم تحديث تفضيل اللغة بنجاح",
     "Email not found" => "البريد الإلكتروني غير موجود",
     "Password not matching" => "كلمة المرور غير متطابقة",
