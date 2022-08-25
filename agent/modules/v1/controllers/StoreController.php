@@ -249,6 +249,34 @@ class StoreController extends Controller
     }
 
     /**
+     * upgrade store
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionUpgrade()
+    {
+        $store = $this->findModel();
+
+        $response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        if ($response->isOk)
+        {
+            //$store->sitemap_require_update = 1;
+            $store->version = Yii::$app->params['storeVersion'];
+            $store->save(false);
+
+            return self::message("success","Store will be updated in 2-5 min!");
+        }
+
+        Yii::error('[Github > Error While merging with master]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            return [
+                'operation' => 'error',
+                'message' => $response->data['message']
+            ];
+    }
+
+    /**
      * Enable payment method
      * @return mixed
      */

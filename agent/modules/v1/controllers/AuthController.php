@@ -180,7 +180,7 @@ class AuthController extends Controller {
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
         $store = new Restaurant();
-        $store->version = 3;
+        $store->version = Yii::$app->params['storeVersion'];
         $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
         $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
         $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
