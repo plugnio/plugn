@@ -151,6 +151,10 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         }
     }
 
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave ($insert, $changedAttributes);
