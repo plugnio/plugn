@@ -51,6 +51,9 @@ return [
         'config' => [
             'class' => 'common\components\Config'
         ],
+        'auth0' => [
+            'class' => 'common\components\Auth0',
+        ],
         'temporaryBucketResourceManager' => [
             'class' => 'common\components\S3ResourceManager',
             'region' => 'eu-west-2', // Bucket based in London

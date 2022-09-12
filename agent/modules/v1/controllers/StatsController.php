@@ -145,7 +145,7 @@ class StatsController extends Controller
 
                 $sold_item_data = $store->getTotalSoldItemsByMonths(2);
 
-                break;
+                break; 
 
             case 'last-3-months':
                 $customer_data = $store->getTotalCustomersByMonths(3);
