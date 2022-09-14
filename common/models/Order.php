@@ -82,7 +82,7 @@ use yii\web\BadRequestHttpException;
  * @property boolean $reminder_sent
  * @property boolean estimated_time_of_arrival
  * @property string $diggipack_awb_no
- *
+ * @property boolean $is_sandbox
  * @property Area
  * @property BankDiscount $bankDiscount
  * @property Country $country
@@ -899,7 +899,7 @@ class Order extends \yii\db\ActiveRecord
             ];
         }
 
-        if (YII_ENV == 'prod') {
+        if (YII_ENV == 'prod' && !$this->is_sandbox) {
 
             $plugn_fee = 0;
             $payment_gateway_fee = 0;
@@ -1110,6 +1110,10 @@ class Order extends \yii\db\ActiveRecord
             return false;
         }
 
+        if($insert) {
+            $this->is_sandbox = $this->restaurant->is_sandbox;
+        }
+
         if (!$this->currency_code) {
 
             if (!$this->restaurant || !$this->restaurant->currency)
@@ -1247,7 +1251,7 @@ class Order extends \yii\db\ActiveRecord
 
 
 
-                      if($this->restaurant->version == 4){
+                      if($this->restaurant->version == 4) {
 
                           $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival))  ));
                           $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival)) ));

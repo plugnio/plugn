@@ -1659,7 +1659,7 @@ class SiteController extends Controller
         $this->layout = 'login';
 
         $store = new Restaurant();
-        $store->version = 3;
+        $store->version = Yii::$app->params['storeVersion'];
         $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent = new Agent();

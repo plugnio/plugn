@@ -116,6 +116,7 @@ class StoreController extends Controller
 
         $store->setScenario(Restaurant::SCENARIO_UPDATE);
 
+        $store->is_sandbox = Yii::$app->request->getBodyParam('is_sandbox');
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
         $store->phone_number_country_code = (int) Yii::$app->request->getBodyParam('mobile_country_code');
@@ -245,6 +246,34 @@ class StoreController extends Controller
             ->all();
 
         return ArrayHelper::map($settings, 'key', 'value');
+    }
+
+    /**
+     * upgrade store
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionUpgrade()
+    {
+        $store = $this->findModel();
+
+        $response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        if ($response->isOk)
+        {
+            //$store->sitemap_require_update = 1;
+            $store->version = Yii::$app->params['storeVersion'];
+            $store->save(false);
+
+            return self::message("success","Store will be updated in 2-5 min!");
+        }
+
+        Yii::error('[Github > Error While merging with master]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            return [
+                'operation' => 'error',
+                'message' => $response->data['message']
+            ];
     }
 
     /**
