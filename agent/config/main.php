@@ -514,6 +514,7 @@ return [
                     'patterns' => [
                         'GET login' => 'login',
                         'POST signup-step-one' => 'signup-step-one',
+                        'POST login-auth0' => 'login-auth0',
                         'POST signup' => 'signup',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
@@ -523,6 +524,7 @@ return [
                         'POST verify-email' => 'verify-email',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
+                        'OPTIONS login-auth0' => 'options',
                         'OPTIONS update-password' => 'options',
                         'OPTIONS request-reset-password' => 'options',
                         'OPTIONS signup' => 'options',
