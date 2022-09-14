@@ -322,9 +322,14 @@ class OrderController extends Controller
                 $payment->payment_mode = $order->paymentMethod->source_id;
                 $payment->payment_gateway_name = 'tap';
 
-                if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
+                if (
+                    $payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD &&
+                    Yii::$app->request->getBodyParam("payment_token") &&
+                    Yii::$app->request->getBodyParam("bank_name")
+                ) {
 
                     Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+
                     $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
 
                     $responseContent = json_decode($response->content);
