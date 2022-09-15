@@ -159,12 +159,14 @@ class Order extends \yii\db\ActiveRecord
             [['customer_name', 'order_mode', 'total_price', 'subtotal',
                 'order_mode', 'restaurant_uuid', 'payment_method_id',
                 'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
+
             [['is_order_scheduled'], 'required', 'on' => 'create'],
             [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted'], 'integer', 'min' => 0],
             [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'pickup_location_id'], 'integer'],
+
             ['mashkor_order_status', 'in', 'range' => [
                 self::MASHKOR_ORDER_STATUS_NEW,
                 self::MASHKOR_ORDER_STATUS_CONFIRMED,
@@ -185,14 +187,21 @@ class Order extends \yii\db\ActiveRecord
             ['order_status', 'in', 'range' => [self::STATUS_PENDING, self::STATUS_BEING_PREPARED, self::STATUS_OUT_FOR_DELIVERY, self::STATUS_COMPLETE, self::STATUS_REFUNDED, self::STATUS_PARTIALLY_REFUNDED, self::STATUS_CANCELED, self::STATUS_DRAFT, self::STATUS_ABANDONED_CHECKOUT, self::STATUS_ACCEPTED]],
 
             ['order_mode', 'in', 'range' => [self::ORDER_MODE_DELIVERY, self::ORDER_MODE_PICK_UP]],
+
             ['pickup_location_id', function ($attribute, $params, $validator) {
                 if (!$this->pickup_location_id && $this->order_mode == Order::ORDER_MODE_PICK_UP)
                     $this->addError($attribute, Yii::t('app', 'Branch name cannot be blank.'));
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
 
             ['delivery_zone_id', function ($attribute, $params, $validator) {
-                if (!$this->delivery_zone_id && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+
+                if($this->order_mode != Order::ORDER_MODE_DELIVERY) {
+                    return true;
+                }
+
+                if (!$this->delivery_zone_id)
                     $this->addError($attribute, Yii::t('app', 'Delivery zone cannot be blank.'));
+
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
 
             [['scheduled_time_start_from', 'scheduled_time_to'], function ($attribute, $params, $validator) {
@@ -302,16 +311,21 @@ class Order extends \yii\db\ActiveRecord
             [['civil_id', 'section', 'class'], 'string', 'max' => 255], //Temp var
 
             [['mashkor_order_number', 'mashkor_tracking_link', 'mashkor_driver_name', 'mashkor_driver_phone'], 'string', 'max' => 255],
-            [['delivery_zone_id'], 'exist', 'skipOnError' => false, 'targetClass' => DeliveryZone::className(), 'targetAttribute' => ['delivery_zone_id' => 'delivery_zone_id']],
+
+            [['delivery_zone_id'], 'exist', 'skipOnError' => false, 'targetClass' => DeliveryZone::className(),
+                'targetAttribute' => ['delivery_zone_id' => 'delivery_zone_id', 'restaurant_uuid']],
             [['shipping_country_id'], 'exist', 'skipOnError' => false, 'targetClass' => Country::className(), 'targetAttribute' => ['shipping_country_id' => 'country_id']],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['bank_discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => BankDiscount::className(), 'targetAttribute' => ['bank_discount_id' => 'bank_discount_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => false, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
-            [['restaurant_branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => RestaurantBranch::className(), 'targetAttribute' => ['restaurant_branch_id' => 'restaurant_branch_id']],
-            [['pickup_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(), 'targetAttribute' => ['pickup_location_id' => 'business_location_id']],
-            [['voucher_id'], 'exist', 'skipOnError' => true, 'targetClass' => Voucher::className(), 'targetAttribute' => ['voucher_id' => 'voucher_id']],
+            [['restaurant_branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => RestaurantBranch::className(),
+                'targetAttribute' => ['restaurant_branch_id' => 'restaurant_branch_id', 'restaurant_uuid']],
+            [['pickup_location_id'], 'exist', 'skipOnError' => true, 'targetClass' => BusinessLocation::className(),
+                'targetAttribute' => ['pickup_location_id' => 'business_location_id', 'restaurant_uuid']],
+            [['voucher_id'], 'exist', 'skipOnError' => true, 'targetClass' => Voucher::className(),
+                'targetAttribute' => ['voucher_id' => 'voucher_id', 'restaurant_uuid']],
         ];
     }
 
@@ -519,7 +533,13 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateArea($attribute)
     {
-        if (!AreaDeliveryZone::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'area_id' => $this->area_id, 'delivery_zone_id' => $this->delivery_zone_id])->one())
+        $model = AreaDeliveryZone::find()->where([
+            'restaurant_uuid' => $this->restaurant_uuid,
+            'area_id' => $this->area_id,
+            'delivery_zone_id' => $this->delivery_zone_id
+        ])->one();
+
+        if (!$model)
             $this->addError($attribute, Yii::t('app',"Store does not deliver to this delivery zone."));
     }
 
@@ -539,7 +559,7 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateCountry($attribute)
     {
-        return true;
+        return true;//todo: why?
         $areaDeliveryZone = AreaDeliveryZone::find()->where(['country_id' => $this->shipping_country_id, 'delivery_zone_id' => $this->delivery_zone_id])->one();
 
         if (!$areaDeliveryZone || $areaDeliveryZone->area_id != null || ($areaDeliveryZone && $areaDeliveryZone->businessLocation->restaurant_uuid != $this->restaurant_uuid))
@@ -556,7 +576,7 @@ class Order extends \yii\db\ActiveRecord
             $this->addError($attribute, Yii::t('app', "Store doesn't accept delivery"));
         }
 
-        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && $this->pickup_location_id && !$this->pickupLocation->support_pick_up) {
+        else if ($this->$attribute == static::ORDER_MODE_PICK_UP && $this->pickup_location_id && $this->pickupLocation && !$this->pickupLocation->support_pick_up) {
             $this->addError($attribute, Yii::t('app', "Store doesn't accept pick up"));
         }
     }
@@ -1110,8 +1130,27 @@ class Order extends \yii\db\ActiveRecord
             return false;
         }
 
-        if($insert) {
+        if($insert)
+        {
             $this->is_sandbox = $this->restaurant->is_sandbox;
+
+            if($this->order_mode == Order::ORDER_MODE_DELIVERY) {
+
+                $isExists = $this->restaurant->getDeliveryZones()->andWhere(['delivery_zone_id' => $this->delivery_zone_id])->exists();
+
+                if (!$isExists)
+                    return $this->addError('delivery_zone_id', Yii::t('app', 'Store not delivering to this area.'));
+            }
+
+            if($this->order_mode == Order::ORDER_MODE_PICK_UP) {
+
+                $isExists = $this->restaurant->getPickupBusinessLocations()
+                    ->andWhere(['business_location_id' => $this->pickup_location_id])
+                    ->exists();
+
+                if (!$isExists)
+                    return $this->addError('pickup_location_id', Yii::t('app', 'Store not delivering to this area.'));
+            }
         }
 
         if (!$this->currency_code) {
@@ -1694,6 +1733,7 @@ class Order extends \yii\db\ActiveRecord
     public function getDeliveryZone($modelClass = "\common\models\DeliveryZone")
     {
         return $this->hasOne($modelClass::className(), ['delivery_zone_id' => 'delivery_zone_id']);
+            //->andWhere(['delivery_zone.is_deleted' => 0]);
     }
 
     /**
@@ -1877,6 +1917,7 @@ class Order extends \yii\db\ActiveRecord
     public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
         return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])
+            ->andWhere(['business_location.is_deleted' => 0])
             ->via('deliveryZone');
     }
 

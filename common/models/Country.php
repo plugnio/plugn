@@ -86,7 +86,8 @@ class Country extends \yii\db\ActiveRecord
      */
     public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id'])
+            ->andWhere(['delivery_zone.is_deleted' => 0]);
     }
 
     /**

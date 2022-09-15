@@ -148,7 +148,8 @@ class DeliveryZone extends \yii\db\ActiveRecord
      */
     public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id']);
+        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])
+            ->andWhere(['business_location.is_deleted' => 0]);
     }
 
     /**

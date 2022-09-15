@@ -115,10 +115,7 @@ class DeliveryZoneController extends Controller {
 
             }
 
-
-
             return array_values($shipping_countries);
-
 
         } else {
             return [

@@ -83,7 +83,7 @@ return [
     'recipient_name' => $faker->firstName,
     'recipient_phone_number' => $faker->phoneNumber,
     'gift_message' => $faker->sentence,
-    'is_deleted' => 1,
+    'is_deleted' => 0,
     'sender_name' => $faker->name(),
     'diggipack_awb_no' => 'AWS234234234',
     'diggipack_order_status' => '1'
