@@ -61,7 +61,7 @@ class ItemController extends Controller {
 
       $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
 
-      if($restaurant_uuid){
+      if($restaurant_uuid) {
 
           $filter = $category_id? [
               'category.restaurant_uuid' => $restaurant_uuid,
@@ -119,7 +119,8 @@ class ItemController extends Controller {
                 item.sort_number IS NULL,
                 item.sort_number ASC,
                 item.sku IS NULL,
-                item.sku ASC')]);
+                item.sku ASC')
+            ]);
 
         if($keyword) {
             $query->filterKeyword($keyword);
@@ -202,7 +203,7 @@ class ItemController extends Controller {
         if(!$expand)
         {
             $item_model = Item::find()
-                ->andWhere(['item_uuid' => $item_uuid])
+                ->andWhere(['item_uuid' => $item_uuid, 'item_status' => Item::ITEM_STATUS_PUBLISH])
                 ->with('options', 'options.extraOptions','itemImages')
                 ->asArray()
                 ->one();
@@ -228,7 +229,9 @@ class ItemController extends Controller {
      */
     public function actionView($slug)
     {
-        return $this->findBySlug($slug);
+        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+
+        return $this->findBySlug($slug, $restaurant_uuid);
     }
 
     /**
@@ -240,16 +243,32 @@ class ItemController extends Controller {
      */
     protected function findModel($id)
     {
-        if (($model = Item::findOne($id)) !== null) {
+        $model = Item::findOne(['item_uuid' => $id, 'item_status' => Item::ITEM_STATUS_PUBLISH]);
+
+        if ($model !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    protected function findBySlug($slug)
+    /**
+     * @param $slug
+     * @return Item
+     * @throws NotFoundHttpException
+     */
+    protected function findBySlug($slug, $restaurant_uuid = null)
     {
-        if (($model = Item::findOne(['slug' => $slug])) !== null) {
+        $query = Item::find()
+            ->andWhere(['slug' => $slug, 'item_status' => Item::ITEM_STATUS_PUBLISH]);
+
+        if($restaurant_uuid) {
+            $query->andWhere(['restaurant_uuid' => $restaurant_uuid]);
+        }
+
+        $model = $query->one();
+
+        if ($model !== null) {
             return $model;
         }
 
