@@ -106,7 +106,8 @@ class OrderController extends Controller {
             }
 
             //if the order mode = 1 => Delivery
-            if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
+            if ($order->order_mode == Order::ORDER_MODE_DELIVERY)
+            {
                 $order->area_id = Yii::$app->request->getBodyParam("area_id");
 
                 if($order->area_id && $areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' =>  $order->area_id])->one())

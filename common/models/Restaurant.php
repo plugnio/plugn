@@ -2599,7 +2599,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getCountryDeliveryZones($countryId, $modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->where (['country_id' => $countryId]);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->where (['country_id' => $countryId, 'delivery_zone.is_deleted' => 0]);
     }
 
     /**
@@ -2609,7 +2610,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getBusinessLocations($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere(['business_location.is_deleted' => 0]);
     }
 
     /**
@@ -2620,7 +2622,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getPickupBusinessLocations($modelClass = "\common\models\BusinessLocation")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere (['support_pick_up' => 1]);
+            ->andWhere (['support_pick_up' => 1, 'business_location.is_deleted' => 0]);
     }
 
     /**
@@ -2630,7 +2632,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere(['delivery_zone.is_deleted' => 0]);
     }
 
     // /**
@@ -2641,6 +2644,7 @@ class Restaurant extends \yii\db\ActiveRecord
     // public function getDeliveryZonesForSpecificCountry($countryId)
     // {
     //   return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
+    //       ->andWhere(['delivery_zone.is_deleted' => 0]);
     //       ->viaTable('business_location', ['restaurant_uuid' => 'restaurant_uuid']);
     // }
 
