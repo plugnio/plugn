@@ -188,7 +188,6 @@ class MyFatoorahPayment extends Component
         parent::init();
     }
 
-
       /**
        * Set the api keys to use
        * @param  [type] $currency [description]
