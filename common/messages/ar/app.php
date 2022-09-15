@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    'Store not delivering to this area.' => "المتجر لا يسلم لهذه المنطقة.",
     "Custom Subscription Price" => "سعر الاشتراك المخصص",
     "Please verify email to use it" => "يرجى التحقق من البريد الإلكتروني لاستخدامه",
     "Ticket comment added successfully" => "تمت إضافة تعليق التذكرة بنجاح",

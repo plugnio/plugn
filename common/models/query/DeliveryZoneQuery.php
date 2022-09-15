@@ -25,6 +25,8 @@ class DeliveryZoneQuery extends \yii\db\ActiveQuery {
      */
     public function one($db = null)
     {
+        //todo: $this->andWhere(['delivery_zone.is_deleted' => 0]);
+
         return parent::one($db);
     }
 }
