@@ -132,7 +132,8 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
      */
     public function getDeliveryZone($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasOne($modelClass::className(), ['delivery_zone_id' => 'delivery_zone_id']);
+        return $this->hasOne($modelClass::className(), ['delivery_zone_id' => 'delivery_zone_id'])
+            ->andWhere(['delivery_zone.is_deleted' => 0]);
     }
 
     /**
@@ -142,7 +143,9 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
      */
     public function getBusinessLocation($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])->via('deliveryZone');
+        return $this->hasOne($modelClass::className(), ['business_location_id' => 'business_location_id'])
+            ->andWhere(['business_location.is_deleted' => 0])
+            ->via('deliveryZone');
     }
 
     /**
