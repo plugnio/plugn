@@ -113,6 +113,8 @@ class Option extends \yii\db\ActiveRecord {
             if($model->max_qty == 0) {
                 $model->max_qty = 1;//to unhide options for old stores
             }
+
+            return $model->max_qty;
         };
 
         return $fields;
