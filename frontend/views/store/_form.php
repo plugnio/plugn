@@ -153,21 +153,28 @@ $this->registerJs($js);
         </div>
 
         <div class="row">
-            <!-- todo: confusing for vendor so removing
+
           <div class="col-12 col-sm-3 col-lg-3">
 
               <?php
-            /*
-              $form->field($model, 'demand_delivery', [
-                  'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Enable on demand delivery</span>{input}<label class='custom-control-label' for='toggle_demand_delivery'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+              /*$form->field($model, 'demand_delivery', [
+                  'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Accept order 24/7</span>{input}<label class='custom-control-label' for='toggle_demand_delivery'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
               ])->checkbox([
                   'checked' => $model->demand_delivery == 0 ? false : true,
                   'id' => 'toggle_demand_delivery',
                   'class' => 'custom-control-input'
-                      ], false)->label(false) */
+              ], false)->label(false)*/
+
+              $form->field($model, 'accept_order_247', [
+                  'template' => "<div class='custom-control custom-switch custom-control-inline'><span style='margin-right: 10px;padding: 0px; display: block;' class='switch-label'>Accept order 24/7</span>{input}<label class='custom-control-label' for='toggle_accept_order_247'> </label></div>\n<div class=\"col-lg-8\">{error}</div>",
+              ])->checkbox([
+                  'checked' => $model->demand_delivery == 0 ? false : true,
+                  'id' => 'toggle_accept_orrder',
+                  'class' => 'custom-control-input'
+              ], false)->label(false)
               ?>
 
-          </div>-->
+          </div>
 
           <div class="col-12 col-sm-3 col-lg-3">
 
