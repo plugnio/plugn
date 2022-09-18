@@ -62,7 +62,6 @@ class RestaurantController extends Controller {
      */
     public function actionGetOpeningHours() {
 
-
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
         $area_id = Yii::$app->request->get("area_id");
 
