@@ -112,6 +112,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property boolean $demand_delivery
  * @property number $custom_subscription_price
  * @property boolean $is_sandbox
+ * @property boolean $accept_order_247
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -226,6 +227,7 @@ class Restaurant extends \yii\db\ActiveRecord
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [['not_for_profit'], 'number'],
+            
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             ['owner_email', 'email'],
             ['iban', 'safe'],
@@ -515,6 +517,8 @@ class Restaurant extends \yii\db\ActiveRecord
             'test_api_key' => Yii::t('app','Test secret key'),
             'default_language' => Yii::t('app','Default Language'),
             'custom_subscription_price'  => Yii::t('app','Custom Subscription Price'),
+            //'demand_delivery' => Yii::t('app','Accept order 24/7')
+            'accept_order_247' => Yii::t('app','Accept order 24/7')
         ];
     }
 
@@ -1403,8 +1407,10 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function isOpen($asap = null) {
 
-       // if(!$this->demand_delivery)
-       //   return false;
+        //always open
+
+        if($this->demand_delivery)
+          return true;
 
         $opening_hour_model = OpeningHour::find()
                                 ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
