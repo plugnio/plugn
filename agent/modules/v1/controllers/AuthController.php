@@ -265,7 +265,8 @@ class AuthController extends Controller {
         $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
         $store->country_id = Yii::$app->request->getBodyParam ('country_id');
         $store->currency_id = Yii::$app->request->getBodyParam('currency');
-
+        $store->accept_order_247 = Yii::$app->request->getBodyParam('accept_order_247');
+        
         $store->annual_revenue= Yii::$app->request->getBodyParam ('annual_revenue');
 
         $store->restaurant_email = $agent->agent_email;

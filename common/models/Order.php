@@ -742,7 +742,7 @@ class Order extends \yii\db\ActiveRecord
             ], [
                 'order' => $this
             ])
-                ->setFrom([$fromEmail => $this->restaurant->name])
+                ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                 ->setTo($this->customer_email)
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                 ->setReplyTo($replyTo)
@@ -758,7 +758,7 @@ class Order extends \yii\db\ActiveRecord
                 ], [
                     'order' => $this
                 ])
-                    ->setFrom([$fromEmail => $this->restaurant->name])
+                    ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                     ->setTo($agentAssignment->agent->agent_email)
                     ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                     ->setReplyTo($replyTo)
@@ -773,7 +773,7 @@ class Order extends \yii\db\ActiveRecord
                 ], [
                     'order' => $this
                 ])
-                ->setFrom([$fromEmail => $this->restaurant->name])
+                ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                 ->setTo($this->restaurant->restaurant_email)
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
                 ->setReplyTo($replyTo)
