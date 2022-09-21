@@ -458,7 +458,7 @@ use common\models\BankDiscount;
                                                                                     <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">Paid by: <?= $order->payment_method_name ?></div>
                                                                                 </td>
                                                                             </tr>
-                                                                            <?php if ($order->payment_method_id != 3) { ?>
+                                                                            <?php if ($order->payment && $order->payment_method_id != 3) { ?>
                                                                                 <tr>
                                                                                     <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
                                                                                         <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">

@@ -315,6 +315,7 @@ class Item extends \yii\db\ActiveRecord
         parent::afterSave($insert, $changedAttributes);
 
         if ($insert || isset($changedAttributes['item_name'])) {
+
             if ($this->restaurant->sitemap_require_update == 0) {
                 $this->restaurant->sitemap_require_update = 1;
 
