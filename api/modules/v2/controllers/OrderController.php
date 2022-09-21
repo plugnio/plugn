@@ -919,7 +919,6 @@ class OrderController extends Controller
         $transaction = Yii::$app->request->getBodyParam("transaction");
         $acquirer = Yii::$app->request->getBodyParam("acquirer");
 
-
         if ($currency_mode = Currency::find()->where(['code' => $currency])->one())
             $decimal_place = $currency_mode->decimal_place;
         else
@@ -940,20 +939,24 @@ class OrderController extends Controller
 
         $isValidSignature = true;
 
-
         //Check If Enabled Secret Key and If The header has request
         if ($headerSignature != null) {
 
             $response_message = null;
 
-            if (isset($acquirer)) {
-                if (isset($acquirer['response']))
+            if (isset($acquirer))
+            {
+                if (
+                    isset($acquirer['response']) &&
+                    isset($acquirer['response']['message'])
+                )
                     $response_message = $acquirer['response']['message'];
-            } else {
-                if (isset($response))
+            }
+            else
+            {
+                if (isset($response) && isset($response['message']))
                     $response_message = $response['message'];
             }
-
 
             $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
 
