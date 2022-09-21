@@ -423,23 +423,29 @@ class CronController extends \yii\console\Controller
         }
     }
 
+    /**
+     * update sitemap for search engines
+     * @return false|int
+     */
     public function actionUpdateSitemap()
     {
         $stores = Restaurant::find()
             ->andWhere(['sitemap_require_update' => 1])
-            ->andWhere(['or',
+            /*->andWhere(['or',
                 ['version' => 2],
                 ['version' => 3],
                 ['version' => 4]
             ])
             ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])//todo: extra load on server just for 1 store?
+            */
             ->all();
 
         foreach ($stores as $key => $store) {
 
-                if ($store && $store->getItems()->count() > 0) {
+                if ($store) {//&& $store->getItems()->count() > 0
 
                     $dirName = "store";
+
                     if (!file_exists($dirName))
                         $createStoreFolder = mkdir($dirName);
 
@@ -451,7 +457,6 @@ class CronController extends \yii\console\Controller
 
                     fwrite($sitemap, Yii::$app->fileGeneratorComponent->createSitemapXml($store->restaurant_uuid));
                     fclose($sitemap);
-
 
                     //Create sitemap.xml file
                     $fileToBeUploaded = file_get_contents("store/" . $store->store_branch_name . "/sitemap.xml");
@@ -468,9 +473,14 @@ class CronController extends \yii\console\Controller
 
                         if ($commitSitemapXmlFileResponse->isOk) {
 
+                            Restaurant::updateAll([
+                                'sitemap_require_update' => 0
+                            ], [
+                                'restaurant_uuid' => $this->restaurant_uuid
+                            ]);
 
-                            $store->sitemap_require_update = 0;
-                            $store->save(false);
+                            //$store->sitemap_require_update = 0;
+                            //$store->save(false);
 
                             //Delete sitemap file
                             $dirPath = "store/" . $store->store_branch_name;
@@ -509,9 +519,12 @@ class CronController extends \yii\console\Controller
     public function actionMakeRefund()
     {
         $refunds = Refund::find()
-            ->joinWith(['store', 'payment', 'currency'])
+            ->joinWith(['store', 'payment', 'currency', 'order'])
             ->where(['refund.refund_reference' => null])
-            ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
+            ->andWhere([
+                'order.is_deleted' => 0,
+                'payment.payment_current_status' => 'CAPTURED'
+            ])
             ->andWhere(['NOT', ['refund.payment_uuid' => null]])
             ->andWhere(new Expression('refund_status IS NULL OR refund_status="" or refund_status = "Initiated"'))
             ->all();
@@ -519,6 +532,7 @@ class CronController extends \yii\console\Controller
         foreach ($refunds as $refund) {
 
             // in case order is deleted but still exist
+
             if (!$refund->payment) {
                 Yii::error('Refund Error > Payment id not found for refund id (' . $refund->refund_id. '): ');
                 continue;

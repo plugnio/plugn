@@ -106,7 +106,6 @@ class NetlifyComponent extends Component {
         return $response;
     }
 
-
     /**
      *  Provision SSL for a site
      * @param type $site_id

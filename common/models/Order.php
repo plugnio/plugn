@@ -696,8 +696,18 @@ class Order extends \yii\db\ActiveRecord
     /**
      * @return void
      */
-    public function sendPaymentConfirmationEmail()
+    public function sendPaymentConfirmationEmail($payment = null)
     {
+        if(!$payment) {
+            $payment = Payment::find()
+                ->andWhere ([
+                    'order_uuid' => $this->order_uuid,
+                    'received_callback' => true
+                ])
+                ->orderBy('payment_updated_at DESC')
+                ->one();
+        }
+
         $replyTo = [];
         if ($this->restaurant->restaurant_email) {
             $replyTo = [
@@ -740,7 +750,8 @@ class Order extends \yii\db\ActiveRecord
             \Yii::$app->mailer->compose([
                 'html' => 'payment-confirm-html',
             ], [
-                'order' => $this
+                'order' => $this,
+                'payment' => $payment
             ])
                 ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                 ->setTo($this->customer_email)
