@@ -725,6 +725,14 @@ class ItemController extends Controller
         $start_date = Yii::$app->request->get('start_date');
         $end_date = Yii::$app->request->get('end_date');
 
+        if(!$start_date) {
+            $start_date = Yii::$app->request->get('from');
+        }
+
+        if(!$end_date) {
+            $end_date = Yii::$app->request->get('to');
+        }
+        
             $query = \agent\models\Item::find()
                 ->joinWith(['orderItems', 'orderItems.order'])
                 ->andWhere ([
