@@ -215,7 +215,7 @@ class RestaurantController extends Controller {
 
         if ($response->isOk)
         {
-            //$store->sitemap_require_update = 1;
+            $store->sitemap_require_update = 1;
             $store->version = Yii::$app->params['storeVersion'];
             $store->save(false);
 

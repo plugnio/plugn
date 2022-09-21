@@ -324,10 +324,8 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
         $paymentRecord->response_message = $response_message;
 
-
         // On Successful Payments
         if ($status == 'CAPTURED') {
-
 
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
@@ -345,8 +343,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                     $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
             }
 
-
-
             // Update payment method used and the order id assigned to it
             if (isset($source->payment_method) && $source->payment_method)
                 $paymentRecord->payment_mode = $source->payment_method;
@@ -363,17 +359,11 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
-                    print_r($responseContent, true), __METHOD__);
+                $response_message, __METHOD__);
         }
-
-
 
         return $paymentRecord;
     }
-
-
-
-
 
     /**
      * @return \yii\db\ActiveQuery
