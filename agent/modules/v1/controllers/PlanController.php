@@ -352,7 +352,13 @@ class PlanController extends Controller
                 }
             }
 
-            $paymentRecord = \common\models\SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+            $paymentRecord = \common\models\SubscriptionPayment::updatePaymentStatus(
+                $charge_id,
+                $status,
+                $destinations,
+                $source,
+                $response_message
+            );
 
             $paymentRecord->received_callback = true;
 
