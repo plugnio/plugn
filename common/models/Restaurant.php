@@ -1409,7 +1409,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         //always open
 
-        if($this->demand_delivery)
+        if($this->accept_order_247)
           return true;
 
         $opening_hour_model = OpeningHour::find()
