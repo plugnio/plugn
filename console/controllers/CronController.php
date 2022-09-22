@@ -476,7 +476,7 @@ class CronController extends \yii\console\Controller
                             Restaurant::updateAll([
                                 'sitemap_require_update' => 0
                             ], [
-                                'restaurant_uuid' => $this->restaurant_uuid
+                                'restaurant_uuid' => $store->restaurant_uuid
                             ]);
 
                             //$store->sitemap_require_update = 0;
