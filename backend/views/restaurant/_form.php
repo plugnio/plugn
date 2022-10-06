@@ -316,7 +316,13 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'test_public_key')->textInput() ?>
 
     <?= $form->field($model, 'custom_subscription_price')->textInput() ?>
-    
+
+    <?= $form->field($model, 'is_public')->checkbox(['checked' => $model->is_public > 0,  'value' => true]) ?>
+
+    <?= $form->field($model, 'is_sandbox')->checkbox(['checked' => $model->is_sandbox > 0,  'value' => true]) ?>
+
+    <?= $form->field($model, 'accept_order_247')->checkbox(['checked' => $model->accept_order_247 > 0,  'value' => true]) ?>
+
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

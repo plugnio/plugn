@@ -180,20 +180,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::img($data->getRestaurantLogoUrl());
                 },
             ],
-            // [
-            //     'label' => 'Support Delivery',
-            //     'value' => function ($data) {
-            //         return $data->support_delivery ? 'Yes' : 'No';
-            //     },
-            //     'format' => 'raw'
-            // ],
-            // [
-            //     'label' => 'Support Pick up',
-            //     'value' => function ($data) {
-            //         return $data->support_pick_up ? 'Yes' : 'No';
-            //     },
-            //     'format' => 'raw'
-            // ],
+            [
+                 'label' => 'Support Delivery',
+                 'value' => function ($data) {
+                     return $data->support_delivery ? 'Yes' : 'No';
+                 },
+                 'format' => 'raw'
+            ],
+            [
+                 'label' => 'Support Pick up',
+                 'value' => function ($data) {
+                     return $data->support_pick_up ? 'Yes' : 'No';
+                 },
+                 'format' => 'raw'
+            ],
             'phone_number',
             'restaurant_email:email',
             'restaurant_email_notification',
@@ -241,6 +241,64 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'store_branch_name',
             'custom_css:text',
+
+            'currency_id',
+            'country_id',
+
+            'meta_title',
+            'meta_title_ar',
+
+            'meta_description',
+            'meta_description_ar',
+
+            'phone_number_country_code',
+
+            'license_number',
+            'not_for_profit',
+            'authorized_signature_file_purpose',
+            'authorized_signature_file_id',
+            'authorized_signature_file',
+            'authorized_signature_title',
+            'authorized_signature_expiry_date',
+            'authorized_signature_issuing_date',
+
+            'owner_phone_country_code',
+
+            'identification_issuing_date',
+            'identification_expiry_date',
+            'identification_file_purpose',
+
+            'armada_api_key',
+            'phone_number_display',
+
+            'store_layout',
+            'commercial_license_issuing_date',
+            'commercial_license_expiry_date',
+            'commercial_license_file',
+            'commercial_license_file_purpose',
+
+            'show_opening_hours',
+
+            'mashkor_branch_id',
+            'schedule_interval',
+            'schedule_order',
+
+            'has_deployed',
+            'tap_queue_id',
+
+            'snapchat_pixil_id',
+            'default_language',
+
+            'enable_gift_message',
+            'payment_gateway_queue_id',
+
+            'annual_revenue',
+            'referral_code',
+            'custom_subscription_price',
+
+            'is_public',
+            'is_sandbox',
+            'accept_order_247'
         ],
     ])
     ?>
