@@ -113,6 +113,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property number $custom_subscription_price
  * @property boolean $is_sandbox
  * @property boolean $accept_order_247
+ * @property boolean $is_public
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -518,7 +519,8 @@ class Restaurant extends \yii\db\ActiveRecord
             'default_language' => Yii::t('app','Default Language'),
             'custom_subscription_price'  => Yii::t('app','Custom Subscription Price'),
             //'demand_delivery' => Yii::t('app','Accept order 24/7')
-            'accept_order_247' => Yii::t('app','Accept order 24/7')
+            'accept_order_247' => Yii::t('app','Accept order 24/7'),
+            'is_public' => Yii::t('app','Is Public?')
         ];
     }
 
