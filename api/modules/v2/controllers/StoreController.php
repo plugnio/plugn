@@ -3,6 +3,7 @@
 namespace api\modules\v2\controllers;
 
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
 use api\models\Restaurant;
 use common\models\RestaurantTheme;
@@ -55,6 +56,20 @@ class StoreController extends Controller
             'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
         ];
         return $actions;
+    }
+
+    /**
+     * return store lists
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function actionList()
+    {
+        $query = Restaurant::find()
+            ->andWhere(['is_public' => true]);
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
     }
 
     /**

@@ -132,7 +132,8 @@ class StoreController extends Controller
         $store->meta_description_ar = Yii::$app->request->getBodyParam("meta_description_ar");
         $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
         $store->accept_order_247 = Yii::$app->request->getBodyParam('accept_order_247');
-        
+        $store->is_public = Yii::$app->request->getBodyParam('is_public');
+
         $currencyCode = Yii::$app->request->getBodyParam('currency');
 
         $currency = Currency::findOne(['code' => $currencyCode]);
