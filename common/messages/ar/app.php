@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "Is Public?" => "هل عامة؟",
     'Accept order 24/7' => "اطلب أسبوعًا على مدار الساعة طوال أيام الأسبوع",
     'Store not delivering to this area.' => "المتجر لا يسلم لهذه المنطقة.",
     "Custom Subscription Price" => "سعر الاشتراك المخصص",

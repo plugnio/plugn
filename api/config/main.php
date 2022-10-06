@@ -135,17 +135,19 @@ return [
                     'controller' => 'v2/store',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'GET get-opening-hours' => 'get-opening-hours',
-                        'POST get-delivery-time' => 'get-delivery-time',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         'GET <id>' => 'view',
+                        'POST get-delivery-time' => 'get-delivery-time',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',
                         'OPTIONS get-delivery-time' => 'options',
                         'OPTIONS locations/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                         'OPTIONS <id>' => 'options',
+                        'OPTIONS' => 'options',
                     ]
                 ],
                 [// RestaurantDeliveryController
