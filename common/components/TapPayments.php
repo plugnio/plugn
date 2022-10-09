@@ -377,6 +377,7 @@ class TapPayments extends Component
         ];
 
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($operatorEndpoint)

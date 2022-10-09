@@ -483,6 +483,8 @@ return [
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
                         'POST update-email-settings' => 'update-email-settings',
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
+                        'PATCH process-gateway-queue/<id>' => 'process-gateway-queue',
+                        'DELETE remove-gateway-queue/<id>' => 'remove-gateway-queue',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS upgrade' => 'options',
@@ -504,9 +506,10 @@ return [
                         'OPTIONS status' => 'options',
                         'OPTIONS settings/<code>' => 'options',
                         'OPTIONS update-email-settings' => 'options',
+                        'OPTIONS process-gateway-queue/<id>' => 'options',
+                        'OPTIONS remove-gateway-queue/<id>' => 'options',
                     ]
                 ],
-
                 [ // AuthController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/auth',
