@@ -382,7 +382,7 @@ class CronController extends \yii\console\Controller
     public function actionCreatePaymentGatewayAccount()
     {
         $queue = PaymentGatewayQueue::find()
-            ->where(['IN', 'queue_status' => [
+            ->where(['IN', 'queue_status', [
                 PaymentGatewayQueue::QUEUE_STATUS_PENDING,
                // PaymentGatewayQueue::QUEUE_STATUS_CREATING,
                // PaymentGatewayQueue::QUEUE_STATUS_FAILED
