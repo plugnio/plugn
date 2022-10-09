@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\Admin;
+use common\models\PaymentGatewayQueue;
 use Yii;
 use common\models\Restaurant;
 use common\models\TapQueue;
@@ -63,6 +64,42 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * process payment gateway queue
+     * @return void
+     */
+    public function actionProcessGatewayQueue($id)
+    {
+        $model = $this->findModel($id);
+
+        if(
+            !$model->paymentGatewayQueue ||
+            $model->paymentGatewayQueue->queue_status == PaymentGatewayQueue::QUEUE_STATUS_COMPLETE
+        )
+        {
+            Yii::$app->session->setFlash('errorResponse', "No payment gateway request in progress");
+
+            return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+        }
+
+        $model->paymentGatewayQueue->processQueue();
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * remove payment gateway queue
+     * @return void
+     */
+    public function actionRemoveGatewayQueue($id)
+    {
+        $model = $this->findModel($id);
+
+        PaymentGatewayQueue::deleteAll(['restaurant_uuid' => $id]);
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
      * Displays a single Restaurant model.
      * @param integer $id
      * @return mixed
@@ -73,11 +110,11 @@ class RestaurantController extends Controller {
         $model = $this->findModel($id);
 
         // Store theme color
+
         $storeThemeColors = new \yii\data\ActiveDataProvider([
             'query' => $model->getRestaurantTheme(),
             'pagination' => false
         ]);
-
 
         return $this->render('view', [
                     'model' => $this->findModel($id),

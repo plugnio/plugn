@@ -43,6 +43,28 @@ $this->params['breadcrumbs'][] = $this->title;
          ?>
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
 
+        <?php if($model->paymentGatewayQueue && $model->paymentGatewayQueue->queue_status != \common\models\PaymentGatewayQueue::QUEUE_STATUS_COMPLETE) { ?>
+
+        <?=
+        Html::a('Remove payment gateway request', ['remove-gateway-queue', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to remove payment gateway queue for this store?',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+
+        <?=
+        Html::a('Process payment gateway request', ['process-gateway-queue', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to create payment gateway account for this store?',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+        <?php } ?>
 
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
