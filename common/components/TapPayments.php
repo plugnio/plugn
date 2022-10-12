@@ -146,8 +146,10 @@ class TapPayments extends Component
         // Set the API key we're going to use
         //These keys we will use it to (upload document - create a business - create a merchant - create an operator)
         if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            Yii::info('Plugn Live gateway');
             $this->plugnScretApiKey = $this->plugnLiveApiKey;
         } else {
+            Yii::info('Plugn Sandbox gateway');
             $this->plugnScretApiKey = $this->plugnTestApiKey;
         }
 
@@ -166,10 +168,10 @@ class TapPayments extends Component
         $this->vendorTestApiKey = $testKey;
 
         if (!$is_sandbox && $this->gatewayToUse == self::USE_LIVE_GATEWAY) {
-            Yii::info('Live gateway');
+            Yii::info('Vendor Live gateway'. $this->vendoerLiveApiKey);
             $this->vendorSecretApiKey = $this->vendoerLiveApiKey;
         } else {
-            Yii::info('Sandbox gateway');
+            Yii::info('Vendor Sandbox gateway'. $this->vendorTestApiKey);
             $this->vendorSecretApiKey = $this->vendorTestApiKey;
         }
     }

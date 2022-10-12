@@ -41,7 +41,10 @@ $this->params['breadcrumbs'][] = $this->title;
             $model->hide_request_driver_button == 1 ?  'display-request-driver-button' : 'hide-request-driver-button'
          , 'id' => $model->restaurant_uuid], ['class' => $model->hide_request_driver_button == 0 ? 'btn btn-success' : 'btn btn-danger'])
          ?>
+
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
+
+        <?= Html::a('Toggle Debugger', ['toggle-debugger', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
 
         <?php if($model->paymentGatewayQueue && $model->paymentGatewayQueue->queue_status != \common\models\PaymentGatewayQueue::QUEUE_STATUS_COMPLETE) { ?>
 
@@ -251,7 +254,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'commercial_license_title',
             'authorized_signature_title',
 
-
             'wallet_id',
             'operator_id',
 
@@ -318,9 +320,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'referral_code',
             'custom_subscription_price',
 
-            'is_public',
-            'is_sandbox',
-            'accept_order_247'
+            'is_public:boolean',
+            'is_sandbox:boolean',
+            'enable_debugger:boolean',
+            'accept_order_247:boolean'
         ],
     ])
     ?>
