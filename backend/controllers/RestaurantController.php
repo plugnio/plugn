@@ -238,6 +238,26 @@ class RestaurantController extends Controller {
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
     }
 
+
+    public function actionToggleDebugger($id)
+    {
+        $store = $this->findModel($id);
+
+        $store->setScenario('toggleDebugger');
+
+        $store->enable_debugger = true;
+
+        if ($store->save())
+        {
+            Yii::$app->session->setFlash('successResponse', "Store debug mode updated!");
+        }
+        else
+        {
+            Yii::$app->session->setFlash('errorResponse', $store->getErrors());
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
     /**
      * upgrade store
      * @param $id

@@ -321,6 +321,8 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'is_sandbox')->checkbox(['checked' => $model->is_sandbox > 0,  'value' => true]) ?>
 
+    <?= $form->field($model, 'enable_debugger')->checkbox(['checked' => $model->enable_debugger > 0,  'value' => true]) ?>
+    
     <?= $form->field($model, 'accept_order_247')->checkbox(['checked' => $model->accept_order_247 > 0,  'value' => true]) ?>
 
     <div class="form-group">
