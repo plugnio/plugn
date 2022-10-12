@@ -132,7 +132,8 @@ class StoreController extends Controller
         $store->meta_description_ar = Yii::$app->request->getBodyParam("meta_description_ar");
         $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
         $store->accept_order_247 = Yii::$app->request->getBodyParam('accept_order_247');
-        
+        $store->is_public = Yii::$app->request->getBodyParam('is_public');
+
         $currencyCode = Yii::$app->request->getBodyParam('currency');
 
         $currency = Currency::findOne(['code' => $currencyCode]);
@@ -344,6 +345,7 @@ class StoreController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
+
             if (!$model->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
@@ -402,7 +404,6 @@ class StoreController extends Controller
             $payment_gateway_queue->restaurant_uuid = $model->restaurant_uuid;
             $payment_gateway_queue->payment_gateway =  'tap';
 
-
             if (!$payment_gateway_queue->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
@@ -413,11 +414,12 @@ class StoreController extends Controller
 
             $transaction->commit();
 
-            return self::message("success","Your request has been successfully submitted");
+            return self::message("success", "Your request has been successfully submitted");
         }
         catch (\Exception $e)
         {
             $transaction->rollBack();
+
             return self::message("error",$e->getMessage());
         }
     }
@@ -706,6 +708,38 @@ class StoreController extends Controller
         $transaction->commit ();
 
         return self::message("success","Layout updated successfully");
+    }
+
+    /**
+     * process payment gateway queue
+     * @return void
+     */
+    public function actionProcessGatewayQueue($id)
+    {
+        $model = $this->findModel($id);
+
+        if(
+            !$model->paymentGatewayQueue ||
+            $model->paymentGatewayQueue->queue_status == PaymentGatewayQueue::QUEUE_STATUS_COMPLETE
+        )
+        {
+            return self::message("error", "Payment gateway already active");
+        }
+
+        return $model->paymentGatewayQueue->processQueue();
+    }
+
+    /**
+     * remove payment gateway queue
+     * @return void
+     */
+    public function actionRemoveGatewayQueue($id)
+    {
+        $this->findModel($id);
+
+        PaymentGatewayQueue::deleteAll(['restaurant_uuid' => $id]);
+
+        return self::message("success", "Payment gateway queue removed");
     }
 
     /**
