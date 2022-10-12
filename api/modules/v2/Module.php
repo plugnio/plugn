@@ -31,6 +31,8 @@ class Module extends \yii\base\Module
         {
             $component = \Yii::$app->getModule('debug');
 
+            //$component->allowedIPs = Yii::$app->request->userIP;
+
             $component->bootstrap(\Yii::$app);
 
             \Yii::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE, [$component, 'setDebugHeaders']);
