@@ -245,7 +245,7 @@ class RestaurantController extends Controller {
 
         $store->setScenario('toggleDebugger');
 
-        $store->enable_debugger = true;
+        $store->enable_debugger = !$store->enable_debugger;
 
         if ($store->save())
         {
