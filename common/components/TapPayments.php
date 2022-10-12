@@ -166,8 +166,10 @@ class TapPayments extends Component
         $this->vendorTestApiKey = $testKey;
 
         if (!$is_sandbox && $this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            Yii::info('Live gateway');
             $this->vendorSecretApiKey = $this->vendoerLiveApiKey;
         } else {
+            Yii::info('Sandbox gateway');
             $this->vendorSecretApiKey = $this->vendorTestApiKey;
         }
     }
