@@ -112,6 +112,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property boolean $demand_delivery
  * @property number $custom_subscription_price
  * @property boolean $is_sandbox
+ * @property boolean $enable_debugger
  * @property boolean $accept_order_247
  * @property boolean $is_public
  * @property AgentAssignment[] $agentAssignments
@@ -165,6 +166,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const STORE_LAYOUT_GRID_HALFWIDTH = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
 
+    const SCENARIO_TOGGLE_DEBUGGER = 'toggleDebugger';
     const SCENARIO_UPDATE_DESIGN_LAYOUT = 'update_design_layout';
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
@@ -371,6 +373,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $scenarios = parent::scenarios();
 
         return array_merge($scenarios, [
+            self::SCENARIO_TOGGLE_DEBUGGER => ['enable_debugger'],
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
             self::SCENARIO_UPDATE_STATUS => ['restaurant_status'],
             self::SCENARIO_UPDATE_ANALYTICS => [

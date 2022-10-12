@@ -18,6 +18,9 @@ return [
             'basePath' => '@api/modules/v2',
             'class' => 'api\modules\v2\Module',
         ],
+        'debug' => [
+            'class' => 'yii\debug\Module',
+        ]
     ],
     'components' => [
         'user' => [
