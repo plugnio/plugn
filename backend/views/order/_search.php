@@ -49,6 +49,11 @@ $this->registerJs($js);
                         <div class="col-md-2">
                             <?=
                             $form->field($model, 'order_status')->dropDownList([
+
+                                Order::STATUS_DRAFT => 'Draft',
+                                Order::STATUS_PARTIALLY_REFUNDED => 'Partially Refunded',
+                                Order::STATUS_REFUNDED => 'Refunded',
+                                Order::STATUS_ABANDONED_CHECKOUT => 'Abandoned',
                                 Order::STATUS_PENDING => 'Pending',
                                 Order::STATUS_BEING_PREPARED => 'Being prepared',
                                 Order::STATUS_OUT_FOR_DELIVERY => 'Out for delivery',
