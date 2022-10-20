@@ -340,6 +340,7 @@ class OrderController extends Controller
                     try {
 
                         // Validate that theres no error from TAP gateway
+
                         if (isset($responseContent->status) && $responseContent->status == "fail") {
                             $transaction->rollBack();
 
