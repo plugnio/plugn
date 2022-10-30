@@ -89,6 +89,14 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
      */
     public function processQueue()
     {
+        if(!$this->restaurant->restaurant_email)
+        {
+            return [
+                "operation" => "error",
+                "message" => "Restaurant email missing"
+            ];
+        }
+
         if ($this->payment_gateway == 'tap')
         {
             $response = $this->restaurant->createTapAccount();
@@ -101,8 +109,6 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
         if ($response['operation'] == 'success')
         {
             $this->queue_status = self::QUEUE_STATUS_COMPLETE;
-
-            if ($this->validate() && $this->restaurant->restaurant_email) {
 
                 //save
 
@@ -125,7 +131,6 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                     ->setTo([$this->restaurant->restaurant_email])
                     ->setSubject($subject)
                     ->send();
-            }
         }
         else
         {
