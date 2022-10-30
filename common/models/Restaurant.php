@@ -1006,7 +1006,9 @@ class Restaurant extends \yii\db\ActiveRecord
                 Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
 
                 if (isset(Yii::$app->session->id))
+                {
                     Yii::$app->session->setFlash('errorResponse', json_encode($businessApiResponse->data));
+                }
 
                 $this->addError('business_id', json_encode($businessApiResponse->data));
 
