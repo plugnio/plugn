@@ -218,6 +218,15 @@ class AuthController extends Controller {
                 "message" => $agent->errors
             ];
         } else {
+
+            if (YII_ENV == 'prod') {
+                $param = [
+                    'email' => Yii::$app->request->getBodyParam('email'),
+                    'password' => Yii::$app->request->getBodyParam('password')
+                ];
+                Yii::$app->auth0->createUser($param);
+            }
+
             return [
                 "operation" => "success"
             ];
@@ -372,6 +381,15 @@ class AuthController extends Controller {
                         'store_url' => $store->restaurant_domain
                     ]
                 ]);
+
+                if (YII_ENV == 'prod') {
+                    $param = [
+                        'email' => Yii::$app->request->getBodyParam('email'),
+                        'password' => Yii::$app->request->getBodyParam('password')
+                    ];
+                    Yii::$app->auth0->createUser($param);
+                }
+
             }
 
             $transaction->commit();
