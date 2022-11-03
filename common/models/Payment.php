@@ -156,9 +156,13 @@ class Payment extends \yii\db\ActiveRecord
         }
 
         // Request response about it from TAP
-        Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
+        Yii::$app->tapPayments->setApiKeys(
+            $paymentRecord->restaurant->live_api_key,
+            $paymentRecord->restaurant->test_api_key
+        );
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
+
         $responseContent = json_decode($response->content);
 
 
@@ -177,6 +181,7 @@ class Payment extends \yii\db\ActiveRecord
 
 
         $paymentRecord->payment_current_status = $responseContent->status; // 'CAPTURED' ?
+
         $paymentRecord->response_message = $responseContent->response->message;
 
         $isError = false;
