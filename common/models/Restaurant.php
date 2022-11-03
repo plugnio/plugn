@@ -1471,24 +1471,10 @@ class Restaurant extends \yii\db\ActiveRecord
         if($this->accept_order_247)
           return true;
 
-        $opening_hour_model = OpeningHour::find()
-                                ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
-                                ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
-                                ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
-                                ->orderBy(['open_at' => SORT_ASC])
-                                ->one();
-
-
-          if ($opening_hour_model) {
-              if (
-                   date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
-                   strtotime("now") > strtotime(date('c', strtotime($opening_hour_model->open_at, strtotime("now") ))) &&
-                   strtotime("now") <  strtotime(date('c', strtotime($opening_hour_model->close_at, strtotime("now") )) )
-                  )
-                  return true;
-          }
-
-          return false;
+        return OpeningHour::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
+            ->andWhere(new Expression("TIME(open_at) < NOW() AND TIME(close_at) > NOW()"))    
+            ->exists();
     }
 
     /**
