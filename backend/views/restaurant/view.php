@@ -106,7 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
           ?>
 
             <?=
-            Html::a('Busy', ['promote-to-close', 'id' => $model->restaurant_uuid], [
+            Html::a('Close', ['promote-to-close', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => 'Are you sure you want to change store status to closed?',
