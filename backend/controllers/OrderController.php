@@ -378,7 +378,7 @@ class OrderController extends Controller
 
         $agentAssignment = $restaurant->getAgentAssignments()
             ->where([
-                'restaurant_uuid' => $restaurant->restaurant_uuid,
+                'agent_assignment.restaurant_uuid' => $restaurant->restaurant_uuid,
                 'agent_id' => Yii::$app->user->identity->agent_id
             ])->one();
 
@@ -405,7 +405,7 @@ class OrderController extends Controller
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $agentAssignment = $restaurant->getAgentAssignments()
-            ->where(['restaurant_uuid' => $restaurant->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
+            ->where(['agent_assignment.restaurant_uuid' => $restaurant->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
 

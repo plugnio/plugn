@@ -109,7 +109,7 @@ class Restaurant extends \common\models\Restaurant {
         }
 
         $model = $this->getAgentAssignments($modelClass)
-            ->andWhere(['agent_id' => Yii::$app->user->getId()])
+            ->andWhere(['agent_assignment.agent_id' => Yii::$app->user->getId()])
             ->one();
 
         if($model) {
