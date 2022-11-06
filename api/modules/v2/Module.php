@@ -27,6 +27,11 @@ class Module extends \yii\base\Module
 
         $store = Restaurant::findOne($store_id);
 
+        if($store_id && !$store)
+        {
+            \Yii::$app->getResponse()->setStatusCode(404);
+        }
+
         if($store && $store->enable_debugger)
         {
             $component = \Yii::$app->getModule('debug');
