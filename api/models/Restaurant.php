@@ -25,7 +25,7 @@ class Restaurant extends \common\models\Restaurant {
       unset($fields['armada_api_key']);
       unset($fields['mashkor_branch_id']);
       unset($fields['app_id']);
-      unset($fields['restaurant_status']);
+     // unset($fields['restaurant_status']);
       unset($fields['vendor_sector']);
       unset($fields['business_id']);
       unset($fields['business_entity_id']);

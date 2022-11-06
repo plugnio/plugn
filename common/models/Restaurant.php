@@ -115,6 +115,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property boolean $enable_debugger
  * @property boolean $accept_order_247
  * @property boolean $is_public
+ * @property boolean $is_deleted
+ * @property boolean $is_under_maintenance
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -276,6 +278,7 @@ class Restaurant extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
+            [['is_public', 'is_deleted', 'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox'], 'boolean'],
             [['platform_fee', 'warehouse_fee','warehouse_delivery_charges'], 'number'],
             [['instagram_url'], 'url'],
             [['export_orders_data_in_specific_date_range', 'export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
@@ -523,7 +526,9 @@ class Restaurant extends \yii\db\ActiveRecord
             'custom_subscription_price'  => Yii::t('app','Custom Subscription Price'),
             //'demand_delivery' => Yii::t('app','Accept order 24/7')
             'accept_order_247' => Yii::t('app','Accept order 24/7'),
-            'is_public' => Yii::t('app','Is Public?')
+            'is_public' => Yii::t('app','Is Public?'),
+            'is_deleted' => Yii::t('app','Is Deleted?'),
+            'is_under_maintenance' => Yii::t('app','Is Under Maintenance?'),
         ];
     }
 
@@ -2795,5 +2800,9 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getRestaurantCurrencies($modelClass = "\common\models\RestaurantCurrency")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    public static function find() {
+        return new query\RestaurantQuery(get_called_class());
     }
 }
