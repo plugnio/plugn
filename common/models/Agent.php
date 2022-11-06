@@ -516,6 +516,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         $category_model->restaurant_uuid = $store->restaurant_uuid;
         $category_model->title = 'Products';
         $category_model->title_ar = 'منتجات';
+
         if (!$category_model->save ()) {
             return [
                 "operation" => "error",
