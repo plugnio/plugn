@@ -79,7 +79,23 @@ class StoreController extends Controller
      */
     public function actionView($id)
     {
-        return $this->findModel($id);
+        $store =  $this->findModel($id);
+
+        /*
+        if ($store->is_deleted) {
+            throw new \yii\web\HttpException(404, 'The requested Item could not be found.');
+            \Yii::$app->getResponse()->setStatusCode(418);
+        } else if ($store->restaurant_status == \common\models\Restaurant::RESTAURANT_STATUS_CLOSED) {
+            \Yii::$app->getResponse()->setStatusCode(419);
+        } else if ($store->restaurant_status == Restaurant::RESTAURANT_STATUS_BUSY) {
+            \Yii::$app->getResponse()->setStatusCode(420);
+        } else if ($store->is_under_maintenance) {
+            //Yii::$app->response->statusCode = 427;
+            //\Yii::$app->getResponse()->setStatusCode(427);
+            throw new \yii\web\HttpException(427, 'Store is under maintenance.');
+        }*/
+
+        return $store;
     }
 
     /**

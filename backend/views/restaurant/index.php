@@ -73,10 +73,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'version',
             'restaurant_created_at:datetime',
             'referral_code',
+            'status',
+            'is_deleted',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'restaurant',
-                'template' => ' {view} {update}'
+                //'template' => ' {view} {update}'
             ],
 
 

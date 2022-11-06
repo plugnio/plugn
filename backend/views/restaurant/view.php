@@ -104,7 +104,19 @@ $this->params['breadcrumbs'][] = $this->title;
               ],
           ])
           ?>
+
+            <?=
+            Html::a('Busy', ['promote-to-close', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to change store status to closed?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
         <?php } ?>
+
+
 
         <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
             <?=
@@ -322,6 +334,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'is_public:boolean',
             'is_sandbox:boolean',
+            'is_under_maintenance:boolean',
+            'is_deleted:boolean',
             'enable_debugger:boolean',
             'accept_order_247:boolean'
         ],
