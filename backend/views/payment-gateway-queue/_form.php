@@ -15,21 +15,23 @@ use kartik\select2\Select2;
 
   <?php
 
-  $restaurantQuery = Restaurant::find()->asArray()->all();
-  $restaurantArray = ArrayHelper::map($restaurantQuery, 'restaurant_uuid', 'name');
+  //$restaurantQuery = Restaurant::find()->asArray()->all();
+  //$restaurantArray = ArrayHelper::map($restaurantQuery, 'restaurant_uuid', 'name');
 
   $form = ActiveForm::begin();
   ?>
 
-    <?=
+    <?php /*
         $form->field($model, 'restaurant_uuid')->widget(Select2::classname(), [
             'data' => $restaurantArray,
             'options' => ['placeholder' => 'Select a restaurant ...'],
             'pluginOptions' => [
                 'allowClear' => true
             ],
-        ])->label('Restaurant');
+        ])->label('Restaurant');*/
     ?>
+
+    <?= $form->field($model, 'restaurant_uuid')->textInput() ?>
 
     <?= $form->field($model, 'payment_gateway')->dropDownList(
         [
