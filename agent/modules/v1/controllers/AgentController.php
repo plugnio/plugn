@@ -80,7 +80,7 @@ class AgentController extends Controller
 
         return Yii::$app->user->identity
             ->getAgentAssignments ()
-            ->andWhere (['restaurant.restaurant_uuid' => $restaurant->restaurant_uuid])
+            ->andWhere (['agent_assignment.restaurant_uuid' => $restaurant->restaurant_uuid])
             ->one ();
     }
 
