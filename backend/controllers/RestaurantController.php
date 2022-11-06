@@ -474,8 +474,13 @@ class RestaurantController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id) {
-        $this->findModel($id)->delete();
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $model->is_deleted = true;
+        $model->save(false);
+
+            //->delete();
 
         return $this->redirect(['index']);
     }
