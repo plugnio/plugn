@@ -586,7 +586,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         }
 
         return [
-            'operation' => 'success',
+            'operation' => 'success'
         ];
     }
 
@@ -606,6 +606,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getAgentAssignments($modelClass = "\common\models\AgentAssignment")
     {
-        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id']);
+        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id'])
+            ->joinWith(['restaurant'])
+            ->andWhere(['restaurant.is_deleted' => false]);
     }
 }
