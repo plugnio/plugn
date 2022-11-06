@@ -608,6 +608,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id'])
             ->joinWith(['restaurant'])
-            ->andWhere(['is_deleted' => false]);
+            ->andWhere(['restaurant.is_deleted' => false]);
     }
 }
