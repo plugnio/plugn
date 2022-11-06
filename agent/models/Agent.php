@@ -22,7 +22,7 @@ class Agent extends \common\models\Agent implements IdentityInterface {
             $agent = \Yii::$app->accountManager->getManagedAccount ();
 
             return $this->getAgentAssignments()
-                ->andWhere(['restaurant_uuid'=>$agent['restaurant_uuid']])
+                ->andWhere(['agent_assignment.restaurant_uuid'=>$agent['restaurant_uuid']])
                 ->one();
         };
         return $fields;
