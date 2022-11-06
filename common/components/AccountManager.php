@@ -61,7 +61,9 @@ class AccountManager  extends BaseObject
 
          // Getting a list of Restaurants this agent manages
         // No cache
-        $this->_managedAccounts = Yii::$app->user->identity->getAgentAssignments()->all();
+        $this->_managedAccounts = Yii::$app->user->identity
+            ->getAgentAssignments()
+            ->all();
 
         parent::__construct($config);
     }
