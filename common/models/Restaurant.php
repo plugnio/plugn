@@ -2318,7 +2318,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getAgentAssignments($modelClass = "\common\models\AgentAssignment")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->with ('agent');
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->with ('agent');
     }
 
     /**
@@ -2472,7 +2473,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getOrders($modelClass = "\common\models\Order")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->andWhere (['is_deleted' => 0]);
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere (['order.is_deleted' => 0]);
     }
 
     /**
