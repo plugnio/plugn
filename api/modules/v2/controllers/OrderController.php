@@ -1040,7 +1040,8 @@ class OrderController extends Controller
     public function actionOrderDetails($id, $restaurant_uuid)
     {
         $model = Order::find()
-            ->andWhere(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid, 'is_deleted' => 0])
+            ->andWhere(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid,
+                'order.is_deleted' => 0])
             ->one();
 
         if (!$model) {
