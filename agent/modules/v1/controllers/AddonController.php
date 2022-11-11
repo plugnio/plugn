@@ -111,6 +111,7 @@ class AddonController extends Controller
         $payment->addon_uuid = $addon_uuid;
         $payment->payment_amount_charged = $addon->special_price > 0 ? $addon->special_price: $addon->price;
         $payment->payment_current_status = "Redirected to payment gateway";
+        $payment->is_sandbox = false;//$store->is_sandbox;
 
         if (!$payment->save ()) {
             return [
@@ -120,7 +121,11 @@ class AddonController extends Controller
         }
 
         // Redirect to payment gateway
-        Yii::$app->tapPayments->setApiKeys (\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+        Yii::$app->tapPayments->setApiKeys (
+            \Yii::$app->params['liveApiKey'],
+            \Yii::$app->params['testApiKey'],
+            $payment->is_sandbox
+        );
 
         $response = Yii::$app->tapPayments->createCharge (
             "KWD",
@@ -267,6 +272,12 @@ class AddonController extends Controller
             throw new ForbiddenHttpException('Invalid Currency code');
         }
 
+        $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $charge_id]);
+
+        if (!$paymentRecord) {
+            throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
         if (isset($reference)){
             $gateway_reference = $reference['gateway'];
             $payment_reference = $reference['payment'];
@@ -294,7 +305,12 @@ class AddonController extends Controller
             $isValidSignature = false;
 
             if (!$isValidSignature) {
-                Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+
+                Yii::$app->tapPayments->setApiKeys(
+                    \Yii::$app->params['liveApiKey'],
+                    \Yii::$app->params['testApiKey'],
+                    $paymentRecord->is_sandbox
+                );
 
                 $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
 
