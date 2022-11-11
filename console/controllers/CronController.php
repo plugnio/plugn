@@ -670,6 +670,10 @@ class CronController extends \yii\console\Controller
         {
             //todo: what if fatoorah used? instead of tap
 
+            if(!$refund->payment) {
+                continue;
+            }
+            
             Yii::$app->tapPayments->setApiKeys(
                 $refund->store->live_api_key,
                 $refund->store->test_api_key,
