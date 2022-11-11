@@ -181,7 +181,8 @@ class Refund extends \yii\db\ActiveRecord
             //
             //     Yii::$app->tapPayments->setApiKeys(
             //         $this->order->restaurant->live_api_key,
-            //         $this->order->restaurant->test_api_key
+            //         $this->order->restaurant->test_api_key,
+            //         $this->payment->is_sandbox
             //     );
             //
             //     $tapPaymentResponse = Yii::$app->tapPayments->createRefund(

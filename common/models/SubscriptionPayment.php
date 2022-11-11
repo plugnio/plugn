@@ -33,7 +33,7 @@ use yii\web\NotFoundHttpException;
  * @property double $partner_fee
  * @property  double $payout_status
  * @property string|null $partner_payout_uuid
- *
+ * @property boolean $is_sandbox
  * @property Subscription $subscription
  * @property Plan $plan
  * @property Restaurant $restaurant
@@ -67,6 +67,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message', 'payment_token'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
+            [['is_sandbox'], 'boolean'],
             [['subscription_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Subscription::className(), 'targetAttribute' => ['subscription_uuid' => 'subscription_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['partner_payout_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => PartnerPayout::className(), 'targetAttribute' => ['partner_payout_uuid' => 'partner_payout_uuid']]
@@ -141,7 +142,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             'payment_udf5' => Yii::t('app', 'Udf5'),
             'payment_created_at' => Yii::t('app', 'Created at'),
             'payment_updated_at' => Yii::t('app', 'Last activity'),
-            'payment_updated_at' => Yii::t('app', 'Last activity'),
+            'is_sandbox' => Yii::t('app', 'IS Sandbox?'),
             'received_callback' => Yii::t('app', 'Received Callback'),
             'response_message' => Yii::t('app', 'Response Message'),
             'partner_fee' => Yii::t('app', 'Plugn fee'),
@@ -178,7 +179,11 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         }
 
         // Request response about it from TAP
-        Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+        Yii::$app->tapPayments->setApiKeys(
+            \Yii::$app->params['liveApiKey'],
+            \Yii::$app->params['testApiKey'],
+            $paymentRecord->is_sandbox
+        );
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
 

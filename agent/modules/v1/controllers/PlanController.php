@@ -143,6 +143,7 @@ class PlanController extends Controller
         $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
         $payment->payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price: $subscription_model->plan->price;
         $payment->payment_current_status = "Redirected to payment gateway";
+        $payment->is_sandbox = false;//$store->is_sandbox;
 
         if (!$payment->save ()) {
             return [
@@ -156,7 +157,11 @@ class PlanController extends Controller
         $subscription_model->save (false);
 
         // Redirect to payment gateway
-        Yii::$app->tapPayments->setApiKeys (\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+        Yii::$app->tapPayments->setApiKeys (
+            \Yii::$app->params['liveApiKey'],
+            \Yii::$app->params['testApiKey'],
+            $payment->is_sandbox
+        );
 
         $response = Yii::$app->tapPayments->createCharge (
             "KWD",
@@ -317,6 +322,13 @@ class PlanController extends Controller
             throw new ForbiddenHttpException('Invalid Currency code');
         }
 
+        $paymentRecord = \common\models\SubscriptionPayment::findOne([
+            'payment_gateway_transaction_id' => $charge_id]);
+
+        if (!$paymentRecord) {
+            throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
         if (isset($reference)){
             $gateway_reference = $reference['gateway'];
             $payment_reference = $reference['payment'];
@@ -344,8 +356,15 @@ class PlanController extends Controller
             $isValidSignature = false;
 
             if (!$isValidSignature) {
-                Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+
+                Yii::$app->tapPayments->setApiKeys(
+                    \Yii::$app->params['liveApiKey'],
+                    \Yii::$app->params['testApiKey'],
+                    $paymentRecord->is_sandbox
+                );
+
                 $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
+
                 if (!$isValidSignature) {
                     Yii::error('Invalid Signature', __METHOD__);
                     throw new ForbiddenHttpException('Invalid Signature');

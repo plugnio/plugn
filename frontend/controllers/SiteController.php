@@ -234,6 +234,7 @@ class SiteController extends Controller
                 $payment->subscription_uuid = $subscription->subscription_uuid; //subscription_uuid
                 $payment->payment_amount_charged = $fees;
                 $payment->payment_current_status = "Redirected to payment gateway";
+                $payment->is_sandbox = $managedRestaurant->is_sandbox;
 
                 if ($managedRestaurant->referral_code) {
                     $payment->partner_fee = $payment->payment_amount_charged * $managedRestaurant->partner->commission;
@@ -247,7 +248,11 @@ class SiteController extends Controller
 
 
                     // Redirect to payment gateway
-                    Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+                    Yii::$app->tapPayments->setApiKeys(
+                        \Yii::$app->params['liveApiKey'],
+                        \Yii::$app->params['testApiKey'],
+                        $payment->is_sandbox
+                    );
                     
                     $response = Yii::$app->tapPayments->createCharge(
                         "KWD",
@@ -425,12 +430,19 @@ class SiteController extends Controller
             } else if(isset($response)) {
                 $response_message = $response['message'];
             }
+
             $paymentRecord = SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
 
             $isValidSignature = false;
 
             if (!$isValidSignature) {
-                Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+
+                Yii::$app->tapPayments->setApiKeys(
+                    \Yii::$app->params['liveApiKey'],
+                    \Yii::$app->params['testApiKey'],
+                    $paymentRecord->is_sandbox
+                );
+
                 $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
                 if (!$isValidSignature) {
                     Yii::error('Invalid Signature', __METHOD__);

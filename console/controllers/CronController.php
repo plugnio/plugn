@@ -593,7 +593,11 @@ class CronController extends \yii\console\Controller
 
             } else if ($refund->store->is_tap_enable) {
 
-                Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+                Yii::$app->tapPayments->setApiKeys(
+                    $refund->store->live_api_key,
+                    $refund->store->test_api_key,
+                    $refund->payment->is_sandbox
+                );
 
                 $response = Yii::$app->tapPayments->createRefund(
                     $refund->payment->payment_gateway_transaction_id,
@@ -666,7 +670,11 @@ class CronController extends \yii\console\Controller
         {
             //todo: what if fatoorah used? instead of tap
 
-            Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+            Yii::$app->tapPayments->setApiKeys(
+                $refund->store->live_api_key,
+                $refund->store->test_api_key,
+                $refund->payment->is_sandbox
+            );
 
             $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
 
