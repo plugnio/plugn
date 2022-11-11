@@ -14,6 +14,7 @@ class m221106_120941_store_delete extends Migration
     {
         $this->addColumn('restaurant', 'is_deleted',
             $this->boolean()->defaultValue(false)->after('is_sandbox'));
+
         $this->addColumn('restaurant', 'is_under_maintenance',
             $this->boolean()->defaultValue(false)->after('is_sandbox'));
     }

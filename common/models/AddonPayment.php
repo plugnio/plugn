@@ -28,6 +28,7 @@ use yii\web\NotFoundHttpException;
  * @property string|null $payment_udf4
  * @property string|null $payment_udf5
  * @property int $received_callback
+ * @property boolean $is_sandbox
  * @property string|null $response_message
  * @property string|null $payment_token
  * @property string|null $payment_created_at
@@ -60,6 +61,7 @@ class AddonPayment extends \yii\db\ActiveRecord
             [['restaurant_uuid', 'addon_uuid'], 'string', 'max' => 60],
             [['payment_gateway_order_id', 'payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message', 'payment_token'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
+            [['is_sandbox'], 'boolean'],
             [['addon_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Addon::className(), 'targetAttribute' => ['addon_uuid' => 'addon_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -118,6 +120,7 @@ class AddonPayment extends \yii\db\ActiveRecord
             'received_callback' => Yii::t('common', 'Received Callback'),
             'response_message' => Yii::t('common', 'Response Message'),
             'payment_token' => Yii::t('common', 'Payment Token'),
+            'is_sandbox' => Yii::t('common', 'Is Sandbox?'),
             'payment_created_at' => Yii::t('common', 'Payment Created At'),
             'payment_updated_at' => Yii::t('common', 'Payment Updated At'),
         ];
@@ -139,7 +142,11 @@ class AddonPayment extends \yii\db\ActiveRecord
         }
 
         // Request response about it from TAP
-        Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+        Yii::$app->tapPayments->setApiKeys(
+            \Yii::$app->params['liveApiKey'],
+            \Yii::$app->params['testApiKey'],
+            $paymentRecord->is_sandbox
+        );
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
 

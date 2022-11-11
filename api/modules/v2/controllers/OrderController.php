@@ -315,6 +315,7 @@ class OrderController extends Controller
             $payment->order_uuid = $order->order_uuid;
             $payment->payment_amount_charged = $order->total_price;
             $payment->payment_current_status = "Redirected to payment gateway";
+            $payment->is_sandbox = $restaurant_model->is_sandbox;
 
             if ($restaurant_model->is_tap_enable) {
 
@@ -330,7 +331,7 @@ class OrderController extends Controller
                     Yii::$app->tapPayments->setApiKeys(
                         $order->restaurant->live_api_key,
                         $order->restaurant->test_api_key,
-                        $order->restaurant->is_sandbox
+                        $payment->is_sandbox
                     );
 
                     $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
@@ -768,6 +769,7 @@ class OrderController extends Controller
      */
     public function actionCallback($tap_id)
     {
+
         try {
             $paymentRecord = Payment::updatePaymentStatusFromTap($tap_id);
             $paymentRecord->received_callback = true;
@@ -967,7 +969,7 @@ class OrderController extends Controller
                 Yii::$app->tapPayments->setApiKeys(
                     $paymentRecord->restaurant->live_api_key,
                     $paymentRecord->restaurant->test_api_key,
-                    $paymentRecord->restaurant->is_sandbox
+                    $paymentRecord->is_sandbox
                 );
 
                 $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString, $headerSignature);
