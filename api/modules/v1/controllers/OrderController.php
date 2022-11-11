@@ -260,10 +260,15 @@ class OrderController extends Controller {
                     $payment = new Payment;
                     $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
                     $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+                    $payment->is_sandbox = $restaurant_model->is_sandbox;
 
                     if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
-                        Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+                        Yii::$app->tapPayments->setApiKeys(
+                            $order->restaurant->live_api_key,
+                            $order->restaurant->test_api_key,
+                            $payment->is_sandbox
+                        );
 
                         $response = Yii::$app->tapPayments->retrieveToken(Yii::$app->request->getBodyParam("payment_token"));
 
@@ -325,6 +330,7 @@ class OrderController extends Controller {
                     $payment->order_uuid = $order->order_uuid;
                     $payment->payment_amount_charged = $order->total_price;
                     $payment->payment_current_status = "Redirected to payment gateway";
+                    $payment->is_sandbox = $order->restaurant->is_sandbox;
 
                     if ($payment->save()) {
 
@@ -343,7 +349,11 @@ class OrderController extends Controller {
 
 
                         // Redirect to payment gateway
-                        Yii::$app->tapPayments->setApiKeys($order->restaurant->live_api_key, $order->restaurant->test_api_key);
+                        Yii::$app->tapPayments->setApiKeys(
+                            $order->restaurant->live_api_key,
+                            $order->restaurant->test_api_key,
+                            $payment->is_sandbox
+                        );
 
                         if ($order->payment_method_id == 1) {
                             $source_id = TapPayments::GATEWAY_KNET;
@@ -732,14 +742,17 @@ class OrderController extends Controller {
                     $response_message = $response['message'];
             }
 
-
             $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
 
             $isValidSignature = false;
 
             if (!$isValidSignature)
             {
-                Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
+                Yii::$app->tapPayments->setApiKeys(
+                    $paymentRecord->restaurant->live_api_key,
+                    $paymentRecord->restaurant->test_api_key,
+                    $paymentRecord->is_sandbox
+                );
 
                 $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString, $headerSignature);
 

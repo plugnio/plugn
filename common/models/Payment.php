@@ -36,6 +36,7 @@ use yii\web\NotFoundHttpException;
  * @property boolean $received_callback
  * @property string $payment_gateway_name
  * @property string|null $partner_payout_uuid
+ * @property boolean $is_sandbox
  * @property Customer $customer
  * @property Order $order
  * @property Restaurant $restaurant
@@ -73,6 +74,7 @@ class Payment extends \yii\db\ActiveRecord
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message', 'payment_token', 'payment_gateway_name'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
+            [['is_sandbox'], 'boolean'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
@@ -137,6 +139,7 @@ class Payment extends \yii\db\ActiveRecord
             'payment_updated_at' => Yii::t('app', 'Last activity'),
             'received_callback' => Yii::t('app', 'Received Callback'),
             'response_message' => Yii::t('app', 'Response Message'),
+            'is_sandbox' => Yii::t('app', 'Is Sandbox'),
         ];
     }
 
@@ -158,13 +161,13 @@ class Payment extends \yii\db\ActiveRecord
         // Request response about it from TAP
         Yii::$app->tapPayments->setApiKeys(
             $paymentRecord->restaurant->live_api_key,
-            $paymentRecord->restaurant->test_api_key
+            $paymentRecord->restaurant->test_api_key,
+            $paymentRecord->is_sandbox
         );
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
 
         $responseContent = json_decode($response->content);
-
 
         // If there's an error from TAP, exit and display error
         if (isset($responseContent->errors)) {

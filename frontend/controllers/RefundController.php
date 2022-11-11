@@ -88,7 +88,11 @@ class RefundController extends Controller {
 
             if ($model->load(Yii::$app->request->post()))
             {
-                Yii::$app->tapPayments->setApiKeys($restaurant->live_api_key, $restaurant->test_api_key);
+                Yii::$app->tapPayments->setApiKeys(
+                    $restaurant->live_api_key,
+                    $restaurant->test_api_key,
+                    $order->payment->is_sandbox
+                );
 
                 if ($model->validate()) {
 
