@@ -164,6 +164,14 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'tagline_ar')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'meta_title')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'meta_title_ar')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'meta_description')->textarea(['rows' => '12']) ?>
+
+    <?= $form->field($model, 'meta_description_ar')->textarea(['rows' => '12']) ?>
+
     <?= $form->field($model, 'restaurant_domain')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'app_id')->textInput(['maxlength' => true]) ?>
