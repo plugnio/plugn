@@ -32,6 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'payment_gateway',
             'queue_status',
+            'queue_response',
             'queue_created_at',
             ['class' => 'yii\grid\ActionColumn'],
         ],
