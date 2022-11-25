@@ -312,6 +312,43 @@ class StoreController extends Controller
     }
 
     /**
+     * Update bank account in tap account
+     * @return array
+     */
+    public function actionUpdateBankAccount()
+    {
+        $model = $this->findModel();
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_BANK);
+
+        $model->iban = Yii::$app->request->getBodyParam('iban');
+
+        if(!$model->save()) {
+            return [
+                'operation' => 'success',
+                'message' => $model->errors
+            ];
+        }
+
+        Yii::$app->tapPayments->setApiKeys(
+            $model->live_api_key,
+            $model->test_api_key,
+            false// $this->is_sandbox
+        );
+
+        $result = Yii::$app->tapPayments->updateBankAccount($model->wallet_id, $model->iban);
+
+        //print_r($result->content);
+
+        //Yii::debug($result);
+
+        return [
+            'operation' => 'error',
+            'message' => "Bank detail updated successfully"
+        ];
+    }
+
+    /**
      * Create tap account
      * @param type $id
      * @return array
