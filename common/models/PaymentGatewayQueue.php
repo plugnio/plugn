@@ -91,6 +91,13 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
     {
         if(!$this->restaurant->restaurant_email)
         {
+            self::updateAll([
+                'queue_status' => self::QUEUE_STATUS_FAILED,
+                'queue_response' => "Store email missing"
+            ], [
+                'payment_gateway_queue_id' => $this->payment_gateway_queue_id
+            ]);
+
             return [
                 "operation" => "error",
                 "message" => "Restaurant email missing"
