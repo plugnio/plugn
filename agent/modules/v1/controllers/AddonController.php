@@ -74,9 +74,12 @@ class AddonController extends Controller
         $keyword = Yii::$app->request->get('keyword');
 
         $query =  Addon::find()
-            ->filterKeyword($keyword)
             ->orderBy('sort_number');
 
+        if($keyword) {
+            $query->filterKeyword($keyword);
+        }    
+        
         return new ActiveDataProvider([
             'query' => $query
         ]);

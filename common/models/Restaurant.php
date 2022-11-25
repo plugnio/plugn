@@ -168,6 +168,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const STORE_LAYOUT_GRID_HALFWIDTH = 5;
     const STORE_LAYOUT_CATEGORY_HALFWIDTH = 6;
 
+    const SCENARIO_UPDATE_BANK = 'updateBankAccount';
     const SCENARIO_TOGGLE_DEBUGGER = 'toggleDebugger';
     const SCENARIO_UPDATE_DESIGN_LAYOUT = 'update_design_layout';
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
@@ -376,6 +377,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $scenarios = parent::scenarios();
 
         return array_merge($scenarios, [
+            self::SCENARIO_UPDATE_BANK => ['iban'],
             self::SCENARIO_TOGGLE_DEBUGGER => ['enable_debugger'],
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
             self::SCENARIO_UPDATE_STATUS => ['restaurant_status'],
@@ -1410,6 +1412,8 @@ class Restaurant extends \yii\db\ActiveRecord
             $currecy->currency_id = $this->currency_id;
             $currecy->save();
         }
+
+
     }
 
     /**
