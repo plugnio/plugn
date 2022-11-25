@@ -634,6 +634,35 @@ class TapPayments extends Component
         return $response;
     }
 
+
+
+    /**
+     * Update bank account connected with wallet
+     * @param  string $wallet_id
+     * @param  string $iban
+     * @param  string $swift_code
+     * @param  string $account_number
+     */
+    public function updateBankAccount($wallet_id, $iban, $swift_code = null, $account_number = null)
+    {
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('PUT')
+            ->setUrl($this->apiEndpoint . "/bankaccount")
+            ->setData([
+                'iban' => $iban,
+                'swift_code' => $swift_code,
+                'account_number' => $account_number
+            ])
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
+
+        return $response;
+    }
+
     /**
      * Check charge object for status updates
      * @param  string $chargeId
