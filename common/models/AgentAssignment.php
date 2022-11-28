@@ -141,6 +141,14 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         return $this->hasOne($modelClass::className(), ['agent_id' => 'agent_id']);
     }
 
+    public function getRestaurantName($modelClass = "\common\models\Restaurant") {
+        return $this->restaurant? $this->restaurant->name: null;
+    }
+
+    public function getAgentName($modelClass = "\common\models\Agent") {
+        return $this->agent? $this->agent->agent_name: null;
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
