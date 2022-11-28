@@ -8,6 +8,7 @@ use common\models\Restaurant;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 use common\models\AgentAssignment;
+use common\components\SelectWidget;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
@@ -116,9 +117,6 @@ $this->registerJs($js);
 
     <?php
 
-    $restaurantQuery = Restaurant::find()->asArray()->all();
-    $restaurantArray = ArrayHelper::map($restaurantQuery, 'restaurant_uuid', 'name');
-
     if(!$model->isNewRecord && $model->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
     {
       $businessLocationsQuery = $model->restaurant->getBusinessLocations()->asArray()->all();
@@ -133,25 +131,16 @@ $this->registerJs($js);
 
     <?= $form->field($model, 'agent_id')->hiddenInput()->label(false); ?>
 
-    <?php
-        /*$form->field($model, 'agent_id')->widget(Select2::classname(), [
-            'data' => $agentArray,
-            'options' => ['placeholder' => 'Select a agent ...'],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ])->label('Agent');*/
-    ?>
 
-    <?=
-        $form->field($model, 'restaurant_uuid')->widget(Select2::classname(), [
-            'data' => $restaurantArray,
-            'options' => ['placeholder' => 'Select a restaurant ...'],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ])->label('Restaurant');
-    ?>
+    <?=  SelectWidget::widget([
+        'action' => 'restaurant/dropdown',
+        'form' => $form,
+        'formModal' => $model,
+        "modalName" => "restaurant",
+        'labelAttribute' => "restaurantname",
+        'valueAttribute' => "restaurant_uuid",
+        "formModalName" => "agentassignment"
+    ]); ?>
 
 
 
@@ -218,10 +207,3 @@ $this->registerJs($js);
         <?php ActiveForm::end(); ?>
 
 </div>
-
-<!-- Button trigger modal -->
-<button type="button" id="button-agent_id" class="btn btn-primary" data-toggle="modal" data-target="#agentModal">
-    Launch demo modal
-</button>
-
-
