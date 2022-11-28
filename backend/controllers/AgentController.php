@@ -62,6 +62,24 @@ class AgentController extends Controller
        ]);
     }
 
+    public function actionDropdown()
+    {
+        $fromPager = Yii::$app->request->get('fromPager');
+
+        $searchModel = new AgentSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        if($fromPager) {
+            return $this->renderPartial ('_dropdown_list', [
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+
+        return $this->renderPartial('dropdown', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
 
     /**
      * Displays a single Agent model.
