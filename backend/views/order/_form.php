@@ -81,7 +81,7 @@ $this->registerJs($js);
         ], ['prompt' => 'Choose...', 'class' => 'form-control select2', 'id' => 'orderModeInput']);
 
 
-
+//todo:
         $businessLocationQuery = common\models\BusinessLocation::find()->where(['restaurant_uuid' => $model->restaurant_uuid])->asArray()->all();
         $businessLocationArray = ArrayHelper::map($businessLocationQuery, 'business_location_id', 'business_location_name');
         ?>
