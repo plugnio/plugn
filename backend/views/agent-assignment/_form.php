@@ -38,7 +38,7 @@ supportPickupInput.change(function(){
     }
 });
 
-$('#agentassignment-agent_id').on('click', function() {
+$('#agentassignment-agentname').on('click', function() {
 			$('#modal-agent').remove();
 	
 			$.ajax({
@@ -71,6 +71,7 @@ $('#agentassignment-agent_id').on('click', function() {
 	    }
 	    
 	    $('#agentassignment-agent_id').val(target.data('key'));
+	    $('#agentassignment-agentname').val(target.data('value'));
         $('#modal-agent').modal('hide');
     });
     
@@ -82,7 +83,25 @@ $('#agentassignment-agent_id').on('click', function() {
 				url: $(e.target).attr('href') + '&fromPager=1',
 				dataType: 'html',
 				success: function(html) {
-					$('#modal-agent .modal-body').html(html);
+					$('#modal-agent .list-wrapper').html(html);
+				}
+		});
+	});
+	
+    $(document).delegate('#modal-agent form', 'submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    
+        const data = new FormData(event.target);
+
+        const value = Object.fromEntries(data.entries());
+
+        $.ajax({
+				url: '". Url::to(['agent/dropdown']) ."&fromPager=1',
+				dataType: 'html',
+				data: value,
+				success: function(html) {
+					$('#modal-agent .list-wrapper').html(html);
 				}
 		});
 	});
@@ -110,7 +129,9 @@ $this->registerJs($js);
 
     ?>
 
-    <?= $form->field($model, 'agent_id')->textInput (); ?>
+    <?= $form->field($model, 'agentName')->textInput (); ?>
+
+    <?= $form->field($model, 'agent_id')->hiddenInput()->label(false); ?>
 
     <?php
         /*$form->field($model, 'agent_id')->widget(Select2::classname(), [

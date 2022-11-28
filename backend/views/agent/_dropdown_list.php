@@ -2,7 +2,7 @@
 <?php foreach($dataProvider->getModels () as $agent) { ?>
     <li class="item list-group-item" data-key="<?= $agent->agent_id ?>"
         data-value="<?= $agent->agent_name ?>">
-        <?= $agent->agent_name ?>
+        <h5><?= $agent->agent_name ?></h5>
         <small><?= $agent->agent_email ?></small>
     </li>
 
