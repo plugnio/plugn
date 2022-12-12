@@ -28,7 +28,10 @@ return [
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
-
+        'walletManager' => [
+            'class' => 'common\components\walletManager',
+            'apiKey' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+        ],
         'resourceManager' => [
             'class' => 'common\components\S3ResourceManager',
             'authMethod' => \common\components\S3ResourceManager::AUTH_VIA_IAM_ROLE,

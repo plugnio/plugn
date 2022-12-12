@@ -45,11 +45,6 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
-        $getLastCommitResponse = Yii::$app->githubComponent->getLastCommit();
-
-        //print_r($getLastCommitResponse);
-        echo $getLastCommitResponse->headers['http-code'];
-        die();
     }
 
     /**

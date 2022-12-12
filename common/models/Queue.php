@@ -84,6 +84,7 @@ class Queue extends \yii\db\ActiveRecord {
                     Yii::error('Invalid SSH key while fetching gihub result', __METHOD__);
                     return false;
                 }
+                
                 //Replace test with store branch name
                 $branchName = 'refs/heads/' . $store_model->store_branch_name;
 
