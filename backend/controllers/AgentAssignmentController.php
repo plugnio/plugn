@@ -61,8 +61,6 @@ class AgentAssignmentController extends Controller {
              'searchModel' => $searchModel,
              'dataProvider' => $dataProvider,
          ]);
-
-
     }
 
     /**
@@ -104,7 +102,7 @@ class AgentAssignmentController extends Controller {
         }
 
         return $this->render('create', [
-                    'model' => $model,
+             'model' => $model,
         ]);
     }
 

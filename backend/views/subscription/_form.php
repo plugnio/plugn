@@ -16,24 +16,21 @@ use kartik\select2\Select2;
 
     <?php
 
-    $restaurantQuery = Restaurant::find()->asArray()->all();
-    $restaurantArray = ArrayHelper::map($restaurantQuery, 'restaurant_uuid', 'name');
-
     $planQuery = Plan::find()->asArray()->all();
     $planArray = ArrayHelper::map($planQuery, 'plan_id', 'name');
 
     $form = ActiveForm::begin();
     ?>
 
-    <?=
-        $form->field($model, 'restaurant_uuid')->widget(Select2::classname(), [
-            'data' => $restaurantArray,
-            'options' => ['placeholder' => 'Select a restaurant ...'],
-            'pluginOptions' => [
-                'allowClear' => true
-            ],
-        ])->label('Restaurant');
-    ?>
+    <?=  \common\components\SelectWidget::widget([
+        'action' => 'restaurant/dropdown',
+        'form' => $form,
+        'formModal' => $model,
+        "modalName" => "restaurant",
+        'labelAttribute' => "restaurantname",
+        'valueAttribute' => "restaurant_uuid",
+        "formModalName" => "subscription"
+    ]); ?>
 
     <?=
         $form->field($model, 'plan_id')->widget(Select2::classname(), [
@@ -60,10 +57,6 @@ use kartik\select2\Select2;
     <?= $form->field($model, 'subscription_start_at')->textInput(['type' => 'datetime']) ?>
 
     <?= $form->field($model, 'subscription_end_at')->textInput(['type' => 'datetime']) ?>
-
-
-
-
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

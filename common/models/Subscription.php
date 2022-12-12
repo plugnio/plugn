@@ -240,4 +240,9 @@ class Subscription extends \yii\db\ActiveRecord {
     public function getRestaurant($modelClass = "\common\models\Restaurant") {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+    public function getRestaurantName($modelClass = "\common\models\Restaurant") {
+        return $this->restaurant? $this->restaurant->name: null;
+    }
+
 }
