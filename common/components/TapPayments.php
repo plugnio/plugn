@@ -8,6 +8,7 @@ use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use yii\base\InvalidConfigException;
 
+
 /**
  * TapPayments class for payment processing
  *
