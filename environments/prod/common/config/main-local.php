@@ -30,7 +30,7 @@ return [
         ],
         'walletManager' => [
             'class' => 'common\components\walletManager',
-            'apiKey' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+            'apiKey' => 'imx4kpyVCXbi7sVy-zEvEITL63sQWisn',//QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG
         ],
         'resourceManager' => [
             'class' => 'common\components\S3ResourceManager',
