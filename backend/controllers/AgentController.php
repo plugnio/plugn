@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\Admin;
+use backend\models\AgentAssignmentSearch;
 use Yii;
 use yii\filters\AccessControl;
 use backend\models\Agent;
@@ -94,8 +95,14 @@ class AgentController extends Controller
      */
     public function actionView($id)
     {
+        $searchModel = new AgentAssignmentSearch();
+        $searchModel->agent_id = $id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel
         ]);
     }
 
