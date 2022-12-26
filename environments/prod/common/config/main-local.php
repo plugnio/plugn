@@ -29,7 +29,7 @@ return [
             'schemaCache' => 'cache',
         ],
         'walletManager' => [
-            'class' => 'common\components\walletManager',
+            'class' => 'common\components\WalletManager',
             'apiKey' => 'imx4kpyVCXbi7sVy-zEvEITL63sQWisn',//QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG
         ],
         'resourceManager' => [
