@@ -11,17 +11,8 @@ use kartik\daterange\DateRangePicker;
 
 <div class="card">
 
-
-
-    <div class="card-header" style="padding-bottom:21px !important">
+    <div class="card-header">
         <h4 class="card-title">Filters</h4>
-        <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
-        <div class="heading-elements">
-            <ul class="list-inline mb-0">
-                <li><a data-action="collapse"><i class="feather icon-chevron-down"></i></a></li>
-                <li><a data-action="close"><i class="feather icon-x"></i></a></li>
-            </ul>
-        </div>
     </div>
     <div class="card-content  ">
 
@@ -33,7 +24,7 @@ use kartik\daterange\DateRangePicker;
 
                         <?php
                         $form = ActiveForm::begin([
-                                    'action' => ['customer/index', 'storeUuid' => $restaurant_uuid],
+                                    'action' => ['customer/index', 'storeUuid' => $model->restaurant_uuid],
                                     'method' => 'get',
                         ]);
                         ?>
@@ -41,7 +32,6 @@ use kartik\daterange\DateRangePicker;
                         <div class="col-12 col-md-4">
                             <?= $form->field($model, 'customer_name') ?>
                         </div>
-
 
                         <div class="col-12 col-md-4">
                             <?= $form->field($model, 'customer_phone_number') ?>
@@ -62,7 +52,8 @@ use kartik\daterange\DateRangePicker;
 
                         <div class="form-group">
                             <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-                            <?= Html::a('Reset', ['customer/index', 'storeUuid' => $restaurant_uuid], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
+                            <?= Html::a('Reset', ['customer/index', 'storeUuid' => $model->restaurant_uuid],
+                                ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
                         </div>
                         <?php ActiveForm::end(); ?>
 

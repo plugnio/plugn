@@ -707,7 +707,6 @@ class OrderController extends Controller {
         $transaction = Yii::$app->request->getBodyParam("transaction");
         $acquirer = Yii::$app->request->getBodyParam("acquirer");
 
-
         if ($currency_mode = Currency::find()->where(['code' => $currency])->one())
             $decimal_place = $currency_mode->decimal_place;
         else
@@ -737,12 +736,13 @@ class OrderController extends Controller {
             if (isset($acquirer)) {
                 if (isset($acquirer['response']))
                     $response_message = $acquirer['response']['message'];
+
             } else {
                 if (isset($response))
                     $response_message = $response['message'];
             }
 
-            $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+            $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message, $response);
 
             $isValidSignature = false;
 
