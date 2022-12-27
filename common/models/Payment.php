@@ -238,9 +238,12 @@ class Payment extends \yii\db\ActiveRecord
 
         } else {
 
+            $amount = Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [
+                \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]);
+
             Yii::error('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                 . $paymentRecord->customer->customer_name .
-                ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
+                ' tried to pay ' . $amount .
                 ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::error('[Response from TAP for Failed Payment] ' .
@@ -340,7 +343,7 @@ class Payment extends \yii\db\ActiveRecord
             Yii::info('[TAP Payment Issue: ' . $paymentRecord->customer->customer_name . ' - #' . $paymentRecord->order_uuid . ']'
                 . $paymentRecord->restaurant->name . ': ' .$paymentRecord->customer->customer_name .
                 ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
-                ' and has failed at gateway. '. $response_message . ' or maybe card issue.', __METHOD__);
+                ' and has failed at gateway. '. print_r($response_message, true) . ' or maybe card issue.', __METHOD__);
 
             //notify tech team + vendor
 
@@ -375,10 +378,13 @@ class Payment extends \yii\db\ActiveRecord
         if (!$responseContent->IsSuccess) {
 
             $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+
             \Yii::error('[Payment Issue]' . $errorMessage, __METHOD__); // Log error faced by user
+
             throw new NotFoundHttpException(json_encode($errorMessage));
 
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
+
             return $paymentRecord;
         }
 
