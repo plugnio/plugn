@@ -527,12 +527,12 @@ class OrderController extends Controller
      * Update payment's status
      * @return mixed
      */
-    public function actionUpdatePaymentStatus($id, $storeUuid)
+    public function actionUpdatePaymentStatus($id)
     {
         try {
             $payment = Payment::findOne($id);
 
-            if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+            if ($payment !== null) {
 
                 if ($payment->payment_gateway_name == 'tap') {
                     $transaction_id = $payment->payment_gateway_transaction_id;
@@ -542,7 +542,7 @@ class OrderController extends Controller
                     Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
                 }
 
-                return $this->redirect(['view', 'id' => $payment->order_uuid, 'storeUuid' => $storeUuid]);
+                return $this->redirect(['view', 'id' => $payment->order_uuid]);
             }
 
         } catch (\Exception $e) {

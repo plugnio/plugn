@@ -98,7 +98,7 @@ $('#agentassignment-agentname').on('click', function() {
         const value = Object.fromEntries(data.entries());
 
         $.ajax({
-				url: '". Url::to(['agent/dropdown']) ."&fromPager=1',
+				url: '". Url::to(['agent/dropdown', 'fromPager' => 1]) ."',
 				dataType: 'html',
 				data: value,
 				success: function(html) {

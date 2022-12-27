@@ -11,7 +11,6 @@ use common\models\AgentAssignment;
  */
 class AgentAssignmentSearch extends AgentAssignment
 {
-
     public $store_name;
     public $agent_name;
 
@@ -76,7 +75,7 @@ class AgentAssignmentSearch extends AgentAssignment
         // grid filtering conditions
         $query->andFilterWhere([
             'assignment_id' => $this->assignment_id,
-            'agent_id' => $this->agent_id,
+            'agent_assignment.agent_id' => $this->agent_id,
             'assignment_created_at' => $this->assignment_created_at,
             'assignment_updated_at' => $this->assignment_updated_at,
             'role' => $this->role,
