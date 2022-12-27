@@ -69,13 +69,12 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
 if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->diggipack_customer_id != null)
   $diggipack_customer_id = $model->deliveryZone->businessLocation->diggipack_customer_id;
 
-
 ?>
 
-
-
 <div class="page-title">
-
+    <h1>
+        <?= Html::encode($this->title) ?>
+    </h1>
     <p>
         <?php
         if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
@@ -184,6 +183,15 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                             'format' => 'html',
                             'value' => function ($data) {
                                 return '<span  style="font-size:25px; font-weight: 700" >' . $data->orderStatusInEnglish . '</span>';
+                            },
+                        ],
+                        [
+                            'label' => 'Store',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return Html::a(
+                                        $data->restaurant->name,
+                                        \yii\helpers\Url::to(['restaurant/view', 'id' => $data->restaurant_uuid]), ['target' => '_blank']);
                             },
                         ],
                         [
@@ -643,10 +651,12 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
             <?php
 
             if($model->restaurant->is_tap_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
-              echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid], ['class'=>'btn btn-outline-primary']);
+              echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid],
+                  ['class'=>'btn btn-outline-primary']);
 
             // if($model->restaurant->is_myfatoorah_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'Succss')
-            //   echo Html::a('Request Payment Status Update from MyFatoorah', ['update-payment-status','id' => $model->payment_uuid], ['class'=>'btn btn-outline-primary']);
+            //   echo Html::a('Request Payment Status Update from MyFatoorah', ['update-payment-status','id' => $model->payment_uuid],
+            //  ['class'=>'btn btn-outline-primary']);
 
             ?>
 
@@ -735,6 +745,14 @@ DetailView::widget([
 ])
 ?>
 
+
+                <?php if(sizeof($model->payment->paymentFails) > 0) { ?>
+                    <h4>Payment failed response</h4>
+                <?php } ?>
+
+                <?php foreach($model->payment->paymentFails as $paymentFail) { ?>
+                   <pre> <?php print_r(unserialize($paymentFail->response . '')) ?></pre>
+                <?php } ?>
             </div>
         </div>
     </div>

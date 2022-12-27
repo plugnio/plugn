@@ -5,7 +5,7 @@ namespace backend\controllers;
 use Yii;
 use common\models\Customer;
 use common\models\Order;
-use frontend\models\CustomerSearch;
+use backend\models\CustomerSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -44,24 +44,17 @@ class CustomerController extends Controller {
      * Lists all Customer models.
      * @return mixed
      */
-    public function actionIndex($storeUuid) {
-
-      // add conditions that should always apply here
-
-        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
+    public function actionIndex($storeUuid = null) {
 
         $searchModel = new CustomerSearch();
         
-        $count = $searchModel->search([], $restaurant->restaurant_uuid)->getCount();
+        $searchModel->restaurant_uuid = $storeUuid;
 
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $storeUuid);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
-                    'restaurant' => $restaurant,
-                    'count' => $count,
-                    'storeUuid' => $storeUuid
         ]);
     }
 
@@ -96,14 +89,12 @@ class CustomerController extends Controller {
        * @return mixed
        * @throws NotFoundHttpException if the model cannot be found
        */
-      public function actionUpdate($id, $storeUuid)
+      public function actionUpdate($id)
       {
-        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
-
-        $model = $this->findModel($id, $storeUuid);
+        $model = $this->findModel($id);
 
           if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->customer_id,'storeUuid' => $storeUuid]);
+            return $this->redirect(['view', 'id' => $model->customer_id]);
           }
 
           return $this->render('update', [
@@ -117,17 +108,15 @@ class CustomerController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $storeUuid) {
-        $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
+    public function actionView($id, $storeUuid = null) {
 
-        $model = $this->findModel($id, $storeUuid);
+        $model = $this->findModel($id);
 
         // Customer's Orders Data
         $customersOrdersData = new \yii\data\ActiveDataProvider([
             'query' => $model->getOrders()->with(['currency'])->orderBy(['order_created_at' => SORT_ASC]),
             'pagination' => false
         ]);
-
 
         return $this->render('view', [
           'model' => $model,
@@ -317,8 +306,8 @@ class CustomerController extends Controller {
      * @return Customer the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id, $storeUuid) {
-        if (($model = Customer::find()->where(['customer_id'=>$id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid ])->one()) !== null) {
+    protected function findModel($id) {
+        if (($model = Customer::find()->where(['customer_id'=>$id])->one()) !== null) {
             return $model;
         }
 
