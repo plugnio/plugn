@@ -431,7 +431,7 @@ class SiteController extends Controller
                 $response_message = $response['message'];
             }
 
-            $paymentRecord = SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+            $paymentRecord = SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $reference, $response_message);
 
             $isValidSignature = false;
 
