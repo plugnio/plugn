@@ -969,8 +969,14 @@ class OrderController extends Controller
                     $response_message = $response['message'];
             }
 
-            $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations,
-                $source, $response_message, $response);
+            $paymentRecord = Payment::updatePaymentStatus(
+                $charge_id,
+                $status,
+                $destinations,
+                $source,
+                $reference,
+                $response_message,
+                $response);
 
             $isValidSignature = false;
 
