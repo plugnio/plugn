@@ -272,8 +272,13 @@ class Payment extends \yii\db\ActiveRecord
      * @param string $response_message
      */
     public static function updatePaymentStatus(
-        $id, $status, $destinations = null , $source = null, $reference,
-        $response_message = null, $responseContent = []
+        $id,
+        $status,
+        $destinations = null ,
+        $source = null,
+        $reference,
+        $response_message = null,
+        $responseContent = []
     ) {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
