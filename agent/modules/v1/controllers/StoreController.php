@@ -5,9 +5,11 @@ namespace agent\modules\v1\controllers;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
+use common\components\TapPayments;
 use common\models\Setting;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
@@ -104,6 +106,51 @@ class StoreController extends Controller
     public function actionDetail($store_uuid)
     {
         return $this->findModel($store_uuid);
+    }
+
+    /**
+     * test tap connection
+     * @return void
+     */
+    public function actionTestTap()
+    {
+        $store = $this->findModel();
+
+        Yii::$app->tapPayments->setApiKeys(
+            $store->live_api_key,
+            $store->test_api_key
+        );//$order->restaurant->is_sandbox
+
+        $response = Yii::$app->tapPayments->createCharge(
+            $store->currency->code,
+            "Testing integration", // Description
+            $store->name, //Statement Desc.
+            time(), // Reference
+            1,
+            "test name",
+            "test@localhost.com",
+            "+91",
+            "8758702738",
+            0,
+            Url::to(['order/callback'], true),
+            Url::to(['order/payment-webhook'], true),
+            "src_kw.knet",//src_all
+            0,
+            0,
+            'Kuwait'
+        );
+
+        $responseContent = json_decode($response->content);
+
+        if (isset($responseContent->errors)) {
+
+            return [
+                'operation' => 'error',
+                "message" => "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description
+            ];
+        }
+
+        return self::message("success", 'Integration working fine.');
     }
 
     /**

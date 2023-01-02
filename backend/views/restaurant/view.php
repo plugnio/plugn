@@ -69,6 +69,10 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         <?php } ?>
 
+        <?php if($model->is_tap_enable) { ?>
+            <?= Html::a('Test tap integration', ['restaurant/test-tap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-default']) ?>
+        <?php } ?>
+
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger btn-delete',
