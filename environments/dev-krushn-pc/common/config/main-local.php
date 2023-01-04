@@ -52,6 +52,12 @@ return [
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',
             'branch' => 'develop'
-        ]
+        ],
+        'apiUrlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'http://localhost/plugn/api/web',
+            'enablePrettyUrl' => false,
+            'showScriptName' => false,
+        ],
     ],
 ];
