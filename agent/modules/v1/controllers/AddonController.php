@@ -323,7 +323,14 @@ class AddonController extends Controller
                 }
             }
 
-            $paymentRecord = \common\models\SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+            $paymentRecord = \common\models\SubscriptionPayment::updatePaymentStatus(
+                $charge_id,
+                $status,
+                $destinations,
+                $source,
+                $reference,
+                $response_message);
+
             $paymentRecord->received_callback = true;
             $paymentRecord->save(false);
 

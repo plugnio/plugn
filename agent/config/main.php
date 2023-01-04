@@ -465,6 +465,7 @@ return [
                         'GET' => 'detail',
                         'GET status' => 'status',
                         'GET settings/<code>' => 'settings',
+                        'GET test-tap' => 'test-tap',
                         'POST' => 'update',
                         'POST upgrade' => 'upgrade',
                         'POST connect-domain' => 'connect-domain',
@@ -488,6 +489,7 @@ return [
                         'DELETE remove-gateway-queue/<id>' => 'remove-gateway-queue',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS test-tap' => 'options',
                         'OPTIONS upgrade' => 'options',
                         'OPTIONS connect-domain' => 'options',
                         'OPTIONS update-bank-account' => 'options',

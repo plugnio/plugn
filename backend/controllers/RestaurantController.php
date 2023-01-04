@@ -8,6 +8,7 @@ use Yii;
 use common\models\Restaurant;
 use common\models\TapQueue;
 use backend\models\RestaurantSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -108,6 +109,49 @@ class RestaurantController extends Controller {
         $model->paymentGatewayQueue->processQueue();
 
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * test tap connection
+     * @return void
+     */
+    public function actionTestTap($id)
+    {
+        $store = $this->findModel($id);
+
+        Yii::$app->tapPayments->setApiKeys(
+            $store->live_api_key,
+            $store->test_api_key
+        );//$order->restaurant->is_sandbox
+
+        $response = Yii::$app->tapPayments->createCharge(
+            $store->currency->code,
+            "Testing integration", // Description
+            $store->name, //Statement Desc.
+            time(), // Reference
+            1,
+            "test name",
+            "test@localhost.com",
+            "+91",
+            "8758702738",
+            0,
+            Url::to(['order/callback'], true),
+            Url::to(['order/payment-webhook'], true),
+            "src_kw.knet",//src_all
+            0,
+            0,
+            'Kuwait'
+        );
+
+        $responseContent = json_decode($response->content);
+
+        if (isset($responseContent->errors)) {
+            Yii::$app->session->setFlash('errorResponse', "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description);
+        } else {
+            Yii::$app->session->setFlash('successResponse', 'Integration working fine.');
+        }
+
+        return $this->redirect(['view', 'id' => $id]);
     }
 
     /**

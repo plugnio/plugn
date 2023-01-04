@@ -182,7 +182,6 @@ class Payment extends \yii\db\ActiveRecord
             return $paymentRecord;
         }
 
-
         $paymentRecord->payment_current_status = $responseContent->status; // 'CAPTURED' ?
 
         $paymentRecord->response_message = $responseContent->response->message;
@@ -223,12 +222,10 @@ class Payment extends \yii\db\ActiveRecord
                     $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFee;
             }
 
-
             if (isset($responseContent->destinations))
                 $paymentRecord->plugn_fee = $responseContent->destinations->amount;
             else
                 $paymentRecord->plugn_fee = 0;
-
 
             // Update payment method used and the order id assigned to it
             if (isset($responseContent->source->payment_method) && $responseContent->source->payment_method)
@@ -240,13 +237,21 @@ class Payment extends \yii\db\ActiveRecord
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
 
         } else {
-            Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
+
+            $amount = Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [
+                \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]);
+
+            Yii::error('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                 . $paymentRecord->customer->customer_name .
-                ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
+                ' tried to pay ' . $amount .
                 ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
-            Yii::info('[Response from TAP for Failed Payment] ' .
+            Yii::error('[Response from TAP for Failed Payment] ' .
                 print_r($responseContent, true), __METHOD__);
+
+            //notify tech team + vendor
+
+            self::notifyTapError($paymentRecord, $responseContent);
         }
 
         $paymentRecord->save();
@@ -266,10 +271,18 @@ class Payment extends \yii\db\ActiveRecord
      * @param string $source                        transaction's source
      * @param string $response_message
      */
-    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
-    {
+    public static function updatePaymentStatus(
+        $id,
+        $status,
+        $destinations = null ,
+        $source = null,
+        $reference,
+        $response_message = null,
+        $responseContent = []
+    ) {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
+
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
@@ -282,10 +295,8 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
         $paymentRecord->response_message = $response_message;
 
-
         // On Successful Payments
         if ($status == 'CAPTURED') {
-
 
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
@@ -337,10 +348,12 @@ class Payment extends \yii\db\ActiveRecord
             Yii::info('[TAP Payment Issue: ' . $paymentRecord->customer->customer_name . ' - #' . $paymentRecord->order_uuid . ']'
                 . $paymentRecord->restaurant->name . ': ' .$paymentRecord->customer->customer_name .
                 ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
-                ' and has failed at gateway. '. $response_message . ' or maybe card issue.', __METHOD__);
+                ' and has failed at gateway. '. print_r($response_message, true) . ' or maybe card issue.', __METHOD__);
 
+            //notify tech team + vendor
+
+            self::notifyTapError($paymentRecord, $responseContent);
         }
-
 
         return $paymentRecord;
     }
@@ -370,10 +383,13 @@ class Payment extends \yii\db\ActiveRecord
         if (!$responseContent->IsSuccess) {
 
             $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+
             \Yii::error('[Payment Issue]' . $errorMessage, __METHOD__); // Log error faced by user
+
             throw new NotFoundHttpException(json_encode($errorMessage));
 
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
+
             return $paymentRecord;
         }
 
@@ -520,7 +536,10 @@ class Payment extends \yii\db\ActiveRecord
 
         }
 
-        if(!$insert && $this->scenario == self::SCENARIO_UPDATE_STATUS_WEBHOOK && isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED' && $this->payment_current_status == 'CAPTURED' && $this->order->order_status == Order::STATUS_ABANDONED_CHECKOUT){
+        if(!$insert && $this->scenario == self::SCENARIO_UPDATE_STATUS_WEBHOOK &&
+            isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED'
+            && $this->payment_current_status == 'CAPTURED' && $this->order->order_status == Order::STATUS_ABANDONED_CHECKOUT)
+        {
 
           $this->order->changeOrderStatusToPending();
           $this->order->sendPaymentConfirmationEmail($this);
@@ -542,6 +561,54 @@ class Payment extends \yii\db\ActiveRecord
                 'payment_uuid' => $this->payment_uuid
             ]);
         }
+    }
+
+    /**
+     * add tap error in log
+     * @param $paymentRecord
+     * @param $responseContent
+     * @return void
+     */
+    public static function notifyTapError($paymentRecord, $responseContent) {
+
+        $model = new PaymentFailed;
+        $model->payment_uuid = $paymentRecord->payment_uuid;
+        $model->order_uuid = $paymentRecord->order_uuid;
+        $model->customer_id = $paymentRecord->customer_id;
+        $model->response = serialize($responseContent);
+
+        if(!$model->save()) {
+            Yii::error($model->errors);
+        }
+
+        $agents = $paymentRecord->restaurant->getAgentAssignments()->all();
+
+        foreach ($agents as $agentAssignment) {
+
+            if ($agentAssignment->email_notification) {
+
+                \Yii::$app->mailer->compose([
+                    'html' => 'payment-failed-html',
+                ], [
+                    'payment' => $paymentRecord,
+                    'responseContent' => $responseContent
+                ])
+                    ->setFrom(Yii::$app->params['supportEmail'])//[$fromEmail => $this->restaurant->name]
+                    ->setTo($agentAssignment->agent->agent_email)
+                    ->setCc(Yii::$app->params['supportEmail'])
+                    ->setSubject('Payment failed for order #' . $paymentRecord->order_uuid . ' from ' . $paymentRecord->restaurant->name)
+                    //->setReplyTo($replyTo)
+                    ->send();
+            }
+        }
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentFails($modelClass = "\common\models\PaymentFailed")
+    {
+        return $this->hasMany($modelClass::className(), ['payment_uuid' => 'payment_uuid']);
     }
 
     /**
