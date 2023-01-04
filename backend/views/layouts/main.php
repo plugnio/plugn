@@ -66,6 +66,7 @@ AppAsset::register($this);
                 ]
             ],
             ['label' => 'Customers', 'url' => ['/customer/index']],
+            ['label' => 'Debugger', 'url' => Yii::$app->apiUrlManager->getBaseUrl(). '/debug'],
             [
                 'label' => 'Settings',
                 'items' => [
