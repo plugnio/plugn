@@ -734,7 +734,7 @@ class TapPayments extends Component
             ->setMethod('GET')
             ->setUrl($this->apiEndpoint . "/destination/" . $destination_id)
             ->addHeaders([
-                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey, 
                 'content-type' => 'application/json',
             ])
             ->send();
@@ -750,7 +750,7 @@ class TapPayments extends Component
             ->setMethod('POST')
             ->setUrl($this->apiEndpoint . "/destination/list")
             ->addHeaders([
-                'authorization' => 'Bearer ' . $this->plugnScretApiKey,//sk_test_BPmcTgEfuK1dHslMaLGY42Ry
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey,
                 'content-type' => 'application/json',
             ])
             ->setData([
@@ -776,7 +776,7 @@ class TapPayments extends Component
             ->setMethod('DELETE')
             ->setUrl($this->apiEndpoint . "/destination/" .$destination_id)
             ->addHeaders([
-                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey,
                 'content-type' => 'application/json',
             ])
             ->send();
