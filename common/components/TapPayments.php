@@ -124,6 +124,7 @@ class TapPayments extends Component
      * @var string Variable for test api key to be stored in
      */
     public $vendorTestApiKey;
+
     private $apiEndpoint = "https://api.tap.company/v2";
 
     /**
@@ -294,7 +295,6 @@ class TapPayments extends Component
 
             array_push($bussinessParams['entity']['documents'], $authorizedSignatureDocument);
 
-
             $commercialLicenseDocument = [
                 "type" => "Commercial License",
                 "number" => 1,
@@ -307,7 +307,6 @@ class TapPayments extends Component
             ];
 
             array_push($bussinessParams['entity']['documents'], $commercialLicenseDocument);
-
 
             $bussinessParams['entity']['is_licensed'] = 'true';
         } else {
@@ -601,8 +600,6 @@ class TapPayments extends Component
             "by" => "PROVIDER"
         ];
 
-
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
@@ -634,8 +631,6 @@ class TapPayments extends Component
 
         return $response;
     }
-
-
 
     /**
      * Update bank account connected with wallet
@@ -704,6 +699,90 @@ class TapPayments extends Component
         return $response;
     }
 
+    /*public function addDestination($display_name)
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl($this->apiEndpoint . "/destination")
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->setData([
+                'display_name' => $display_name,
+                'business_id' => $swift_code,
+                'business_entity_id' => $account_number,
+                "brand_id" => $brand_id,
+                "branch_id" => $branch_id,
+                "bank_account": [
+                    "iban":
+                ],
+                "settlement_by": "Acquirer"
+            ])
+            ->send();
+
+        return $response;
+    }*/
+
+    public function getDestination($destination_id)
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('GET')
+            ->setUrl($this->apiEndpoint . "/destination/" . $destination_id)
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
+
+        return $response;
+    }
+
+    public function listDestination()
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl($this->apiEndpoint . "/destination/list")
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey,//sk_test_BPmcTgEfuK1dHslMaLGY42Ry
+                'content-type' => 'application/json',
+            ])
+            ->setData([
+                "period" => [
+                    "date" => [
+                        "from" => 0,
+                        "to" => time()
+                    ]
+                ],
+                "limit" => 20,
+                "page" => 1
+            ])
+            ->send();
+
+        return $response;
+    }
+
+    public function deleteDestination($destination_id)
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('DELETE')
+            ->setUrl($this->apiEndpoint . "/destination/" .$destination_id)
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
+
+        return $response;
+    }
 
     /**
      * checkTapSignature

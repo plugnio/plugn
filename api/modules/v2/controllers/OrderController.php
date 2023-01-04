@@ -382,6 +382,7 @@ class OrderController extends Controller
                         }
 
                     } catch (\Exception $e) {
+                        
                         $transaction->rollBack();
 
                         return [
@@ -456,7 +457,7 @@ class OrderController extends Controller
 
                         $transaction->rollBack();
 
-                        Yii::error($responseContent, 'application');
+                       // Yii::error($responseContent, 'application');
 
                         $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
 
