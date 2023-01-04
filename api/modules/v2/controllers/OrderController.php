@@ -461,7 +461,7 @@ class OrderController extends Controller
 
                         $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
 
-                        $requestBody = [
+                        /*$requestBody = [
                             $order->currency->code,
                             "Order placed from: " . $order->customer_name, // Description
                             $order->restaurant->name, //Statement Desc.
@@ -479,14 +479,14 @@ class OrderController extends Controller
                             $order->restaurant->warehouse_fee,
                             $order->restaurant->warehouse_delivery_charges,
                             $order->area_id ? $order->area->country->country_name : ''
-                        ];
+                        ];*/
 
-                        Yii::error($requestBody, 'application');
+                        Yii::error("Order #". $order->order_uuid . " Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description, 'application');
 
                         return [
                             'operation' => 'error',
                             'message' => $errorMessage,
-                            'rerquestSent' => $requestBody,
+                            //'rerquestSent' => $requestBody,
                             'code' => 15,
                             'errors' => $responseContent->errors
                         ];
@@ -503,6 +503,8 @@ class OrderController extends Controller
 
                             $transaction->rollBack();
 
+                            Yii::error("Order #". $order->order_uuid . " Error: " . print_r($payment->getErrors(), true), 'application');
+
                             return [
                                 'operation' => 'error',
                                 'message' => $payment->getErrors(),
@@ -511,10 +513,13 @@ class OrderController extends Controller
                         }
                     } else {
 
-                        $transaction->commit();
+                        $transaction->rollBack();
+
+                        Yii::error("Order #". $order->order_uuid . " Error: Payment Issue > Charge id is missing",
+                            'application');
 
                         return [
-                            'operation' => 'success',
+                            'operation' => 'error',
                             'message' => 'Payment Issue > Charge id is missing',
                             'code' => 17
                         ];
@@ -536,6 +541,10 @@ class OrderController extends Controller
 
                     Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
                       */
+
+                    Yii::error("Order #". $order->order_uuid . " Error: " . $e->getMessage(),
+                        'application');
+
                     $transaction->rollBack();
 
                     return [
@@ -677,6 +686,8 @@ class OrderController extends Controller
                 ];
 
             } else {
+
+                //Yii::error("Order #". $order->order_uuid . " Error: " . $e->getMessage(), 'application');
 
                 $transaction->rollBack();
 
