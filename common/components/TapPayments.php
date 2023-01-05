@@ -124,6 +124,7 @@ class TapPayments extends Component
      * @var string Variable for test api key to be stored in
      */
     public $vendorTestApiKey;
+
     private $apiEndpoint = "https://api.tap.company/v2";
 
     /**
@@ -434,8 +435,22 @@ class TapPayments extends Component
      * Create a charge for redirect
      */
     public function createCharge(
-        $currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee,
-        $redirectUrl, $webhookUrl , $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null
+        $currency,
+        $desc = "Pay",
+        $statementDesc = "",
+        $ref,
+        $amount ,
+        $firstName,
+        $email,
+        $country_code ,
+        $phone,
+        $platform_fee,
+        $redirectUrl,
+        $webhookUrl ,
+        $gateway,
+        $warehouse_fee = 0,
+        $warehouse_delivery_charges = 0,
+        $country_name = null
     ) {
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
@@ -501,7 +516,7 @@ class TapPayments extends Component
           } 
           else if($gateway == static::GATEWAY_BENEFIT) 
           {
-              $platform_fee = $amount *  ( $platform_fee  - $this->benefitGatewayFee );
+              $platform_fee = $amount *  ($platform_fee  - $this->benefitGatewayFee );
           }
           else 
           {
@@ -516,7 +531,6 @@ class TapPayments extends Component
            {
                $charge_amount = $platform_fee;
            }
-
 
             if($warehouse_delivery_charges > 0 && $country_name != null && $country_name == 'Kuwait') {
                 $charge_amount = $warehouse_delivery_charges + $charge_amount;
