@@ -31,7 +31,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'payment_method_code',
             'vat',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => "{view}"
+            ],
         ],
     ]); ?>
 

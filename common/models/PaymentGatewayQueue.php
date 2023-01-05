@@ -138,6 +138,12 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                     ->setTo([$this->restaurant->restaurant_email])
                     ->setSubject($subject)
                     ->send();
+
+                //enable all payment gateway by default
+
+                if($this->payment_gateway == 'tap')
+                    $this->enableTapGateways();
+
         }
         else
         {
@@ -150,6 +156,30 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
         }
 
         return $response;
+    }
+
+    /**
+     * enable tap payment gateways from tap
+     * @return void
+     */
+    public function enableTapGateways() {
+
+        $subQuery = $this->restaurant->getRestaurantPaymentMethods()
+            ->select('payment_method_id');
+
+        $paymentGateways = PaymentMethod::find()
+            ->andWhere(['LIKE', 'source_id', "src_"])
+            ->andWhere(new Expression("source_id IS NOT NULL"))
+            ->andWhere(['NOT IN', 'payment_method_id', $subQuery])
+            ->all();
+
+        foreach ($paymentGateways as $paymentGateway) {
+            $model = new RestaurantPaymentMethod();
+            $model->payment_method_id = $paymentGateway->payment_method_id;
+            $model->restaurant_uuid = $this->restaurant_uuid;
+            $model->status = RestaurantPaymentMethod::STATUS_ACTIVE;
+            $model->save();
+        }
     }
 
     /**
