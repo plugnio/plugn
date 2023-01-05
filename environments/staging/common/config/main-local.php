@@ -115,5 +115,11 @@ return [
             'class' => 'common\components\GithubComponent',
             'branch' => 'develop'
         ],
+        'apiUrlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'https://api.dev.plugn.io',
+            'enablePrettyUrl' => false,
+            'showScriptName' => false,
+        ],
     ],
 ];

@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\PaymentMethod */
 
-$this->title = $model->payment_method_id;
+$this->title = $model->payment_method_name;
 $this->params['breadcrumbs'][] = ['label' => 'Payment Methods', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <!--
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->payment_method_id], ['class' => 'btn btn-primary btn-update']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->payment_method_id], [
@@ -24,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-    </p>
+    </p>-->
 
     <?= DetailView::widget([
         'model' => $model,
@@ -32,6 +33,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'payment_method_id',
             'payment_method_name',
             'payment_method_name_ar',
+            'payment_method_code',
+            'vat',
+            'source_id',
+            [
+                'label' => 'Supported Currencies',
+                'value' => function($model) {
+                    $cs = \yii\helpers\ArrayHelper::getColumn($model->paymentMethodCurrencies, 'currency');
+
+                    return implode(', ', $cs);
+                }
+            ],
         ],
     ]) ?>
 

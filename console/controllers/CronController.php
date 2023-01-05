@@ -378,6 +378,13 @@ class CronController extends \yii\console\Controller
 
     }
 
+    public function actionTest() {
+        $tap = PaymentGatewayQueue::find()->offset(1)->one();
+
+        $tap->enableGateways();
+
+    }
+
     /**
      * todo: why cron? when can just proccess form submit
      */
