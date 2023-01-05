@@ -109,6 +109,7 @@ class OrderController extends Controller
         }
 
         //payment method
+
         $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
         $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
         $order->currency_code = Yii::$app->currency->getCode();
@@ -295,18 +296,21 @@ class OrderController extends Controller
         }
 
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
+
             $transaction->rollBack();
+
             return [
                 'operation' => 'error',
-                'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]),
+                'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge,
+                        $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]),
                 'code' => 10
             ];
         }
 
         //if payment method not cash redirect customer to payment gateway
 
-        if (!in_array($order->payment_method_id, [3, 7])) {
-
+        if (!in_array($order->payment_method_id, [3, 7]))
+        {
             // Create new payment record
             $payment = new Payment;
             $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
@@ -343,6 +347,7 @@ class OrderController extends Controller
                         // Validate that theres no error from TAP gateway
 
                         if (isset($responseContent->status) && $responseContent->status == "fail") {
+
                             $transaction->rollBack();
 
                             return [
@@ -377,6 +382,7 @@ class OrderController extends Controller
                         }
 
                     } catch (\Exception $e) {
+                        
                         $transaction->rollBack();
 
                         return [
@@ -436,7 +442,8 @@ class OrderController extends Controller
                     $order->restaurant->platform_fee,
                     Url::to(['order/callback'], true),
                     Url::to(['order/payment-webhook'], true),
-                    $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
+                    $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ?
+                        $payment->payment_token : $order->paymentMethod->source_id,
                     $order->restaurant->warehouse_fee,
                     $order->restaurant->warehouse_delivery_charges,
                     $order->area_id ? $order->area->country->country_name : ''
@@ -450,9 +457,11 @@ class OrderController extends Controller
 
                         $transaction->rollBack();
 
+                       // Yii::error($responseContent, 'application');
+
                         $errorMessage = "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description;
 
-                        $requestBody = [
+                        /*$requestBody = [
                             $order->currency->code,
                             "Order placed from: " . $order->customer_name, // Description
                             $order->restaurant->name, //Statement Desc.
@@ -465,18 +474,19 @@ class OrderController extends Controller
                             $order->restaurant->platform_fee,
                             Url::to(['order/callback'], true),
                             Url::to(['order/payment-webhook'], true),
-                            $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
+                            $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD &&
+                            $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
                             $order->restaurant->warehouse_fee,
                             $order->restaurant->warehouse_delivery_charges,
                             $order->area_id ? $order->area->country->country_name : ''
-                        ];
+                        ];*/
 
-                        Yii::error($requestBody, 'application');
+                        Yii::error("Order #". $order->order_uuid . " Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description, 'application');
 
                         return [
                             'operation' => 'error',
                             'message' => $errorMessage,
-                            'rerquestSent' => $requestBody,
+                            //'rerquestSent' => $requestBody,
                             'code' => 15,
                             'errors' => $responseContent->errors
                         ];
@@ -493,6 +503,8 @@ class OrderController extends Controller
 
                             $transaction->rollBack();
 
+                            Yii::error("Order #". $order->order_uuid . " Error: " . print_r($payment->getErrors(), true), 'application');
+
                             return [
                                 'operation' => 'error',
                                 'message' => $payment->getErrors(),
@@ -501,10 +513,13 @@ class OrderController extends Controller
                         }
                     } else {
 
-                        $transaction->commit();
+                        $transaction->rollBack();
+
+                        Yii::error("Order #". $order->order_uuid . " Error: Payment Issue > Charge id is missing",
+                            'application');
 
                         return [
-                            'operation' => 'success',
+                            'operation' => 'error',
                             'message' => 'Payment Issue > Charge id is missing',
                             'code' => 17
                         ];
@@ -526,6 +541,10 @@ class OrderController extends Controller
 
                     Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
                       */
+
+                    Yii::error("Order #". $order->order_uuid . " Error: " . $e->getMessage(),
+                        'application');
+
                     $transaction->rollBack();
 
                     return [
@@ -667,6 +686,8 @@ class OrderController extends Controller
                 ];
 
             } else {
+
+                //Yii::error("Order #". $order->order_uuid . " Error: " . $e->getMessage(), 'application');
 
                 $transaction->rollBack();
 
@@ -960,7 +981,14 @@ class OrderController extends Controller
                     $response_message = $response['message'];
             }
 
-            $paymentRecord = Payment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+            $paymentRecord = Payment::updatePaymentStatus(
+                $charge_id,
+                $status,
+                $destinations,
+                $source,
+                $reference,
+                $response_message,
+                $response);
 
             $isValidSignature = false;
 
@@ -1262,7 +1290,6 @@ class OrderController extends Controller
      */
     public function actionUpdateArmadaOrderStatus()
     {
-
         $armada_delivery_code = Yii::$app->request->getBodyParam("code");
 
         if (!$armada_delivery_code) {

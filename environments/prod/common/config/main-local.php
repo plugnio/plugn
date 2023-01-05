@@ -29,8 +29,8 @@ return [
             'schemaCache' => 'cache',
         ],
         'walletManager' => [
-            'class' => 'common\components\walletManager',
-            'apiKey' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+            'class' => 'common\components\WalletManager',
+            'apiKey' => 'imx4kpyVCXbi7sVy-zEvEITL63sQWisn',//QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG
         ],
         'resourceManager' => [
             'class' => 'common\components\S3ResourceManager',
@@ -152,6 +152,12 @@ return [
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',
             'branch' => 'master'
+        ],
+        'apiUrlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'https://api.plugn.io',
+            'enablePrettyUrl' => false,
+            'showScriptName' => false,
         ],
     ],
 ];
