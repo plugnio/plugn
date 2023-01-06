@@ -74,6 +74,10 @@ class PaymentController extends Controller {
 
         $currency = \Yii::$app->currency->getCode();
 
+        if(!$currency) {
+            $currency = $model->currency->code;
+        }
+
         $query = $model->getPaymentMethods()
             ->joinWith('paymentMethodCurrencies')
             ->andWhere(['payment_method_currency.currency' => $currency]);
