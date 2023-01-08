@@ -1,18 +1,16 @@
 <?php
 
-namespace api\modules\v1\controllers;
+namespace agent\modules\v1\controllers;
 
 use Yii;
+use common\models\Agent;
+use yii\db\Expression;
 use yii\rest\Controller;
-use yii\data\ActiveDataProvider;
-use common\models\RestaurantPaymentMethod;
-use common\models\PaymentMethod;
-use api\models\Payment;
-use api\models\Restaurant;
 
-class PaymentController extends Controller {
-
-    public function behaviors() {
+class BaseController extends Controller
+{
+    public function behaviors()
+    {
         $behaviors = parent::behaviors();
 
         // remove authentication filter for cors to work
@@ -36,13 +34,21 @@ class PaymentController extends Controller {
             ],
         ];
 
+        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+        ];
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
+
         return $behaviors;
     }
 
     /**
      * @inheritdoc
      */
-    public function actions() {
+    public function actions()
+    {
         $actions = parent::actions();
         $actions['options'] = [
             'class' => 'yii\rest\OptionsAction',
@@ -54,38 +60,28 @@ class PaymentController extends Controller {
     }
 
     /**
-     *  Return Payment details
+     * @param \yii\base\Action $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
      */
-    // public function actionPaymentDetail($id) {
-    //
-    //     $model = Payment::find()->where(['payment_uuid' => $id])->with('order')->asArray()->one();
-    //
-    //     return $model;
-    // }
-    //
-
-
-    /**
-     * return a list of payments method that restaurant's owner added on agent dashboard
-     */
-    public function actionListAllRestaurantsPaymentMethod($id) {
-
-        $model = Restaurant::findOne($id);
-
-        $currency = \Yii::$app->currency->getCode();
-
-        if(!$currency) {
-            $currency = $model->currency->code;
-        }
-
-        $query = $model->getPaymentMethods()
-            ->joinWith('paymentMethodCurrencies')
-            ->andWhere(['payment_method_currency.currency' => $currency]);
-
-        return new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => false
-        ]);
+    public function beforeAction($action)
+    {
+        return parent::beforeAction($action);
     }
 
+    /**
+     * @param \yii\base\Action $action
+     * @param mixed $result
+     * @return mixed
+     */
+    public function afterAction($action, $result)
+    {
+        if(!Yii::$app->user->isGuest) {
+            Agent::updateAll(['last_active_at' => new Expression('NOW()')], [
+                'agent_id' => Yii::$app->user->getId()
+            ]);
+        }
+
+        return parent::afterAction($action, $result);
+    }
 }

@@ -117,6 +117,9 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property boolean $is_public
  * @property boolean $is_deleted
  * @property boolean $is_under_maintenance
+ * @property string|null $last_active_at
+ * @property string|null $last_order_at
+ *
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -301,13 +304,13 @@ class Restaurant extends \yii\db\ActiveRecord
             [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent','enable_gift_message'], 'integer'],
 
             [['phone_number', 'owner_number'], 'string', 'min' => 6, 'max' => 20],
-            //[['phone_number', 'owner_number'], 'number'],
 
+            [['last_active_at', 'last_order_at'], 'safe'],
+
+            //[['phone_number', 'owner_number'], 'number'],
 
             // [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT ,self::SCENARIO_CREATE_STORE_BY_AGENT]],
             // [['phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
-
-
 
             //  ['currency_id', function ($attribute, $params, $validator) {
             //     if ($this->getOrders()->exists())
