@@ -23,6 +23,7 @@ use common\models\AgentToken;
  * @property int $receive_weekly_stats
  * @property int $reminder_email
  * @property string $agent_language_pref
+ * @property string $last_active_at
  * @property string $agent_created_at
  * @property string $agent_updated_at
  *
@@ -77,7 +78,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             [['agent_email'], 'unique'],
             [['agent_email'], 'email'],
             [['tempPassword'], 'required', 'on' => 'create'],
-            [['tempPassword'], 'safe'],
+            [['tempPassword', 'last_active_at'], 'safe'],
             [['agent_password_reset_token'], 'unique'],
         ];
     }
