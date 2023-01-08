@@ -2564,6 +2564,16 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[StoreUpdates]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoreUpdates($modelClass = "\common\models\StoreUpdate")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[Customers]].
      *
      * @return \yii\db\ActiveQuery
