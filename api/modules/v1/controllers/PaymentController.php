@@ -72,8 +72,14 @@ class PaymentController extends Controller {
 
         $model = Restaurant::findOne($id);
 
+        $currency = \Yii::$app->currency->getCode();
+
+        $query = $model->getPaymentMethods()
+            ->joinWith('paymentMethodCurrencies')
+            ->andWhere(['payment_method_currency.currency' => $currency]);
+
         return new ActiveDataProvider([
-            'query' => $model->getPaymentMethods()->asArray(),
+            'query' => $query,
             'pagination' => false
         ]);
     }

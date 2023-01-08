@@ -69,6 +69,16 @@ class PaymentMethod extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[PaymentMethodCurrencies]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentMethodCurrencies($modelClass = "\common\models\PaymentMethodCurrency")
+    {
+        return $this->hasMany($modelClass::className(), ['payment_method_id' => 'payment_method_id']);
+    }
+
+    /**
      * Gets query for [[RestaurantUus]].
      *
      * @return \yii\db\ActiveQuery
