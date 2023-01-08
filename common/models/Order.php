@@ -1375,7 +1375,11 @@ class Order extends \yii\db\ActiveRecord
             $this->customer_phone_number = str_replace(' ', '', $this->customer_phone_number);
 
             //Save Customer data
-            $customer = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
+
+            $customer = Customer::find()->where([
+                'customer_phone_number' => $this->customer_phone_number,
+                'restaurant_uuid' => $this->restaurant_uuid
+            ])->one();
 
             if (!$customer) {//new customer
                 $customer = new Customer();
@@ -1443,6 +1447,8 @@ class Order extends \yii\db\ActiveRecord
             }
 
             $this->store_currency_code = $this->restaurant->currency->code;
+
+            $this->last_order_at = new Expression('NOW()');
 
             //$this->save(false);
         }
