@@ -114,6 +114,16 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+                [
+                    //PlugnUpdateController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/plugn-update',
+                    'patterns' => [
+                        'GET' => 'index',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
                 [// AreaDeliveryZoneController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/area-delivery-zone',
