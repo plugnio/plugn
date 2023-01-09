@@ -24,6 +24,7 @@ return [
     'item_updated_at' => $faker->date('Y-m-d H:i:s'),
     'item_status' => 10,
     'prep_time' => 11,
+    'slug' => $faker->slug,
     'prep_time_unit' => 'hrs'
  ];
 
