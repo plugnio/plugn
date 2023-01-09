@@ -4,25 +4,10 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=mysql;dbname=plugn_test',
-            'username' => 'root',
-            'password' => '12345',
-            'charset' => 'utf8mb4',
-            // Enable Caching of Schema to Reduce SQL Queries
-            'enableSchemaCache' => true,
-            // Duration of schema cache.
-            'schemaCacheDuration' => 10, // 10 seconds
-            // Name of the cache component used to store schema information
-            'schemaCache' => 'cache',
-        ],
-        'cache' => [
-            // Use Redis as a cache
-            'class' => 'yii\redis\Cache',
-            'redis' => [
-                'hostname' => 'redis',
-                'port' => 6379,
-                'database' => 2,
-            ]
+            'dsn' => 'mysql:host=127.0.0.1;dbname=payroll_test',
+            'username' => 'bawes',
+            'password' => 'passw0rd',
+            'charset' => 'utf8',
         ],
         'mailer' => [
                  'class' => 'yii\swiftmailer\Mailer',
@@ -35,7 +20,7 @@ return [
         'walletManager' => [
             'class' => 'common\components\WalletManager',
             'apiKey' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
-            'apiEndpoint' => 'http://localhost/wallet/webhook/web/v1',
+            'apiEndpoint' => 'http://localhost/wallet/webhook/web/v1',//todo
             'companyWalletUserID' => 'user_fcac8a5f-52a2-11ed-a68e-d85ed3a264df'
         ],
         'resourceManager' => [
@@ -43,14 +28,11 @@ return [
             'region' => 'eu-west-2', // Bucket based in London
             'key' => 'AKIAJXOMRCDE65WKBPUA',
             'secret' => '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',
-            'bucket' => 'plugn-uploads-dev-server',
+            'bucket' => 'plugn-public-anyone-can-upload-24hr-expiry'
             /**
-             * For Local Development, we access using key and secret
-             * For Dev and Production servers, access is via server embedded IAM roles so no key/secret required
-             *
-             * You can access the bucket with:
-             * https://plugn-uploads-dev-server.s3.amazonaws.com/
-             * https://plugn-uploads-dev-server.s3.amazonaws.com/folderName/fileName.jpg
+             * You can access the Temporary bucket with:
+             * https://pogi-public-anyone-can-upload-24hr-expiry.s3.amazonaws.com/
+             * https://pogi-public-anyone-can-upload-24hr-expiry.s3.amazonaws.com/folderName/fileName.jpg
              */
         ],
         
