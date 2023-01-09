@@ -4,16 +4,10 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=mysql;dbname=plugn_test',
+            'dsn' => 'mysql:host=127.0.0.1;dbname=payroll_test',
             'username' => 'bawes',
             'password' => 'passw0rd',
-            'charset' => 'utf8mb4',
-            // Enable Caching of Schema to Reduce SQL Queries
-            'enableSchemaCache' => true,
-            // Duration of schema cache.
-            'schemaCacheDuration' => 10, // 10 seconds
-            // Name of the cache component used to store schema information
-            'schemaCache' => 'cache',
+            'charset' => 'utf8',
         ],
         'mailer' => [
                  'class' => 'yii\swiftmailer\Mailer',

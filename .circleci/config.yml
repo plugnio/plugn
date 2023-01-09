@@ -17,7 +17,6 @@ jobs:
 
       - image: circleci/mysql:5.7
         environment:
-          PUPPETEER_SKIP_DOWNLOAD: true
           MYSQL_ROOT_PASSWORD: rootpw
           MYSQL_DATABASE: plugn_test
           MYSQL_USER: bawes
