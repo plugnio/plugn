@@ -234,8 +234,11 @@ class DeliveryZoneController extends BaseController
     public function actionCancelOverride($delivery_zone_id, $store_uuid = null)
     {
         $this->ownerCheck();
+
         $model = $this->findModel($delivery_zone_id, $store_uuid);
+
         $model->delivery_zone_tax = null;
+
         if (!$model->save()) {
             if (isset($model->errors)) {
                 return [

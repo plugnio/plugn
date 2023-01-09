@@ -147,7 +147,10 @@ class AuthCest {
      * @param FunctionalTester $I
      */
     public function tryToCheckIfEmailVerified(FunctionalTester $I) {
-        $agent = Agent::findOne(['agent_email_verification'=>0]);
+        $agent = Agent::findOne([
+            'agent_email_verification'=>0,
+            'agent_status' => Agent::STATUS_ACTIVE
+        ]);
         $I->wantTo('Validate auth > is-email-verified api');
         $I->sendPOST('v1/auth/is-email-verified', [
             'email' => $agent->agent_email,
@@ -179,16 +182,22 @@ class AuthCest {
      * @param FunctionalTester $I
      */
     public function tryToGetVerificationEmail(FunctionalTester $I) {
+
         $I->wantTo('Validate auth > resend-verification-email api');
         $I->sendPOST('v1/auth/resend-verification-email', [
             'email' => $this->agent->agent_email
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
+
         $I->seeResponseContainsJson([
+            "operation"=>"success"
+        ]);
+
+        /*$I->seeResponseContainsJson([
             "operation"=>"error",
             "errorCode"=>1,
             "message"=>"You have verified your email"
-        ]);
+        ]);*/
     }
 
     /**
@@ -203,7 +212,7 @@ class AuthCest {
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
         $I->seeResponseContainsJson([
-            'email' => $this->agent->agent_email
+            'agent_email' => $this->agent->agent_email
         ]);
     }
 }

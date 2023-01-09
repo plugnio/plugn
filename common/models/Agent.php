@@ -41,6 +41,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
     const SCENARIO_CHANGE_PASSWORD = 'change-password';
     const SCENARIO_CREATE_NEW_AGENT = 'create';
+    const SCENARIO_UPDATE_EMAIL = 'update-email';
 
     /**
      * Field for temporary password. If set, it will overwrite the old password on save
@@ -91,6 +92,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         $scenarios = parent::scenarios ();
 
         $scenarios['updateLanguagePref'] = ['agent_language_pref'];
+
+        $scenarios['update-email'] = ['agent_email', 'agent_new_semail'];
 
         return $scenarios;
     }
@@ -441,9 +444,30 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
+    public static function findIdentityByUnVerifiedTokenToken($token, $modelClass = "\agent\models\AgentToken") {
+        $token = $modelClass::find()
+            ->andWhere(['token_value' => $token])
+            ->with('agent')
+            ->one();
+
+        //update last used datetime
+
+        $token->token_last_used_datetime = new Expression('NOW()');
+        $token->save ();
+
+        if ($token && $token->agent) {//&& !$token->agent->deleted
+            return $token->agent;
+        }
+
+        //invalid token
+        $token->delete ();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\agent\models\AgentToken")
     {
-
         $token = $modelClass::find ()->where ([
             'token_value' => $token,
             'token_status' => $modelClass::STATUS_ACTIVE

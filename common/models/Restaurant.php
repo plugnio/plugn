@@ -1388,6 +1388,15 @@ class Restaurant extends \yii\db\ActiveRecord
                 ->where (['valid_for' => 0])
                 ->one ();
 
+            if(!$freePlan) {
+                $freePlan = new Plan();
+                $freePlan->name = "Free plan auto generated";
+                $freePlan->price = 0;
+                $freePlan->valid_for = 0;// 0 days
+                $freePlan->platform_fee = 5;
+                $freePlan->save(false);
+            }
+
             $subscription = new Subscription();
             $subscription->restaurant_uuid = $this->restaurant_uuid;
             $subscription->plan_id = $freePlan->plan_id; //Free plan by default
@@ -2809,6 +2818,16 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return $this->hasMany($modelClass::className (), ['currency_id' => 'currency_id'])
             ->via('restaurantCurrencies');
+    }
+
+    /**
+     * Gets query for [[BankDiscount]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBankDiscounts($modelClass = "\common\models\BankDiscount")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
