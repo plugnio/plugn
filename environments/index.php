@@ -145,6 +145,42 @@ return [
             'shortner/config/main-local.php',
         ],
     ],
+    'Circle-CI' => [
+        'path' => 'circle-ci',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'backend/web/uploads/project-files',
+            'console/runtime',
+            'frontend/runtime',
+            'frontend/web/assets',
+            'frontend/web/uploads/',
+            'api/runtime',
+            'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
+            'shortner/runtime'
+        ],
+        'setExecutable' => [
+            'yii',
+            'yii_test',
+            'fixture-generate-and-load',
+            'run-tests.sh'
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'common/config/codeception-local.php',
+            'partner/config/main-local.php',
+            'frontend/config/main-local.php',
+            'api/config/main-local.php',
+            'agent/config/main-local.php',
+            'crm/config/main-local.php',
+            'shortner/config/main-local.php',
+        ],
+    ],
+
     'Dev-Server' => [
         'path' => 'dev-server',
         'setWritable' => [
