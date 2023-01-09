@@ -14,7 +14,8 @@ jobs:
     docker:
       # specify the version you desire here
       - image: cimg/php:7.4.30-browsers
-
+      - image: 'cimg/base:stable'
+      
       #older: 7.3-apache-stretch-node-browsers
 
       - image: circleci/mysql:5.7
