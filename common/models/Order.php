@@ -1448,7 +1448,11 @@ class Order extends \yii\db\ActiveRecord
 
             $this->store_currency_code = $this->restaurant->currency->code;
 
-            $this->last_order_at = new Expression('NOW()');
+            Restaurant::updateAll([
+                'last_order_at' => new Expression('NOW()')
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
 
             //$this->save(false);
         }
