@@ -11,5 +11,6 @@ return [
     'subtitle' => $faker->words(3, true),
     'subtitle_ar' => $faker->words(3, true),
     'category_image' => null,//todo: sample image path
+    'slug' => $faker->slug,
     'sort_number' => $faker->numberBetween(1, 5)
  ];
