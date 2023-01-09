@@ -14,7 +14,7 @@ return [
     ],
     'category1' => [
         'category_id' => 2,
-        'restaurant_uuid' => 2,
+        'restaurant_uuid' => 1,
         'title' => 'aperiam',
         'title_ar' => 'deleniti',
         'subtitle' => 'rerum nihil eaque',

@@ -94,6 +94,7 @@ class BankDiscountCest
     }
 
     public function tryToUpdateStatus(FunctionalTester $I) {
+        
         $model = $this->store->getBankDiscounts()->one();
 
         $I->wantTo('Validate bank-discount > update status api');

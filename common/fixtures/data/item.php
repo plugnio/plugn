@@ -26,7 +26,7 @@ return [
     ],
     'item1' => [
         'item_uuid' => 2,
-        'restaurant_uuid' => 2,
+        'restaurant_uuid' => 1,
         'item_name' => 'Wallace',
         'item_name_ar' => 'Gonzalo',
         'item_description' => 'Quo adipisci quo ipsum et.',

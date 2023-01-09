@@ -1390,6 +1390,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
             if(!$freePlan) {
                 $freePlan = new Plan();
+                $freePlan->description = "";
                 $freePlan->name = "Free plan auto generated";
                 $freePlan->price = 0;
                 $freePlan->valid_for = 0;// 0 days
