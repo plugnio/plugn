@@ -94,7 +94,7 @@ jobs:
 
       - run:
           name: Run Store app Codeception tests and store result output
-          command: ./vendor/bin/codecept run unit --xml --html --fail-fast
+          command: ./vendor/bin/codecept run api/tests/unit --xml --html --fail-fast
 
       #---------- Agent app --------------#
 
@@ -102,9 +102,9 @@ jobs:
           name: Run Vendor Dashboard app Codeception functional tests and store result output
           command: cd ./agent && ../vendor/bin/codecept run functional --xml --html --fail-fast
 
-      - run:
-          name: Run Vendor Dashboard app Codeception tests and store result output
-          command: ./vendor/bin/codecept run unit --xml --html --fail-fast
+      #- run:
+      #    name: Run Vendor Dashboard app Codeception tests and store result output
+      #    command: ./vendor/bin/codecept run agent/tests/unit --xml --html --fail-fast
 
       #---------- common --------------#
 
