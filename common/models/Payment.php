@@ -581,10 +581,11 @@ class Payment extends \yii\db\ActiveRecord
             Yii::error($model->errors);
         }
 
-        $agents = $paymentRecord->restaurant->getAgentAssignments()->all();
+        /*
+        //$agents = $paymentRecord->restaurant->getAgentAssignments()->all();
 
-        foreach ($agents as $agentAssignment) {
-
+        //foreach ($agents as $agentAssignment) {
+        
             if ($agentAssignment->email_notification) {
 
                 \Yii::$app->mailer->compose([
@@ -594,13 +595,13 @@ class Payment extends \yii\db\ActiveRecord
                     'responseContent' => $responseContent
                 ])
                     ->setFrom(Yii::$app->params['supportEmail'])//[$fromEmail => $this->restaurant->name]
-                    ->setTo($agentAssignment->agent->agent_email)
-                    ->setCc(Yii::$app->params['supportEmail'])
+                    //->setTo($agentAssignment->agent->agent_email)
+                    ->setTo(Yii::$app->params['supportEmail'])
                     ->setSubject('Payment failed for order #' . $paymentRecord->order_uuid . ' from ' . $paymentRecord->restaurant->name)
                     //->setReplyTo($replyTo)
                     ->send();
             }
-        }
+        }*/
     }
 
     /**
