@@ -157,7 +157,8 @@ class Currency extends \yii\db\ActiveRecord
 
                 if(!$model->save()) {
                     
-                    $transaction->rollBack();
+                    if($useTransaction)
+                        $transaction->rollBack();
 
                     return $model->errors;
                 }

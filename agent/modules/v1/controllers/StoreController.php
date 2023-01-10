@@ -551,7 +551,7 @@ class StoreController extends BaseController
     /**
      *  Enable Cash on delivery
      */
-    public function actionEnableCod($id)
+    public function actionEnableCod($id = null)
     {
         $model = $this->findModel($id);
 
@@ -585,7 +585,7 @@ class StoreController extends BaseController
     /**
      *  Disable Cash on delivery
      */
-    public function actionDisableCod($id)
+    public function actionDisableCod($id = null)
     {
         $model = $this->findModel($id);
 
@@ -607,7 +607,7 @@ class StoreController extends BaseController
     /**
      *  Enable Free Checkout
      */
-    public function actionEnableFreeCheckout($id)
+    public function actionEnableFreeCheckout($id = null)
     {
         $model = $this->findModel($id);
 
@@ -642,7 +642,7 @@ class StoreController extends BaseController
     /**
      *  Disable Free Checkout
      */
-    public function actionDisableFreeCheckout($id)
+    public function actionDisableFreeCheckout($id = null)
     {
         $model = $this->findModel($id);
 
@@ -724,12 +724,14 @@ class StoreController extends BaseController
 
         $themeData = Yii::$app->request->getBodyParam('restaurantTheme');
 
-        $restaurantTheme->primary = $themeData['primary'];
-        $restaurantTheme->secondary = $themeData['secondary'];
-        $restaurantTheme->tertiary = $themeData['tertiary'];
-        $restaurantTheme->light = $themeData['light'];
-        $restaurantTheme->medium = $themeData['medium'];
-        $restaurantTheme->dark = $themeData['dark'];
+        if($themeData) {
+            $restaurantTheme->primary = $themeData['primary'];
+            $restaurantTheme->secondary = $themeData['secondary'];
+            $restaurantTheme->tertiary = $themeData['tertiary'];
+            $restaurantTheme->light = $themeData['light'];
+            $restaurantTheme->medium = $themeData['medium'];
+            $restaurantTheme->dark = $themeData['dark'];
+        }
 
         if(!$restaurantTheme->save()) {
             $transaction->rollBack ();
@@ -749,7 +751,7 @@ class StoreController extends BaseController
      * process payment gateway queue
      * @return void
      */
-    public function actionProcessGatewayQueue($id)
+    public function actionProcessGatewayQueue($id = null)
     {
         $model = $this->findModel($id);
 
@@ -768,7 +770,7 @@ class StoreController extends BaseController
      * remove payment gateway queue
      * @return void
      */
-    public function actionRemoveGatewayQueue($id)
+    public function actionRemoveGatewayQueue($id = null)
     {
         $this->findModel($id);
 
@@ -836,7 +838,7 @@ class StoreController extends BaseController
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionStatus($store_uuid) {
+    public function actionStatus($store_uuid = null) {
 
         $model = $this->findModel($store_uuid);
 
@@ -854,7 +856,7 @@ class StoreController extends BaseController
      * @throws NotFoundHttpException
      * update store status
      */
-    public function actionUpdateStoreStatus($id,$status) {
+    public function actionUpdateStoreStatus($id, $status) {
 
         $model = $this->findModel($id);
 

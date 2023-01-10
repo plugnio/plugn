@@ -1181,7 +1181,7 @@ class Order extends \yii\db\ActiveRecord
 
         //currency rate from store currency to order currency
 
-        if (!$this->currency_rate) {
+        if (!$this->currency_rate && $this->restaurant->currency) {
             $this->store_currency_code = $this->restaurant->currency->code;
             $this->currency_rate = $this->currency->rate / $this->restaurant->currency->rate;
         }

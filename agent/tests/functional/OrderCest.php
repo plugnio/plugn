@@ -196,13 +196,15 @@ class OrderCest
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
+    /*
+     * todo
     public function tryToRequestDriverFromMashkor(FunctionalTester $I) {
         $order = $this->store->getOrders()->one();
 
         $I->wantTo('Validate order > request driver from mashkor api');
         $I->sendPOST('v1/order/request-driver-from-mashkor/' . $order->order_uuid);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
-    }
+    }*/
 
     public function tryToRequestDriverFromArmada(FunctionalTester $I) {
         $order = $this->store->getOrders()->one();

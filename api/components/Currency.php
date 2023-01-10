@@ -33,7 +33,8 @@ class Currency extends BaseObject
 
             $restaurant = Restaurant::findOne($id);
 
-            $this->code = $restaurant->currency->code;
+            $this->code = $restaurant->currency?
+                $restaurant->currency->code: 'KWD';
         }
 
         return $this->code;

@@ -54,7 +54,7 @@ class BankDiscountCest
     }
 
     public function tryToView(FunctionalTester $I) {
-        $model = BankDiscount::find()->one();
+        $model = $this->store->getBankDiscounts()->one();
 
         $I->wantTo('Validate bank-discount > view api');
         $I->sendGET('v1/bank-discount/detail', [
@@ -64,7 +64,8 @@ class BankDiscountCest
     }
 
     public function tryToUpdate(FunctionalTester $I) {
-        $model = BankDiscount::find()->one();
+
+        $model = $this->store->getBankDiscounts()->one();
 
         $I->wantTo('Validate bank-discount > update api');
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -81,6 +82,7 @@ class BankDiscountCest
     public function tryToCreate(FunctionalTester $I) {
 
         $I->wantTo('Validate bank-discount > create api');
+
         $I->sendPOST('v1/bank-discount', [
             'bank_id' => 1,
             'discount_type' => BankDiscount::DISCOUNT_TYPE_PERCENTAGE,
@@ -92,7 +94,8 @@ class BankDiscountCest
     }
 
     public function tryToUpdateStatus(FunctionalTester $I) {
-        $model = BankDiscount::find()->one();
+        
+        $model = $this->store->getBankDiscounts()->one();
 
         $I->wantTo('Validate bank-discount > update status api');
         $I->haveHttpHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -104,7 +107,7 @@ class BankDiscountCest
     }
 
     public function tryToDelete(FunctionalTester $I) {
-        $model = BankDiscount::find()->one();
+        $model = $this->store->getBankDiscounts()->one();
 
         $I->wantTo('Validate bank-discount > delete api');
         $I->sendDelete('v1/bank-discount/'. $model->bank_discount_id);
