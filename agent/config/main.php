@@ -400,6 +400,18 @@ return [
                         'OPTIONS cancel-override/<delivery_zone_id>' => 'options',
                     ]
                 ],
+                [// MoyasarController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment/moyasar',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
                 [// OpeningHoursController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/opening-hours',

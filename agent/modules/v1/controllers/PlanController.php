@@ -75,61 +75,21 @@ class PlanController extends BaseController
         $plan_id = Yii::$app->request->getBodyParam ('plan_id');
         $payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
 
-        $selectedPlan = Plan::findOne ($plan_id);
-
-        $subscription_model = new Subscription();
-        $subscription_model->restaurant_uuid = $store->restaurant_uuid;
-        $subscription_model->plan_id = $selectedPlan->plan_id;
-        $subscription_model->payment_method_id = $payment_method_id;
-
-        if (!$subscription_model->save ()) {
-            return [
-                "operation" => 'error',
-                "message" => $subscription_model->getErrors ()
-            ];
-        }
-
-        //for free-tier
-
-        if ($selectedPlan->price == 0) {
-            return [
-                "operation" => 'success',
-                "message" => Yii::t('agent', 'Subscribed successfully')
-            ];
-        }
-
-        $payment = new SubscriptionPayment;
-        $payment->restaurant_uuid = $store->restaurant_uuid;
-        $payment->payment_mode = $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
-        $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
-        $payment->payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price: $subscription_model->plan->price;
-        $payment->payment_current_status = "Redirected to payment gateway";
-        $payment->is_sandbox = false;//$store->is_sandbox;
-
-        if (!$payment->save ()) {
-            return [
-                'operation' => 'error',
-                'message' => $payment->getErrors ()
-            ];
-        }
-
-        //Update payment_uuid in order
-        $subscription_model->payment_uuid = $payment->payment_uuid;
-        $subscription_model->save (false);
+        $subscription = SubscriptionPayment::initPayment($plan_id, $payment_method_id);
 
         // Redirect to payment gateway
         Yii::$app->tapPayments->setApiKeys (
             \Yii::$app->params['liveApiKey'],
             \Yii::$app->params['testApiKey'],
-            $payment->is_sandbox
+            $subscription->payment->is_sandbox
         );
 
         $response = Yii::$app->tapPayments->createCharge (
             "KWD",
-            "Upgrade $store->name's plan to " . $subscription_model->plan->name, // Description
+            "Upgrade $store->name's plan to " . $subscription->plan->name, // Description
             'Plugn', //Statement Desc.
-            $payment->payment_uuid, // Reference
-            $payment->payment_amount_charged,
+            $subscription->payment->payment_uuid, // Reference
+            $subscription->payment->payment_amount_charged,
             $store->name,
             $store->getAgents ()->one ()->agent_email,
             $store->country->country_code,
@@ -137,7 +97,7 @@ class PlanController extends BaseController
             0, //Comission
             Url::to (['plans/callback'], true),
             Url::to(['plans/payment-webhook'], true),
-            $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
+            $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
             0,
             0,
             ''
@@ -166,15 +126,15 @@ class PlanController extends BaseController
                 $chargeId = $responseContent->id;
                 $redirectUrl = $responseContent->transaction->url;
 
-                $payment->payment_gateway_transaction_id = $chargeId;
+                $subscription->payment->payment_gateway_transaction_id = $chargeId;
 
-                if (!$payment->save (false)) {
+                if (!$subscription->payment->save (false)) {
 
                     //\Yii::error ($payment->errors, __METHOD__); // Log error faced by user
 
                     return [
                         'operation' => 'error',
-                        'message' => $payment->getErrors ()
+                        'message' => $subscription->payment->getErrors ()
                     ];
                 }
             } else {
@@ -222,9 +182,10 @@ class PlanController extends BaseController
             $paymentRecord->save(false);
 
             if ($paymentRecord->payment_current_status == 'CAPTURED') {
-                $this->_addCallbackCookies ("paymentSuccess", "There seems to be an issue with your payment, please try again.");
+                $this->_addCallbackCookies ("paymentSuccess", $paymentRecord->plan->name . ' has been activated');
             } else {
-                $this->_addCallbackCookies ("paymentFailed", $paymentRecord->plan->name . ' has been activated');
+                $this->_addCallbackCookies ("paymentFailed", "There seems to be an issue with your payment, please try again."
+                );
             }
 
         } catch (\Exception $e) {
