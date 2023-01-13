@@ -1,6 +1,6 @@
 <?php
 
-namespace agent\modules\v1\controllers\payment;
+namespace api\modules\v2\controllers\payment;
 
 use agent\models\PaymentMethod;
 use common\models\Payment;
@@ -8,7 +8,7 @@ use common\models\SubscriptionPayment;
 use Yii;
 use common\models\Setting;
 use yii\helpers\Url;
-use agent\modules\v1\controllers\BaseController;
+use api\modules\v2\controllers\BaseController;
 use yii\web\Cookie;
 
 

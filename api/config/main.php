@@ -191,6 +191,18 @@ return [
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
+                [// MoyasarController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment/moyasar',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
                 [// OrderController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/order',
@@ -198,6 +210,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
+                        'POST init-order/<id>' => 'init-order',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
@@ -208,6 +221,7 @@ return [
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
+                        'OPTIONS init-order/<id>' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',
