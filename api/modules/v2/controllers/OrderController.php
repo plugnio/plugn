@@ -117,7 +117,7 @@ class OrderController extends Controller
 
         //payment method
 
-        $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+        //$order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
         $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
         $order->currency_code = Yii::$app->currency->getCode();
 
@@ -125,9 +125,8 @@ class OrderController extends Controller
         $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
 
         //Apply promo code
-        if (Yii::$app->request->getBodyParam("voucher_id")) {
-            $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
-        }
+
+        $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
 
         //if the order mode = 1 => Delivery
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
@@ -259,7 +258,9 @@ class OrderController extends Controller
         }
 
         if (!$order->is_order_scheduled && !$restaurant_model->isOpen()) {
+
             $transaction->rollBack();
+
             return [
                 'operation' => 'error',
                 'message' => $restaurant_model->name . ' is currently closed and is not accepting orders at this time',
@@ -295,7 +296,7 @@ class OrderController extends Controller
                     'code' => 8
                 ];
 
-            } else if ($order->payment_method_id != $freeCheckout->payment_method_id) {
+            } else if ($order->payment_method_id && $order->payment_method_id != $freeCheckout->payment_method_id) {
 
                 $transaction->rollBack();
 
@@ -364,15 +365,52 @@ class OrderController extends Controller
      */
     public function actionPlaceAnOrder($id)
     {
+        $order_uuid = Yii::$app->request->getBodyParam('order_uuid');
+
         $restaurant_model = Restaurant::findOne($id);
 
-        $response =  $this->actionInitOrder($id);
+        if($order_uuid)
+        {
+            $order = $this->findModel($order_uuid);
+        }
+        else
+        {
+            $response = $this->actionInitOrder($id);
 
-        if($response['operation'] == 'error') {
-            return $response;
+            if ($response['operation'] == 'error') {
+                return $response;
+            }
+
+            $order = $response['order'];
         }
 
-        $order = $response['order'];
+        //Apply promo code
+
+        $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+
+        //bank discount
+
+        $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+
+        $order->order_instruction = Yii::$app->request->getBodyParam("order_instruction");
+
+        //save gift message
+        $order->sender_name = Yii::$app->request->getBodyParam("sender_name");
+        $order->recipient_name = Yii::$app->request->getBodyParam("recipient_name");
+        $order->recipient_phone_number = Yii::$app->request->getBodyParam("recipient_phone_number");
+        $order->gift_message = Yii::$app->request->getBodyParam("gift_message");
+
+        if($order->voucher_id) {
+            $order->calculateOrderTotalPrice();//update total based on voucher
+        }
+
+        if (!$order->save()) {
+            return [
+                'operation' => 'error',
+                'message' => $order->getErrors(),
+                'code' => 2
+            ];
+        }
 
         //if payment method not cash redirect customer to payment gateway
 
@@ -841,8 +879,8 @@ class OrderController extends Controller
         $content = $this->render('invoice', [
             'order' => $order,
             'defaultLogo' => $defaultLogo,
-            'bankDiscount' => $order->voucher_discount,
-            'voucherDiscount' => $order->bank_discount,
+            'bankDiscount' => $order->bank_discount,
+            'voucherDiscount' => $order->voucher_discount,
         ]);
 
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();

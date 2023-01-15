@@ -1193,7 +1193,6 @@ class Order extends \yii\db\ActiveRecord
             $this->order_status = self::STATUS_DRAFT;
         }
 
-
         if ($this->scenario == self::SCENARIO_UPDATE_TOTAL) {
 
           if ($this->voucher && $this->voucher->minimum_order_amount !== 0 && $this->calculateOrderItemsTotalPrice() < $this->voucher->minimum_order_amount)
@@ -1350,9 +1349,6 @@ class Order extends \yii\db\ActiveRecord
 
           }
 
-
-
-
         return true;
     }
 
@@ -1458,6 +1454,21 @@ class Order extends \yii\db\ActiveRecord
             ]);
 
             //$this->save(false);
+        }
+        //on update
+        else {
+
+            if (isset($changedAttributes['voucher_id']) && $changedAttributes['voucher_id'] != $this->voucher_id) {
+
+                $voucher_model = Voucher::findOne($this->voucher_id);
+
+                if ($voucher_model->isValid($this->customer_phone_number)) {
+                    $customerVoucher = new CustomerVoucher();
+                    $customerVoucher->customer_id = $this->customer_id;
+                    $customerVoucher->voucher_id = $this->voucher_id;
+                    $customerVoucher->save();
+                }
+            }
         }
 
         /**
