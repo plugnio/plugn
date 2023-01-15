@@ -8,7 +8,7 @@ return [
     'id' => 'app-api',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'api\controllers',
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'debug'],
     'modules' => [
         'v1' => [
             'basePath' => '@api/modules/v1',
@@ -178,6 +178,19 @@ return [
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
+                [// MoyasarController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/payment/moyasar',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS callback' => 'options',
+                    ]
+                ],
                 [// PaymentMethodController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/payment',
@@ -189,18 +202,6 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS <id>' => 'options',
-                    ]
-                ],
-                [// MoyasarController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/payment/moyasar',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'index',
-                        'GET callback' => 'callback',
-                        'POST callback' => 'callback',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
                     ]
                 ],
                 [// OrderController
@@ -240,6 +241,7 @@ return [
                         'POST payment-webhook' => 'payment-webhook',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST update-armada-order-status' => 'update-armada-order-status',
+                        'POST init-order/<id>' => 'init-order',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
@@ -252,6 +254,7 @@ return [
                         'OPTIONS payment-webhook' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS update-armada-order-status' => 'options',
+                        'OPTIONS init-order/<id>' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',

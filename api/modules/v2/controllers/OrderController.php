@@ -92,6 +92,8 @@ class OrderController extends Controller
 
         $order = new Order();
 
+        $order->setScenario(Order::SCENARIO_INIT_ORDER);
+
         //as we will calculate after items get saved
         $order->total_price = 0;
         $order->subtotal = 0;

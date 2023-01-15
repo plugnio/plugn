@@ -2,25 +2,65 @@
 
 namespace api\modules\v2\controllers\payment;
 
+
 use agent\models\PaymentMethod;
+use api\models\Order;
 use common\models\Payment;
-use common\models\SubscriptionPayment;
 use Yii;
 use common\models\Setting;
 use yii\helpers\Url;
-use api\modules\v2\controllers\BaseController;
+//use api\modules\v2\controllers\BaseController;
+use yii\rest\Controller;
 use yii\web\Cookie;
+use yii\web\NotFoundHttpException;
 
 
-class MoyasarController extends BaseController
+class MoyasarController extends Controller
 {
-    public function behaviors() {
+    public function behaviors()
+    {
         $behaviors = parent::behaviors();
 
+        // remove authentication filter for cors to work
+        unset($behaviors['authenticator']);
+
+        // Allow XHR Requests from our different subdomains and dev machines
+        $behaviors['corsFilter'] = [
+            'class' => \yii\filters\Cors::className(),
+            'cors' => [
+                'Origin' => Yii::$app->params['allowedOrigins'],
+                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                'Access-Control-Request-Headers' => ['*'],
+                'Access-Control-Allow-Credentials' => null,
+                'Access-Control-Max-Age' => 86400,
+                'Access-Control-Expose-Headers' => [
+                    'X-Pagination-Current-Page',
+                    'X-Pagination-Page-Count',
+                    'X-Pagination-Per-Page',
+                    'X-Pagination-Total-Count'
+                ],
+            ],
+        ];
+
         // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options', 'callback'];
+        //$behaviors['authenticator']['except'] = ['options', 'index', 'callback'];
 
         return $behaviors;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        $actions = parent::actions();
+        $actions['options'] = [
+            'class' => 'yii\rest\OptionsAction',
+            // optional:
+            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
+            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+        ];
+        return $actions;
     }
 
     /**
@@ -31,13 +71,11 @@ class MoyasarController extends BaseController
     {
         //Yii::$app->session->set('payment_uuid', $payment->payment_uuid);
 
-        $store = Yii::$app->accountManager->getManagedAccount ();
+        $order_uuid = Yii::$app->request->get ('order_uuid');
 
-        $plan_id = Yii::$app->request->get ('plan_id');
+        //$paymentMethod = PaymentMethod::findOne(['payment_method_code' => 'Moyasar']);
 
-        $paymentMethod = PaymentMethod::findOne(['payment_method_code' => 'Moyasar']);
-
-        $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id);
+        $order = $this->findOrder($order_uuid);
 
         $data['action'] = 'https://api.moyasar.com/v1/payments.html';
 
@@ -69,15 +107,15 @@ class MoyasarController extends BaseController
 
         $data['validate_merchant_url'] = 'https://api.moyasar.com/v1/applepay/initiate';
 
-        $data['amount'] = $subscription->subscriptionPayment->payment_amount_charged;
-        $data['amount_in_halals'] =  $subscription->subscriptionPayment->payment_amount_charged * 1000;
+        $data['amount'] = $order->total_price;
+        $data['amount_in_halals'] =  $order->total_price * pow(10, $order->currency->decimal_place);
         $data['language_code'] = Yii::$app->language;
-        $data['currency'] = "KWD";// $payment['currency_code'];
+        $data['currency'] = $order->currency_code;// $payment['currency_code'];
         $data['country'] = "KW";
         $data['store_name'] = Yii::$app->params['appName'];
-        $data['orderdate'] = $subscription->subscriptionPayment['payment_created_at'];
-        $data['description'] = "Upgrade $store->name's plan to " . $subscription->plan->name;
-        $data['domain_name'] = Yii::$app->request->hostName;
+        $data['orderdate'] = $order->order_created_at;
+        $data['description'] = "Order placed from: " . $order->customer_name;
+        $data['domain_name'] = $order->restaurant->restaurant_domain;  //Yii::$app->request->hostName;
 
         $data['text_cc'] = Yii::t('app', "Credit card");
         $data['text_mada'] = Yii::t('app', "Mada");
@@ -90,9 +128,10 @@ class MoyasarController extends BaseController
 
         //metadata
         $data['metadata'] = [
-            'payment_uuid' =>  $subscription->subscriptionPayment['payment_uuid'],
-            'restaurant_uuid' => $store->restaurant_uuid,
-            'username' => $store->name,
+            'order_uuid' => $order->order_uuid,
+            'restaurant_uuid' => $order->restaurant_uuid,
+            'customer_name' => $order->customer_name,
+            'customer_email' => $order->customer_email,
             //'email' => $payment->user->email
         ];
 
@@ -114,14 +153,12 @@ class MoyasarController extends BaseController
         $payment = $this->updateOrder();
 
         if ($payment) {
-            $this->_addCallbackCookies ("paymentSuccess", $payment->plan->name . ' has been activated');
+            $url = $payment->restaurant->restaurant_domain . '/payment-success/' . $payment->order_uuid . '/' . $payment->payment_uuid;
         } else {
-            $this->_addCallbackCookies ("paymentFailed", "There seems to be an issue with your payment, please try again.");
+            $url = $payment->restaurant->restaurant_domain . '/payment-failed/' . $payment->order_uuid;
         }
 
-        $url = Yii::$app->params['newDashboardAppUrl'] . '/settings/payment-methods';
-
-        return $this->redirect ($url);
+        return Yii::$app->getResponse()->redirect($url)->send(301);
     }
 
     // todo: old callback in general form
@@ -137,43 +174,80 @@ class MoyasarController extends BaseController
 
         $paymentDetail = $this->_paymentDetail($id);
 
-        if ($status != 'paid') {
-            Yii::error('Moyasar Payment Verification Failed: '. $message);
+        $order_uuid = $paymentDetail['metadata']['order_uuid'];
 
-            return false;
+        $order = $this->findOrder($order_uuid);
+
+        $order_amount = $order->total_price * pow(10, $order->currency->decimal_place);
+
+        //add payment entry for debug
+
+        $paymentMethod = PaymentMethod::findOne(['payment_method_code' => PaymentMethod::CODE_MOYASAR]);
+        $order->payment_method_id = $paymentMethod->payment_method_id;
+        $order->payment_method_name = $paymentMethod->payment_method_name;
+        $order->payment_method_name_ar = $paymentMethod->payment_method_name_ar;
+
+        $payment = new \api\models\Payment;
+        $payment->restaurant_uuid = $order->restaurant_uuid;
+        $payment->customer_id = $order->customer->customer_id; //customer id
+        $payment->order_uuid = $order->order_uuid;
+        $payment->payment_amount_charged = $order->total_price;
+        //$payment->is_sandbox = $order->restaurant->is_sandbox;
+        $payment->response_message = $message;
+        $payment->payment_gateway_fee = $paymentDetail['fee'] / pow(10, $order->currency->decimal_place);//in halals
+        //$payment->payment_gateway_order_id = $id;
+        $payment->payment_gateway_payment_id = $id;
+        $payment->received_callback = true;
+
+        // Net amount after deducting gateway fee
+        $payment->payment_net_amount = $payment->payment_amount_charged - $payment->payment_gateway_fee;
+
+        if ($order->restaurant->platform_fee)
+            $payment->plugn_fee = ($payment->payment_amount_charged * $order->restaurant->platform_fee / 100) - $payment->payment_gateway_fee;
+        else
+            $payment->plugn_fee = 0;
+
+        if ($status == 'paid')
+            $payment->payment_current_status = 'CAPTURED';
+        else
+            $payment->payment_current_status = $status;
+
+        $payment->save(false);
+
+        $order->payment_uuid = $payment->payment_uuid;
+        $order->save(false);
+
+        $error = null;
+
+        if ($status != 'paid') {
+            $error = 'Moyasar Payment Verification Failed: '. $message;
+        } else if (empty($paymentDetail['amount']) || $paymentDetail['amount'] != $order_amount) {
+            $error = 'Moyasar payment is successful but amount does not match paid, possible tampering. #' . $id;
         }
 
-        $payment_uuid = $paymentDetail['metadata']['payment_uuid'];
-
-        $payment = SubscriptionPayment::findOne($payment_uuid);
-
-        $order_amount = $payment['payment_amount_charged'] * 1000;//todo: only if 3 decimal currency
+        /*if (!$payment) {
+            Yii::error('Moyasar payment is successful but payment_uuid does not match, possible tampering. #' . $id);
+            return false;
+        }*/
 
         //Yii::$app->currency->format($payment['total'], $payment['currency_code'], $payment['currency_value'], false)*100;
 
-        if (empty($paymentDetail['amount']) || $paymentDetail['amount'] != $order_amount) {
-            Yii::debug('Moyasar payment is successful but amount does not match paid, possible tampering. #' . $id);
-            return false;
-        }
+        if($error) {
 
-        if (!$payment) {
-            Yii::debug('Moyasar payment is successful but payment_uuid does not match, possible tampering. #' . $id);
+            //notify tech team + vendor
+
+            Yii::error($error);
+
+            Payment::notifyTapError($payment, $paymentDetail);
+
             return false;
         }
 
         //payment was made successfully
 
-        $payment->payment_current_status = 'CAPTURED';
-        $payment->response_message = $message;
-        $payment->payment_gateway_fee = $paymentDetail['fee'] / 1000;//in halals
-        $payment->payment_gateway_order_id = $id;
+        //todo: generate invoice for plugn fee
 
-        // Net amount after deducting gateway fee
-        $payment->payment_net_amount = $payment->payment_amount_charged - $payment->payment_gateway_fee;
-
-        $payment->save(false);
-
-        SubscriptionPayment::onPaymentCaptured($payment);
+        //Payment::onPaymentCaptured($payment);
 
         return $payment;
     }
@@ -221,5 +295,26 @@ class MoyasarController extends BaseController
         $cookie->sameSite = PHP_VERSION_ID >= 70300 ? 'None' : null;
 
         \Yii::$app->getResponse ()->getCookies ()->add ($cookie);
+    }
+    /**
+     * Finds the Order model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Order the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findOrder($order_uuid)
+    {
+        $model = Order::find()
+            ->andWhere([
+                'order_uuid' => $order_uuid
+            ])
+            ->one();
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
     }
 }

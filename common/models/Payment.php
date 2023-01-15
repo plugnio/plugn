@@ -418,7 +418,7 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord->payment_net_amount = (float)$responseContent->Data->Suppliers[0]->DepositShare;
 
         // Failed Payments
-        if ($responseContent->Data->InvoiceTransactions[0]->TransactionStatus != 'Succss') {
+        if ($responseContent->Data->InvoiceTransactions[0]->TransactionStatus != 'Success') {
 
             Yii::info('[MyFatoorah Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                 . $paymentRecord->customer->customer_name .
@@ -437,29 +437,6 @@ class Payment extends \yii\db\ActiveRecord
 
         return $paymentRecord;
     }
-
-
-    /**
-     * Returns String value of current status
-     * @return string
-     */
-    public function getStatus()
-    {
-        switch ($this->payout_status) {
-            case self::PAYOUT_STATUS_UNPAID:
-                return "Unpaid";
-                break;
-            case self::PAYOUT_STATUS_PENDING:
-                return "Pending";
-                break;
-            case self::PAYOUT_STATUS_PAID:
-                return "Paid";
-                break;
-        }
-
-        return "Couldnt find a status";
-    }
-
 
     /**
      * Update Payment's Status from Myfatoorah Payments
@@ -493,6 +470,31 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord->save();
 
         return true;
+    }
+
+    /**
+     * Returns String value of current status
+     * @return string
+     */
+    public function getStatus()
+    {
+        switch ($this->payout_status) {
+            case self::PAYOUT_STATUS_UNPAID:
+                return "Unpaid";
+                break;
+            case self::PAYOUT_STATUS_PENDING:
+                return "Pending";
+                break;
+            case self::PAYOUT_STATUS_PAID:
+                return "Paid";
+                break;
+        }
+
+        return "Couldnt find a status";
+    }
+
+    public static function onPaymentCaptured($payment) {
+
     }
 
     /**
