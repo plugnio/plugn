@@ -236,6 +236,8 @@ class Payment extends \yii\db\ActiveRecord
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
 
+            \common\models\Payment::onPaymentCaptured($paymentRecord);
+
         } else {
 
             $amount = Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [
@@ -328,7 +330,6 @@ class Payment extends \yii\db\ActiveRecord
                     $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFee;
             }
 
-
             if (isset($destinations))
                 $paymentRecord->plugn_fee = $destinations['amount'];
             else
@@ -343,6 +344,8 @@ class Payment extends \yii\db\ActiveRecord
 
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+
+            \common\models\Payment::onPaymentCaptured($paymentRecord);
 
         } else {
             Yii::info('[TAP Payment Issue: ' . $paymentRecord->customer->customer_name . ' - #' . $paymentRecord->order_uuid . ']'
@@ -427,6 +430,10 @@ class Payment extends \yii\db\ActiveRecord
 
             Yii::info('[Response from MyFatoorah for Failed Payment] ' .
                 print_r($responseContent, true), __METHOD__);
+        } else {
+
+            \common\models\Payment::onPaymentCaptured($paymentRecord);
+
         }
 
         $paymentRecord->save();
@@ -449,6 +456,7 @@ class Payment extends \yii\db\ActiveRecord
     {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\Payment::find()->where(['payment_gateway_invoice_id' => $invoiceId, 'received_callback' => 0])->one();
+
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
@@ -468,6 +476,13 @@ class Payment extends \yii\db\ActiveRecord
             $paymentRecord->payment_gateway_order_id = $responseContent['ReferenceId'];
 
         $paymentRecord->save();
+
+        if (
+            $paymentRecord->payment_current_status == 'Paid' ||
+            $paymentRecord->payment_current_status == 'Success' ||
+            $paymentRecord->payment_current_status == 'SUCCESS') {
+            \common\models\Payment::onPaymentCaptured($paymentRecord);
+        }
 
         return true;
     }
@@ -493,10 +508,6 @@ class Payment extends \yii\db\ActiveRecord
         return "Couldnt find a status";
     }
 
-    public static function onPaymentCaptured($payment) {
-
-    }
-
     /**
      * @inheritdoc
      */
@@ -512,31 +523,36 @@ class Payment extends \yii\db\ActiveRecord
     //
     // }
 
+    public static function onPaymentCaptured($payment) {
+
+        if(in_array($payment->order->order_status, [
+            Order::STATUS_DRAFT,
+            Order::STATUS_ABANDONED_CHECKOUT
+        ])) {
+
+            $payment->order->changeOrderStatusToPending();
+            $payment->order->sendPaymentConfirmationEmail($payment);
+
+            if ($payment->plugn_fee > 0) {
+                $invoice = new RestaurantInvoice();
+                $invoice->restaurant_uuid = $payment->restaurant_uuid;
+                $invoice->order_uuid = $payment->order_uuid;
+                $invoice->payment_uuid = $payment->payment_uuid;
+                $invoice->amount = $payment->plugn_fee;
+                $invoice->currency_code = $payment->order->currency_code;
+                $invoice->save(false);
+            }
+
+            Yii::info("[" . $payment->restaurant->name . ": " . $payment->customer->customer_name . " has placed an order for " .
+                Yii::$app->formatter->asCurrency($payment->payment_amount_charged, $payment->currency->code, [
+                    \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $payment->currency->decimal_place]) . '] ' . 'Paid with ' .
+                $payment->order->payment_method_name, __METHOD__);
+        }
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-
-        if (
-            !$insert &&
-            (
-                isset($changedAttributes['received_callback']) &&
-                $changedAttributes['received_callback'] == 0 &&
-                (
-                    $this->payment_current_status == 'CAPTURED' ||
-                    $this->payment_current_status == 'SUCCESS' ||
-                    $this->payment_current_status == 'Success'
-                ) &&
-                $this->received_callback
-            )
-        ) {
-
-            $this->order->changeOrderStatusToPending();
-            $this->order->sendPaymentConfirmationEmail($this);
-
-            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' .
-            $this->order->payment_method_name, __METHOD__);
-
-        }
 
         if(!$insert && $this->scenario == self::SCENARIO_UPDATE_STATUS_WEBHOOK &&
             isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED'

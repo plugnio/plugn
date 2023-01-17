@@ -508,6 +508,17 @@ return [
                         'OPTIONS config/<code>' => 'options',
                     ]
                 ],
+                [// InvoiceController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/invoice',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// BusinessLocationController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/business-location',

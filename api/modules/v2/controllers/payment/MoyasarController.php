@@ -245,9 +245,7 @@ class MoyasarController extends Controller
 
         //payment was made successfully
 
-        //todo: generate invoice for plugn fee
-
-        //Payment::onPaymentCaptured($payment);
+        Payment::onPaymentCaptured($payment);
 
         return $payment;
     }
