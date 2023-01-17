@@ -80,11 +80,11 @@ class MoyasarController extends Controller
         $data['action'] = 'https://api.moyasar.com/v1/payments.html';
 
         //payment_moyasar_api_secret_key
-        $data['payment_moyasar_api_key'] = Setting::getConfig(null, "Moyasar", 'payment_moyasar_api_key');
+        $data['payment_moyasar_api_key'] = Setting::getConfig($order->restaurant_uuid, "Moyasar", 'payment_moyasar_api_key');
 
-        $data['payment_moyasar_payment_type'] = Setting::getConfig(null, "Moyasar", 'payment_moyasar_payment_type');
+        $data['payment_moyasar_payment_type'] = Setting::getConfig($order->restaurant_uuid, "Moyasar", 'payment_moyasar_payment_type');
 
-        $data['payment_moyasar_network_type'] = Setting::getConfig(null, "Moyasar", 'payment_moyasar_network_type');
+        $data['payment_moyasar_network_type'] = Setting::getConfig($order->restaurant_uuid, "Moyasar", 'payment_moyasar_network_type');
 
         //$country = $this->model_localisation_country->getCountry($this->config->get('config_country_id'));
 

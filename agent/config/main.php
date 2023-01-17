@@ -497,6 +497,17 @@ return [
                         'OPTIONS orders' => 'options'
                     ]
                 ],
+                [// PaymentMethodController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment-method',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST config/<code>' => 'config',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS config/<code>' => 'options',
+                    ]
+                ],
                 [// BusinessLocationController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/business-location',

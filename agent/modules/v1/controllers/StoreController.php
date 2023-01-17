@@ -659,7 +659,12 @@ class StoreController extends BaseController
             return self::message("error", $payment_method->getErrors());
         }
 
-        return self::message("success","Cash on delivery disabled successfully");
+        Setting::deleteAll([
+                'restaurant_uuid' => $model->restaurant_uuid,
+                'code' => PaymentMethod::CODE_MOYASAR
+            ]);
+
+        return self::message("success", "Moyasar disabled successfully");
     }
 
     /**
