@@ -38,6 +38,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             // ['class' => 'yii\grid\SerialColumn'],
             [
+                'attribute' => 'logo',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return Html::img($data->getRestaurantLogoUrl());
+                },
+            ],
+            [
                 'attribute' => 'name',
                 'format' => 'raw',
                 'value' => function ($data) {
