@@ -554,19 +554,6 @@ class Payment extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if(!$insert && $this->scenario == self::SCENARIO_UPDATE_STATUS_WEBHOOK &&
-            isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED'
-            && $this->payment_current_status == 'CAPTURED' && $this->order->order_status == Order::STATUS_ABANDONED_CHECKOUT)
-        {
-
-          $this->order->changeOrderStatusToPending();
-          $this->order->sendPaymentConfirmationEmail($this);
-
-          Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' .
-           $this->order->payment_method_name, __METHOD__);
-
-        }
-
         if ($this->plugn_fee > 0 && $this->partner_fee == 0 && $this->restaurant->referral_code) {
 
             $this->partner_fee = $this->plugn_fee * $this->partner->commission;
@@ -686,7 +673,6 @@ class Payment extends \yii\db\ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[PartnerUu]].

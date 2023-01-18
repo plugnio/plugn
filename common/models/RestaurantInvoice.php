@@ -160,6 +160,16 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Currency]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency($modelClass = "\common\models\Currency")
+    {
+        return $this->hasOne($modelClass::className(), ['code' => 'currency_code']);
+    }
+
+    /**
      * Gets query for [[Payment]].
      *
      * @return \yii\db\ActiveQuery

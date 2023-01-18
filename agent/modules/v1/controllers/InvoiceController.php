@@ -48,7 +48,7 @@ class InvoiceController extends BaseController
     {
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $model = $store->getInvoices()->andWhere(['invoice_uuid' => $invoice_uuid]);
+        $model = $store->getInvoices()->andWhere(['invoice_uuid' => $invoice_uuid])->one();
 
         if ($model !== null) {
             return $model;

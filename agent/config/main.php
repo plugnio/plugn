@@ -406,6 +406,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'index',
+                        'POST' => 'index',
                         'GET callback' => 'callback',
                         'POST callback' => 'callback',
                         // OPTIONS VERBS
