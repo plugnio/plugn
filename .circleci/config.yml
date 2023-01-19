@@ -4,8 +4,8 @@
 #
 version: 2
 
-#orbs:
-#  slack: circleci/slack@4.1
+orbs:
+  slack: circleci/slack@4.1
 
 jobs:
   build:
@@ -124,13 +124,12 @@ jobs:
           path: ~/plugn/console/runtime/logs/report.html
           destination: report
 
-      #- slack/notify:
-      #    event: fail
-      #    #mentions: '@EngineeringTeam'
-      #    template: basic_fail_1
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
 
-      #- slack/notify:
-      #    event: pass
-      #    template: success_tagged_deploy_1
-              
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
+
 

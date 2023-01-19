@@ -2,8 +2,9 @@
 
 namespace agent\modules\v1\controllers\payment;
 
+use agent\models\Currency;
 use agent\models\PaymentMethod;
-use common\models\Payment;
+use common\models\InvoicePayment;
 use common\models\SubscriptionPayment;
 use Yii;
 use common\models\Setting;
@@ -33,11 +34,48 @@ class MoyasarController extends BaseController
 
         $store = Yii::$app->accountManager->getManagedAccount ();
 
-        $plan_id = Yii::$app->request->get ('plan_id');
+        $plan_id = Yii::$app->request->getBodyParam('plan_id');
+        $invoice_uuid = Yii::$app->request->getBodyParam ('invoice_uuid');
 
         $paymentMethod = PaymentMethod::findOne(['payment_method_code' => 'Moyasar']);
 
-        $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id);
+        if($plan_id) {
+
+            $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id);
+
+            $currency = Currency::findOne(['code' => 'KWD']);
+
+            $data['description'] = "Upgrade $store->name's plan to " . $subscription->plan->name;
+
+            $payment = $subscription->subscriptionPayment;
+        } else {
+
+            $payment = InvoicePayment::initPayment($invoice_uuid, $paymentMethod->payment_method_id);
+
+            $currency = $payment->currency;
+
+            $data['description'] = "Invoice for plugn commission on order #" . $payment->invoice->invoiceItems[0]->order_uuid;
+        }
+
+        $data['amount'] = $payment->payment_amount_charged;
+        $data['amount_in_halals'] =  $payment->payment_amount_charged * pow(10, $currency->decimal_place);
+        $data['language_code'] = Yii::$app->language;
+        $data['currency'] = $currency->code;// $payment['currency_code'];
+        $data['country'] = "KW";
+        $data['store_name'] = Yii::$app->params['appName'];
+        $data['orderdate'] = $payment['payment_created_at'];
+        $data['domain_name'] = Yii::$app->request->hostName;
+
+        //metadata
+        $data['metadata'] = [
+            'payment_uuid' =>  $payment['payment_uuid'],
+            'invoice_uuid' => $invoice_uuid,
+            'restaurant_uuid' => $store->restaurant_uuid,
+            'username' => $store->name,
+            //'email' => $payment->user->email
+        ];
+
+        $data['metadata_json'] = $data['metadata'];
 
         $data['action'] = 'https://api.moyasar.com/v1/payments.html';
 
@@ -69,16 +107,6 @@ class MoyasarController extends BaseController
 
         $data['validate_merchant_url'] = 'https://api.moyasar.com/v1/applepay/initiate';
 
-        $data['amount'] = $subscription->subscriptionPayment->payment_amount_charged;
-        $data['amount_in_halals'] =  $subscription->subscriptionPayment->payment_amount_charged * 1000;
-        $data['language_code'] = Yii::$app->language;
-        $data['currency'] = "KWD";// $payment['currency_code'];
-        $data['country'] = "KW";
-        $data['store_name'] = Yii::$app->params['appName'];
-        $data['orderdate'] = $subscription->subscriptionPayment['payment_created_at'];
-        $data['description'] = "Upgrade $store->name's plan to " . $subscription->plan->name;
-        $data['domain_name'] = Yii::$app->request->hostName;
-
         $data['text_cc'] = Yii::t('app', "Credit card");
         $data['text_mada'] = Yii::t('app', "Mada");
         $data['text_cc_mada'] = Yii::t('app', "Credit card mada");
@@ -87,16 +115,6 @@ class MoyasarController extends BaseController
         $data['text_stcpay'] = Yii::t('app', "Stc Pay");
         $data['text_applepay_not_configured'] = Yii::t('app', "Apple pay not configured");
         $data['text_applepay_not_supported'] = Yii::t('app', "Apple pay not supported");
-
-        //metadata
-        $data['metadata'] = [
-            'payment_uuid' =>  $subscription->subscriptionPayment['payment_uuid'],
-            'restaurant_uuid' => $store->restaurant_uuid,
-            'username' => $store->name,
-            //'email' => $payment->user->email
-        ];
-
-        $data['metadata_json'] = $data['metadata'];
 
         //todo: update url
         $data['applepay_on_cancel_url'] = $data['callback_url'];//  Url::to(['site/index'], true);
@@ -114,12 +132,25 @@ class MoyasarController extends BaseController
         $payment = $this->updateOrder();
 
         if ($payment) {
-            $this->_addCallbackCookies ("paymentSuccess", $payment->plan->name . ' has been activated');
+
+            $message = "Payment got processed successfully";
+
+            $url = Yii::$app->params['newDashboardAppUrl'] . '/invoice-list';
+
+            if(isset($payment->subscription_uuid)) {
+
+                $message = $payment->plan->name . ' has been activated';
+
+                $url = Yii::$app->params['newDashboardAppUrl'] . '/settings/payment-methods';
+            }
+
+            $this->_addCallbackCookies ("paymentSuccess", $message);
         } else {
             $this->_addCallbackCookies ("paymentFailed", "There seems to be an issue with your payment, please try again.");
-        }
 
-        $url = Yii::$app->params['newDashboardAppUrl'] . '/settings/payment-methods';
+
+            $url = Yii::$app->params['newDashboardAppUrl'] . '/settings/payment-methods';
+        }
 
         return $this->redirect ($url);
     }
@@ -143,11 +174,15 @@ class MoyasarController extends BaseController
             return false;
         }
 
-        $payment_uuid = $paymentDetail['metadata']['payment_uuid'];
+        if(isset($paymentDetail['metadata']['invoice_uuid'])) {
+            $payment = InvoicePayment::findOne($paymentDetail['metadata']['payment_uuid']);
+            $currency = Currency::findOne(['code' => $payment->currency_code]);
+        } else if(isset($paymentDetail['metadata']['payment_uuid'])) {
+            $payment = SubscriptionPayment::findOne($paymentDetail['metadata']['payment_uuid']);
+            $currency = Currency::findOne(['code' => 'KWD']);
+        }
 
-        $payment = SubscriptionPayment::findOne($payment_uuid);
-
-        $order_amount = $payment['payment_amount_charged'] * 1000;//todo: only if 3 decimal currency
+        $order_amount = $payment['payment_amount_charged'] * pow(10, $currency->decimal_place);
 
         //Yii::$app->currency->format($payment['total'], $payment['currency_code'], $payment['currency_value'], false)*100;
 
@@ -164,16 +199,20 @@ class MoyasarController extends BaseController
         //payment was made successfully
 
         $payment->payment_current_status = 'CAPTURED';
-        $payment->response_message = $message;
-        $payment->payment_gateway_fee = $paymentDetail['fee'];
-        $payment->payment_gateway_order_id = $id;
+        $payment->payment_gateway_fee = $paymentDetail['fee'] / pow(10, $currency->decimal_place);//in halals
+
+        if(isset($payment->payment_gateway_order_id)) {
+            $payment->response_message = $message;
+            $payment->payment_gateway_order_id = $id;
+        }
 
         // Net amount after deducting gateway fee
         $payment->payment_net_amount = $payment->payment_amount_charged - $payment->payment_gateway_fee;
 
-        $payment->save(false);
+        $payment->save();
 
-        SubscriptionPayment::onPaymentCaptured($payment);
+        if(isset($payment->subscription_uuid))
+            SubscriptionPayment::onPaymentCaptured($payment);
 
         return $payment;
     }

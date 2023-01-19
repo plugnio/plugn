@@ -406,6 +406,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'index',
+                        'POST' => 'index',
                         'GET callback' => 'callback',
                         'POST callback' => 'callback',
                         // OPTIONS VERBS
@@ -497,6 +498,28 @@ return [
                         'OPTIONS orders' => 'options'
                     ]
                 ],
+                [// PaymentMethodController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment-method',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST config/<code>' => 'config',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS config/<code>' => 'options',
+                    ]
+                ],
+                [// InvoiceController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/invoice',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// BusinessLocationController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/business-location',
@@ -538,6 +561,10 @@ return [
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
                         'POST disable-cod/<id>' => 'disable-cod',
+                        'POST enable-moyasar' => 'enable-moyasar',
+                        'POST disable-moyasar' => 'disable-moyasar',
+                        'POST enable-moyasar/<id>' => 'enable-moyasar',
+                        'POST disable-moyasar/<id>' => 'disable-moyasar',
                         'POST enable-free-checkout/<id>' => 'enable-free-checkout',
                         'POST disable-free-checkout/<id>' => 'disable-free-checkout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
@@ -560,6 +587,10 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS test-tap' => 'options',
                         'OPTIONS upgrade' => 'options',
+                        'OPTIONS enable-moyasar' => 'options',
+                        'OPTIONS disable-moyasar' => 'options',
+                        'OPTIONS enable-moyasar/<id>' => 'options',
+                        'OPTIONS disable-moyasar/<id>' => 'options',
                         'OPTIONS connect-domain' => 'options',
                         'OPTIONS update-bank-account' => 'options',
                         'OPTIONS update-delivery-integration/<id>' => 'options',
