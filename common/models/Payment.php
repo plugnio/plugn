@@ -534,13 +534,37 @@ class Payment extends \yii\db\ActiveRecord
             $payment->order->sendPaymentConfirmationEmail($payment);
 
             if ($payment->plugn_fee > 0) {
-                $invoice = new RestaurantInvoice();
-                $invoice->restaurant_uuid = $payment->restaurant_uuid;
-                $invoice->order_uuid = $payment->order_uuid;
-                $invoice->payment_uuid = $payment->payment_uuid;
-                $invoice->amount = $payment->plugn_fee;
-                $invoice->currency_code = $payment->order->currency_code;
-                $invoice->save(false);
+
+                $invoice = RestaurantInvoice::find()->andWhere([
+                    'restaurant_uuid' => $payment->restaurant_uuid,
+                    'currency_code' => $payment->order->currency_code,
+                    'invoice_status' => RestaurantInvoice::STATUS_UNPAID
+                ])->one();
+
+                if(!$invoice) {
+                    $invoice = new RestaurantInvoice();
+                    $invoice->restaurant_uuid = $payment->restaurant_uuid;
+                    $invoice->payment_uuid = $payment->payment_uuid;
+                    $invoice->amount = $payment->plugn_fee;
+                    $invoice->currency_code = $payment->order->currency_code;
+                }
+                else {
+                    $invoice->amount += $payment->plugn_fee;
+                }
+
+                if(!$invoice->save()) {
+                    Yii::error(print_r($invoice->errors, true));
+                }
+
+                $invoice_item = new InvoiceItem();
+                $invoice_item->invoice_uuid = $invoice->invoice_uuid;
+                $invoice_item->order_uuid = $payment->order_uuid;
+                //$invoice_item->comment = $payment->order_uuid;
+                $invoice_item->total = $payment->plugn_fee;
+
+                if(!$invoice_item->save()) {
+                    Yii::error(print_r($invoice->errors, true));
+                }
             }
 
             Yii::info("[" . $payment->restaurant->name . ": " . $payment->customer->customer_name . " has placed an order for " .

@@ -13,7 +13,6 @@ use yii\db\Expression;
  * @property string $invoice_uuid
  * @property string $invoice_number
  * @property string $restaurant_uuid
- * @property string|null $order_uuid
  * @property string|null $payment_uuid
  * @property float $amount
  * @property string|null $currency_code
@@ -29,6 +28,7 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
 {
     const STATUS_UNPAID = 0;
     const STATUS_PAID = 1;
+    const STATUS_LOCKED = 2;
 
     /**
      * {@inheritdoc}
@@ -49,13 +49,16 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
             [['invoice_status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['invoice_uuid', 'invoice_number', 'restaurant_uuid', 'payment_uuid'], 'string', 'max' => 60],
-            [['order_uuid'], 'string', 'max' => 40],
             [['currency_code'], 'string', 'max' => 3],
             [['invoice_uuid'], 'unique'],
-            [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
             [['payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Payment::className(), 'targetAttribute' => ['payment_uuid' => 'payment_uuid']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
+    }
+
+    public function extraFields()
+    {
+        return array_merge(['invoiceItems'], parent::extraFields());
     }
 
     public function fields()
@@ -63,7 +66,7 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
         $fields = parent::fields();
 
         $fields['invoice_status'] = function($model) {
-            return (boolean) $model->invoice_status;
+            return (int) $model->invoice_status;
         };
 
         return $fields;
@@ -139,7 +142,6 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
             'invoice_uuid' => Yii::t('app', 'Invoice Uuid'),
             'invoice_number' => Yii::t('app', 'Invoice Number'),
             'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
-            'order_uuid' => Yii::t('app', 'Order Uuid'),
             'payment_uuid' => Yii::t('app', 'Payment Uuid'),
             'amount' => Yii::t('app', 'Amount'),
             'currency_code' => Yii::t('app', 'Currency Code'),
@@ -150,13 +152,13 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Order]].
+     * Gets query for [[InvoiceItem]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrder($modelClass = "\common\models\Order")
+    public function getInvoiceItems($modelClass = "\common\models\InvoiceItem")
     {
-        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
+        return $this->hasMany($modelClass::className(), ['invoice_uuid' => 'invoice_uuid']);
     }
 
     /**

@@ -26,8 +26,8 @@ use yii\db\Expression;
  * @property string|null $payment_created_at
  * @property string|null $payment_updated_at
  *
- * @property RestaurantInvoice $invoiceUu
- * @property Restaurant $restaurantUu
+ * @property RestaurantInvoice $invoice
+ * @property Restaurant $restaurant
  */
 class InvoicePayment extends \yii\db\ActiveRecord
 {
@@ -157,6 +157,17 @@ class InvoicePayment extends \yii\db\ActiveRecord
             return [
                 'operation' => 'error',
                 'message' => $model->getErrors ()
+            ];
+        }
+
+        //mark invoice as locked to prevent new order commission getting add
+
+        $model->invoice->invoice_status = RestaurantInvoice::STATUS_LOCKED;
+
+        if(!$model->invoice->save()) {
+            return [
+                'operation' => 'error',
+                'message' => $model->invoice->getErrors ()
             ];
         }
 
