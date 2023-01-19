@@ -2841,6 +2841,19 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[Invoices]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvoices($modelClass = "\common\models\RestaurantInvoice")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * @return query\RestaurantQuery
+     */
     public static function find() {
         return new query\RestaurantQuery(get_called_class());
     }

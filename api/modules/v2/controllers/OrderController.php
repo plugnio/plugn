@@ -3,6 +3,7 @@
 namespace api\modules\v2\controllers;
 
 use agent\models\PaymentMethod;
+use common\models\PaymentFailed;
 use kartik\mpdf\Pdf;
 use Yii;
 use yii\rest\Controller;
@@ -69,10 +70,14 @@ class OrderController extends Controller
     }
 
     /**
-     * Place an order
+     * initialize order without payment details
+     * @param $id
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\db\Exception
      */
-    public function actionPlaceAnOrder($id)
-    {
+    public function actionInitOrder($id) {
+
         $restaurant_model = Restaurant::findOne($id);
 
         if (!$restaurant_model) {
@@ -86,6 +91,8 @@ class OrderController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
 
         $order = new Order();
+
+        $order->setScenario(Order::SCENARIO_INIT_ORDER);
 
         //as we will calculate after items get saved
         $order->total_price = 0;
@@ -110,7 +117,7 @@ class OrderController extends Controller
 
         //payment method
 
-        $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+        //$order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
         $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
         $order->currency_code = Yii::$app->currency->getCode();
 
@@ -118,9 +125,8 @@ class OrderController extends Controller
         $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
 
         //Apply promo code
-        if (Yii::$app->request->getBodyParam("voucher_id")) {
-            $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
-        }
+
+        $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
 
         //if the order mode = 1 => Delivery
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
@@ -252,7 +258,9 @@ class OrderController extends Controller
         }
 
         if (!$order->is_order_scheduled && !$restaurant_model->isOpen()) {
+
             $transaction->rollBack();
+
             return [
                 'operation' => 'error',
                 'message' => $restaurant_model->name . ' is currently closed and is not accepting orders at this time',
@@ -279,14 +287,19 @@ class OrderController extends Controller
                 ->one();
 
             if (!$freeCheckout) {
+
                 $transaction->rollBack();
+
                 return [
                     'operation' => 'error',
                     'message' => "Free checkout not enabled on this store!",
                     'code' => 8
                 ];
-            } else if ($order->payment_method_id != $freeCheckout->payment_method_id) {
+
+            } else if ($order->payment_method_id && $order->payment_method_id != $freeCheckout->payment_method_id) {
+
                 $transaction->rollBack();
+
                 return [
                     'operation' => 'error',
                     'message' => "Invalid payment method for free order!",
@@ -304,6 +317,98 @@ class OrderController extends Controller
                 'message' => 'Minimum order amount ' . Yii::$app->formatter->asCurrency($order->deliveryZone->min_charge,
                         $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]),
                 'code' => 10
+            ];
+        }
+
+        $bank_name = Yii::$app->request->getBodyParam("bank_name");
+
+        if($bank_name) {
+
+            $bank_discount_model = BankDiscount::find()
+                ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
+                ->andWhere(['bank.bank_name' => $bank_name])
+                ->andWhere(['restaurant_uuid' => $order->restaurant_uuid])
+                ->andWhere(['<=', 'minimum_order_amount', $order->total_price])
+                ->one();
+
+            if ($bank_discount_model) {
+
+                if ($bank_discount_model->isValid($order->customer_phone_number)) {
+                    $customerBankDiscount = new CustomerBankDiscount();
+                    $customerBankDiscount->customer_id = $order->customer_id;
+                    $customerBankDiscount->bank_discount_id = $bank_discount_model->bank_discount_id;
+                    $customerBankDiscount->save();
+                }
+
+                $order->bank_discount_id = $bank_discount_model->bank_discount_id;
+
+                if (!$order->updateOrderTotalPrice()) {
+                    return [
+                        'operation' => 'error',
+                        'message' => $order->getErrors(),
+                        'code' => 14
+                    ];
+                }
+            }
+        }
+
+        $transaction->commit();
+
+        return [
+            'operation' => 'success',
+            'order' => $order
+        ];
+    }
+
+    /**
+     * Place an order
+     */
+    public function actionPlaceAnOrder($id)
+    {
+        $order_uuid = Yii::$app->request->getBodyParam('order_uuid');
+
+        $restaurant_model = Restaurant::findOne($id);
+
+        if($order_uuid)
+        {
+            $order = $this->findModel($order_uuid);
+        }
+        else
+        {
+            $response = $this->actionInitOrder($id);
+
+            if ($response['operation'] == 'error') {
+                return $response;
+            }
+
+            $order = $response['order'];
+        }
+
+        //Apply promo code
+
+        $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
+
+        //bank discount
+
+        $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+
+        $order->order_instruction = Yii::$app->request->getBodyParam("order_instruction");
+
+        //save gift message
+        $order->sender_name = Yii::$app->request->getBodyParam("sender_name");
+        $order->recipient_name = Yii::$app->request->getBodyParam("recipient_name");
+        $order->recipient_phone_number = Yii::$app->request->getBodyParam("recipient_phone_number");
+        $order->gift_message = Yii::$app->request->getBodyParam("gift_message");
+
+        if($order->voucher_id) {
+            $order->calculateOrderTotalPrice();//update total based on voucher
+        }
+
+        if (!$order->save()) {
+            return [
+                'operation' => 'error',
+                'message' => $order->getErrors(),
+                'code' => 2
             ];
         }
 
@@ -342,13 +447,9 @@ class OrderController extends Controller
 
                     $responseContent = json_decode($response->content);
 
-                    try {
-
                         // Validate that theres no error from TAP gateway
 
                         if (isset($responseContent->status) && $responseContent->status == "fail") {
-
-                            $transaction->rollBack();
 
                             return [
                                 'operation' => 'error',
@@ -357,46 +458,12 @@ class OrderController extends Controller
                             ];
 
                         } else if (isset($responseContent->id) && $responseContent->id) {
-
-                            $bank_name = Yii::$app->request->getBodyParam("bank_name");
-
-                            $bank_discount_model = BankDiscount::find()
-                                ->innerJoin('bank', 'bank.bank_id = bank_discount.bank_id')
-                                ->andWhere(['bank.bank_name' => $bank_name])
-                                ->andWhere(['restaurant_uuid' => $order->restaurant_uuid])
-                                ->andWhere(['<=', 'minimum_order_amount', $order->total_price])
-                                ->one();
-
-                            if ($bank_discount_model) {
-
-                                if ($bank_discount_model->isValid($order->customer_phone_number)) {
-                                    $customerBankDiscount = new CustomerBankDiscount();
-                                    $customerBankDiscount->customer_id = $order->customer_id;
-                                    $customerBankDiscount->bank_discount_id = $bank_discount_model->bank_discount_id;
-                                    $customerBankDiscount->save();
-                                }
-                                $order->bank_discount_id = $bank_discount_model->bank_discount_id;
-                            }
-
                             $payment->payment_token = Yii::$app->request->getBodyParam("payment_token");
                         }
 
-                    } catch (\Exception $e) {
-                        
-                        $transaction->rollBack();
-
-                        return [
-                            'operation' => 'error',
-                            'message' => 'Invalid Token id',
-                            'code' => 12
-                        ];
-                    }
                 }
 
                 if (!$payment->save()) {
-
-                    $transaction->rollBack();
-
                     return [
                         'operation' => 'error',
                         'message' => $payment->getErrors(),
@@ -407,17 +474,6 @@ class OrderController extends Controller
                 //Update payment_uuid in order
                 $order->payment_uuid = $payment->payment_uuid;
                 $order->save(false);
-
-                if (!$order->updateOrderTotalPrice()) {
-
-                    $transaction->rollBack();
-
-                    return [
-                        'operation' => 'error',
-                        'message' => $order->getErrors(),
-                        'code' => 14
-                    ];
-                }
 
                 Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
@@ -451,11 +507,8 @@ class OrderController extends Controller
 
                 $responseContent = json_decode($response->content);
 
-                try {
                     // Validate that theres no error from TAP gateway
                     if (isset($responseContent->errors)) {
-
-                        $transaction->rollBack();
 
                        // Yii::error($responseContent, 'application');
 
@@ -483,6 +536,13 @@ class OrderController extends Controller
 
                         Yii::error("Order #". $order->order_uuid . " Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description, 'application');
 
+                        $paymentFailed = new PaymentFailed();
+                        $paymentFailed->payment_uuid = $payment->payment_uuid;
+                        $paymentFailed->customer_id = $order->customer_id;
+                        $paymentFailed->order_uuid = $order->order_uuid;
+                        $paymentFailed->response = print_r($responseContent->errors, true);
+                        $paymentFailed->save();
+
                         return [
                             'operation' => 'error',
                             'message' => $errorMessage,
@@ -501,8 +561,6 @@ class OrderController extends Controller
 
                         if (!$payment->save(false)) {
 
-                            $transaction->rollBack();
-
                             Yii::error("Order #". $order->order_uuid . " Error: " . print_r($payment->getErrors(), true), 'application');
 
                             return [
@@ -512,8 +570,6 @@ class OrderController extends Controller
                             ];
                         }
                     } else {
-
-                        $transaction->rollBack();
 
                         Yii::error("Order #". $order->order_uuid . " Error: Payment Issue > Charge id is missing",
                             'application');
@@ -525,42 +581,18 @@ class OrderController extends Controller
                         ];
                     }
 
-                    $transaction->commit();
-
                     return [
                         'operation' => 'redirecting',
                         'is_sandbox' => $order->restaurant->is_sandbox,
                         'redirectUrl' => $redirectUrl,
                     ];
 
-                } catch (\Exception $e) {
-
-                    /* todo: notify admin?
-                    if ($payment)
-                        Yii::error('[TAP Payment Issue > ]' . json_encode($payment->getErrors()), __METHOD__);
-
-                    Yii::error('[TAP Payment Issue > Charge id is missing]' . json_encode($responseContent), __METHOD__);
-                      */
-
-                    Yii::error("Order #". $order->order_uuid . " Error: " . $e->getMessage(),
-                        'application');
-
-                    $transaction->rollBack();
-
-                    return [
-                        'operation' => 'error',
-                        'message' => $responseContent,
-                        'code' => 18
-                    ];
-                }
             } else if ($restaurant_model->is_myfatoorah_enable) {
 
                 $payment->payment_gateway_name = 'myfatoorah';
                 $payment->payment_mode = $order->paymentMethod->payment_method_name;
 
                 if (!$payment->save()) {
-
-                    $transaction->rollBack();
 
                     return [
                         'operation' => 'error',
@@ -573,17 +605,6 @@ class OrderController extends Controller
                 $order->payment_uuid = $payment->payment_uuid;
                 $order->save(false);
 
-                if (!$order->updateOrderTotalPrice()) {
-
-                    $transaction->rollBack();
-
-                    return [
-                        'operation' => 'error',
-                        'message' => $order->getErrors(),
-                        'code' => 20
-                    ];
-                }
-
                 Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
                 Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code, $order->restaurant->is_sandbox);
@@ -592,9 +613,15 @@ class OrderController extends Controller
                 $initiatePaymentResponse = json_decode($initiatePayment->content);
 
                 if (!$initiatePaymentResponse->IsSuccess) {
-                    $transaction->rollBack();
 
                     $errorMessage = "Error: " . $initiatePaymentResponse->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+
+                    $paymentFailed = new PaymentFailed();
+                    $paymentFailed->payment_uuid = $payment->payment_uuid;
+                    $paymentFailed->customer_id = $order->customer_id;
+                    $paymentFailed->order_uuid = $order->order_uuid;
+                    $paymentFailed->response = $errorMessage;
+                    $paymentFailed->save();
 
                     return [
                         'operation' => 'error',
@@ -604,6 +631,7 @@ class OrderController extends Controller
                 }
 
                 $paymentMethodId = null;
+
                 foreach ($initiatePaymentResponse->Data->PaymentMethods as $key => $paymentMethod) {
                     if ($order->paymentMethod->payment_method_code == $paymentMethod->PaymentMethodCode) {
                         $paymentMethodId = $paymentMethod->PaymentMethodId;
@@ -611,8 +639,6 @@ class OrderController extends Controller
                 }
 
                 if ($paymentMethodId == null) {
-
-                    $transaction->rollBack();
 
                     return [
                         'operation' => 'error',
@@ -645,7 +671,7 @@ class OrderController extends Controller
 
                 if (!$responseContent->IsSuccess) {
                     $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors[0]->Error) : $responseContent->Message;
-                    $transaction->rollBack();
+
                     return [
                         'operation' => 'error',
                         'message' => $errorMessage,
@@ -660,7 +686,13 @@ class OrderController extends Controller
                     $payment->payment_gateway_invoice_id = $invoiceId;
 
                     if (!$payment->save(false)) {
-                        $transaction->rollBack();
+
+                        $paymentFailed = new PaymentFailed();
+                        $paymentFailed->payment_uuid = $payment->payment_uuid;
+                        $paymentFailed->customer_id = $order->customer_id;
+                        $paymentFailed->order_uuid = $order->order_uuid;
+                        $paymentFailed->response = print_r($payment->getErrors(), true);
+                        $paymentFailed->save();
 
                         return [
                             'operation' => 'error',
@@ -669,15 +701,13 @@ class OrderController extends Controller
                         ];
                     }
                 } else {
-                    $transaction->rollBack();
+
                     return [
                         'operation' => 'error',
                         'message' => $responseContent,
                         'code' => 25
                     ];
                 }
-
-                $transaction->commit();
 
                 return [
                     'operation' => 'redirecting',
@@ -688,8 +718,6 @@ class OrderController extends Controller
             } else {
 
                 //Yii::error("Order #". $order->order_uuid . " Error: " . $e->getMessage(), 'application');
-
-                $transaction->rollBack();
 
                 return [
                     'operation' => 'error',
@@ -705,8 +733,6 @@ class OrderController extends Controller
             $order->sendPaymentConfirmationEmail();
 
             Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
-
-            $transaction->commit();
 
             return [
                 'operation' => 'success',
@@ -790,7 +816,6 @@ class OrderController extends Controller
      */
     public function actionCallback($tap_id)
     {
-
         try {
             $paymentRecord = Payment::updatePaymentStatusFromTap($tap_id);
             $paymentRecord->received_callback = true;
@@ -854,8 +879,8 @@ class OrderController extends Controller
         $content = $this->render('invoice', [
             'order' => $order,
             'defaultLogo' => $defaultLogo,
-            'bankDiscount' => $order->voucher_discount,
-            'voucherDiscount' => $order->bank_discount,
+            'bankDiscount' => $order->bank_discount,
+            'voucherDiscount' => $order->voucher_discount,
         ]);
 
         $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
