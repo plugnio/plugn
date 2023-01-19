@@ -17,7 +17,7 @@ class AgentSearch extends Agent {
     public function rules() {
         return [
             [['agent_id', 'agent_status'], 'integer'],
-            [['agent_name', 'agent_email', 'agent_auth_key', 'agent_password_hash', 'agent_password_reset_token', 'agent_created_at', 'agent_updated_at'], 'safe'],
+            [['agent_name', 'agent_email', 'last_active_at', 'agent_auth_key', 'agent_password_hash', 'agent_password_reset_token', 'agent_created_at', 'agent_updated_at'], 'safe'],
         ];
     }
 
@@ -59,7 +59,13 @@ class AgentSearch extends Agent {
             'agent_status' => $this->agent_status,
             'agent_created_at' => $this->agent_created_at,
             'agent_updated_at' => $this->agent_updated_at,
+            //'last_active_at' => $this->last_active_at,
         ]);
+
+        if($this->last_active_at) {
+            $query->andWhere("DATE(last_active_at) = DATE('".
+                date('Y-m-d', strtotime($this->last_active_at))."')");
+        }
 
         $query->andFilterWhere(['like', 'agent_name', $this->agent_name])
                 ->andFilterWhere(['like', 'agent_email', $this->agent_email])

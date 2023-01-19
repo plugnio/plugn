@@ -483,7 +483,12 @@ class CronController extends \yii\console\Controller
                     if ($getSitemapXmlSHA->isOk && $getSitemapXmlSHA->data) {
 
                         //Replace test with store branch name
-                        $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'src/sitemap.xml', 'Update sitemap', $getSitemapXmlSHA->data['sha']);
+                        $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent(
+                            $data,
+                            $store->store_branch_name,
+                            'src/sitemap.xml',
+                            'Update sitemap',
+                            $getSitemapXmlSHA->data['sha']);
 
                         if ($commitSitemapXmlFileResponse->isOk) {
 

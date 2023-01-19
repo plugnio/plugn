@@ -38,6 +38,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             // ['class' => 'yii\grid\SerialColumn'],
             [
+                'attribute' => 'logo',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return Html::img($data->getRestaurantLogoUrl());
+                },
+            ],
+            [
                 'attribute' => 'name',
                 'format' => 'raw',
                 'value' => function ($data) {
@@ -58,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             'restaurant_domain',
-            [
+            /*[
               'attribute' => 'country_name',
               'value' =>     'country.country_name'
             ],
@@ -66,15 +73,17 @@ $this->params['breadcrumbs'][] = $this->title;
               'label' => 'Currency',
               'attribute' => 'currency_title',
               'value' =>     'currency.title'
-            ],
+            ],*/
             'platform_fee:percent',
-            'warehouse_fee',
-            'warehouse_delivery_charges',
-            'version',
-            'restaurant_created_at:datetime',
-            'referral_code',
+            //'warehouse_fee',
+            //'warehouse_delivery_charges',
+           // 'version',
+           // 'restaurant_created_at:datetime',
+            //'referral_code',
+            'last_active_at',
+            'last_order_at',
             'status',
-            'is_deleted',
+            //'is_deleted',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'restaurant',
