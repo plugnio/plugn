@@ -124,6 +124,13 @@ jobs:
           path: ~/plugn/console/runtime/logs/report.html
           destination: report
 
+  notify:
+    docker:
+      - image: 'cimg/base:stable'
+        #auth:
+        #  username: mydockerhub-user
+        #  password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    steps:
       - slack/notify:
           event: fail
           template: basic_fail_1
