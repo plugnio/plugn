@@ -22,21 +22,53 @@ $this->title = 'Admin dashboard';
 
                   <?= Html::a('Go &raquo', ['restaurant/index'], ['class' => 'btn btn-default']) ?>
             </div>
+
+            <div class="col-12 col-lg-4">
+                <h2>Store Invoices</h2>
+
+                <span class="badge badge-light"><?= $draft ?> Unpaid</span>
+                    <span class="badge badge-warning"><?= $pending ?> Locked</span>
+                        <span class="badge badge-primary"><?= $paid ?> Paid</span>
+
+                <br />
+                <br />
+
+                <?= Html::a('Go &raquo', ['restaurant-invoice/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <h2>Store Orders</h2>
+
+                <?= Html::a('Go &raquo', ['order/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-4">
+                <h2>Subscriptions</h2>
+
+                <?= Html::a('Go &raquo', ['subscription/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <h2>Order Payments</h2>
+
+                <?= Html::a('Go &raquo', ['payment/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+
             <div class="col-12 col-lg-4">
                 <h2>Agents</h2>
 
                   <?= Html::a('Go &raquo', ['agent/index'], ['class' => 'btn btn-default']) ?>
             </div>
 
+        </div>
+        <div class="row">
             <div class="col-12 col-lg-4">
                 <h2>Agent Assignment</h2>
 
                   <?= Html::a('Go &raquo', ['agent-assignment/index'], ['class' => 'btn btn-default']) ?>
             </div>
 
-        </div>
-
-        <div class="row">
             <div class="col-12 col-lg-4">
                 <h2>Partners</h2>
 

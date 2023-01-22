@@ -46,6 +46,7 @@ AppAsset::register($this);
             [
                 'label' => 'Store',
                 'items' => [
+                    ['label' => 'Invoices', 'url' => ['/restaurant-invoice/index']],
                     ['label' => 'Orders', 'url' => ['/order/index']],
                     ['label' => 'Stores', 'url' => ['/restaurant/index']],
                     ['label' => 'Queue', 'url' => ['/queue/index']],

@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use backend\models\RestaurantInvoice;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -62,8 +63,23 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $draft = RestaurantInvoice::find()
+            ->andWhere(['invoice_status' => RestaurantInvoice::STATUS_UNPAID])
+            ->count();
 
-        return $this->render('index');
+        $pending = RestaurantInvoice::find()
+            ->andWhere(['invoice_status' => RestaurantInvoice::STATUS_LOCKED])
+            ->count();
+
+        $paid = RestaurantInvoice::find()
+            ->andWhere(['invoice_status' => RestaurantInvoice::STATUS_PAID])
+            ->count();
+
+        return $this->render('index', [
+            'draft' => $draft,
+            'pending' => $pending,
+            'paid' => $paid
+        ]);
     }
 
     /**
@@ -89,8 +105,6 @@ class SiteController extends Controller
             ]);
         }
     }
-
-
 
     /**
      * Logout action.
