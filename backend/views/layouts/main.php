@@ -55,6 +55,8 @@ AppAsset::register($this);
                     ['label' => 'Agents', 'url' => ['/agent/index']],
                     ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
                     ['label' => 'Subscription', 'url' => ['/subscription/index']],
+                    ['label' => 'Customers', 'url' => ['/customer/index']],
+                    ['label' => 'Debugger', 'url' => Yii::$app->apiUrlManager->getBaseUrl(). '/debug'],
                 ]
             ],
             [
@@ -66,9 +68,15 @@ AppAsset::register($this);
                     ['label' => 'Subscription Payment', 'url' => ['/subscription-payment/index']],
                 ]
             ],
-            ['label' => 'Customers', 'url' => ['/customer/index']],
-            ['label' => 'Debugger', 'url' => Yii::$app->apiUrlManager->getBaseUrl(). '/debug'],
-            ['label' => 'Plugn Updates', 'url' => ['/plugn-update/index'] ],
+            [
+                'label' => 'Marketing',
+                'items' => [
+                    ['label' => 'Vendor campaign', 'url' => ['/vendor-campaign/index']],
+                    ['label' => 'Pre-built email template', 'url' => ['/prebuilt-email-template/index']],
+                    ['label' => 'Vendor email template', 'url' => ['/vendor-email-template/index']],
+                    ['label' => 'Plugn Updates', 'url' => ['/plugn-update/index'] ],
+                ]
+            ],
             [
                 'label' => 'Settings',
                 'items' => [

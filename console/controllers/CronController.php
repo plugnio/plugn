@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\Currency;
+use common\models\VendorCampaign;
 use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
@@ -834,6 +835,14 @@ class CronController extends \yii\console\Controller
     {
         // GET UPDATED CURRENCY DATA FROM API
         $response = Currency::getDataFromApi();
+
+        $campaigns = VendorCampaign::find()
+            ->andWhere(['status' => VendorCampaign::STATUS_READY])
+            ->all();
+
+        foreach ($campaigns as $campaign) {
+            $campaign->process();
+        }
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }
