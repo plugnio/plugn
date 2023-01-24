@@ -32,7 +32,7 @@ class Module extends \yii\base\Module
             \Yii::$app->getResponse()->setStatusCode(404);
         }
 
-        if($store && $store->enable_debugger)
+        /*if($store && $store->enable_debugger)
         {
             $component = \Yii::$app->getModule('debug');
 
@@ -41,7 +41,7 @@ class Module extends \yii\base\Module
             $component->bootstrap(\Yii::$app);
 
             \Yii::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE, [$component, 'setDebugHeaders']);
-        }
+        }*/
 
         $lang = \Yii::$app->request->headers->get('language');
 
