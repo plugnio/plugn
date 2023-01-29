@@ -424,6 +424,9 @@ class CronController extends \yii\console\Controller
 
                 Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
 
+                $this->queue_response = self::QUEUE_STATUS_FAILED;
+                $this->save(false);
+
                 $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
 
                 echo "<pre>";
