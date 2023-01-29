@@ -848,6 +848,14 @@ class CronController extends \yii\console\Controller
             $campaign->process();
         }
 
+        //remind failed build
+
+        $failed = Queue::find()->andWhere (['queue_status' => Queue::QUEUE_STATUS_FAILED])
+            ->count();
+
+        if($failed > 0)
+            Yii::error ($failed . ' Stores failed, need to publish manually');
+
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }
 
