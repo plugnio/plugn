@@ -638,6 +638,33 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * send campaign message
+     * @param $campaign
+     * @return void
+     */
+    public function sendVendorEmailTemplate($campaign) {
+
+        $mailer = \Yii::$app->mailer->compose()
+            ->setHtmlBody($campaign->template->message)
+            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setSubject($campaign->template->subject);
+
+        $agents = $this->getAgentAssignments()
+            //->andWhere(['email_notification' => true])
+            ->all();
+
+        foreach ($agents as $agentAssignment) {
+            $mailer->setTo($agentAssignment->agent->agent_email)
+                ->send();
+        }
+
+        if ($this->restaurant_email_notification && $this->restaurant_email) {
+            $mailer->setTo($this->restaurant_email)
+                ->send();
+        }
+    }
+
+    /**
      * Upload a File to cloudinary
      * @param type $imageURL
      */

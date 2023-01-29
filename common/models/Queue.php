@@ -132,6 +132,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                 } else{
                     $this->queue_response = json_encode($createBranchResponse);
+
                     if (isset(Yii::$app->session->id)) {
                         Yii::$app->session->setFlash('error', '[Github > Create branch]' . json_encode($createBranchResponse->data['message']) . ' RestaurantUuid: ' . $store_model->restaurant_uuid);
                     }
