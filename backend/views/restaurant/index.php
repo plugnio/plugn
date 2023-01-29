@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if ($data->queue) {
 
                         $icon = "";
-                        
+
                         if ($data->queue->queue_status == 1) {
                             $icon = Html::a('<i class="glyphicon glyphicon-minus-sign" style="color:red"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Pending']);
                         } else if ($data->queue->queue_status == 2) {
@@ -61,7 +61,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         } else if ($data->queue->queue_status == 4) {
                             $icon = Html::a('<i class="glyphicon glyphicon glyphicon-time" style="color:black"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Hold']);
                         } else if ($data->queue->queue_status == 5) {
-                            $icon = Html::a('<i class="glyphicon glyphicon-minus-sign" style="color:red"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Failed']);
+                            $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign"></i> Failed', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Failed']);
+
                         }
 
                         return $data->name . ' ' . $data->queue->queue_status . '&nbsp;&nbsp;' . $icon;
