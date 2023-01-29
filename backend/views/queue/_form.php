@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\Queue;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Queue */
@@ -14,7 +15,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'restaurant_uuid')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'queue_status')->textInput() ?>
+    <?= $form->field($model, 'queue_status')->dropDownList([
+        Queue::QUEUE_STATUS_FAILED=>'Failed',
+        Queue::QUEUE_STATUS_PENDING=>'Pending',
+        Queue::QUEUE_STATUS_CREATING=>'Creating',
+        Queue::QUEUE_STATUS_COMPLETE=>'Published',
+        Queue::QUEUE_STATUS_HOLD=>'Hold'
+    ]) ?>
 
     <?= $form->field($model, 'queue_start_at')->textInput() ?>
 
