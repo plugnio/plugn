@@ -130,7 +130,38 @@ class PaymentController extends Controller
 
         $query = $model->getPaymentMethods()
             ->joinWith('paymentMethodCurrencies')
-            ->andWhere(['payment_method_currency.currency' => $currency]);
+            ->andWhere([
+                'OR',
+                ['payment_method_currency.currency' => $currency],
+                [
+                    'IN',
+                    'payment_method_code',
+                    [
+                        PaymentMethod::CODE_MOYASAR
+                    ]
+                ]
+            ]);
+
+        //for premium stores
+
+        /*if(!$model->platform_fee || $model->platform_fee == 0)
+        {
+            $query->andWhere([
+                'OR',
+                ['payment_method_currency.currency' => $currency],
+                [
+                    'IN',
+                    'payment_method_code',
+                    [
+                        PaymentMethod::CODE_MOYASAR
+                    ]
+                ]
+            ]);
+        }
+        else
+        {
+            $query->andWhere(['payment_method_currency.currency' => $currency]);
+        }*/
 
         return new ActiveDataProvider([
             'query' => $query,

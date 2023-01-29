@@ -2,6 +2,9 @@
 
 namespace common\models;
 
+use agent\models\Plan;
+use agent\models\Subscription;
+use common\components\TapPayments;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
@@ -207,7 +210,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         // On Successful Payments
         if ($responseContent->status == 'CAPTURED') {
 
-
           // KNET Gateway Fee Calculation
           if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
 
@@ -226,6 +228,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                   $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->minCreditcardGatewayFee;
           }
 
+          //todo: moyasar fee
 
             // Update payment method used and the order id assigned to it
             if (isset($responseContent->source->payment_method) && $responseContent->source->payment_method)
@@ -236,22 +239,10 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
 
-        if(YII_ENV == 'prod') {
-            //Send event to Segment
-            \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+            //$paymentRecord->payment_current_status == 'CAPTURED';
+            $paymentRecord->save();
 
-            \Segment::track([
-                  'userId' => $paymentRecord->restaurant_uuid,
-                  'event' => 'Premium Plan Purchase',
-                  'properties' => [
-                      'order_id' => $paymentRecord->payment_uuid,
-                      'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
-                      'paymentMethod' => $paymentRecord->payment_mode,
-                      'currency' => 'USD'
-                  ]
-              ]);
-          }
-
+            self::onPaymentCaptured($paymentRecord);
 
         } else {
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
@@ -263,39 +254,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                     print_r($responseContent, true), __METHOD__);
         }
 
-        if($paymentRecord->save() && $paymentRecord->payment_current_status == 'CAPTURED')
-        {
-            Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
-
-            $subscription_model = $paymentRecord->subscription;
-            $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
-
-            $valid_for =  $subscription_model->plan->valid_for;
-
-            $subscription_model->subscription_end_at = date(
-                'Y-m-d', strtotime(
-                    date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"
-                )
-            );
-
-            $subscription_model->save(false);
-
-            foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
-
-              \Yii::$app->mailer->compose([
-                     'html' => 'premium-upgrade',
-                         ], [
-                     'subscription' => $subscription_model,
-                     'store' => $paymentRecord->restaurant,
-                 ])
-                 ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                 ->setTo([$agent->agent_email])
-                 ->setBcc(\Yii::$app->params['supportEmail'])
-                 ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
-                 ->send();
-            }
-        }
-
         if ($isError) {
             throw new \Exception($errorMessage);
         }
@@ -304,6 +262,60 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             Yii::$app->session->setFlash('success', 'Updated payment status');
 
         return $paymentRecord;
+    }
+
+    /**
+     * on payment captured, mark subscription as active
+     * @param $paymentRecord
+     */
+    public static function onPaymentCaptured($paymentRecord) {
+
+        if(YII_ENV == 'prod') {
+            //Send event to Segment
+            \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
+
+            \Segment::track([
+                'userId' => $paymentRecord->restaurant_uuid,
+                'event' => 'Premium Plan Purchase',
+                'properties' => [
+                    'order_id' => $paymentRecord->payment_uuid,
+                    'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
+                    'paymentMethod' => $paymentRecord->payment_mode,
+                    'currency' => 'USD'
+                ]
+            ]);
+        }
+
+        Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and',
+            ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
+
+        $subscription_model = $paymentRecord->subscription;
+        $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
+
+        $valid_for =  $subscription_model->plan->valid_for;
+
+        $subscription_model->subscription_end_at = date(
+            'Y-m-d', strtotime(
+                date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"
+            )
+        );
+
+        $subscription_model->save(false);
+
+        foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
+
+            \Yii::$app->mailer->compose([
+                'html' => 'premium-upgrade',
+            ], [
+                'subscription' => $subscription_model,
+                'store' => $paymentRecord->restaurant,
+            ])
+                ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                ->setTo([$agent->agent_email])
+                ->setBcc(\Yii::$app->params['supportEmail'])
+                ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
+                ->send();
+        }
     }
 
     /**
@@ -369,6 +381,60 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         return $paymentRecord;
     }
+
+    public static function initPayment($plan_id, $payment_method_id) {
+
+        //todo: support multi currency
+        //$payment->currency_code = "KWD";
+        //$payment->currency_value = 1;
+
+        $store = Yii::$app->accountManager->getManagedAccount ();
+
+        $selectedPlan = Plan::findOne ($plan_id);
+
+        $subscription_model = new Subscription();
+        $subscription_model->restaurant_uuid = $store->restaurant_uuid;
+        $subscription_model->plan_id = $selectedPlan->plan_id;
+        $subscription_model->payment_method_id = $payment_method_id;
+
+        if (!$subscription_model->save ()) {
+            return [
+                "operation" => 'error',
+                "message" => $subscription_model->getErrors ()
+            ];
+        }
+
+        //for free-tier
+
+        if ($selectedPlan->price == 0) {
+            return [
+                "operation" => 'success',
+                "message" => Yii::t('agent', 'Subscribed successfully')
+            ];
+        }
+
+        $payment = new \agent\models\SubscriptionPayment;
+        $payment->restaurant_uuid = $store->restaurant_uuid;
+        $payment->payment_mode = $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+        $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
+        $payment->payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price: $subscription_model->plan->price;
+        $payment->payment_current_status = "Redirected to payment gateway";
+        $payment->is_sandbox = false;//$store->is_sandbox;
+
+        if (!$payment->save ()) {
+            return [
+                'operation' => 'error',
+                'message' => $payment->getErrors ()
+            ];
+        }
+
+        //Update payment_uuid in order
+        $subscription_model->payment_uuid = $payment->payment_uuid;
+        $subscription_model->save (false);
+
+        return $subscription_model;
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
