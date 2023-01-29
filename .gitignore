@@ -48,5 +48,5 @@ phpunit.phar
 /partner/web/index.php
 /partner/web/index-test.php
 /partner/web/robots.txt
-crm/config/main-local.php
-crm/config/params-local.php
+/crm/config/main-local.php
+/crm/config/params-local.php

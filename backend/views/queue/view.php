@@ -69,6 +69,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         return 'Published';
                     } else if ($data->queue_status  == Queue::QUEUE_STATUS_HOLD) {
                         return 'On Hold';
+                    }else if ($data->queue_status  == Queue::QUEUE_STATUS_FAILED) {
+                        return 'Failed';
                     }
                 }
             ],
