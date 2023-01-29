@@ -243,12 +243,12 @@ class Payment extends \yii\db\ActiveRecord
             $amount = Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [
                 \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]);
 
-            Yii::error('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
+            Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                 . $paymentRecord->customer->customer_name .
                 ' tried to pay ' . $amount .
                 ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
-            Yii::error('[Response from TAP for Failed Payment] ' .
+            Yii::info('[Response from TAP for Failed Payment] ' .
                 print_r($responseContent, true), __METHOD__);
 
             //notify tech team + vendor
