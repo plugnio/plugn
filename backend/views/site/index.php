@@ -20,6 +20,17 @@ $this->title = 'Admin dashboard';
             <div class="col-12 col-lg-4">
                 <h2>Stores</h2>
 
+                <span class="badge badge-light"><?= $pendingInQueue ?> Pending</span>
+
+                <span class="badge badge-warning"><?= $holdInQueue ?> Hold</span>
+
+                <?php if($failedInQueue > 0) { ?>
+                <span class="badge badge-danger"><?= $failedInQueue ?> Failed</span>
+                <?php } ?>
+
+                <br />
+                <br />
+
                   <?= Html::a('Go &raquo', ['restaurant/index'], ['class' => 'btn btn-default']) ?>
             </div>
 

@@ -21,7 +21,7 @@ class Moyasar extends Model
     {
         parent::init();
 
-        $this->payment_moyasar_api_secret_key = Setting::getConfig(null, "Moyasar", 'payment_moyasar_api_key');
+        $this->payment_moyasar_api_secret_key = Setting::getConfig(null, "Moyasar", 'payment_moyasar_api_secret_key');
 
         $this->payment_moyasar_api_key = Setting::getConfig(null, "Moyasar", 'payment_moyasar_api_key');
 

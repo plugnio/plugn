@@ -423,7 +423,11 @@ class CronController extends \yii\console\Controller
 
             if (!$queue->save()) {
 
-                Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+                //Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+
+                $queue->queue_status = Queue::QUEUE_STATUS_FAILED;
+                $queue->queue_response = print_r($queue->getErrors(), true);
+                $queue->save(false);
 
                 $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
 
@@ -843,6 +847,14 @@ class CronController extends \yii\console\Controller
         foreach ($campaigns as $campaign) {
             $campaign->process();
         }
+
+        //remind failed build
+
+        $failed = Queue::find()->andWhere (['queue_status' => Queue::QUEUE_STATUS_FAILED])
+            ->count();
+
+        if($failed > 0)
+            Yii::error ($failed . ' Stores failed, need to publish manually');
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }
