@@ -151,6 +151,11 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getRestaurantName() {
+        if($this->restaurant)
+            return $this->restaurant->name;
+    }
+
     /**
      * Gets query for [[InvoiceItem]].
      *

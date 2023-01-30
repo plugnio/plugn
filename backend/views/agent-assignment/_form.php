@@ -143,7 +143,6 @@ $this->registerJs($js);
     ]); ?>
 
 
-
     <?=
         $form->field($model, 'role')->widget(Select2::classname(), [
             'data' => [
