@@ -191,6 +191,19 @@ return [
                         'OPTIONS callback' => 'options',
                     ]
                 ],
+                [// StripeController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/payment/stripe',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS callback' => 'options',
+                    ]
+                ],
                 [// PaymentMethodController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/payment',
