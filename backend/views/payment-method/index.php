@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             return  Html::a('<span class="glyphicon glyphicon-cog"></span>', ['config', 'code' => $model->payment_method_code], [
                                // 'class' => 'btn btn-success',
-                                'hidden' => $model->payment_method_code != 'Moyasar'
+                                'hidden' => !in_array($model->payment_method_code, ['Moyasar', 'Stripe'])
                             ]) ;
                     },
                 ],
