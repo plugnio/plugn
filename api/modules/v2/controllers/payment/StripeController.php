@@ -62,6 +62,69 @@ class StripeController extends Controller
     }
 
     /**
+     * return client secret to initiate stripe form
+     * @return array
+     * @throws NotFoundHttpException
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function actionClientSecret() {
+
+        $order_uuid = Yii::$app->request->get ('order_uuid');
+
+        $order = $this->findOrder($order_uuid);
+
+        try {
+
+            $stripeSecretKey = Setting::getConfig($order->restaurant_uuid, "Stripe", 'payment_stripe_secret_key');
+            $stripePublishableKey = Setting::getConfig($order->restaurant_uuid, "Stripe", 'payment_stripe_publishable_key');
+
+            \Stripe\Stripe::setApiKey($stripeSecretKey);
+
+            // Create a PaymentIntent with amount and currency
+            $paymentIntent = \Stripe\PaymentIntent::create([
+                'amount' => $order->total_price * pow(10, $order->currency->decimal_place),
+                'currency' => strtolower($order->currency_code),
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                ],
+            ]);
+
+            $paymentMethod = PaymentMethod::findOne(['payment_method_code' => PaymentMethod::CODE_STRIPE]);
+
+            $order->payment_method_id = $paymentMethod->payment_method_id;
+            $order->payment_method_name = $paymentMethod->payment_method_name;
+            $order->payment_method_name_ar = $paymentMethod->payment_method_name_ar;
+
+            $payment = new \api\models\Payment;
+            $payment->restaurant_uuid = $order->restaurant_uuid;
+            $payment->customer_id = $order->customer->customer_id; //customer id
+            $payment->order_uuid = $order->order_uuid;
+            $payment->payment_amount_charged = $order->total_price;
+            $payment->payment_gateway_transaction_id  = $paymentIntent->id;
+            $payment->payment_gateway_payment_id = $paymentIntent->id;
+            $payment->save(false);
+
+            $order->payment_uuid = $payment->payment_uuid;
+            $order->save(false);
+
+            return [
+                'operation' => 'success',
+                'clientSecret' => $paymentIntent->client_secret,
+                "stripePublishableKey" => $stripePublishableKey,
+                'success_url' => Url::to(['payment/stripe/callback', 'order_uuid' => $order->order_uuid], true),
+                'cancel_url' => Url::to(['payment/stripe/callback', 'order_uuid' => $order->order_uuid], true),
+            ];
+
+        } catch (Error $e) {
+
+            return [
+                'operation' => 'error',
+                'clientSecret' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
      * return params for payment
      * @return array
      */

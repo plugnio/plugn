@@ -1009,16 +1009,17 @@ class Order extends \yii\db\ActiveRecord
                 return $this->addError($attribute, Yii::t('app', 'Delivery zone is invalid'));
             }
 
-            $this->delivery_fee = $this->deliveryZone->delivery_fee;
+            $this->delivery_fee = round($this->deliveryZone->delivery_fee, $this->currency->decimal_place);
         }
 
         if ($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
-            $this->subtotal_before_refund = $this->calculateOrderItemsTotalPrice();
-            $this->total_price_before_refund = $this->calculateOrderTotalPrice();
+            $this->subtotal_before_refund = round($this->calculateOrderItemsTotalPrice(), $this->currency->decimal_place);
+            $this->total_price_before_refund = round($this->calculateOrderTotalPrice(), $this->currency->decimal_place);
         }
 
-        $this->subtotal = $this->calculateOrderItemsTotalPrice();
-        $this->total_price = $this->calculateOrderTotalPrice();
+        $this->subtotal = round($this->calculateOrderItemsTotalPrice(), $this->currency->decimal_place);
+
+        $this->total_price = round($this->calculateOrderTotalPrice(), $this->currency->decimal_place);
 
         $this->setScenario(self::SCENARIO_UPDATE_TOTAL);
 
@@ -1897,7 +1898,19 @@ class Order extends \yii\db\ActiveRecord
      */
     public function getPayment($modelClass = "\common\models\Payment")
     {
-        return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid']);
+        return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid'])
+            ->orderBy('payment_created_at DESC');
+    }
+
+    /**
+     * Gets query for [[Payments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments($modelClass = "\common\models\Payment")
+    {
+        return $this->hasMany($modelClass::className(), ['payment_uuid' => 'payment_uuid'])
+            ->orderBy('payment_created_at DESC');
     }
 
     /**

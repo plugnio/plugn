@@ -187,9 +187,9 @@ class OrderItem extends \yii\db\ActiveRecord {
             $totalPrice = ($totalPrice / $this->restaurant->currency->rate) * $this->order->currency->rate;
         }*/
 
-        $this->item_unit_price = $totalPrice;
+        $this->item_unit_price = round($totalPrice, $this->order->currency->decimal_place);
 
-        return $totalPrice * $this->qty;
+        return round($this->item_unit_price * $this->qty, $this->order->currency->decimal_place);
     }
 
     /**

@@ -197,10 +197,12 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET' => 'index',
+                        'GET client-secret' => 'client-secret',
                         'GET callback' => 'callback',
                         'POST callback' => 'callback',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS client-secret' => 'options',
                         'OPTIONS callback' => 'options',
                     ]
                 ],
