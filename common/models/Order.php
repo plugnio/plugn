@@ -428,9 +428,11 @@ class Order extends \yii\db\ActiveRecord
             'restaurantBranch',
             'deliveryZone',
             'pickupLocation',
+            'businessLocation',
             'payment',
             'currency',
-            'refundedTotal'
+            'refundedTotal',
+            'voucher'
         ];
     }
 
