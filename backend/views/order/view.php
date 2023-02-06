@@ -746,13 +746,17 @@ DetailView::widget([
 ?>
 
 
-                <?php if(sizeof($model->payment->paymentFails) > 0) { ?>
+                <?php if($model->payment && sizeof($model->payment->paymentFails) > 0) { ?>
                     <h4>Payment failed response</h4>
                 <?php } ?>
 
-                <?php foreach($model->payment->paymentFails as $paymentFail) { ?>
-                   <pre> <?php print_r(unserialize($paymentFail->response . '')) ?></pre>
-                <?php } ?>
+                <?php
+                if ($model->payment) {
+                    foreach($model->payment->paymentFails as $paymentFail) { ?>
+                       <pre> <?php print_r(unserialize($paymentFail->response . '')) ?></pre>
+                    <?php }
+                }
+                ?>
             </div>
         </div>
     </div>
