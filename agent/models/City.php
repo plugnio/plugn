@@ -19,7 +19,7 @@ class City extends \common\models\City
                 ->all();
 
             return $model->getAreas()
-                ->andWhere(['NOT IN','area_id',$allAreas])
+//                ->andWhere(['NOT IN','area_id',$allAreas])
                 ->all();
         };
         $fields['totalDeliveryAreas'] = function ($model) {
