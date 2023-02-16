@@ -78,7 +78,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
     <p>
         <?php
         if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
-            echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice', 'order_uuid' => $model->order_uuid
+            echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice', 'order_uuid' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid
                 ], ['class' => 'btn btn-outline-primary mr-1 mb-1', 'style' => 'margin-right: 7px']);
         }
         ?>
