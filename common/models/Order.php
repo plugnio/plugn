@@ -127,6 +127,7 @@ class Order extends \yii\db\ActiveRecord
     const MASHKOR_ORDER_STATUS_DELIVERED = 10;
     const MASHKOR_ORDER_STATUS_CANCELED = 11;
 
+    const SCENARIO_APPLY_VOUCHER = 'apply-voucher';
     const SCENARIO_UPDATE_ARMADA_STATUS = 'update-armada-status';
     const SCENARIO_UPDATE_MASHKOR_STATUS = 'update-mashkor-status';
     const SCENARIO_UPDATE_ARMADA = 'update-armada';
@@ -1048,12 +1049,14 @@ class Order extends \yii\db\ActiveRecord
     /**
      * Calculate order's total price
      */
-    public function calculateOrderTotalPrice()
+    public function calculateOrderTotalPrice($totalPrice = null)
     {
-        $totalPrice = $this->calculateOrderItemsTotalPrice();
+        if(!$totalPrice)
+            $totalPrice = $this->calculateOrderItemsTotalPrice();
 
         if ($totalPrice > 0)
         {
+            //todo: free delivery voucher?
             if ($this->voucher)
             {
                 $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ?
@@ -1174,10 +1177,13 @@ class Order extends \yii\db\ActiveRecord
 
 
         if ($this->voucher && !$this->voucher_discount) {
+
             $this->discount_type = $this->voucher->discount_type;
 
             $this->voucher_discount = $this->voucher->discount_type == 1 ?
                 $this->subtotal * ($this->voucher->discount_amount / 100) : $this->voucher->discount_amount;
+
+            //todo: if free delivery?
         }
 
         if ($this->bankDiscount && !$this->bank_discount) {
@@ -1642,6 +1648,9 @@ class Order extends \yii\db\ActiveRecord
         $scenarios = parent::scenarios();
 
         $scenarios['updateStatus'] = ['order_status'];
+
+        $scenarios[self::SCENARIO_APPLY_VOUCHER] = ["voucher_id", "discount_type", "voucher_discount", "subtotal_before_refund",
+            "total_price_before_refund", "subtotal", "total_price"];
 
         $scenarios[self::SCENARIO_DELETE] = ['is_deleted'];
 
