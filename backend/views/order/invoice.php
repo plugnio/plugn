@@ -132,8 +132,6 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                   </p>
               <?php } ?>
 
-
-
                 </div>
             </div>
             <div class="col-sm-6 col-12 text-right">
