@@ -8,7 +8,7 @@ return [
     'id' => 'app-api',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'api\controllers',
-    'bootstrap' => ['log', 'debug'],
+    'bootstrap' => ['log'],//'debug'
     'modules' => [
         'v1' => [
             'basePath' => '@api/modules/v1',
