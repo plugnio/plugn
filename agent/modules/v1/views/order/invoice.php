@@ -197,7 +197,9 @@
                                     else if(!empty($order->payment_method_name_ar))
                                         echo $order->payment_method_name_ar;
                                     else if($order->paymentMethod)
-                                        echo $order->paymentMethod->payment_method_name; ?>
+                                        echo $order->paymentMethod->payment_method_name;
+                                    else
+                                        echo "KNET"; ?>
                                 </td>
                             </tr>
 

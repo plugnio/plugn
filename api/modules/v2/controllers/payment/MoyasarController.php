@@ -183,6 +183,7 @@ class MoyasarController extends Controller
         //add payment entry for debug
 
         $paymentMethod = PaymentMethod::findOne(['payment_method_code' => PaymentMethod::CODE_MOYASAR]);
+
         $order->payment_method_id = $paymentMethod->payment_method_id;
         $order->payment_method_name = $paymentMethod->payment_method_name;
         $order->payment_method_name_ar = $paymentMethod->payment_method_name_ar;
