@@ -1104,7 +1104,8 @@ class Order extends \yii\db\ActiveRecord
             $this->tax = $totalPrice * ($this->pickupLocation->business_location_tax / 100);
             $totalPrice += $this->tax;
         }
-
+        // new changes done as calculation was not saving while placing an order.
+        $this->total_price = $totalPrice;
         return $totalPrice;
     }
 

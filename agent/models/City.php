@@ -17,8 +17,7 @@ class City extends \common\models\City
                 ->andWhere(['restaurant_uuid' => $store_uuid])
                 ->andWhere(['!=','delivery_zone_id',$delivery_zone_id])
                 ->all();
-            //todo need to check why its not showing all records
-            // somehow its retaining the data but not showing in frontend
+
             return $model->getAreas()
 //                ->andWhere(['NOT IN','area_id',$allAreas])
                 ->all();
