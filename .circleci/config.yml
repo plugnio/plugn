@@ -1,0 +1,123 @@
+# PHP CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-php/ for more details
+#
+version: 2
+
+jobs:
+  build:
+    branches:
+      only:
+        - main
+        - develop
+    docker:
+      # specify the version you desire here
+      - image: cimg/php:7.4.30-browsers
+      #- image: 'cimg/base:stable'
+
+      #older: 7.3-apache-stretch-node-browsers
+
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_ROOT_PASSWORD: rootpw
+          MYSQL_DATABASE: plugn_test
+          MYSQL_USER: bawes
+          MYSQL_PASSWORD: passw0rd
+        command:
+          mysqld --sql-mode=NO_ENGINE_SUBSTITUTION --character-set-server=utf8mb4 --collation-server=utf8mb4_bin --innodb-large-prefix=true
+
+    # Specify Server Type. Keep it as small as possible to reduce costs
+    resource_class: small
+
+    working_directory: ~/plugn
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install things we need
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libpng-dev libmcrypt-dev libreadline-dev zip zlib1g-dev default-mysql-client
+
+      - run:
+          name: Install PHP exts
+          command: |
+            sudo apt-get install
+        #sudo docker-php-ext-install zip
+        #sudo docker-php-ext-install pdo_mysql exif && sudo docker-php-ext-enable pdo_mysql
+        #sudo docker-php-ext-install libonig-dev mbstring exif
+        # sudo docker-php-ext-configure intl
+        # sudo docker-php-ext-install intl
+        #sudo docker-php-ext-install gd
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "composer.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run:
+          name: Install Dependencies
+          command: composer install -n --prefer-dist
+
+      - save_cache:
+          paths:
+            - ./vendor
+          key: v1-dependencies-{{ checksum "composer.json" }}
+
+      - run:
+          name: Initialize Dev Environment
+          command: ./init --env=Circle-CI --overwrite=All
+
+      - run:
+          name: Install DB Migrations
+          command: ./yii_test migrate --interactive=0
+
+      - run:
+          name: Configure secondary database for wallet
+          command: mysql -h 127.0.0.1 -u root -prootpw -e "CREATE DATABASE wallet_test"
+          #command: mysql -h 127.0.0.1 -u bawes -ppassw0rd -e "CREATE DATABASE wallet_test"
+
+      - run:
+          name: Grant priviledges to database for wallet
+          command: mysql -h 127.0.0.1 -u root -prootpw -e "GRANT ALL PRIVILEGES ON wallet_test.* TO 'bawes'@'127.0.0.1' IDENTIFIED BY 'passw0rd'"
+
+      #- run:
+      #    name: Seed secondary database for wallet
+      #    command: ./yii cron/
+
+      #---------- Store app --------------#
+
+      - run:
+          name: Run Store app Codeception functional tests and store result output
+          command: cd ./api && ../vendor/bin/codecept run functional --xml --html --fail-fast
+
+      - run:
+          name: Run Store app Codeception tests and store result output
+          command: ./vendor/bin/codecept run api/tests/unit --xml --html --fail-fast
+
+      #---------- Agent app --------------#
+
+      - run:
+          name: Run Vendor Dashboard app Codeception functional tests and store result output
+          command: cd ./agent && ../vendor/bin/codecept run functional --xml --html --fail-fast
+
+      #- run:
+      #    name: Run Vendor Dashboard app Codeception tests and store result output
+      #    command: ./vendor/bin/codecept run agent/tests/unit --xml --html --fail-fast
+
+      #---------- common --------------#
+
+      - run:
+          name: Run Common Codeception unit tests and store result output
+          command: cd ./common && ../vendor/bin/codecept run unit --xml --html --fail-fast
+
+      - store_test_results:
+          path: ~/plugn/console/runtime/logs
+
+      - store_artifacts:
+          path: ~/plugn/console/runtime/logs/report.html
+          destination: report
+

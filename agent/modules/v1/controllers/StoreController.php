@@ -551,7 +551,7 @@ class StoreController extends BaseController
     /**
      *  Enable Cash on delivery
      */
-    public function actionEnableCod($id)
+    public function actionEnableCod($id = null)
     {
         $model = $this->findModel($id);
 
@@ -585,7 +585,7 @@ class StoreController extends BaseController
     /**
      *  Disable Cash on delivery
      */
-    public function actionDisableCod($id)
+    public function actionDisableCod($id = null)
     {
         $model = $this->findModel($id);
 
@@ -605,9 +605,72 @@ class StoreController extends BaseController
     }
 
     /**
+     *  Enable Moyasar
+     */
+    public function actionEnableMoyasar($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_MOYASAR])
+            ->exists();
+
+        if ($payment_method) {
+            return self::message("error",'Moyasar already enabled');
+        }
+
+        $codPaymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_MOYASAR])
+            ->one();
+
+        if(!$codPaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+        }
+
+        $payments_method = new RestaurantPaymentMethod();
+        $payments_method->payment_method_id = $codPaymentMethod->payment_method_id;
+        $payments_method->restaurant_uuid = $model->restaurant_uuid;
+
+        if (!$payments_method->save()) {
+            return self::message("error",$payments_method->getErrors());
+        }
+
+        return self::message("success","Moyasar enabled successfully");
+    }
+
+    /**
+     *  Disable Moyasar
+     */
+    public function actionDisableMoyasar($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_MOYASAR])
+            ->one();
+
+        if (!$payment_method) {
+            throw new BadRequestHttpException('The requested record does not exist.');
+        }
+
+        if (!$payment_method->delete()) {
+            return self::message("error", $payment_method->getErrors());
+        }
+
+        Setting::deleteAll([
+                'restaurant_uuid' => $model->restaurant_uuid,
+                'code' => PaymentMethod::CODE_MOYASAR
+            ]);
+
+        return self::message("success", "Moyasar disabled successfully");
+    }
+
+    /**
      *  Enable Free Checkout
      */
-    public function actionEnableFreeCheckout($id)
+    public function actionEnableFreeCheckout($id = null)
     {
         $model = $this->findModel($id);
 
@@ -642,7 +705,7 @@ class StoreController extends BaseController
     /**
      *  Disable Free Checkout
      */
-    public function actionDisableFreeCheckout($id)
+    public function actionDisableFreeCheckout($id = null)
     {
         $model = $this->findModel($id);
 
@@ -724,12 +787,14 @@ class StoreController extends BaseController
 
         $themeData = Yii::$app->request->getBodyParam('restaurantTheme');
 
-        $restaurantTheme->primary = $themeData['primary'];
-        $restaurantTheme->secondary = $themeData['secondary'];
-        $restaurantTheme->tertiary = $themeData['tertiary'];
-        $restaurantTheme->light = $themeData['light'];
-        $restaurantTheme->medium = $themeData['medium'];
-        $restaurantTheme->dark = $themeData['dark'];
+        if($themeData) {
+            $restaurantTheme->primary = $themeData['primary'];
+            $restaurantTheme->secondary = $themeData['secondary'];
+            $restaurantTheme->tertiary = $themeData['tertiary'];
+            $restaurantTheme->light = $themeData['light'];
+            $restaurantTheme->medium = $themeData['medium'];
+            $restaurantTheme->dark = $themeData['dark'];
+        }
 
         if(!$restaurantTheme->save()) {
             $transaction->rollBack ();
@@ -749,7 +814,7 @@ class StoreController extends BaseController
      * process payment gateway queue
      * @return void
      */
-    public function actionProcessGatewayQueue($id)
+    public function actionProcessGatewayQueue($id = null)
     {
         $model = $this->findModel($id);
 
@@ -768,7 +833,7 @@ class StoreController extends BaseController
      * remove payment gateway queue
      * @return void
      */
-    public function actionRemoveGatewayQueue($id)
+    public function actionRemoveGatewayQueue($id = null)
     {
         $this->findModel($id);
 
@@ -836,7 +901,7 @@ class StoreController extends BaseController
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionStatus($store_uuid) {
+    public function actionStatus($store_uuid = null) {
 
         $model = $this->findModel($store_uuid);
 
@@ -854,7 +919,7 @@ class StoreController extends BaseController
      * @throws NotFoundHttpException
      * update store status
      */
-    public function actionUpdateStoreStatus($id,$status) {
+    public function actionUpdateStoreStatus($id, $status) {
 
         $model = $this->findModel($id);
 

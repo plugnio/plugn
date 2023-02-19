@@ -638,6 +638,33 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * send campaign message
+     * @param $campaign
+     * @return void
+     */
+    public function sendVendorEmailTemplate($campaign) {
+
+        $mailer = \Yii::$app->mailer->compose()
+            ->setHtmlBody($campaign->template->message)
+            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setSubject($campaign->template->subject);
+
+        $agents = $this->getAgentAssignments()
+            //->andWhere(['email_notification' => true])
+            ->all();
+
+        foreach ($agents as $agentAssignment) {
+            $mailer->setTo($agentAssignment->agent->agent_email)
+                ->send();
+        }
+
+        if ($this->restaurant_email_notification && $this->restaurant_email) {
+            $mailer->setTo($this->restaurant_email)
+                ->send();
+        }
+    }
+
+    /**
      * Upload a File to cloudinary
      * @param type $imageURL
      */
@@ -1387,6 +1414,16 @@ class Restaurant extends \yii\db\ActiveRecord
             $freePlan = Plan::find ()
                 ->where (['valid_for' => 0])
                 ->one ();
+
+            if(!$freePlan) {
+                $freePlan = new Plan();
+                $freePlan->description = "";
+                $freePlan->name = "Free plan auto generated";
+                $freePlan->price = 0;
+                $freePlan->valid_for = 0;// 0 days
+                $freePlan->platform_fee = 5;
+                $freePlan->save(false);
+            }
 
             $subscription = new Subscription();
             $subscription->restaurant_uuid = $this->restaurant_uuid;
@@ -2812,6 +2849,16 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[BankDiscount]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBankDiscounts($modelClass = "\common\models\BankDiscount")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[RestaurantCurrencies]].
      *
      * @return \yii\db\ActiveQuery
@@ -2821,6 +2868,19 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[Invoices]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvoices($modelClass = "\common\models\RestaurantInvoice")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * @return query\RestaurantQuery
+     */
     public static function find() {
         return new query\RestaurantQuery(get_called_class());
     }

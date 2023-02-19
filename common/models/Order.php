@@ -133,6 +133,7 @@ class Order extends \yii\db\ActiveRecord
     const SCENARIO_UPDATE_MASHKOR = 'update-mashkor';
     const SCENARIO_UPDATE_TOTAL = 'updateTotal';
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
+    const SCENARIO_INIT_ORDER = 'init-order';
     const SCENARIO_OLD_VERSION = 'old_version';
     const SCENARIO_UPDATE_STATUS = 'updateStatus';
     const SCENARIO_DELETE = 'delete';
@@ -155,13 +156,15 @@ class Order extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // 'currency_code', 'store_currency_code', 'payment_method_name'
+            // 'currency_code', 'store_currency_code', 'payment_method_name', 'payment_method_id',
             [['customer_name', 'order_mode', 'total_price', 'subtotal',
-                'order_mode', 'restaurant_uuid', 'payment_method_id',
-                'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
+                'order_mode', 'restaurant_uuid', 'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
 
             [['is_order_scheduled'], 'required', 'on' => 'create'],
-            [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
+            [['payment_method_id'], 'required', 'except' => [
+                self::SCENARIO_CREATE_ORDER_BY_ADMIN,
+                self::SCENARIO_INIT_ORDER
+            ]],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted'], 'integer', 'min' => 0],
@@ -1095,7 +1098,8 @@ class Order extends \yii\db\ActiveRecord
             $this->tax = $totalPrice * ($this->pickupLocation->business_location_tax / 100);
             $totalPrice += $this->tax;
         }
-
+        // new changes done as calculation was not saving while placing an order.
+        $this->total_price = $totalPrice;
         return $totalPrice;
     }
 
@@ -1181,7 +1185,7 @@ class Order extends \yii\db\ActiveRecord
 
         //currency rate from store currency to order currency
 
-        if (!$this->currency_rate) {
+        if (!$this->currency_rate && $this->restaurant->currency) {
             $this->store_currency_code = $this->restaurant->currency->code;
             $this->currency_rate = $this->currency->rate / $this->restaurant->currency->rate;
         }
@@ -1189,7 +1193,6 @@ class Order extends \yii\db\ActiveRecord
         if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN) {
             $this->order_status = self::STATUS_DRAFT;
         }
-
 
         if ($this->scenario == self::SCENARIO_UPDATE_TOTAL) {
 
@@ -1347,9 +1350,6 @@ class Order extends \yii\db\ActiveRecord
 
           }
 
-
-
-
         return true;
     }
 
@@ -1433,7 +1433,7 @@ class Order extends \yii\db\ActiveRecord
 
             $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
 
-            if (!$payment_method_model) {
+            if ($this->payment_method_id && !$payment_method_model) {
                 throw new BadRequestHttpException('payment gateway not found');
             }
 
@@ -1455,6 +1455,21 @@ class Order extends \yii\db\ActiveRecord
             ]);
 
             //$this->save(false);
+        }
+        //on update
+        else {
+
+            if (isset($changedAttributes['voucher_id']) && $changedAttributes['voucher_id'] != $this->voucher_id) {
+
+                $voucher_model = Voucher::findOne($this->voucher_id);
+
+                if ($voucher_model->isValid($this->customer_phone_number)) {
+                    $customerVoucher = new CustomerVoucher();
+                    $customerVoucher->customer_id = $this->customer_id;
+                    $customerVoucher->voucher_id = $this->voucher_id;
+                    $customerVoucher->save();
+                }
+            }
         }
 
         /**

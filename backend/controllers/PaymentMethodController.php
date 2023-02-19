@@ -113,6 +113,34 @@ class PaymentMethodController extends Controller
     }
 
     /**
+     * edit payment gateway settings
+     * @param $code
+     * @return string
+     */
+    public function actionConfig($code)
+    {
+        $name = "\backend\models\payment\\" . $code;
+
+        $model = new $name ;
+
+        if ($model->load($this->request->post()) && $model->save())
+        {
+            Yii::$app->session->setFlash('success', "Extension $code updated.");
+
+            $this->redirect(['index']);
+        }
+
+        /*$settings = Setting::find()
+            ->andWhere(['code' => $code])
+            ->all();*/
+
+        return $this->render('config/' . strtolower($code), [
+            'model' => $model,
+            "code" => $code
+        ]);
+    }
+
+    /**
      * Deletes an existing PaymentMethod model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id

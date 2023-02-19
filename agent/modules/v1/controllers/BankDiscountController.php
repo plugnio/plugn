@@ -152,7 +152,9 @@ class BankDiscountController extends BaseController {
      * @throws NotFoundHttpException
      */
      public function actionUpdateBankDiscountStatus() {
+         
          $this->ownerCheck();
+
          $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
          $bank_discount_id =  Yii::$app->request->getBodyParam('bank_discount_id');
          
