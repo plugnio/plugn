@@ -1468,6 +1468,17 @@ class Order extends \yii\db\ActiveRecord
         //on update
         else {
 
+            if ($this->payment_method_id && !$this->payment_method_name) {
+
+                $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
+
+                if(!$payment_method_model)
+                    throw new BadRequestHttpException('payment gateway not found');
+
+                $this->payment_method_name = $payment_method_model->payment_method_name;
+                $this->payment_method_name_ar = $payment_method_model->payment_method_name_ar;
+            }
+
             if (isset($changedAttributes['voucher_id']) && $changedAttributes['voucher_id'] != $this->voucher_id) {
 
                 $voucher_model = Voucher::findOne($this->voucher_id);

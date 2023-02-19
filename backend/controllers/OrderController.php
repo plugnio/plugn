@@ -597,7 +597,7 @@ class OrderController extends Controller
     {
         $order = Order::find()
             ->where(['order_uuid' => $order_uuid, 'restaurant_uuid' => $storeUuid])
-            ->with(['restaurant', 'currency', 'country', 'deliveryZone.country'])
+            ->with(['restaurant', 'currency', 'country', 'deliveryZone.country', 'paymentMethod'])
             ->one();
 
         // Item
