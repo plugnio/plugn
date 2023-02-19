@@ -595,7 +595,10 @@ class OrderController extends Controller
      */
     public function actionViewInvoice($order_uuid, $storeUuid)
     {
-        $order = Order::find()->where(['order_uuid' => $order_uuid, 'restaurant_uuid' => $storeUuid])->with(['restaurant', 'currency', 'country', 'deliveryZone.country'])->one();
+        $order = Order::find()
+            ->where(['order_uuid' => $order_uuid, 'restaurant_uuid' => $storeUuid])
+            ->with(['restaurant', 'currency', 'country', 'deliveryZone.country'])
+            ->one();
 
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([

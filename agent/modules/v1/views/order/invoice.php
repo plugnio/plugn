@@ -190,7 +190,15 @@
                                 <td><strong>Customer</strong> : <?= $order->customer_name ?></td>
                             </tr>
                             <tr>
-                                <td><strong>Payment Method</strong> : <?= $order->payment_method_name ?></td>
+                                <td><strong>Payment Method</strong> :
+                                    <?php
+                                    if(!empty($order->payment_method_name))
+                                        echo $order->payment_method_name;
+                                    else if(!empty($order->payment_method_name_ar))
+                                        echo $order->payment_method_name_ar;
+                                    else if($order->paymentMethod)
+                                        echo $order->paymentMethod->payment_method_name; ?>
+                                </td>
                             </tr>
 
                                 <tr>
