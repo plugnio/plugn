@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\Currency;
+use common\models\VendorCampaign;
 use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
@@ -378,6 +379,13 @@ class CronController extends \yii\console\Controller
 
     }
 
+    public function actionTest() {
+        $tap = PaymentGatewayQueue::find()->offset(1)->one();
+
+        $tap->enableGateways();
+
+    }
+
     /**
      * todo: why cron? when can just proccess form submit
      */
@@ -415,7 +423,11 @@ class CronController extends \yii\console\Controller
 
             if (!$queue->save()) {
 
-                Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+                //Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+
+                $queue->queue_status = Queue::QUEUE_STATUS_FAILED;
+                $queue->queue_response = print_r($queue->getErrors(), true);
+                $queue->save(false);
 
                 $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
 
@@ -476,7 +488,12 @@ class CronController extends \yii\console\Controller
                     if ($getSitemapXmlSHA->isOk && $getSitemapXmlSHA->data) {
 
                         //Replace test with store branch name
-                        $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'src/sitemap.xml', 'Update sitemap', $getSitemapXmlSHA->data['sha']);
+                        $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent(
+                            $data,
+                            $store->store_branch_name,
+                            'src/sitemap.xml',
+                            'Update sitemap',
+                            $getSitemapXmlSHA->data['sha']);
 
                         if ($commitSitemapXmlFileResponse->isOk) {
 
@@ -822,6 +839,22 @@ class CronController extends \yii\console\Controller
     {
         // GET UPDATED CURRENCY DATA FROM API
         $response = Currency::getDataFromApi();
+
+        $campaigns = VendorCampaign::find()
+            ->andWhere(['status' => VendorCampaign::STATUS_READY])
+            ->all();
+
+        foreach ($campaigns as $campaign) {
+            $campaign->process();
+        }
+
+        //remind failed build
+
+        $failed = Queue::find()->andWhere (['queue_status' => Queue::QUEUE_STATUS_FAILED])
+            ->count();
+
+        if($failed > 0)
+            Yii::error ($failed . ' Stores failed, need to publish manually');
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
     }

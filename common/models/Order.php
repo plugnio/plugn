@@ -127,12 +127,14 @@ class Order extends \yii\db\ActiveRecord
     const MASHKOR_ORDER_STATUS_DELIVERED = 10;
     const MASHKOR_ORDER_STATUS_CANCELED = 11;
 
+    const SCENARIO_APPLY_VOUCHER = 'apply-voucher';
     const SCENARIO_UPDATE_ARMADA_STATUS = 'update-armada-status';
     const SCENARIO_UPDATE_MASHKOR_STATUS = 'update-mashkor-status';
     const SCENARIO_UPDATE_ARMADA = 'update-armada';
     const SCENARIO_UPDATE_MASHKOR = 'update-mashkor';
     const SCENARIO_UPDATE_TOTAL = 'updateTotal';
     const SCENARIO_CREATE_ORDER_BY_ADMIN = 'manual';
+    const SCENARIO_INIT_ORDER = 'init-order';
     const SCENARIO_OLD_VERSION = 'old_version';
     const SCENARIO_UPDATE_STATUS = 'updateStatus';
     const SCENARIO_DELETE = 'delete';
@@ -155,13 +157,15 @@ class Order extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // 'currency_code', 'store_currency_code', 'payment_method_name'
+            // 'currency_code', 'store_currency_code', 'payment_method_name', 'payment_method_id',
             [['customer_name', 'order_mode', 'total_price', 'subtotal',
-                'order_mode', 'restaurant_uuid', 'payment_method_id',
-                'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
+                'order_mode', 'restaurant_uuid', 'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
 
             [['is_order_scheduled'], 'required', 'on' => 'create'],
-            [['payment_method_id'], 'required', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
+            [['payment_method_id'], 'required', 'except' => [
+                self::SCENARIO_CREATE_ORDER_BY_ADMIN,
+                self::SCENARIO_INIT_ORDER
+            ]],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
             [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted'], 'integer', 'min' => 0],
@@ -425,9 +429,11 @@ class Order extends \yii\db\ActiveRecord
             'restaurantBranch',
             'deliveryZone',
             'pickupLocation',
+            'businessLocation',
             'payment',
             'currency',
-            'refundedTotal'
+            'refundedTotal',
+            'voucher'
         ];
     }
 
@@ -1006,16 +1012,17 @@ class Order extends \yii\db\ActiveRecord
                 return $this->addError($attribute, Yii::t('app', 'Delivery zone is invalid'));
             }
 
-            $this->delivery_fee = $this->deliveryZone->delivery_fee;
+            $this->delivery_fee = round($this->deliveryZone->delivery_fee, $this->currency->decimal_place);
         }
 
         if ($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
-            $this->subtotal_before_refund = $this->calculateOrderItemsTotalPrice();
-            $this->total_price_before_refund = $this->calculateOrderTotalPrice();
+            $this->subtotal_before_refund = round($this->calculateOrderItemsTotalPrice(), $this->currency->decimal_place);
+            $this->total_price_before_refund = round($this->calculateOrderTotalPrice(), $this->currency->decimal_place);
         }
 
-        $this->subtotal = $this->calculateOrderItemsTotalPrice();
-        $this->total_price = $this->calculateOrderTotalPrice();
+        $this->subtotal = round($this->calculateOrderItemsTotalPrice(), $this->currency->decimal_place);
+
+        $this->total_price = round($this->calculateOrderTotalPrice(), $this->currency->decimal_place);
 
         $this->setScenario(self::SCENARIO_UPDATE_TOTAL);
 
@@ -1042,12 +1049,14 @@ class Order extends \yii\db\ActiveRecord
     /**
      * Calculate order's total price
      */
-    public function calculateOrderTotalPrice()
+    public function calculateOrderTotalPrice($totalPrice = null)
     {
-        $totalPrice = $this->calculateOrderItemsTotalPrice();
+        if(!$totalPrice)
+            $totalPrice = $this->calculateOrderItemsTotalPrice();
 
         if ($totalPrice > 0)
         {
+            //todo: free delivery voucher?
             if ($this->voucher)
             {
                 $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ?
@@ -1095,7 +1104,8 @@ class Order extends \yii\db\ActiveRecord
             $this->tax = $totalPrice * ($this->pickupLocation->business_location_tax / 100);
             $totalPrice += $this->tax;
         }
-
+        // new changes done as calculation was not saving while placing an order.
+        $this->total_price = $totalPrice;
         return $totalPrice;
     }
 
@@ -1168,10 +1178,13 @@ class Order extends \yii\db\ActiveRecord
 
 
         if ($this->voucher && !$this->voucher_discount) {
+
             $this->discount_type = $this->voucher->discount_type;
 
             $this->voucher_discount = $this->voucher->discount_type == 1 ?
                 $this->subtotal * ($this->voucher->discount_amount / 100) : $this->voucher->discount_amount;
+
+            //todo: if free delivery?
         }
 
         if ($this->bankDiscount && !$this->bank_discount) {
@@ -1181,7 +1194,7 @@ class Order extends \yii\db\ActiveRecord
 
         //currency rate from store currency to order currency
 
-        if (!$this->currency_rate) {
+        if (!$this->currency_rate && $this->restaurant->currency) {
             $this->store_currency_code = $this->restaurant->currency->code;
             $this->currency_rate = $this->currency->rate / $this->restaurant->currency->rate;
         }
@@ -1189,7 +1202,6 @@ class Order extends \yii\db\ActiveRecord
         if ($insert && $this->scenario == self::SCENARIO_CREATE_ORDER_BY_ADMIN) {
             $this->order_status = self::STATUS_DRAFT;
         }
-
 
         if ($this->scenario == self::SCENARIO_UPDATE_TOTAL) {
 
@@ -1347,9 +1359,6 @@ class Order extends \yii\db\ActiveRecord
 
           }
 
-
-
-
         return true;
     }
 
@@ -1375,7 +1384,11 @@ class Order extends \yii\db\ActiveRecord
             $this->customer_phone_number = str_replace(' ', '', $this->customer_phone_number);
 
             //Save Customer data
-            $customer = Customer::find()->where(['customer_phone_number' => $this->customer_phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
+
+            $customer = Customer::find()->where([
+                'customer_phone_number' => $this->customer_phone_number,
+                'restaurant_uuid' => $this->restaurant_uuid
+            ])->one();
 
             if (!$customer) {//new customer
                 $customer = new Customer();
@@ -1429,7 +1442,7 @@ class Order extends \yii\db\ActiveRecord
 
             $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
 
-            if (!$payment_method_model) {
+            if ($this->payment_method_id && !$payment_method_model) {
                 throw new BadRequestHttpException('payment gateway not found');
             }
 
@@ -1444,7 +1457,39 @@ class Order extends \yii\db\ActiveRecord
 
             $this->store_currency_code = $this->restaurant->currency->code;
 
+            Restaurant::updateAll([
+                'last_order_at' => new Expression('NOW()')
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
             //$this->save(false);
+        }
+        //on update
+        else {
+
+            if ($this->payment_method_id && !$this->payment_method_name) {
+
+                $payment_method_model = PaymentMethod::findOne($this->payment_method_id);
+
+                if(!$payment_method_model)
+                    throw new BadRequestHttpException('payment gateway not found');
+
+                $this->payment_method_name = $payment_method_model->payment_method_name;
+                $this->payment_method_name_ar = $payment_method_model->payment_method_name_ar;
+            }
+
+            if (isset($changedAttributes['voucher_id']) && $changedAttributes['voucher_id'] != $this->voucher_id) {
+
+                $voucher_model = Voucher::findOne($this->voucher_id);
+
+                if ($voucher_model->isValid($this->customer_phone_number)) {
+                    $customerVoucher = new CustomerVoucher();
+                    $customerVoucher->customer_id = $this->customer_id;
+                    $customerVoucher->voucher_id = $this->voucher_id;
+                    $customerVoucher->save();
+                }
+            }
         }
 
         /**
@@ -1615,6 +1660,9 @@ class Order extends \yii\db\ActiveRecord
         $scenarios = parent::scenarios();
 
         $scenarios['updateStatus'] = ['order_status'];
+
+        $scenarios[self::SCENARIO_APPLY_VOUCHER] = ["voucher_id", "discount_type", "voucher_discount", "subtotal_before_refund",
+            "total_price_before_refund", "subtotal", "total_price"];
 
         $scenarios[self::SCENARIO_DELETE] = ['is_deleted'];
 
@@ -1873,7 +1921,19 @@ class Order extends \yii\db\ActiveRecord
      */
     public function getPayment($modelClass = "\common\models\Payment")
     {
-        return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid']);
+        return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid'])
+            ->orderBy('payment_created_at DESC');
+    }
+
+    /**
+     * Gets query for [[Payments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments($modelClass = "\common\models\Payment")
+    {
+        return $this->hasMany($modelClass::className(), ['payment_uuid' => 'payment_uuid'])
+            ->orderBy('payment_created_at DESC');
     }
 
     /**

@@ -7,6 +7,7 @@ use common\models\AgentAssignment;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidParamException;
+use yii\db\Expression;
 use yii\web\NotFoundHttpException;
 use agent\models\Restaurant;
 

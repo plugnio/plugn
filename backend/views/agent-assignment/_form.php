@@ -81,7 +81,7 @@ $('#agentassignment-agentname').on('click', function() {
         e.stopPropagation();
     
         $.ajax({
-				url: $(e.target).attr('href') + '&fromPager=1',
+				url: $(e.target).attr('href') + '?fromPager=1',
 				dataType: 'html',
 				success: function(html) {
 					$('#modal-agent .list-wrapper').html(html);
@@ -141,7 +141,6 @@ $this->registerJs($js);
         'valueAttribute' => "restaurant_uuid",
         "formModalName" => "agentassignment"
     ]); ?>
-
 
 
     <?=

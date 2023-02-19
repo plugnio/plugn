@@ -117,6 +117,9 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property boolean $is_public
  * @property boolean $is_deleted
  * @property boolean $is_under_maintenance
+ * @property string|null $last_active_at
+ * @property string|null $last_order_at
+ *
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -301,13 +304,13 @@ class Restaurant extends \yii\db\ActiveRecord
             [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent','enable_gift_message'], 'integer'],
 
             [['phone_number', 'owner_number'], 'string', 'min' => 6, 'max' => 20],
-            //[['phone_number', 'owner_number'], 'number'],
 
+            [['last_active_at', 'last_order_at'], 'safe'],
+
+            //[['phone_number', 'owner_number'], 'number'],
 
             // [['owner_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT ,self::SCENARIO_CREATE_STORE_BY_AGENT]],
             // [['phone_number'], PhoneInputValidator::className(), 'message' => 'Please insert a valid phone number'],
-
-
 
             //  ['currency_id', function ($attribute, $params, $validator) {
             //     if ($this->getOrders()->exists())
@@ -632,6 +635,33 @@ class Restaurant extends \yii\db\ActiveRecord
               $this->addError($attribute, $err->getMessage());
               return false;
             }
+    }
+
+    /**
+     * send campaign message
+     * @param $campaign
+     * @return void
+     */
+    public function sendVendorEmailTemplate($campaign) {
+
+        $mailer = \Yii::$app->mailer->compose()
+            ->setHtmlBody($campaign->template->message)
+            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setSubject($campaign->template->subject);
+
+        $agents = $this->getAgentAssignments()
+            //->andWhere(['email_notification' => true])
+            ->all();
+
+        foreach ($agents as $agentAssignment) {
+            $mailer->setTo($agentAssignment->agent->agent_email)
+                ->send();
+        }
+
+        if ($this->restaurant_email_notification && $this->restaurant_email) {
+            $mailer->setTo($this->restaurant_email)
+                ->send();
+        }
     }
 
     /**
@@ -1384,6 +1414,16 @@ class Restaurant extends \yii\db\ActiveRecord
             $freePlan = Plan::find ()
                 ->where (['valid_for' => 0])
                 ->one ();
+
+            if(!$freePlan) {
+                $freePlan = new Plan();
+                $freePlan->description = "";
+                $freePlan->name = "Free plan auto generated";
+                $freePlan->price = 0;
+                $freePlan->valid_for = 0;// 0 days
+                $freePlan->platform_fee = 5;
+                $freePlan->save(false);
+            }
 
             $subscription = new Subscription();
             $subscription->restaurant_uuid = $this->restaurant_uuid;
@@ -2561,6 +2601,16 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[StoreUpdates]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoreUpdates($modelClass = "\common\models\StoreUpdate")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[Customers]].
      *
      * @return \yii\db\ActiveQuery
@@ -2799,6 +2849,16 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[BankDiscount]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBankDiscounts($modelClass = "\common\models\BankDiscount")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[RestaurantCurrencies]].
      *
      * @return \yii\db\ActiveQuery
@@ -2808,6 +2868,19 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * Gets query for [[Invoices]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvoices($modelClass = "\common\models\RestaurantInvoice")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * @return query\RestaurantQuery
+     */
     public static function find() {
         return new query\RestaurantQuery(get_called_class());
     }

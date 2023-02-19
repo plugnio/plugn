@@ -11,6 +11,7 @@ use api\models\Payment;
 use common\models\Refund;
 use api\models\Restaurant;
 use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
 
 class PaymentController extends Controller
 {
@@ -119,12 +120,73 @@ class PaymentController extends Controller
      */
     public function actionListAllRestaurantsPaymentMethod($id)
     {
+        $model = $this->findModel($id);
 
-        $model = Restaurant::findOne($id);
+        $currency = \Yii::$app->currency->getCode();
+
+        if(!$currency) {
+            $currency = $model->currency->code;
+        }
+
+        $query = $model->getPaymentMethods()
+            ->joinWith('paymentMethodCurrencies')
+            ->andWhere([
+                'OR',
+                ['payment_method_currency.currency' => $currency],
+                [
+                    'IN',
+                    'payment_method_code',
+                    [
+                        PaymentMethod::CODE_MOYASAR,
+                        PaymentMethod::CODE_STRIPE
+                    ]
+                ]
+            ]);
+
+        //for premium stores
+
+        /*if(!$model->platform_fee || $model->platform_fee == 0)
+        {
+            $query->andWhere([
+                'OR',
+                ['payment_method_currency.currency' => $currency],
+                [
+                    'IN',
+                    'payment_method_code',
+                    [
+                        PaymentMethod::CODE_MOYASAR
+                    ]
+                ]
+            ]);
+        }
+        else
+        {
+            $query->andWhere(['payment_method_currency.currency' => $currency]);
+        }*/
 
         return new ActiveDataProvider([
-            'query' => $model->getPaymentMethods()->asArray(),
+            'query' => $query,
             'pagination' => false
         ]);
+    }
+
+    /**
+     * Finds the Restaurant model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return Category the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        $model = Restaurant::find()
+            ->where(['restaurant_uuid' => $id])
+            ->one();
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
     }
 }

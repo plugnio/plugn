@@ -61,6 +61,8 @@ class AdminTest extends \Codeception\Test\Unit
             $model->admin_email = 'unique@admin.com';
             $model->admin_auth_key = '';
             $model->setPassword('admin2');
+            $model->admin_role = Admin::ROLE_ADMIN;
+            
             expect('Created successfully', $model->save())->true();
             expect('Record is in database', $model->findOne(['admin_name' => 'Magan']))->notNull();
         });

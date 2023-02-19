@@ -25,6 +25,8 @@ class PaymentMethod extends \yii\db\ActiveRecord
     const CODE_CASH = 'cash';
     const CODE_CREDIT_CARD = 'credit-card';
     const CODE_KNET = 'kn';
+    const CODE_MOYASAR = "Moyasar";
+    const CODE_STRIPE = "Stripe";
 
     /**
      * {@inheritdoc}
@@ -64,6 +66,16 @@ class PaymentMethod extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
+    {
+        return $this->hasMany($modelClass::className(), ['payment_method_id' => 'payment_method_id']);
+    }
+
+    /**
+     * Gets query for [[PaymentMethodCurrencies]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentMethodCurrencies($modelClass = "\common\models\PaymentMethodCurrency")
     {
         return $this->hasMany($modelClass::className(), ['payment_method_id' => 'payment_method_id']);
     }

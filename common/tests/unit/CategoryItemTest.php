@@ -23,7 +23,8 @@ class CategoryItemTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'bankDiscounts' => CategoryItemFixture::className()];
+            'categoryItems' => CategoryItemFixture::className()
+        ];
     }
 
     /**

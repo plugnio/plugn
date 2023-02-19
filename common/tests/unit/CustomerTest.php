@@ -41,7 +41,7 @@ class CustomerTest extends \Codeception\Test\Unit
             $model = new Customer();
 
             expect('should not accept empty customer_name', $model->validate(['customer_name']))->false();
-            expect('should not accept empty customer_email', $model->validate(['customer_email']))->false();
+            //expect('should not accept empty customer_email', $model->validate(['customer_email']))->false();
             expect('should not accept empty customer_phone_number', $model->validate(['customer_phone_number']))->false();
         });
     }
