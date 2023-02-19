@@ -677,7 +677,14 @@ DetailView::widget([
             'label' => 'Payment type',
             'format' => 'html',
             'value' => function ($data) {
-                return $data->payment_method_name;
+                 if(!empty($data->payment_method_name))
+                     return $data->payment_method_name;
+                                else if(!empty($data->payment_method_name_ar))
+                                    return $data->payment_method_name_ar;
+                                else if($data->paymentMethod)
+                                    return $data->paymentMethod->payment_method_name;
+                                else
+                                    echo "KNET";
             },
         ],
         [
