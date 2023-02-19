@@ -187,7 +187,9 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                           else if(!empty($model->payment_method_name_ar))
                               echo $model->payment_method_name_ar;
                           else if($model->paymentMethod)
-                              echo $model->paymentMethod->payment_method_name; ?>
+                              echo $model->paymentMethod->payment_method_name;
+                          else
+                              echo "KNET"; ?>
                         </span>
                       </span>
 
