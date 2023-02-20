@@ -22,7 +22,6 @@ class Stripe extends Model
 
         if($this->restaurant_uuid) {
             $this->payment_stripe_secret_key = Setting::getConfig($this->restaurant_uuid, "Stripe", 'payment_stripe_secret_key');
-
             $this->payment_stripe_publishable_key = Setting::getConfig($this->restaurant_uuid, "Stripe", 'payment_stripe_publishable_key');
         }
     }
@@ -38,6 +37,7 @@ class Stripe extends Model
     }
 
     public function save() {
+
         Setting::setConfig($this->restaurant_uuid, 'Stripe', 'payment_stripe_secret_key', $this->payment_stripe_secret_key);
         Setting::setConfig($this->restaurant_uuid, 'Stripe', 'payment_stripe_publishable_key', $this->payment_stripe_publishable_key);
 
