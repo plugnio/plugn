@@ -62,8 +62,8 @@ class CurrencyController extends BaseController {
         $keyword = Yii::$app->request->get('keyword');
         $page = Yii::$app->request->get('page');
 
-        $query =  Currency::find()
-            ->andWhere(['status' => Currency::STATUS_ACTIVE]);
+        $query =  Currency::find();
+            //->andWhere(['status' => Currency::STATUS_ACTIVE]);
 
         if ($keyword) {
             $query->andWhere([

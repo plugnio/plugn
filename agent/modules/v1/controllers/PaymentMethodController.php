@@ -23,6 +23,51 @@ class PaymentMethodController extends BaseController
 
         $model = new $name;
         $model->restaurant_uuid = $store->restaurant_uuid;
+
+        if($code == "Moyasar") {
+            return $this->_configMoyasar($model, $store, $code);
+        } else if($code == "Stripe") {
+            return $this->_configStripe($model, $store, $code);
+        }
+
+    }
+
+    private function _configStripe($model, $store, $code) {
+
+        $model->payment_stripe_secret_key = Yii::$app->request->getBodyParam('payment_stripe_secret_key');
+        $model->payment_stripe_publishable_key = Yii::$app->request->getBodyParam('payment_stripe_publishable_key');
+
+        if ($model->save())
+        {
+            $payment_method = $store->getRestaurantPaymentMethods()
+                ->joinWith('paymentMethod')
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPE])
+                ->exists();
+
+            if (!$payment_method) {
+
+                $moyasarPaymentMethod = PaymentMethod::find()
+                    ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPE])
+                    ->one();
+
+                $payments_method = new RestaurantPaymentMethod();
+                $payments_method->payment_method_id = $moyasarPaymentMethod->payment_method_id;
+                $payments_method->restaurant_uuid = $store->restaurant_uuid;
+
+                if (!$payments_method->save()) {
+                    return self::message("error", $payments_method->getErrors());
+                }
+            }
+
+            return self::message('success', "Extension $code updated.");
+        }
+
+        return self::message('error', $model->errors);
+    }
+
+
+    private function _configMoyasar($model, $store, $code) {
+
         $model->payment_moyasar_api_secret_key = Yii::$app->request->getBodyParam('payment_moyasar_api_secret_key');
         $model->payment_moyasar_api_key = Yii::$app->request->getBodyParam('payment_moyasar_api_key');
         $model->payment_moyasar_payment_type = Yii::$app->request->getBodyParam('payment_moyasar_payment_type');

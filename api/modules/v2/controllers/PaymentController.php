@@ -137,7 +137,8 @@ class PaymentController extends Controller
                     'IN',
                     'payment_method_code',
                     [
-                        PaymentMethod::CODE_MOYASAR
+                        PaymentMethod::CODE_MOYASAR,
+                        PaymentMethod::CODE_STRIPE
                     ]
                 ]
             ]);
