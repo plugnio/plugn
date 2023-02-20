@@ -191,6 +191,21 @@ return [
                         'OPTIONS callback' => 'options',
                     ]
                 ],
+                [// StripeController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/payment/stripe',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET client-secret' => 'client-secret',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS client-secret' => 'options',
+                        'OPTIONS callback' => 'options',
+                    ]
+                ],
                 [// PaymentMethodController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/payment',
@@ -212,6 +227,8 @@ return [
                         'GET' => 'list',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST init-order/<id>' => 'init-order',
+                        'POST apply-promo-code/<order_uuid>' => 'apply-promo-code',
+                        'POST instruction/<order_uuid>' => 'instruction',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
@@ -223,6 +240,8 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS init-order/<id>' => 'options',
+                        'POST instruction/<order_uuid>' => 'instruction',
+                        'OPTIONS apply-promo-code/<order_uuid>' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',

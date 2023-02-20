@@ -139,22 +139,29 @@ class Setting extends \yii\db\ActiveRecord
 
         //if exists update
 
-        if(Yii::$app->config->has($key))
+        /*if(Yii::$app->config->has($key))
         {
             return self::updateAll([
                 'value' => $value
             ], [
                 'key' => $key,
             ]);
+        }*/
+
+        $model = Setting::find()->andWhere([
+            "restaurant_uuid" => $restaurant_uuid,
+            "code" => $code,
+            "key" => $key
+        ])->one();
+
+        if(!$model) {
+            $model = new Setting();
+            $model->code = $code;
+            $model->key = $key;
+            $model->restaurant_uuid = $restaurant_uuid;
         }
 
-        //else add
-
-        $model = new Setting();
-        $model->code = $code;
         $model->value = $value;
-        $model->key = $key;
-        $model->restaurant_uuid = $restaurant_uuid;
         $model->save();
     }
 

@@ -565,6 +565,12 @@ return [
                         'POST disable-moyasar' => 'disable-moyasar',
                         'POST enable-moyasar/<id>' => 'enable-moyasar',
                         'POST disable-moyasar/<id>' => 'disable-moyasar',
+
+                        'POST enable-stripe' => 'enable-stripe',
+                        'POST disable-stripe' => 'disable-stripe',
+                        'POST enable-stripe/<id>' => 'enable-stripe',
+                        'POST disable-stripe/<id>' => 'disable-stripe',
+
                         'POST enable-free-checkout/<id>' => 'enable-free-checkout',
                         'POST disable-free-checkout/<id>' => 'disable-free-checkout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
@@ -591,6 +597,12 @@ return [
                         'OPTIONS disable-moyasar' => 'options',
                         'OPTIONS enable-moyasar/<id>' => 'options',
                         'OPTIONS disable-moyasar/<id>' => 'options',
+
+                        'OPTIONS enable-stripe' => 'options',
+                        'OPTIONS disable-stripe' => 'options',
+                        'OPTIONS enable-stripe/<id>' => 'options',
+                        'OPTIONS disable-stripe/<id>' => 'options',
+
                         'OPTIONS connect-domain' => 'options',
                         'OPTIONS update-bank-account' => 'options',
                         'OPTIONS update-delivery-integration/<id>' => 'options',

@@ -127,6 +127,7 @@ class Order extends \yii\db\ActiveRecord
     const MASHKOR_ORDER_STATUS_DELIVERED = 10;
     const MASHKOR_ORDER_STATUS_CANCELED = 11;
 
+    const SCENARIO_APPLY_VOUCHER = 'apply-voucher';
     const SCENARIO_UPDATE_ARMADA_STATUS = 'update-armada-status';
     const SCENARIO_UPDATE_MASHKOR_STATUS = 'update-mashkor-status';
     const SCENARIO_UPDATE_ARMADA = 'update-armada';
@@ -428,9 +429,11 @@ class Order extends \yii\db\ActiveRecord
             'restaurantBranch',
             'deliveryZone',
             'pickupLocation',
+            'businessLocation',
             'payment',
             'currency',
-            'refundedTotal'
+            'refundedTotal',
+            'voucher'
         ];
     }
 
@@ -1009,16 +1012,17 @@ class Order extends \yii\db\ActiveRecord
                 return $this->addError($attribute, Yii::t('app', 'Delivery zone is invalid'));
             }
 
-            $this->delivery_fee = $this->deliveryZone->delivery_fee;
+            $this->delivery_fee = round($this->deliveryZone->delivery_fee, $this->currency->decimal_place);
         }
 
         if ($this->order_status != Order::STATUS_REFUNDED && $this->order_status != Order::STATUS_PARTIALLY_REFUNDED) {
-            $this->subtotal_before_refund = $this->calculateOrderItemsTotalPrice();
-            $this->total_price_before_refund = $this->calculateOrderTotalPrice();
+            $this->subtotal_before_refund = round($this->calculateOrderItemsTotalPrice(), $this->currency->decimal_place);
+            $this->total_price_before_refund = round($this->calculateOrderTotalPrice(), $this->currency->decimal_place);
         }
 
-        $this->subtotal = $this->calculateOrderItemsTotalPrice();
-        $this->total_price = $this->calculateOrderTotalPrice();
+        $this->subtotal = round($this->calculateOrderItemsTotalPrice(), $this->currency->decimal_place);
+
+        $this->total_price = round($this->calculateOrderTotalPrice(), $this->currency->decimal_place);
 
         $this->setScenario(self::SCENARIO_UPDATE_TOTAL);
 
@@ -1045,12 +1049,14 @@ class Order extends \yii\db\ActiveRecord
     /**
      * Calculate order's total price
      */
-    public function calculateOrderTotalPrice()
+    public function calculateOrderTotalPrice($totalPrice = null)
     {
-        $totalPrice = $this->calculateOrderItemsTotalPrice();
+        if(!$totalPrice)
+            $totalPrice = $this->calculateOrderItemsTotalPrice();
 
         if ($totalPrice > 0)
         {
+            //todo: free delivery voucher?
             if ($this->voucher)
             {
                 $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ?
@@ -1172,10 +1178,13 @@ class Order extends \yii\db\ActiveRecord
 
 
         if ($this->voucher && !$this->voucher_discount) {
+
             $this->discount_type = $this->voucher->discount_type;
 
             $this->voucher_discount = $this->voucher->discount_type == 1 ?
                 $this->subtotal * ($this->voucher->discount_amount / 100) : $this->voucher->discount_amount;
+
+            //todo: if free delivery?
         }
 
         if ($this->bankDiscount && !$this->bank_discount) {
@@ -1652,6 +1661,9 @@ class Order extends \yii\db\ActiveRecord
 
         $scenarios['updateStatus'] = ['order_status'];
 
+        $scenarios[self::SCENARIO_APPLY_VOUCHER] = ["voucher_id", "discount_type", "voucher_discount", "subtotal_before_refund",
+            "total_price_before_refund", "subtotal", "total_price"];
+
         $scenarios[self::SCENARIO_DELETE] = ['is_deleted'];
 
         $scenarios[self::SCENARIO_UPDATE_TOTAL] = [
@@ -1909,7 +1921,19 @@ class Order extends \yii\db\ActiveRecord
      */
     public function getPayment($modelClass = "\common\models\Payment")
     {
-        return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid']);
+        return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid'])
+            ->orderBy('payment_created_at DESC');
+    }
+
+    /**
+     * Gets query for [[Payments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments($modelClass = "\common\models\Payment")
+    {
+        return $this->hasMany($modelClass::className(), ['payment_uuid' => 'payment_uuid'])
+            ->orderBy('payment_created_at DESC');
     }
 
     /**

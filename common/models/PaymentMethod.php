@@ -26,6 +26,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
     const CODE_CREDIT_CARD = 'credit-card';
     const CODE_KNET = 'kn';
     const CODE_MOYASAR = "Moyasar";
+    const CODE_STRIPE = "Stripe";
 
     /**
      * {@inheritdoc}
