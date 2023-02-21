@@ -455,9 +455,12 @@ class OrderController extends BaseController
             ->orderBy(['order_created_at' => SORT_DESC])
             ->one();
 
+        $totalPendingInvoices = $store->getInvoices()->notPaid()->count();
+
         return [
             'totalPendingOrders' => (int)$totalPendingOrders,
-            'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null
+            'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null,
+            'totalPendingInvoices' => (int)$totalPendingInvoices
         ];
     }
 
