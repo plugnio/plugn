@@ -195,4 +195,11 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+    /**
+     * @return query\RestaurantInvoiceQuery
+     */
+    public static function find() {
+        return new query\RestaurantInvoiceQuery(get_called_class());
+    }
 }
