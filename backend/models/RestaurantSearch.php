@@ -50,7 +50,8 @@ class RestaurantSearch extends Restaurant
      */
     public function search($params)
     {
-        $query = Restaurant::find()->joinWith(['country', 'currency'])->orderBy(['restaurant_created_at' => SORT_DESC]);
+        $query = Restaurant::find()->joinWith(['country', 'currency'])
+            ->orderBy(['restaurant_created_at' => SORT_DESC]);
 
         // add conditions that should always apply here
 
@@ -77,10 +78,16 @@ class RestaurantSearch extends Restaurant
         }
 
         // grid filtering conditions
-        $query->andFilterWhere([
-            'restaurant_created_at' => $this->restaurant_created_at,
-            'restaurant_updated_at' => $this->restaurant_updated_at,
-        ]);
+
+        if($this->restaurant_created_at)    
+            $query->andFilterWhere([
+                'DATE(restaurant_created_at)' => date('Y-m-d', strtotime($this->restaurant_created_at))
+            ]);
+            
+        if($this->restaurant_updated_at)    
+            $query->andFilterWhere([
+                'DATE(restaurant_updated_at)' => date('Y-m-d', strtotime($this->restaurant_updated_at)),
+            ]);
 
         if($this->is_tap_enable)
             $query->andFilterWhere(['is_tap_enable' => $this->is_tap_enable]);
