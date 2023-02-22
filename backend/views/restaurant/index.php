@@ -90,13 +90,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'last_active_at',
             'last_order_at',
             'status',
+            'restaurant_created_at:date',
             //'is_deleted',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'restaurant',
                 //'template' => ' {view} {update}'
             ],
-
 
             // ['class' => 'yii\grid\ActionColumn','template' => '{view}{update}'],
         ],
