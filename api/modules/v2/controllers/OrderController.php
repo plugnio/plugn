@@ -1208,6 +1208,8 @@ class OrderController extends Controller
 
         if ($voucher && $voucher->isValid($phone_number)) {
 
+            $order = null; 
+            
             if($order_uuid) {
 
                 $order = $this->findModel($order_uuid, $restaurant_uuid);
