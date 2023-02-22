@@ -24,6 +24,15 @@ class RestaurantInvoiceQuery extends \yii\db\ActiveQuery
         return parent::one ($db);
     }
 
+    /**
+     * if invoice not mailed
+     * @return RestaurantInvoiceQuery
+     */
+    public function mailNotSent()
+    {
+        return $this->andWhere(['mail_sent' => false]);
+    }
+
     public function notPaid()
     {
         return $this->andWhere(['!=', 'invoice_status', RestaurantInvoice::STATUS_PAID]);

@@ -514,7 +514,11 @@ return [
                     'controller' => 'v1/invoice',
                     'patterns' => [
                         'GET' => 'list',
+                        'GET callback' => 'callback',
                         'GET <id>' => 'detail',
+                        'POST payment-webhook' => 'payment-webhook',
+                        'PATCH payment-webhook' => 'payment-webhook',
+                        'POST pay-by-tap' => 'pay-by-tap',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',

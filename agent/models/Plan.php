@@ -11,6 +11,9 @@ class Plan extends \common\models\Plan
         $fields = parent::extraFields ();
 
         $fields['paymentMethods'] =  function ($model) {
+
+            //todo: payment method based on currency
+
             return PaymentMethod::find ()
                 ->andWhere (['in', 'payment_method_id', ['1', '2']])
                 ->all ();

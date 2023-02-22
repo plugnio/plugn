@@ -2347,6 +2347,125 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * send weekly store stats in email
+     */
+    public function sendWeeklyReport() {
+
+        //Revenue generated
+        $lastWeekRevenue = $this
+            ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
+
+        $thisWeekRevenue = $this
+            ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
+
+        //Orders received
+        $lastWeekOrdersReceived = $this
+            ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
+
+        $thisWeekOrdersReceived = $this
+            ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
+
+        //customer gained
+        $lastWeekCustomerGained = $this
+            ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
+
+        $thisWeekCustomerGained = $this
+            ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
+
+        // Revenue Generated
+        $revenuePercentage = 0;
+
+        if ($lastWeekRevenue > 0) {
+            if ($thisWeekRevenue > $lastWeekRevenue) { //inc
+                if ($lastWeekRevenue > 0) {
+                    $increase = $thisWeekRevenue - $lastWeekRevenue;
+
+                    $revenuePercentage = $increase / $lastWeekRevenue * 100;
+                } else {
+                    $revenuePercentage = 100;
+                }
+
+            } else if ($thisWeekRevenue < $lastWeekRevenue) { //dec
+                $decrease = $lastWeekRevenue - $thisWeekRevenue;
+                $revenuePercentage = $decrease / $lastWeekRevenue * -100;
+            }
+        }
+
+        // Orders received
+        $ordersReceivedPercentage = 0;
+
+        if ($thisWeekOrdersReceived > $lastWeekOrdersReceived) { //inc
+            if ($lastWeekOrdersReceived > 0) {
+                $increase = $thisWeekOrdersReceived - $lastWeekOrdersReceived;
+
+                $ordersReceivedPercentage = $increase / $lastWeekOrdersReceived * 100;
+            } else {
+                $ordersReceivedPercentage = 100;
+            }
+
+        } else if ($thisWeekOrdersReceived < $lastWeekOrdersReceived) { //dec
+            $decrease = $lastWeekOrdersReceived - $thisWeekOrdersReceived;
+            $ordersReceivedPercentage = $decrease / $lastWeekOrdersReceived * -100;
+        }
+
+
+        //Customer gained
+        $customerGainedPercentage = 0;
+
+        if ($thisWeekCustomerGained > $lastWeekCustomerGained) { // inc
+            if ($lastWeekCustomerGained > 0) {
+                $increase = $thisWeekCustomerGained - $lastWeekCustomerGained;
+
+                $customerGainedPercentage = $increase / $lastWeekCustomerGained * 100;
+            } else {
+                $customerGainedPercentage = 100;
+            }
+
+        } else if ($thisWeekCustomerGained < $lastWeekCustomerGained) { //dec
+            $decrease = $lastWeekCustomerGained - $thisWeekCustomerGained;
+            $customerGainedPercentage = $decrease / $lastWeekCustomerGained * -100;
+        }
+
+        if ($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
+
+            $agentAssignments = $this->getAgentAssignments()
+                ->andWhere([
+                    'role' => AgentAssignment::AGENT_ROLE_OWNER,
+                    'receive_weekly_stats' => 1
+                ])
+                ->all();
+
+            foreach ($agentAssignments as $key => $agentAssignment) {
+
+                if ($agentAssignment->receive_weekly_stats) {
+
+                    $weeklyStoreSummaryEmail = \Yii::$app->mailer->compose([
+                        'html' => 'weekly-summary',
+                    ], [
+                        'store' => $this,
+                        'agent_name' => $agentAssignment->agent->agent_name,
+                        'revenuePercentage' => $revenuePercentage,
+                        'ordersReceivedPercentage' => $ordersReceivedPercentage,
+                        'customerGainedPercentage' => $customerGainedPercentage,
+                        'thisWeekRevenue' => $thisWeekRevenue,
+                        'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
+                        'thisWeekCustomerGained' => $thisWeekCustomerGained,
+                    ])
+                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                        ->setTo([$agentAssignment->agent->agent_email])
+                        ->setSubject('Weekly Store Summary');
+
+                    if ($key == 0)
+                        $weeklyStoreSummaryEmail->setBcc(\Yii::$app->params['supportEmail']);
+
+                    $weeklyStoreSummaryEmail->send();
+
+                }
+            }
+        }
+    }
+
+    /**
      * Gets query for [[Items]].
      *
      * @return \yii\db\ActiveQuery
