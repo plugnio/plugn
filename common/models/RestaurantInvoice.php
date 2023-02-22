@@ -61,8 +61,32 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
     public function extraFields()
     {
         return array_merge([
-            'invoiceItems'
+            'invoiceItems',
+            'paymentMethods'
         ], parent::extraFields());
+    }
+
+    /**
+     * payment methods available for this invoice to pay invoice amount
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function getPaymentMethods() {
+
+        return PaymentMethod::find ()
+            ->joinWith('paymentMethodCurrencies')
+            ->andWhere([
+                'OR',
+                ['payment_method_currency.currency' => $this->currency_code],
+                [
+                    'IN',
+                    'payment_method_code',
+                    [
+                        PaymentMethod::CODE_MOYASAR,
+                        PaymentMethod::CODE_STRIPE
+                    ]
+                ]
+            ])
+            ->all();
     }
 
     public function fields()
