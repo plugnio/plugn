@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers\payment;
 
+use Yii;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\modules\v1\controllers\BaseController;
@@ -135,15 +136,8 @@ class StripeController extends BaseController
         }*/
 
         $intent_id = Yii::$app->request->get('intent_id');
-        $id = Yii::$app->request->get('id');
-        $status = Yii::$app->request->get('status');
-        $message = Yii::$app->request->get('message');
-
-        if ($status != 'paid') {
-            Yii::error('Stripe Payment Verification Failed: '. $message);
-
-            return false;
-        }
+        //$id = Yii::$app->request->get('id');
+        $status = Yii::$app->request->get('redirect_status');
 
         $payment = InvoicePayment::findOne(['payment_gateway_transaction_id' => $intent_id]);
 
@@ -155,7 +149,7 @@ class StripeController extends BaseController
         }
 
         if (!$payment) {
-            Yii::error('Stripe Payment Verification Failed: '. $message);
+            Yii::error('Stripe Payment Verification Failed: '. $status);
 
             return false;
         }
