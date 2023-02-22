@@ -16,6 +16,7 @@ use yii\db\Expression;
  * @property string|null $payment_uuid
  * @property float $amount
  * @property string|null $currency_code
+ * @property boolean $mail_sent
  * @property int|null $invoice_status
  * @property string|null $created_at
  * @property string|null $updated_at
@@ -47,6 +48,7 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
             [['restaurant_uuid', 'amount'], 'required'],//'invoice_uuid', 'invoice_number',
             [['amount'], 'number'],
             [['invoice_status'], 'integer'],
+            [['mail_sent'], 'boolean'],
             [['created_at', 'updated_at'], 'safe'],
             [['invoice_uuid', 'invoice_number', 'restaurant_uuid', 'payment_uuid'], 'string', 'max' => 60],
             [['currency_code'], 'string', 'max' => 3],
@@ -58,7 +60,9 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
 
     public function extraFields()
     {
-        return array_merge(['invoiceItems'], parent::extraFields());
+        return array_merge([
+            'invoiceItems'
+        ], parent::extraFields());
     }
 
     public function fields()
@@ -145,10 +149,48 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
             'payment_uuid' => Yii::t('app', 'Payment Uuid'),
             'amount' => Yii::t('app', 'Amount'),
             'currency_code' => Yii::t('app', 'Currency Code'),
+            'mail_sent' => Yii::t('app', 'Mail Sent'),
             'invoice_status' => Yii::t('app', 'Invoice Status'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     * if mail not sent, mark as lock and notify
+     */
+    public function sendEmail() {
+
+        $this->invoice_status = self::STATUS_LOCKED;
+        $this->mail_sent = true;
+        $this->save();
+
+        $agentAssignments = $this->restaurant->getAgentAssignments()
+            ->andWhere(['email_notification' => true])
+            ->all();
+
+        $emails = [];
+
+        foreach ($agentAssignments as $agentAssignment)
+            $emails[] = $agentAssignment->agent->agent_email;
+
+        if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email)
+            $emails[] = $this->restaurant->restaurant_email;
+
+        if(sizeof($emails) ==  0)
+            return true;
+
+        \Yii::$app->mailer->compose([
+            'html' => 'store/pending-invoice-html',
+        ], [
+            'invoice' => $this
+        ])
+            ->setFrom(\Yii::$app->params['supportEmail'])//[$fromEmail => $this->restaurant->name]
+            ->setTo($emails[0])
+            ->setCc(array_slice($emails, 1))
+            ->setSubject('Invoice #' . $this->invoice_number . ' for Plugn commission | ' . $this->restaurant->name)
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            ->send();
     }
 
     public function getRestaurantName() {
