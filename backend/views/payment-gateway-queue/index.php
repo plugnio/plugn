@@ -31,8 +31,12 @@ $this->params['breadcrumbs'][] = $this->title;
               'value' =>     'restaurant.name'
             ],
             'payment_gateway',
-            'queue_status',
-            'queue_response',
+            [
+                'attribute' => 'queue_status',
+                'filter' => \common\models\PaymentGatewayQueue::arrStatusName(),
+                'value' => 'queueStatusName'
+            ],
+            //'queue_response',
             'queue_created_at',
             ['class' => 'yii\grid\ActionColumn'],
         ],

@@ -32,6 +32,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'currency_id',
             'title',
             'code',
+            'currency_symbol',
+            'rate',
+            'decimal_place',
+            'sort_order',
+            [
+                'attribute' => 'status',
+                'value' => function($model) {
+                    return $model->status == 1? 'Active': 'Inactive';
+                },
+            ]
         ],
     ]) ?>
 

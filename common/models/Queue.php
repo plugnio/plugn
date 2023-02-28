@@ -89,14 +89,17 @@ class Queue extends \yii\db\ActiveRecord {
                 //Replace test with store branch name
                 $branchName = 'refs/heads/' . $store_model->store_branch_name;
 
-                $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
-
                 /**
                  * if branch already exists
                  *
                 if(Yii::$app->githubComponent->isBranchExists($store_model->store_branch_name)) {
+                    $branchName = $branchName .'_'. time();
 
-                }*/ 
+                    $this->restaurant->branch_name = $branchName;
+                    $this->restaurant->save(false);
+                }*/
+
+                $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
 
                 if($createBranchResponse->headers['http-code'] == 201) { // Created
 
@@ -153,7 +156,7 @@ class Queue extends \yii\db\ActiveRecord {
 
                 $this->addError('restaurant_uuid', '[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name);
 
-                //Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name, __METHOD__);
+                Yii::error('[Github > Last commit]' . json_encode($getLastCommitResponse->data['message']) . ' RestaurantUuid: '. $store_model->restaurant_uuid. ' Named: '. $store_model->name, __METHOD__);
 
                 return false;
             }
