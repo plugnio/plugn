@@ -59,5 +59,48 @@ $this->params['breadcrumbs'][] = $this->title;
             'updated_at',
         ],
     ]) ?>
+    <br />
+
+    <h3>Invoice Items</h3>
+
+    <?= \yii\grid\GridView::widget([
+        'dataProvider' => new \yii\data\ActiveDataProvider([
+            'query' => $model->getInvoiceItems(),
+        ]),
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'order_uuid',
+            'plan_id',
+            'addon_uuid',
+            'comment',
+            [
+                'attribute' => 'total',
+                'value' => function($data) use($model) {
+                    return $data->total . ' ' . $model->currency_code;
+                }
+            ]
+        ],
+    ]); ?>
+    <br />
+
+    <h3>Invoice Payments</h3>
+
+    <?= \yii\grid\GridView::widget([
+        'dataProvider' => new \yii\data\ActiveDataProvider([
+                'query' => $model->getPayments()
+        ]),
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            'payment_gateway_transaction_id',
+            'payment_mode',
+            'payment_current_status',
+            //'received_callback',
+            'payment_created_at'
+        ],
+    ]); ?>
+
+
+
 
 </div>

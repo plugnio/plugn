@@ -27,10 +27,10 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'store_name',
               'value' =>     'restaurant.name'
             ],
-            [
-              'attribute' => 'customer_name',
-              'value' =>     'customer.customer_name'
-            ],
+            //[
+            //  'attribute' => 'customer_name',
+            //  'value' =>     'customer.customer_name'
+            //],
             'payment_current_status:ntext',
             // 'payment_gateway_invoice_id',
             'payment_gateway_transaction_id',
@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'payment_created_at',
             //'payment_updated_at',
             'received_callback:boolean',
-            'response_message',
+            //'response_message',
             'is_sandbox:boolean',
             //'payment_token',
             //'payment_gateway_name',

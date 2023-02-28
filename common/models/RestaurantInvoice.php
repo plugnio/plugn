@@ -247,9 +247,20 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPayment($modelClass = "\common\models\Payment")
+    public function getPayment($modelClass = "\common\models\InvoicePayment")
     {
         return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid']);
+    }
+
+    /**
+     * Gets query for [[Payment]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments($modelClass = "\common\models\InvoicePayment")
+    {
+        return $this->hasMany($modelClass::className(), ['invoice_uuid' => 'invoice_uuid'])
+            ->orderBy('payment_created_at ASC');
     }
 
     /**

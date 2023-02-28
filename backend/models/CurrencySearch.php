@@ -18,7 +18,7 @@ class CurrencySearch extends Currency
     {
         return [
             [['currency_id', 'status'], 'integer'],
-            [['title', 'code'], 'safe'],
+            [['title', 'code', 'currency_symbol', 'rate', 'decimal_place', 'sort_order'], 'safe'],
         ];
     }
 
@@ -59,6 +59,10 @@ class CurrencySearch extends Currency
         // grid filtering conditions
         $query->andFilterWhere([
             'currency_id' => $this->currency_id,
+            'currency_symbol' => $this->currency_symbol,
+            'rate' => $this->rate,
+            'decimal_place' => $this->decimal_place,
+            'sort_order' => $this->sort_order
         ]);
 
         $query->andFilterWhere([
