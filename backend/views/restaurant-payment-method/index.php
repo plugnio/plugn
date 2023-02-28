@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+use common\models\RestaurantPaymentMethod;
+
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\RestaurantPaymentMethodSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -39,10 +41,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($data) {
                     return  $data->paymentMethod->payment_method_name;
                 },
-                'filter' => \yii\helpers\ArrayHelper::map(\common\models\PaymentMethod::find()->all(),'payment_method_id','payment_method_name'),
+                'filter' => \yii\helpers\ArrayHelper::map(\common\models\PaymentMethod::find()->all(),
+                    'payment_method_id',
+                    'payment_method_name'
+                ),
                 'filterInputOptions' => ['class' => 'form-control', 'id' => null, 'prompt' => 'All']
             ],
-            'status',
+            [
+                'attribute' =>  'status',
+                'value' => function ($model) {
+                    return $model->status == RestaurantPaymentMethod::STATUS_ACTIVE? "Active": "Inactive";
+                },
+                'filter' => [
+                     RestaurantPaymentMethod::STATUS_ACTIVE => 'Active',
+                     RestaurantPaymentMethod::STATUS_INACTIVE => "Inactive"
+                ]
+            ],
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

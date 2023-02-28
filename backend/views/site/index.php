@@ -2,10 +2,24 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
+/* @var $failedInPaymentQueue integer */
+/* @var $pendingInPaymentQueue integer */
 
 $this->title = 'Admin dashboard';
 ?>
 <div class="site-index">
+
+    <?php if($failedInPaymentQueue > 0) { ?>
+        <div class="alert alert-danger" role="alert">
+            <?= $failedInPaymentQueue ?> Payment Gateway Request Failed, <?= Html::a('Check it now!', ['payment-gateway-queue/index']) ?>
+        </div>
+    <?php } ?>
+
+    <?php if($failedInQueue > 0) { ?>
+        <div class="alert alert-danger" role="alert">
+            <?= $failedInQueue ?> Store building Failed, <?= Html::a('Check it now!', ['restaurant/index']) ?>
+        </div>
+    <?php } ?>
 
     <div class="jumbotron">
         <h1>Plugn Management!</h1>
@@ -90,9 +104,23 @@ $this->title = 'Admin dashboard';
 
                   <?= Html::a('Go &raquo', ['partner-payout/index'], ['class' => 'btn btn-default']) ?>
             </div>
-
-
         </div>
 
+        <div class="row">
+            <div class="col-12 col-lg-4">
+                <h2>Payment Gateway Queue </h2>
+
+                <span class="badge badge-warning"><?= $pendingInPaymentQueue ?> Pending</span>
+
+                <?php if($failedInPaymentQueue > 0) { ?>
+                    <span class="badge badge-danger"><?= $failedInPaymentQueue ?> Failed</span>
+                <?php } ?>
+
+                <br />
+                <br />
+
+                <?= Html::a('Go &raquo', ['payment-gateway-queue/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+        </div>
     </div>
 </div>

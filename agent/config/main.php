@@ -413,6 +413,19 @@ return [
                         'OPTIONS' => 'options',
                     ]
                 ],
+                [// StripeController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment/stripe',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'POST' => 'index',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
                 [// OpeningHoursController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/opening-hours',

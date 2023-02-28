@@ -69,6 +69,19 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function arrStatusName() {
+        return [
+            self::QUEUE_STATUS_PENDING => 'Pending',
+            self::QUEUE_STATUS_CREATING => 'Creating',
+            self::QUEUE_STATUS_COMPLETE => 'Complete',
+            self::QUEUE_STATUS_FAILED => 'Failed'
+        ];
+    }
+
+    public function getQueueStatusName() {
+        return self::arrStatusName()[$this->queue_status];
+    }
+
     /**
      * @param bool $insert
      * @param array $changedAttributes
