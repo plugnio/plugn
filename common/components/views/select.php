@@ -45,7 +45,7 @@ $('#".$formModalName."-".$labelAttribute."').on('click', function() {
         e.stopPropagation();
     
         $.ajax({
-				url: $(e.target).attr('href') + '&fromPager=1',
+				url: $(e.target).attr('href') + '?fromPager=1',
 				dataType: 'html',
 				success: function(html) {
 					$('#modal-". $modalName ." .list-wrapper').html(html);
@@ -62,7 +62,7 @@ $('#".$formModalName."-".$labelAttribute."').on('click', function() {
         const value = Object.fromEntries(data.entries());
 
         $.ajax({
-				url: '". $action ."&fromPager=1',
+				url: '". $action ."?fromPager=1',
 				dataType: 'html',
 				data: value,
 				success: function(html) {
