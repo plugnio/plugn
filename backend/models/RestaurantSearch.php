@@ -89,6 +89,8 @@ class RestaurantSearch extends Restaurant
                 'DATE(restaurant_updated_at)' => date('Y-m-d', strtotime($this->restaurant_updated_at)),
             ]);
 
+        $query->andFilterWhere(['restaurant_status' => $this->restaurant_status]);
+
         if($this->is_tap_enable)
             $query->andFilterWhere(['is_tap_enable' => $this->is_tap_enable]);
 

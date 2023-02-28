@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'template_uuid',
             'restaurant_uuid',
             'progress',
-            'status',
+            'statusName',
             //'created_at',
             //'updated_at',
 

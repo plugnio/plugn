@@ -74,6 +74,28 @@ class PaymentGatewayQueueController extends Controller
     }
 
     /**
+     * trigger process manually
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionProcess($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->processQueue();
+
+        if ($response['operation'] == 'success')
+        {
+            Yii::$app->session->addFlash('success', $response['message']);
+        } else {
+            Yii::$app->session->addFlash('error', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $model->payment_gateway_queue_id]);
+    }
+
+    /**
      * Creates a new PaymentGatewayQueue model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed

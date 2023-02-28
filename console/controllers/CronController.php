@@ -279,9 +279,9 @@ class CronController extends \yii\console\Controller
     }
 
     public function actionTest() {
-        $tap = PaymentGatewayQueue::find()->offset(1)->one();
+        //$tap = PaymentGatewayQueue::find()->offset(1)->one();
 
-        $tap->enableGateways();
+        //$tap->enableGateways();
 
     }
 
