@@ -2,6 +2,7 @@
 namespace backend\controllers;
 
 use backend\models\RestaurantInvoice;
+use common\models\PaymentGatewayQueue;
 use common\models\Queue;
 use Yii;
 use yii\web\Controller;
@@ -88,13 +89,23 @@ class SiteController extends Controller
             'queue_status' => Queue::QUEUE_STATUS_PENDING
         ])->count ();
 
+        $failedInPaymentQueue = PaymentGatewayQueue::find()->andWhere ([
+            'queue_status' => PaymentGatewayQueue::QUEUE_STATUS_FAILED
+        ])->count ();
+
+        $pendingInPaymentQueue = PaymentGatewayQueue::find()->andWhere ([
+            'queue_status' => PaymentGatewayQueue::QUEUE_STATUS_PENDING
+        ])->count ();
+
         return $this->render('index', [
             'draft' => $draft,
             'pending' => $pending,
             'paid' => $paid,
             "failedInQueue" => $failedInQueue,
             "holdInQueue" => $holdInQueue,
-            "pendingInQueue" => $pendingInQueue
+            "pendingInQueue" => $pendingInQueue,
+            "failedInPaymentQueue" => $failedInPaymentQueue,
+            "pendingInPaymentQueue" => $pendingInPaymentQueue
         ]);
     }
 
