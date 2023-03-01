@@ -2875,7 +2875,8 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere(['delivery_zone.is_deleted' => 0]);
+            ->joinWith('businessLocation')
+            ->andWhere(['delivery_zone.is_deleted' => 0, 'business_location.is_deleted' => 0]);
     }
 
     // /**
