@@ -366,7 +366,7 @@ class Restaurant extends \yii\db\ActiveRecord
             [['referral_code'], 'string', 'max' => 6],
             [['referral_code'], 'default', 'value' => null],
             ['restaurant_email', 'email'],
-            [['restaurant_uuid', 'restaurant_domain', 'name'], 'unique'],
+            [['restaurant_uuid', 'restaurant_domain', 'name', 'owner_email'], 'unique'],
             [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
             [['referral_code'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['referral_code' => 'referral_code']],
@@ -600,6 +600,14 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         return "Couldnt find a status";
+    }
+
+    public static function arrStatus() {
+        return [
+            self::RESTAURANT_STATUS_OPEN => "Open",
+            self::RESTAURANT_STATUS_BUSY => "Busy",
+            self::RESTAURANT_STATUS_CLOSED => "Closed"
+        ];
     }
 
     /**
@@ -2867,7 +2875,8 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere(['delivery_zone.is_deleted' => 0]);
+            ->joinWith('businessLocation')
+            ->andWhere(['delivery_zone.is_deleted' => 0, 'business_location.is_deleted' => 0]);
     }
 
     // /**

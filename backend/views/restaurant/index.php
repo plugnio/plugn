@@ -89,14 +89,18 @@ $this->params['breadcrumbs'][] = $this->title;
             //'referral_code',
             'last_active_at',
             'last_order_at',
-            'status',
+            [
+                 'attribute' => 'restaurant_status',
+                'filter' => \common\models\Restaurant::arrStatus(),
+                 'value' =>   'status',
+            ],
+            'restaurant_created_at:date',
             //'is_deleted',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'restaurant',
                 //'template' => ' {view} {update}'
             ],
-
 
             // ['class' => 'yii\grid\ActionColumn','template' => '{view}{update}'],
         ],

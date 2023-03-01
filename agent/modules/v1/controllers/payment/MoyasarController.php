@@ -54,7 +54,7 @@ class MoyasarController extends BaseController
 
             $currency = $payment->currency;
 
-            $data['description'] = "Invoice for plugn commission on order #" . $payment->invoice->invoiceItems[0]->order_uuid;
+            $data['description'] = "Invoice for plugn commission";// on order # . $payment->invoice->invoiceItems[0]->order_uuid;
         }
 
         $data['amount'] = $payment->payment_amount_charged;
