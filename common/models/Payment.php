@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -533,13 +534,20 @@ class Payment extends \yii\db\ActiveRecord
             $payment->order->changeOrderStatusToPending();
             $payment->order->sendPaymentConfirmationEmail($payment);
 
-            if ($payment->plugn_fee > 0) {
+            $invoicePaymentMethods = PaymentMethod::find()
+                ->andWhere(['IN', 'payment_method_code', ["Moyasar", "Stripe"]])
+                ->all();
 
-                $invoice = RestaurantInvoice::find()->andWhere([
-                    'restaurant_uuid' => $payment->restaurant_uuid,
-                    'currency_code' => $payment->order->currency_code,
-                    'invoice_status' => RestaurantInvoice::STATUS_UNPAID
-                ])->one();
+            $invoicePaymentMethodIds = ArrayHelper::getColumn($invoicePaymentMethods, 'payment_method_id');
+
+            if ($payment->plugn_fee > 0 && in_array($payment->order->payment_method_id, $invoicePaymentMethodIds))
+            {
+                $invoice = RestaurantInvoice::find()
+                    ->andWhere([
+                        'restaurant_uuid' => $payment->restaurant_uuid,
+                        'currency_code' => $payment->order->currency_code,
+                        'invoice_status' => RestaurantInvoice::STATUS_UNPAID
+                    ])->one();
 
                 if(!$invoice) {
                     $invoice = new RestaurantInvoice();
