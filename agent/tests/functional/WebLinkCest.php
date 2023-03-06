@@ -63,7 +63,6 @@ class WebLinkCest
     public function tryToCreate(FunctionalTester $I) {
         $I->wantTo('Validate weblink > create api');
         $I->sendPOST('v1/web-link/create', [
-            //'store_uuid' => $weblink->web_link_id,
             'web_link_type' => 'Facebook',
             'url' => 'facebook.com',
             'web_link_title' => 'facebook.com',

@@ -43,6 +43,10 @@ class StripeController extends BaseController
 
             $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id);
 
+            if(isset($subscription['message'])) {
+                return $subscription;
+            }    
+
             $currency = Currency::findOne(['code' => 'KWD']);
 
             $payment = $subscription->subscriptionPayment;
