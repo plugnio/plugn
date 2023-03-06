@@ -2,6 +2,8 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\AreaDeliveryZone;
+use agent\models\DeliveryZone;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
@@ -177,7 +179,11 @@ class BusinessLocationController extends BaseController
     public function actionDelete($business_location_id, $store_uuid = null)
     {
         $this->ownerCheck();
+
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        
+        $transaction = Yii::$app->db->beginTransaction();
+
         $model = $this->findModel ($business_location_id, $store_uuid);
 
         $model->setScenario(BusinessLocation::SCENARIO_DELETE);
@@ -185,6 +191,9 @@ class BusinessLocationController extends BaseController
         $model->is_deleted = 1;
 
         if (!$model->save ()) {
+
+            $transaction->rollBack();
+
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -197,6 +206,26 @@ class BusinessLocationController extends BaseController
                 ];
             }
         }
+
+        //delete delivery zone areas
+
+        foreach ($model->deliveryZones as $deliveryZone) {
+            AreaDeliveryZone::deleteAll([
+                'is_deleted' => 0,
+            ],[
+                'delivery_zone_id'=> $deliveryZone->delivery_zone_id
+            ]);
+        }
+
+        //delete delivery zones
+
+        DeliveryZone::updateAll([
+            'is_deleted' => 0,
+        ],[
+            'business_location_id' => $model->business_location_id
+        ]);
+
+        $transaction->commit();
 
         return [
             "operation" => "success",

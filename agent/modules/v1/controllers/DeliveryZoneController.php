@@ -201,9 +201,11 @@ class DeliveryZoneController extends BaseController
     public function actionDelete($delivery_zone_id, $store_uuid = null)
     {
         $this->ownerCheck();
+
         $transaction = Yii::$app->db->beginTransaction();
 
         AreaDeliveryZone::deleteAll(['delivery_zone_id'=> $delivery_zone_id, 'restaurant_uuid' => $store_uuid]);
+
         $model = $this->findModel($delivery_zone_id, $store_uuid);
 
         if (!$model->delete()) {
