@@ -46,10 +46,10 @@ class WebLinkController extends BaseController
     {
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
 
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = new WebLink();
-        $model->restaurant_uuid = $store_model->restaurant_uuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
         $model->web_link_type = Yii::$app->request->getBodyParam ("web_link_type");
         $model->url = Yii::$app->request->getBodyParam ("url");
         $model->web_link_title = Yii::$app->request->getBodyParam ("web_link_title");
@@ -150,12 +150,12 @@ class WebLinkController extends BaseController
      */
     protected function findModel($web_link_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = WebLink::find ()
             ->andWhere ([
                 'web_link_id' => $web_link_id,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one ();
 

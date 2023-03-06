@@ -89,17 +89,17 @@ class DeliveryZoneController extends BaseController
 
         $business_location_id = Yii::$app->request->getBodyParam("business_location_id");
 
-        $business_location_model = BusinessLocation::findOne([
+        $business_location = BusinessLocation::findOne([
             'business_location_id' => $business_location_id,
             'restaurant_uuid' => $store->restaurant_uuid
         ]);
 
-        if (!$business_location_model)
+        if (!$business_location)
             throw new NotFoundHttpException('business location not found.');
 
         $model = new DeliveryZone();
         $model->restaurant_uuid = $store->restaurant_uuid;
-        $model->business_location_id = $business_location_model->business_location_id;
+        $model->business_location_id = $business_location->business_location_id;
         $model->country_id = Yii::$app->request->getBodyParam("country_id");
         $model->delivery_time = (int)Yii::$app->request->getBodyParam("delivery_time");
         $model->time_unit = Yii::$app->request->getBodyParam("time_unit");
@@ -112,11 +112,11 @@ class DeliveryZoneController extends BaseController
 
           if($model->country->getAreas()->count() == 0){
 
-            $area_delivery_zone_model = new AreaDeliveryZone();
-            $area_delivery_zone_model->delivery_zone_id = $model->delivery_zone_id;
-            $area_delivery_zone_model->country_id = $model->country_id;
-            $area_delivery_zone_model->restaurant_uuid = $store->restaurant_uuid;
-            $area_delivery_zone_model->save(false);
+            $area_delivery_zone = new AreaDeliveryZone();
+            $area_delivery_zone->delivery_zone_id = $model->delivery_zone_id;
+            $area_delivery_zone->country_id = $model->country_id;
+            $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
+            $area_delivery_zone->save(false);
 
           }
 
@@ -142,19 +142,19 @@ class DeliveryZoneController extends BaseController
     public function actionUpdate($delivery_zone_id, $store_uuid = null)
     {
 //        $this->ownerCheck();
-        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $business_location_id = Yii::$app->request->getBodyParam("business_location_id");
 
-        $business_location_model = BusinessLocation::findOne(['business_location_id' => $business_location_id, 'restaurant_uuid' => $store_model->restaurant_uuid]);
+        $business_location = BusinessLocation::findOne(['business_location_id' => $business_location_id, 'restaurant_uuid' => $store->restaurant_uuid]);
 
-        if (!$business_location_model)
+        if (!$business_location)
             throw new NotFoundHttpException('The business location record does not exist.');
 
         $model = $this->findModel($delivery_zone_id, $store_uuid);
 
         $model->country_id = Yii::$app->request->getBodyParam("country_id");
-        $model->business_location_id = $business_location_model->business_location_id;
+        $model->business_location_id = $business_location->business_location_id;
         $model->delivery_time = (int)Yii::$app->request->getBodyParam("delivery_time");
         $model->time_unit = Yii::$app->request->getBodyParam("time_unit");
         $model->delivery_fee = (float)Yii::$app->request->getBodyParam("delivery_fee");
@@ -204,6 +204,7 @@ class DeliveryZoneController extends BaseController
         $transaction = Yii::$app->db->beginTransaction();
 
         AreaDeliveryZone::deleteAll(['delivery_zone_id'=> $delivery_zone_id, 'restaurant_uuid' => $store_uuid]);
+        
         $model = $this->findModel($delivery_zone_id, $store_uuid);
 
         if (!$model->delete()) {

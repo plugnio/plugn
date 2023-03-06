@@ -46,6 +46,174 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                [ // AuthController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/auth',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET login' => 'login',
+                        'POST signup-step-one' => 'signup-step-one',
+                        'POST login-auth0' => 'login-auth0',
+                        'POST signup' => 'signup',
+                        'PATCH update-password' => 'update-password',
+                        'POST request-reset-password' => 'request-reset-password',
+                        'POST is-email-verified' => 'is-email-verified',
+                        'POST update-email' => 'update-email',
+                        'POST resend-verification-email' => 'resend-verification-email',
+                        'POST verify-email' => 'verify-email',
+                        // OPTIONS VERBS
+                        'OPTIONS login' => 'options',
+                        'OPTIONS login-auth0' => 'options',
+                        'OPTIONS update-password' => 'options',
+                        'OPTIONS request-reset-password' => 'options',
+                        'OPTIONS signup' => 'options',
+                        'OPTIONS is-email-verified' => 'options',
+                        'OPTIONS update-email' => 'options',
+                        'OPTIONS resend-verification-email' => 'options',
+                        'OPTIONS verify-email' => 'options',
+                        'OPTIONS signup-step-one' => 'options'
+                    ]
+                ],
+                [// AgentController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/agent',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'detail',
+                        //todo: update-email
+                        'GET store-profile' => 'store-profile',
+                        'GET stores' => 'stores',
+                        'GET language-pref' => 'language-pref',
+                        'PATCH language-pref' => 'language-pref',
+                        'PUT update' => 'update-agent-profile',
+                        'POST change-password' => 'change-password',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS store-profile' => 'options',
+                        'OPTIONS stores' => 'options',
+                        'OPTIONS update' => 'options',
+                        'OPTIONS change-password' => 'options',
+                        'OPTIONS language-pref' => 'options'
+                    ]
+                ],
+                [// BankController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/bank',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+
+                [// BankDiscountController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/bank-discount',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST' => 'create',
+                        'POST create' => 'create',
+                        'PATCH update-status' => 'update-bank-discount-status',
+                        'PATCH <bank_discount_id>/<store_uuid>' => 'update',
+                        'PATCH <bank_discount_id>' => 'update',
+                        'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
+                        'DELETE <bank_discount_id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS update-status' => 'options',
+                        'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
+                        'OPTIONS <bank_discount_id>' => 'options',
+                        'OPTIONS create' => 'options'
+                    ]
+                ],
+
+                [// BusinessLocationController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/business-location',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST' => 'create',
+                        'POST create' => 'create',
+                        'PATCH <business_location_id>/<store_uuid>' => 'update',
+                        'PATCH <business_location_id>' => 'update',
+                        'DELETE <business_location_id>/<store_uuid>' => 'delete',
+                        'DELETE <business_location_id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <business_location_id>' => 'options',
+                        'OPTIONS <business_location_id>/<store_uuid>' => 'options',
+                    ]
+                ],
+
+                [// CategoryController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/category',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'GET item-list' => 'item-list',
+                        'POST' => 'create',
+                        'POST create' => 'create',
+                        'POST upload-image' => 'upload-category-image',
+                        'POST update-position' => 'change-position',
+                        'PATCH <category_id>/<store_uuid>' => 'update',
+                        'PATCH <category_id>' => 'update',
+                        'DELETE <category_id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <category_id>' => 'options',
+                        'OPTIONS <category_id>/<store_uuid>' => 'options',
+                        'OPTIONS update-position' => 'options',
+                        'OPTIONS item-list' => 'options',
+                    ]
+                ],
+                
+                [// CurrencyController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/currency',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET store-currencies' => 'store-currencies',
+                        'POST' => 'update',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS store-currencies' => 'options'
+                    ]
+                ],
+                [// CountryController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/country',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
+                [// CityController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/city',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options'
+                    ]
+                ],
                 [// OrderController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/order',
@@ -164,31 +332,6 @@ return [
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
-                [// CategoryController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/category',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        'GET item-list' => 'item-list',
-                        'POST' => 'create',
-                        'POST create' => 'create',
-                        'POST upload-image' => 'upload-category-image',
-                        'POST update-position' => 'change-position',
-                        'PATCH <category_id>/<store_uuid>' => 'update',
-                        'PATCH <category_id>' => 'update',
-                        'DELETE <category_id>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS <category_id>' => 'options',
-                        'OPTIONS <category_id>/<store_uuid>' => 'options',
-                        'OPTIONS update-position' => 'options',
-                        'OPTIONS item-list' => 'options',
-                    ]
-                ],
                 [ // SitemapController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/sitemap',
@@ -235,51 +378,6 @@ return [
                         'OPTIONS <agent_assignment_id>' => 'options',
                     ]
                 ],
-                [// BankController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/bank',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options'
-                    ]
-                ],
-                [// CurrencyController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/currency',
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET store-currencies' => 'store-currencies',
-                        'POST' => 'update',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS store-currencies' => 'options'
-                    ]
-                ],
-                [// CountryController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/country',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
-                    ]
-                ],
-                [// CityController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/city',
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
-                    ]
-                ],
                 [// TicketController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/ticket',
@@ -308,29 +406,6 @@ return [
                         'OPTIONS <id>' => 'options'
                     ]
                 ],
-                [// AgentController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/agent',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'detail',
-                        //todo: update-email
-
-                        'GET store-profile' => 'store-profile',
-                        'GET stores' => 'stores',
-                        'GET language-pref' => 'language-pref',
-                        'PATCH language-pref' => 'language-pref',
-                        'PUT update' => 'update-agent-profile',
-                        'POST change-password' => 'change-password',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS store-profile' => 'options',
-                        'OPTIONS stores' => 'options',
-                        'OPTIONS update' => 'options',
-                        'OPTIONS change-password' => 'options',
-                        'OPTIONS language-pref' => 'options'
-                    ]
-                ],
                 [// VoucherController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/voucher',
@@ -350,29 +425,6 @@ return [
                         'OPTIONS update-status' => 'options',
                         'OPTIONS <voucher_id>/<store_uuid>' => 'options',
                         'OPTIONS <voucher_id>' => 'options',
-                        'OPTIONS create' => 'options'
-                    ]
-                ],
-                [// BankDiscountController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/bank-discount',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        'POST' => 'create',
-                        'POST create' => 'create',
-                        'PATCH update-status' => 'update-bank-discount-status',
-                        'PATCH <bank_discount_id>/<store_uuid>' => 'update',
-                        'PATCH <bank_discount_id>' => 'update',
-                        'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
-                        'DELETE <bank_discount_id>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options',
-                        'OPTIONS update-status' => 'options',
-                        'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
-                        'OPTIONS <bank_discount_id>' => 'options',
                         'OPTIONS create' => 'options'
                     ]
                 ],
@@ -537,27 +589,6 @@ return [
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
-                [// BusinessLocationController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/business-location',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        'POST' => 'create',
-                        'POST create' => 'create',
-                        'PATCH <business_location_id>/<store_uuid>' => 'update',
-                        'PATCH <business_location_id>' => 'update',
-                        'DELETE <business_location_id>/<store_uuid>' => 'delete',
-                        'DELETE <business_location_id>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS <business_location_id>' => 'options',
-                        'OPTIONS <business_location_id>/<store_uuid>' => 'options',
-                    ]
-                ],
                 [// StoreController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/store',
@@ -567,6 +598,7 @@ return [
                         'GET status' => 'status',
                         'GET settings/<code>' => 'settings',
                         'GET test-tap' => 'test-tap',
+                        'GET view-payment-methods' => 'view-payment-methods',
                         'GET view-payment-methods/<id>' => 'view-payment-methods',
                         'POST' => 'update',
                         'POST upgrade' => 'upgrade',
@@ -596,6 +628,7 @@ return [
                         'POST disable-cod' => 'disable-cod',
                         'POST enable-free-checkout' => 'enable-free-checkout',
                         'POST disable-free-checkout' => 'disable-free-checkout',
+                        
                         'POST update-analytics-integration' => 'update-analytics-integration',
                         'POST update-delivery-integration' => 'update-delivery-integration',
                         'POST update-layout' => 'update-layout',
@@ -649,34 +682,6 @@ return [
                         'OPTIONS update-delivery-integration' => 'options',
                         'OPTIONS process-gateway-queue' => 'options',
                         'OPTIONS remove-gateway-queue' => 'options',
-                    ]
-                ],
-                [ // AuthController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/auth',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET login' => 'login',
-                        'POST signup-step-one' => 'signup-step-one',
-                        'POST login-auth0' => 'login-auth0',
-                        'POST signup' => 'signup',
-                        'PATCH update-password' => 'update-password',
-                        'POST request-reset-password' => 'request-reset-password',
-                        'POST is-email-verified' => 'is-email-verified',
-                        'POST update-email' => 'update-email',
-                        'POST resend-verification-email' => 'resend-verification-email',
-                        'POST verify-email' => 'verify-email',
-                        // OPTIONS VERBS
-                        'OPTIONS login' => 'options',
-                        'OPTIONS login-auth0' => 'options',
-                        'OPTIONS update-password' => 'options',
-                        'OPTIONS request-reset-password' => 'options',
-                        'OPTIONS signup' => 'options',
-                        'OPTIONS is-email-verified' => 'options',
-                        'OPTIONS update-email' => 'options',
-                        'OPTIONS resend-verification-email' => 'options',
-                        'OPTIONS verify-email' => 'options',
-                        'OPTIONS signup-step-one' => 'options'
                     ]
                 ],
                 [ // StatsController

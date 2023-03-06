@@ -177,7 +177,9 @@ class BusinessLocationController extends BaseController
     public function actionDelete($business_location_id, $store_uuid = null)
     {
         $this->ownerCheck();
+        
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
+
         $model = $this->findModel ($business_location_id, $store_uuid);
 
         $model->setScenario(BusinessLocation::SCENARIO_DELETE);
@@ -213,12 +215,12 @@ class BusinessLocationController extends BaseController
      */
     protected function findModel($business_location_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = BusinessLocation::find()
             ->where([
                 'business_location_id' => $business_location_id,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one();
 

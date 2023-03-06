@@ -21,10 +21,10 @@ class CategoryController extends BaseController
     {
         $keyword = Yii::$app->request->get('keyword');
 
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $query = Category::find()
-            ->andWhere(['category.restaurant_uuid' => $store_uuid]);
+            ->andWhere(['category.restaurant_uuid' => $store->restaurant_uuid]);
 
         if ($keyword) {
             $query->joinWith(['items']);
@@ -71,10 +71,10 @@ class CategoryController extends BaseController
 
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
 
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = new Category();
-        $model->restaurant_uuid = $store_uuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
         $model->title = Yii::$app->request->getBodyParam("title");
         $model->title_ar = Yii::$app->request->getBodyParam("title_ar");
         $model->subtitle = Yii::$app->request->getBodyParam("subtitle");
@@ -290,7 +290,7 @@ class CategoryController extends BaseController
 
         $model = Category::find()->where([
             'category_id' => $category_id,
-            'restaurant_uuid' => $store->restaurant_uuid
+           // 'restaurant_uuid' => $store->restaurant_uuid
         ])->one();
 
         if ($model !== null) {

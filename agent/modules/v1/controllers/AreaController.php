@@ -21,6 +21,7 @@ class AreaController extends BaseController {
         $store_id = Yii::$app->request->get('store_id');
 
         //valdiate access
+        
         if ($store_id) {
             Yii::$app->accountManager->getManagedAccount($store_id);
         }

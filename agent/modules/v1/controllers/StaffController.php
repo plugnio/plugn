@@ -48,9 +48,10 @@ class StaffController extends BaseController {
     public function actionList() {
 
         $this->ownerCheck();
+
         $keyword = Yii::$app->request->get('keyword');
 
-        $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $query =  AgentAssignment::find()
             ->joinWith('agent');
@@ -64,7 +65,7 @@ class StaffController extends BaseController {
             ]);
         }
 
-        $query->andWhere(['restaurant_uuid' => $restaurantUuid]);
+        $query->andWhere(['restaurant_uuid' => $store->restaurant_uuid]);
 
         return new ActiveDataProvider([
           'query' => $query
@@ -203,7 +204,7 @@ class StaffController extends BaseController {
      * @return Country|array
      * @throws NotFoundHttpException
      */
-      public function actionDetail($store_uuid, $assignment_id) {
+      public function actionDetail($store_uuid = null, $assignment_id) {
           $this->ownerCheck();
           return $this->findModel($assignment_id);
 
@@ -219,7 +220,7 @@ class StaffController extends BaseController {
     /**
      * Delete Agent Assignment
      */
-    public function actionDelete($assignment_id, $store_uuid)
+    public function actionDelete($assignment_id, $store_uuid = null)
     {
         $this->ownerCheck();
         $model =  $this->findModel($assignment_id);
@@ -252,12 +253,12 @@ class StaffController extends BaseController {
     */
     protected function findModel($assignment_id)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount();
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $model = AgentAssignment::find()
             ->where([
                 'assignment_id' => $assignment_id,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one();
 

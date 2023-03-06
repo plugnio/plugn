@@ -35,10 +35,10 @@ class OpeningHoursController extends BaseController
      */
     public function actionList($store_uuid = null)
     {
-         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+         $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $query = OpeningHour::find ()
-            ->andWhere (['restaurant_uuid' => $store_model->restaurant_uuid])
+            ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
             ->orderBy (['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC]);
 
         return new ActiveDataProvider([
@@ -54,7 +54,7 @@ class OpeningHoursController extends BaseController
     public function actionCreate($store_uuid = null)
     {
 //        $this->ownerCheck();
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
         $opening_hours = Yii::$app->request->getBodyParam ("opening_hours");
 
         if (is_array ($opening_hours) && sizeof ($opening_hours) > 0) {
@@ -62,7 +62,7 @@ class OpeningHoursController extends BaseController
             foreach ($opening_hours as $key => $opening_hour) {
 
                 $model = new OpeningHour();
-                $model->restaurant_uuid = $store_model->restaurant_uuid;
+                $model->restaurant_uuid = $store->restaurant_uuid;
 
                 $model->day_of_week = $opening_hour['day_of_week'];
                 $model->open_at = date('H:i:s', strtotime ($opening_hour['open_at']));
@@ -106,20 +106,20 @@ class OpeningHoursController extends BaseController
 
         //validate
 
-        $store_model = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount ();
 
         //remove old
 
         OpeningHour::deleteAll ([
             'day_of_week' => $day_of_week,
-            'restaurant_uuid' => $store_model->restaurant_uuid
+            'restaurant_uuid' => $store->restaurant_uuid
         ]);
 
         //add new timeslots
         foreach ($opening_hours as $key => $opening_hour) {
 
              $model = new OpeningHour;
-             $model->restaurant_uuid = $store_model->restaurant_uuid;
+             $model->restaurant_uuid = $store->restaurant_uuid;
              $model->day_of_week = $day_of_week;
              $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
              $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
@@ -160,9 +160,9 @@ class OpeningHoursController extends BaseController
     public function actionDetail($store_uuid = null, $day_of_week)
     {
 //        $this->ownerCheck();
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-        if (($model = OpeningHour::find ()->where (['day_of_week' => $day_of_week, 'restaurant_uuid' => $store_model->restaurant_uuid])) !== null) {
+        if (($model = OpeningHour::find ()->where (['day_of_week' => $day_of_week, 'restaurant_uuid' => $store->restaurant_uuid])) !== null) {
 
             return new ActiveDataProvider([
                 'query' => $model
@@ -211,12 +211,12 @@ class OpeningHoursController extends BaseController
      */
     protected function findModel($opening_hour_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = OpeningHour::find ()
             ->where ([
                 'opening_hour_id' => $opening_hour_id,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])->one ();
 
         if ($model !== null) {

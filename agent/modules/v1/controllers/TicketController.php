@@ -14,7 +14,6 @@ class TicketController extends BaseController
 {
     /**
      * Get all tickets
-     * @param $store_uuid
      * @return ActiveDataProvider
      */
     public function actionList() {
@@ -35,6 +34,8 @@ class TicketController extends BaseController
      */
     public function actionCreate() {
 
+        $attachments = Yii::$app->request->getBodyParam("attachments");
+
         $store = Yii::$app->accountManager->getManagedAccount();
 
         $model = new Ticket();
@@ -42,10 +43,13 @@ class TicketController extends BaseController
         $model->agent_id =  Yii::$app->user->getId();
         $model->ticket_detail =  Yii::$app->request->getBodyParam("detail");
         $model->ticket_status = Ticket::STATUS_PENDING;
-        $model->attachments = ArrayHelper::getColumn(
-            Yii::$app->request->getBodyParam("attachments"),
-            'Key'
-        );
+
+        if($attachments) {
+            $model->attachments = ArrayHelper::getColumn(
+                $attachments,
+                'Key'
+            );
+        }
 
         if (!$model->save()) {
             return [
@@ -66,6 +70,8 @@ class TicketController extends BaseController
      */
     public function actionComment($ticket_uuid) {
 
+        $attachments = Yii::$app->request->getBodyParam("attachments");
+
         //validate access
 
         $this->findModel($ticket_uuid);
@@ -76,10 +82,12 @@ class TicketController extends BaseController
         $model->ticket_comment_detail =  Yii::$app->request->getBodyParam("comment_detail");
         //$model->attachments =  Yii::$app->request->getBodyParam("attachments");
 
-        $model->attachments = ArrayHelper::getColumn(
-            Yii::$app->request->getBodyParam("attachments"),
-            'Key'
-        );
+        if($attachments) {    
+            $model->attachments = ArrayHelper::getColumn(
+                Yii::$app->request->getBodyParam("attachments"),
+                'Key'
+            );
+        }
 
         if (!$model->save()) {
             return [
