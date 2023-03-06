@@ -1545,6 +1545,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'noOfItems',
             'categories',
             'paymentGatewayQueue',
+            'openingHours',
             'isOpen' => function ($restaurant) {
                 return $restaurant->isOpen ();
             },
