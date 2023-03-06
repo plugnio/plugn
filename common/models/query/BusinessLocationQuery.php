@@ -25,6 +25,8 @@ class BusinessLocationQuery extends \yii\db\ActiveQuery {
      */
     public function one($db = null)
     {
+        $this->andWhere(['business_location.is_deleted' => 0]);
+
         return parent::one($db);
     }
 }
