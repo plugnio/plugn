@@ -12,6 +12,7 @@ use Yii;
  * @property int $city_id
  * @property int $area_id
  * @property string $restaurant_uuid
+ * @property boolean $is_deleted
  *
  * @property Area $area
  * @property Restaurant $restaurant
@@ -34,7 +35,7 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
     {
         return [
             [['delivery_zone_id', 'restaurant_uuid'], 'required'],
-            [['delivery_zone_id', 'area_id'], 'integer'],
+            [['delivery_zone_id', 'area_id', 'is_deleted'], 'integer'],
             [['delivery_zone_id', 'area_id'], 'unique', 'targetAttribute' => ['delivery_zone_id', 'area_id']],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
@@ -54,6 +55,7 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
             'delivery_zone_id' => Yii::t('app', 'Delivery Zone ID'),
             'area_id' => Yii::t('app', 'Area ID'),
             'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
+            'is_deleted' => Yii::t('app', 'Is Deleted?'),
         ];
     }
 

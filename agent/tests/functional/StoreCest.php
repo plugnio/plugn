@@ -53,7 +53,6 @@ class StoreCest
     public function tryToDetail(FunctionalTester $I) {
         $I->wantTo('Validate store > detail api');
         $I->sendGET('v1/store', [
-            'store_uuid' => $this->store->restaurant_uuid
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
@@ -61,7 +60,6 @@ class StoreCest
     public function tryToGetStatus(FunctionalTester $I) {
         $I->wantTo('Validate store > status api');
         $I->sendGET('v1/store/status', [
-            'store_uuid' => $this->store->restaurant_uuid
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
@@ -69,7 +67,6 @@ class StoreCest
     public function tryToUpdate(FunctionalTester $I) {
         $I->wantTo('Validate store > update api');
         $I->sendPOST('v1/store', [
-            'store_uuid' => $this->store->restaurant_uuid,
             'email_notification' => 1,
             'mobile_country_code' => 91,
             'phone_number' => 8758702738,

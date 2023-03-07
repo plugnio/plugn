@@ -54,7 +54,7 @@ class StoreController extends BaseController
      * Return an overview of the store details
      * @param type $store_uuid
      */
-    public function actionDetail($store_uuid)
+    public function actionDetail($store_uuid = null)
     {
         return $this->findModel($store_uuid);
     }
@@ -196,7 +196,7 @@ class StoreController extends BaseController
      * Disable payment method
      * @return mixed
      */
-    public function actionDisablePaymentMethod($id, $paymentMethodId)
+    public function actionDisablePaymentMethod($id = null, $paymentMethodId)
     {
         $model = $this->findModel($id);
 
@@ -280,7 +280,7 @@ class StoreController extends BaseController
      * Enable payment method
      * @return mixed
      */
-    public function actionEnablePaymentMethod($id, $paymentMethodId)
+    public function actionEnablePaymentMethod($id = null, $paymentMethodId)
     {
         $model = $this->findModel($id);
 
@@ -298,7 +298,7 @@ class StoreController extends BaseController
      * View payment settings page
      * @return mixed
      */
-    public function actionViewPaymentMethods($id)
+    public function actionViewPaymentMethods($id = null)
     {
         $model = $this->findModel($id);
 
@@ -351,7 +351,7 @@ class StoreController extends BaseController
      * @param type $id
      * @return array
      */
-    public function actionCreateTapAccount($id)
+    public function actionCreateTapAccount($id = null)
     {
         $model = $this->findModel($id);
 
@@ -462,7 +462,7 @@ class StoreController extends BaseController
     /**
      *  Enable OnlinePayment
      */
-    public function actionEnableOnlinePayment($id)
+    public function actionEnableOnlinePayment($id = null)
     {
         $model = $this->findModel($id);
 
@@ -525,7 +525,7 @@ class StoreController extends BaseController
     /**
      *  Disable OnlinePayment
      */
-    public function actionDisableOnlinePayment($id)
+    public function actionDisableOnlinePayment($id = null)
     {
         $model = $this->findModel($id);
 
@@ -904,8 +904,8 @@ class StoreController extends BaseController
 
         PaymentGatewayQueue::deleteAll(['restaurant_uuid' => $id]);
 
-        $store->is_tap_enable = false; 
-        $store->payment_gateway_queue = null;
+        $store->payment_gateway_queue_id = null; 
+        $store->is_tap_enable = false;
 
         if(!$store->save(false)) {
             return self::message("error", $store->errors);
@@ -991,7 +991,7 @@ class StoreController extends BaseController
      * @throws NotFoundHttpException
      * update store status
      */
-    public function actionUpdateStoreStatus($id, $status) {
+    public function actionUpdateStoreStatus($id = null, $status) {
 
         $model = $this->findModel($id);
 

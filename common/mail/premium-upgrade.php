@@ -497,25 +497,23 @@ if($subscription->subscriptionPayment->payment_gateway_order_id ){ ?>
 
               </td>
             </tr>
-   <?php } ?>
+          <?php } ?>
+          <?php if($subscription->subscriptionPayment->payment_gateway_transaction_id ){ ?>
+
             <tr>
               <td
                  align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;"
               >
-      <div
-         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
-      >
-      <?php if($subscription->subscriptionPayment->payment_gateway_order_id ){ ?>
-
-        Charge: <?= $subscription->subscriptionPayment->payment_gateway_transaction_id ?>
-        <?php } else {?>
-          Invoice Id: <?= $subscription->subscriptionPayment->payment_gateway_invoice_id ?>
-          <?php } ?>
-
-      </div>
-
+                <div
+                   style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
+                >
+              
+                  Charge: <?= $subscription->subscriptionPayment->payment_gateway_transaction_id ?>
+                 
+                </div>
               </td>
             </tr>
+          <?php } ?>
 
       </table>
 

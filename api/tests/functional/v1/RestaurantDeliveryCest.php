@@ -14,7 +14,8 @@ class RestaurantDeliveryCest
         return [
             'areas' => \common\fixtures\AreaFixture::className(),
             "restaurantDeliveries" => \common\fixtures\RestaurantDeliveryFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className()
+            'restaurants' => \common\fixtures\RestaurantFixture::className(),
+            'businessLocations' => \common\fixtures\BusinessLocationFixture::className()
         ];
     }
 
