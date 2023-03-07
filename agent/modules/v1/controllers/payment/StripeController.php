@@ -47,7 +47,7 @@ class StripeController extends BaseController
                 return $subscription;
             }    
 
-            $currency = Currency::findOne(['code' => 'KWD']);
+            $currency = Currency::findOne(['code' => 'INR']);//todo: KWD
 
             $payment = $subscription->subscriptionPayment;
 
