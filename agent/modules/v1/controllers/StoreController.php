@@ -900,9 +900,16 @@ class StoreController extends BaseController
      */
     public function actionRemoveGatewayQueue($id = null)
     {
-        $this->findModel($id);
+        $store = $this->findModel($id);
 
         PaymentGatewayQueue::deleteAll(['restaurant_uuid' => $id]);
+
+        $store->is_tap_enable = false; 
+        $store->payment_gateway_queue = null;
+
+        if(!$store->save(false)) {
+            return self::message("error", $store->errors);
+        }
 
         return self::message("success", "Payment gateway queue removed");
     }
