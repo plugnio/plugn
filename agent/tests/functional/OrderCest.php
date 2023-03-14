@@ -16,6 +16,7 @@ use common\fixtures\OpeningHourFixture;
 use common\fixtures\OrderFixture;
 use common\fixtures\OrderItemFixture;
 use common\fixtures\RestaurantFixture;
+use common\fixtures\BusinessLocationFixture;
 
 class OrderCest
 {
@@ -33,6 +34,7 @@ class OrderCest
             'areas' => AreaFixture::className(),
             'countries' => CountryFixture::className(),
             'deliveryZones' => DeliveryZoneFixture::className(),
+            'locations' => BusinessLocationFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];

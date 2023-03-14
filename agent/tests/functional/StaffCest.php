@@ -56,8 +56,7 @@ class StaffCest
 
         $I->wantTo('Validate staff > detail api');
         $I->sendGET('v1/staff/detail', [
-            'assignment_id' => $agent->assignment_id,
-            'store_uuid' => $this->store->restaurant_uuid
+            'assignment_id' => $agent->assignment_id
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
@@ -65,7 +64,6 @@ class StaffCest
     public function tryToAdd(FunctionalTester $I) {
         $I->wantTo('Validate staff > create api');
         $I->sendPOST('v1/staff/create', [
-            'store_uuid' => $this->store->restaurant_uuid,
             'business_location_id' => 1,
             'role' => AgentAssignment::AGENT_ROLE_OWNER,
             'agent_email' => 'demo@localhost.com',

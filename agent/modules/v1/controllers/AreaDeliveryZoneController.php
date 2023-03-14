@@ -172,27 +172,27 @@ class AreaDeliveryZoneController extends BaseController
 
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
 
-        $delivery_zone_model = DeliveryZone::findOne ([
+        $delivery_zone = DeliveryZone::findOne ([
             'delivery_zone_id' => $delivery_zone_id,
-            'restaurant_uuid' => $store_model->restaurant_uuid
+            'restaurant_uuid' => $store->restaurant_uuid
         ]);
 
-        if (!$delivery_zone_model)
+        if (!$delivery_zone)
             throw new NotFoundHttpException('The requested record does not exist.');
 
-        $area_model = Area::findOne (['area_id' => $area_id]);
+        $area = Area::findOne (['area_id' => $area_id]);
 
-        if (!$area_model)
+        if (!$area)
             throw new NotFoundHttpException('The requested record does not exist.');
 
         $model = new AreaDeliveryZone();
-        $model->restaurant_uuid = $store_model->restaurant_uuid;
-        $model->delivery_zone_id = $delivery_zone_model->delivery_zone_id;
-        $model->area_id = $area_model->area_id;
+        $model->restaurant_uuid = $store->restaurant_uuid;
+        $model->delivery_zone_id = $delivery_zone->delivery_zone_id;
+        $model->area_id = $area->area_id;
 
         if (!$model->save ()) {
             return [
@@ -214,29 +214,30 @@ class AreaDeliveryZoneController extends BaseController
     public function actionUpdate($area_delivery_zone_id, $store_uuid = null)
     {
         $this->ownerCheck();
+        
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
 
-        $delivery_zone_model = DeliveryZone::findOne ([
+        $delivery_zone = DeliveryZone::findOne ([
             'delivery_zone_id' => $delivery_zone_id,
-            'restaurant_uuid' => $store_model->restaurant_uuid
+            'restaurant_uuid' => $store->restaurant_uuid
         ]);
 
-        if (!$delivery_zone_model)
+        if (!$delivery_zone)
             throw new NotFoundHttpException('The requested record does not exist.');
 
-        $area_model = Area::findOne (['area_id' => $area_id]);
+        $area = Area::findOne (['area_id' => $area_id]);
 
-        if (!$area_model)
+        if (!$area)
             throw new NotFoundHttpException('The requested record does not exist.');
 
         $model = $this->findModel ($area_delivery_zone_id, $store_uuid);
 
-        $model->delivery_zone_id = $delivery_zone_model->delivery_zone_id;
-        $model->area_id = $area_model->area_id;
+        $model->delivery_zone_id = $delivery_zone->delivery_zone_id;
+        $model->area_id = $area->area_id;
 
         if (!$model->save ()) {
             if (isset($model->errors)) {

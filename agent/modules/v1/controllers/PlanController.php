@@ -308,24 +308,24 @@ class PlanController extends BaseController
 
                 \common\models\Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
 
-                $subscription_model = $paymentRecord->subscription;
-                $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
-                $valid_for =  $subscription_model->plan->valid_for;
-                $subscription_model->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"));
-                $subscription_model->save(false);
+                $subscription = $paymentRecord->subscription;
+                $subscription->subscription_status = Subscription::STATUS_ACTIVE;
+                $valid_for =  $subscription->plan->valid_for;
+                $subscription->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription->subscription_start_at)) . " + $valid_for MONTHS"));
+                $subscription->save(false);
 
-                foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
+                foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
 
                     \Yii::$app->mailer->compose([
                         'html' => 'premium-upgrade',
                     ], [
-                        'subscription' => $subscription_model,
+                        'subscription' => $subscription,
                         'store' => $paymentRecord->restaurant,
                     ])
                         ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                         ->setTo([$agent->agent_email])
                         ->setBcc(\Yii::$app->params['supportEmail'])
-                        ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
+                        ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name)
                         ->send();
                 }
 

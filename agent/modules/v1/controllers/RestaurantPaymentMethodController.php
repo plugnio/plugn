@@ -61,8 +61,9 @@ class RestaurantPaymentMethodController extends BaseController
      */
     public function actionIndex()
     {
-        $store_uuid = Yii::$app->request->get('store_uuid');
-        return RestaurantPaymentMethod::findAll(['restaurant_uuid'=>$store_uuid]);
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        return RestaurantPaymentMethod::findAll(['restaurant_uuid' => $store->restaurant_uuid]);
     }
 
     /**
@@ -75,6 +76,7 @@ class RestaurantPaymentMethodController extends BaseController
     {
         return PaymentMethod::find()->all();
     }
+    
     /**
      * Finds the Plan model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

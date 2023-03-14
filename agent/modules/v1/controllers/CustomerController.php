@@ -23,7 +23,7 @@ class CustomerController extends BaseController
     {
         $keyword = Yii::$app->request->get ('keyword');
 
-        Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $query = Customer::find ();
 
@@ -33,7 +33,7 @@ class CustomerController extends BaseController
             $query->orWhere (['like', 'customer_email', $keyword]);
         }
 
-        $query->andWhere (['restaurant_uuid' => $store_uuid]);
+        $query->andWhere (['restaurant_uuid' => $store->restaurant_uuid]);
 
         return new ActiveDataProvider([
             'query' => $query
@@ -78,13 +78,13 @@ class CustomerController extends BaseController
         //5 min
         set_time_limit(60 * 5);
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount ();
+        $restaurant = Yii::$app->accountManager->getManagedAccount ();
 
         $start_date = Yii::$app->request->get('start_date');
         $end_date = Yii::$app->request->get('end_date');
 
         $query = \common\models\Customer::find ()
-            ->andWhere (['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+            ->andWhere (['restaurant_uuid' => $restaurant->restaurant_uuid])
             ->orderBy (['customer_created_at' => SORT_DESC]);
 
         if($start_date && $end_date) {
