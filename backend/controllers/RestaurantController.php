@@ -112,7 +112,7 @@ class RestaurantController extends Controller {
         {
             Yii::$app->session->addFlash('success', $response['message']);
         } else {
-            Yii::$app->session->addFlash('error', $response['message']);
+            Yii::$app->session->addFlash('error', print_r($response['message'], true));
         }
 
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
