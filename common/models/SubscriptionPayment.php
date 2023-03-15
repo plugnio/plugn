@@ -272,18 +272,16 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         if(YII_ENV == 'prod') {
             //Send event to Segment
-            \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-
-            \Segment::track([
-                'userId' => $paymentRecord->restaurant_uuid,
-                'event' => 'Premium Plan Purchase',
-                'properties' => [
+           
+            Yii::$app->eventManager->track('Premium Plan Purchase',  [
                     'order_id' => $paymentRecord->payment_uuid,
                     'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
                     'paymentMethod' => $paymentRecord->payment_mode,
                     'currency' => 'USD'
-                ]
-            ]);
+                ],
+                null, 
+                $paymentRecord->restaurant_uuid
+            );
         }
 
         Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and',
