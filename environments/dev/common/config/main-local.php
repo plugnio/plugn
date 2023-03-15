@@ -73,10 +73,6 @@ return [
             'baseUrl' => 'https://api.dev.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ],
-        'eventManager' => [
-            'class' => 'common\components\EventManager',
-            'key' => 'ac62dbe81767f8871f754c7bdf6669d6'
-        ],
+        ]
     ],
 ];

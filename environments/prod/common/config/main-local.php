@@ -158,10 +158,6 @@ return [
             'baseUrl' => 'https://api.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ],
-        'eventManager' => [
-            'class' => 'common\components\EventManager',
-            'key' => '045c95d677c4fe04b3b406f71050a659'
-        ],
+        ]
     ],
 ];
