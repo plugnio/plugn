@@ -298,20 +298,20 @@ class AddonController extends BaseController
             if($paymentRecord->payment_current_status == 'CAPTURED')
             {
                 if(YII_ENV == 'prod') {
+                    
                     //Send event to Segment
-                    \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                    \Segment::track([
-                        'userId' => $paymentRecord->restaurant_uuid,
-                        'event' => 'Addon Purchase',
-                        'properties' => [
+                    
+                    Yii::$app->eventManager->track('Addon Purchase', [
                             'addon_uuid' => $paymentRecord->addon_uuid,
                             'addon' => $paymentRecord->addon->name,
                             'paymentMethod' => $paymentRecord->payment_mode,
                             'charged' => $paymentRecord->payment_amount_charged,
                             'revenue' => $paymentRecord->payment_net_amount,
                             'currency' => 'KWD'
-                        ]
-                    ]);
+                        ],
+                        null, 
+                        $paymentRecord->restaurant_uuid
+                    );
                 }
 
                 $model = new RestaurantAddon();

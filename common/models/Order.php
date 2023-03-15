@@ -967,12 +967,7 @@ class Order extends \yii\db\ActiveRecord
 
             }
 
-            \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-            
-            \Segment::track([
-                'userId' => $this->restaurant_uuid,
-                'event' => 'Order Completed',
-                'properties' => [
+            Yii::$app->eventManager->track('Order Completed', [
                     'checkout_id' => $this->order_uuid,
                     'order_id' => $this->order_uuid,
                     'total' => ($this->total_price * $rate),
@@ -985,8 +980,9 @@ class Order extends \yii\db\ActiveRecord
                     'currency' => $this->currency_code,
                     'coupon' => $this->voucher && $this->voucher->code ? $this->voucher->code : null,
                     'products' => $productsList ? $productsList : null
-                ]
-            ]);
+                ],
+                null, 
+                $this->restaurant_uuid);
 
             Yii::$app->walletManager->addEntry([
                 'amount' => $plugn_fee_kwd,

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dd9bf825997f3ced9546480bc5e7957c",
+    "content-hash": "84bd675638803dd33a776381a875fd7f",
     "packages": [
         {
             "name": "ajaxray/short-code",
@@ -2556,6 +2556,51 @@
                 "source": "https://github.com/MarkBaker/PHPMatrix/tree/3.0.0"
             },
             "time": "2021-07-01T19:01:15+00:00"
+        },
+        {
+            "name": "mixpanel/mixpanel-php",
+            "version": "2.10.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:mixpanel/mixpanel-php.git",
+                "reference": "c4b6245713dad06f0527c7b98ee7275116b9e163"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mixpanel/mixpanel-php/zipball/c4b6245713dad06f0527c7b98ee7275116b9e163",
+                "reference": "c4b6245713dad06f0527c7b98ee7275116b9e163",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0"
+            },
+            "require-dev": {
+                "phpdocumentor/phpdocumentor": "2.9.*",
+                "phpunit/phpunit": "5.6.*"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/Mixpanel.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Mixpanel <dev@mixpanel.com>",
+                    "homepage": "https://mixpanel.com/"
+                }
+            ],
+            "description": "The Official PHP library for Mixpanel",
+            "homepage": "https://mixpanel.com/help/reference/php",
+            "keywords": [
+                "mixpanel",
+                "mixpanel php"
+            ],
+            "time": "2022-08-10T22:03:19+00:00"
         },
         {
             "name": "moonlandsoft/yii2-phpexcel",
@@ -10165,5 +10210,5 @@
         "php": ">=5.6.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
