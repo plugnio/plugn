@@ -477,21 +477,19 @@ class SiteController extends Controller
                 }
 
                 if(YII_ENV == 'prod') {
-                //Send event to Segment
-                    \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                    \Segment::track([
-                        'userId' => $paymentRecord->restaurant_uuid,
-                        'event' => 'Premium Plan Purchase',
-                        'properties' => [
+                
+                    Yii::$app->eventManager->track('Premium Plan Purchase',  [
                             'order_id' => $paymentRecord->payment_uuid,
                             'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
                             'paymentMethod' => $paymentRecord->payment_mode,
                             'currency' => 'USD'
-                        ]
-                    ]);
+                        ],
+                        null, 
+                        $paymentRecord->restaurant_uuid);
                 }
             }
-            if($paymentRecord){
+
+            if($paymentRecord) {
                 return [
                     'operation' => 'success',
                     'message' => 'Payment status has been updated successfully'
@@ -1794,12 +1792,7 @@ class SiteController extends Controller
                 $firstname = $full_name[0];
                 $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
 
-                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                \Segment::track([
-                    'userId' => $store->restaurant_uuid,
-                    'event' => 'Store Created',
-                    'type' => 'track',
-                    'properties' => [
+                Yii::$app->eventManager->track('Store Created', [
                         'first_name' => trim($firstname),
                         'last_name' => trim($lastname),
                         'store_name' => $store->name,
@@ -1808,8 +1801,9 @@ class SiteController extends Controller
                         'phone_number' => $store->owner_number,
                         'email' => $agent->agent_email,
                         'store_url' => $store->restaurant_domain
-                    ]
-                ]);
+                    ],
+                    null, 
+                    $store->restaurant_uuid);
 
                 Yii::$app->session->setFlash('storeCreated');
             }

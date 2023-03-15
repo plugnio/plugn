@@ -108,17 +108,12 @@ class VoucherController extends Controller
                     $discount_amount = $discount_amount *  2.65;
                   }
 
-
-
-                  \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                  \Segment::track([
-                      'userId' => $storeUuid,
-                      'event' => 'Voucher Created',
-                      'properties' => [
+                  Yii::$app->eventManager->track('Voucher Created', [
                           'type' => $model->discountType,
                           'discountAmount' => $model->discount_amount ? ((float) $model->discount_amount * 3.28) : 0
-                      ]
-                  ]);
+                      ],
+                      null, 
+                      $storeUuid);
                 }
 
                 return $this->redirect(['index',  'storeUuid' => $storeUuid]);
