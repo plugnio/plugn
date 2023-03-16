@@ -17,6 +17,7 @@ use Yii;
  * @property float|null $min_charge
  * @property float|null $delivery_zone_tax
  * @property string $time_unit
+ * @property boolean $is_deleted
  *
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property Area[] $areas
@@ -50,7 +51,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
             [['country_id','business_location_id', 'restaurant_uuid','time_unit', 'delivery_fee', 'min_charge', 'delivery_time'], 'required'],
             ['time_unit', 'in', 'range' => [self::TIME_UNIT_MIN,self::TIME_UNIT_HRS, self::TIME_UNIT_DAY]],
             ['time_unit', 'string','min' => 3  , 'max' => 3],
-            [['business_location_id', 'delivery_time','country_id'], 'integer'],
+            [['business_location_id', 'delivery_time', 'country_id', 'is_deleted'], 'integer'],
             [['delivery_zone_tax'], 'number', 'max' => 100],
             [['delivery_fee', 'min_charge'], 'number'],
             [['selectedAreas'], 'safe'],
@@ -73,7 +74,8 @@ class DeliveryZone extends \yii\db\ActiveRecord
             'delivery_time' => Yii::t('app', 'Delivery Time'),
             'delivery_fee' => Yii::t('app', 'Delivery Fee'),
             'min_charge' => Yii::t('app', 'Min Charge'),
-            'delivery_zone_tax' => Yii::t('app', 'Tax Override')
+            'delivery_zone_tax' => Yii::t('app', 'Tax Override'),
+            'is_deleted' => Yii::t('app', 'Is Deleted?'),
         ];
     }
 

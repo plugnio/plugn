@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use common\models\Subscription;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\SubscriptionSearch */
@@ -38,8 +39,12 @@ $this->params['breadcrumbs'][] = $this->title;
               'value' =>     'plan.name'
             ],
             [
+              'filter' => [
+                  Subscription::STATUS_ACTIVE =>  'Active',
+                  Subscription::STATUS_INACTIVE =>  'Inactive',
+              ],
               'attribute' => 'subscription_status',
-              'value' =>     'status'
+              'value' =>  'status'
             ],
             'subscription_start_at',
             'subscription_end_at',

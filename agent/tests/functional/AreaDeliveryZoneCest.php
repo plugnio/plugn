@@ -13,6 +13,7 @@ use common\fixtures\CityFixture;
 use common\fixtures\CountryFixture;
 use common\fixtures\DeliveryZoneFixture;
 use common\fixtures\RestaurantFixture;
+use common\fixtures\BusinessLocationFixture;
 
 
 class AreaDeliveryZoneCest
@@ -30,6 +31,7 @@ class AreaDeliveryZoneCest
             'countries' => CountryFixture::className(),
             'areaDeliveryZone' => AreaDeliveryZoneFixture::className(),
             'deliveryZones' => DeliveryZoneFixture::className(),
+            'businessLocations' => BusinessLocationFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];

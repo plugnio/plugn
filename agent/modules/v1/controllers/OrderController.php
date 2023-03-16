@@ -30,11 +30,11 @@ class OrderController extends BaseController
      */
     public function actionLiveOrders()
     {
-        $store_uuid = Yii::$app->request->get('store_uuid');
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $query = Order::find()
-            ->filterBusinessLocationIfManager($store_uuid)
-            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->andWhere(
                 [
                     'order_status' => [
@@ -59,11 +59,11 @@ class OrderController extends BaseController
      */
     public function actionArchiveOrders()
     {
-        $store_uuid = Yii::$app->request->get('store_uuid');
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $query = Order::find()
-            ->filterBusinessLocationIfManager($store_uuid)
-            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->andWhere(
                 [
                     'order_status' => [
@@ -88,7 +88,8 @@ class OrderController extends BaseController
      */
     public function actionList($type = null)
     {
-        $store_uuid = Yii::$app->request->get('store_uuid');
+        $store = Yii::$app->accountManager->getManagedAccount();
+
         $keyword = Yii::$app->request->get('keyword');
         $order_uuid = Yii::$app->request->get('order_uuid');
         $phone = Yii::$app->request->get('phone');
@@ -98,8 +99,8 @@ class OrderController extends BaseController
         $customer_id = Yii::$app->request->get('customer_id');
 
         $query = Order::find()
-            ->filterBusinessLocationIfManager($store_uuid)
-            ->andWhere(['restaurant_uuid' => $store_uuid]);
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid]);
 
         # as we already doing some search with keyword textbox so reusing that
         if ($order_uuid) {
@@ -133,7 +134,7 @@ class OrderController extends BaseController
             $query->filterByKeyword($keyword);
         }
 
-        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+        $query->andWhere(['restaurant_uuid' => $store->restaurant_uuid]);
 
         if ($type == 'active') {
             $query->andWhere(
@@ -455,9 +456,12 @@ class OrderController extends BaseController
             ->orderBy(['order_created_at' => SORT_DESC])
             ->one();
 
+        $totalPendingInvoices = $store->getInvoices()->notPaid()->count();
+
         return [
             'totalPendingOrders' => (int)$totalPendingOrders,
-            'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null
+            'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null,
+            'totalPendingInvoices' => (int)$totalPendingInvoices
         ];
     }
 
@@ -1312,13 +1316,12 @@ class OrderController extends BaseController
 
     /**
      * Return order detail
-     * @param type $store_uuid
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid = null, $order_uuid)
+    public function actionDetail($order_uuid)
     {
-        return $this->findModel($order_uuid, $store_uuid);
+        return $this->findModel($order_uuid);
     }
 
     /**
@@ -1754,12 +1757,18 @@ class OrderController extends BaseController
      * @return string[]|void
      * @throws NotFoundHttpException
      */
-    public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid)
+    public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid = null)
     {
         try {
-            $payment = Payment::findOne(['order_uuid' => $order_uuid]);
 
-            if (($payment = Payment::find()->where(['payment_uuid' => $payment->payment_uuid, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($store_uuid)->restaurant_uuid])->one()) !== null) {
+            $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+            $payment = Payment::find()->where([
+                'order_uuid' => $order_uuid,//$payment->payment_uuid,
+                'restaurant_uuid' => $store->restaurant_uuid
+            ])->one();
+
+            if ($payment !== null) {
 
                 if ($payment->payment_gateway_name == 'tap') {
                     $transaction_id = $payment->payment_gateway_transaction_id;
@@ -1872,15 +1881,13 @@ class OrderController extends BaseController
      */
     protected function findModel($order_uuid, $store_uuid = null)
     {
-        if (!$store_uuid) {
-            $store_uuid = Yii::$app->request->headers->get('Store-Id');
-        }
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = Order::find()
-            ->filterBusinessLocationIfManager($store_uuid)
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
             ->andWhere([
                 'order_uuid' => $order_uuid,
-                'restaurant_uuid' => $store_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one();
 

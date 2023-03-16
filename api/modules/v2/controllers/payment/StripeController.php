@@ -84,9 +84,10 @@ class StripeController extends Controller
             $paymentIntent = \Stripe\PaymentIntent::create([
                 'amount' => $order->total_price * pow(10, $order->currency->decimal_place),
                 'currency' => strtolower($order->currency_code),
-                'automatic_payment_methods' => [
+                "payment_method_types" => ["card"],
+                /*'automatic_payment_methods' => [
                     'enabled' => true,
-                ],
+                ],*/
             ]);
 
             $paymentMethod = PaymentMethod::findOne(['payment_method_code' => PaymentMethod::CODE_STRIPE]);
@@ -100,7 +101,7 @@ class StripeController extends Controller
             $payment->customer_id = $order->customer->customer_id; //customer id
             $payment->order_uuid = $order->order_uuid;
             $payment->payment_amount_charged = $order->total_price;
-            $payment->payment_gateway_transaction_id  = $paymentIntent->id;
+            $payment->payment_gateway_transaction_id = $paymentIntent->id;
             $payment->payment_gateway_payment_id = $paymentIntent->id;
             $payment->save(false);
 
@@ -115,11 +116,17 @@ class StripeController extends Controller
                 'cancel_url' => Url::to(['payment/stripe/callback', 'order_uuid' => $order->order_uuid], true),
             ];
 
+        } catch (\Stripe\Exception\InvalidRequestException $e) {
+
+            return [
+                'operation' => 'error',
+                'message' => $e->getMessage()
+            ];
         } catch (Error $e) {
 
             return [
                 'operation' => 'error',
-                'clientSecret' => $e->getMessage()
+                'message' => $e->getMessage()
             ];
         }
     }
@@ -292,6 +299,7 @@ class StripeController extends Controller
 
         \Yii::$app->getResponse ()->getCookies ()->add ($cookie);
     }
+
     /**
      * Finds the Order model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

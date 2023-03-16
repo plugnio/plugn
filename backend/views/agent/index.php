@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'agent_auth_key',
             // 'agent_password_hash',
             //'agent_password_reset_token',
-            // 'agent_status',
+            //'agent_status',
             'last_active_at:datetime',
             'agent_created_at',
             'agent_updated_at',

@@ -23,6 +23,7 @@ class OrderItemController extends BaseController {
         $model = $this->findModel($order_item_id, $order_uuid ,$store_uuid);
         
         $model->qty = Yii::$app->request->getBodyParam("qty");
+        
         $model->customer_instruction = Yii::$app->request->getBodyParam("customer_instructions");
         
           if (!$model->save()) {

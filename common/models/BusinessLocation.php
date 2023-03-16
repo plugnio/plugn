@@ -71,7 +71,8 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'business_location_name_ar' => Yii::t('app','Location Name in Arabic'),
             'support_pick_up' => Yii::t('app','Support Pick Up'),
             'business_location_tax' => Yii::t('app','Tax / VAT'),
-            'max_num_orders' => Yii::t('app','Maximum number of orders')
+            'max_num_orders' => Yii::t('app','Maximum number of orders'),
+            'is_deleted' => Yii::t('app', 'Is Deleted?'),
         ];
     }
 

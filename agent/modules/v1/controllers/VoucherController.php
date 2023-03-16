@@ -145,7 +145,7 @@ class VoucherController extends BaseController
         $voucher_id = Yii::$app->request->getBodyParam('voucher_id');
         $voucherStatus = (int)Yii::$app->request->getBodyParam('voucherStatus');
 
-        $voucher_model = $this->findModel($voucher_id, $store_uuid);
+        $voucher = $this->findModel($voucher_id, $store_uuid);
 
         /*if (!$voucherStatus) {
             return [
@@ -154,14 +154,14 @@ class VoucherController extends BaseController
             ];
         }*/
 
-        $voucher_model->setScenario(Voucher::SCENARIO_UPDATE_STATUS);
+        $voucher->setScenario(Voucher::SCENARIO_UPDATE_STATUS);
 
-        $voucher_model->voucher_status = $voucherStatus;
+        $voucher->voucher_status = $voucherStatus;
 
-        if (!$voucher_model->save()) {
+        if (!$voucher->save()) {
             return [
                 "operation" => "error",
-                "message" => $voucher_model->errors
+                "message" => $voucher->errors
             ];
         }
 
@@ -227,9 +227,9 @@ class VoucherController extends BaseController
      */
     protected function findModel($voucher_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        if (($model = Voucher::find()->where(['voucher_id' => $voucher_id, 'restaurant_uuid' => $store_model->restaurant_uuid])->one()) !== null) {
+        if (($model = Voucher::find()->where(['voucher_id' => $voucher_id, 'restaurant_uuid' => $store->restaurant_uuid])->one()) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');

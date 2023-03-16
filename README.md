@@ -96,3 +96,7 @@ Phpmyadmin is running on localhost port 8080.
 # Every Sunday
 0 0 * * SAT php ~/www/yii cron/weekly-report  > /dev/null 2>&1
 ```
+
+## Database schema 
+
+[https://dbdiagram.io/d/6409f34a296d97641d86b825](https://dbdiagram.io/d/6409f34a296d97641d86b825)

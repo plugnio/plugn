@@ -3,6 +3,7 @@
 namespace api\modules\v2\controllers;
 
 use agent\models\PaymentMethod;
+use common\models\CustomerVoucher;
 use common\models\PaymentFailed;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -739,7 +740,8 @@ class OrderController extends Controller
             return [
                 'operation' => 'redirecting',
                 'redirectUrl' => $redirectUrl,
-                'orderUuid' => $order->order_uuid
+                'orderUuid' => $order->order_uuid,
+                'total_price' => $order->total_price
             ];
 
         } else {
@@ -1192,7 +1194,7 @@ class OrderController extends Controller
     /**
      * Whether is valid promo code or no
      */
-    public function actionApplyPromoCode()
+    public function actionApplyPromoCode($order_uuid = null)
     {
         $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
         $phone_number = Yii::$app->request->get("phone_number");
@@ -1205,9 +1207,38 @@ class OrderController extends Controller
         ])->one();
 
         if ($voucher && $voucher->isValid($phone_number)) {
+
+            $order = null; 
+            
+            if($order_uuid) {
+
+                $order = $this->findModel($order_uuid, $restaurant_uuid);
+
+                $order->setScenario(Order::SCENARIO_APPLY_VOUCHER);
+
+                $order->voucher_id = $voucher->voucher_id;
+
+                $itemTotal = $order->calculateOrderItemsTotalPrice();
+
+                if (
+                    $order->order_status != \common\models\Order::STATUS_REFUNDED &&
+                    $order->order_status != \common\models\Order::STATUS_PARTIALLY_REFUNDED
+                ) {
+                    $order->subtotal_before_refund = round($itemTotal, $order->currency->decimal_place);
+                    $order->total_price_before_refund = round($itemTotal, $order->currency->decimal_place);
+                }
+
+                $order->subtotal = round($itemTotal, $order->currency->decimal_place);
+
+                $order->total_price = round($order->calculateOrderTotalPrice($itemTotal), $order->currency->decimal_place);
+
+                $order->save();
+            }
+
             return [
                 'operation' => 'success',
-                'voucher' => $voucher
+                'voucher' => $voucher,
+                'order' => $order
             ];
         }
 
@@ -1376,12 +1407,18 @@ class OrderController extends Controller
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($order_uuid)
+    protected function findModel($order_uuid, $restaurant_uuid = null)
     {
-        $model = Order::find()
+        $query = Order::find()
             ->andWhere([
                 'order_uuid' => $order_uuid
-            ])
+            ]);
+
+        if($restaurant_uuid) {
+            $query->andWhere(['restaurant_uuid' => $restaurant_uuid]);
+        }
+
+        $model = $query
             ->one();
 
         if ($model !== null) {

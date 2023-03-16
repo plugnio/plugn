@@ -28,6 +28,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'title',
             'code',
+            'currency_symbol',
+            'rate',
+            'decimal_place',
+            'sort_order',
             [
                 'attribute' => 'status',
                 'value' => function($model) {

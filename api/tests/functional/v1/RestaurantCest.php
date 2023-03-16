@@ -17,6 +17,7 @@ class RestaurantCest
             'openingHours' => \common\fixtures\OpeningHourFixture::className(),
             "restaurantBranches" => \common\fixtures\RestaurantBranchFixture::className(),
             'restaurantDeliveryAreas' => RestaurantDeliveryFixture::className(),
+            'businessLocations' => \common\fixtures\BusinessLocationFixture::className(),
             'restaurants' => \common\fixtures\RestaurantFixture::className()
         ];
     }

@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'payment_gateway_queue_id',
             'restaurant_uuid',
             'payment_gateway',
-            'queue_status',
+            'queueStatusName',
             'queue_response',
             'queue_created_at',
             'queue_updated_at',

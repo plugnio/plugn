@@ -17,7 +17,8 @@ class StoreCest
             'deliveryZones' => \common\fixtures\DeliveryZoneFixture::className(),
             "restaurantBranches" => \common\fixtures\RestaurantBranchFixture::className(),
             'restaurantDeliveryAreas' => RestaurantDeliveryFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className()
+            'restaurants' => \common\fixtures\RestaurantFixture::className(),
+            'businessLocations' => \common\fixtures\BusinessLocationFixture::className()
         ];
     }
 

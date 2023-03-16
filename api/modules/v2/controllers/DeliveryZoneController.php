@@ -265,6 +265,7 @@ class DeliveryZoneController extends Controller {
 
 
                   if($countryCities){
+                    
                     $areaDeliveryZones = $store_model->getAreaDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
 
                     foreach ($countryCities as $cityKey => $city) {

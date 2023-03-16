@@ -670,7 +670,7 @@ class ItemController extends BaseController
     public function actionItemsReport()
     {
         ini_set('memory_limit', '-1');
-        $store_model = Yii::$app->accountManager->getManagedAccount();
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $start_date = Yii::$app->request->get('start_date');
         $end_date = Yii::$app->request->get('end_date');
@@ -695,7 +695,7 @@ class ItemController extends BaseController
                         Order::STATUS_CANCELED
                     ]
                 ])
-                ->andWhere(['order.restaurant_uuid' => $store_model->restaurant_uuid]);
+                ->andWhere(['order.restaurant_uuid' => $store->restaurant_uuid]);
 
             if($start_date && $end_date) {
                 $query->andWhere (new Expression('DATE(order.order_created_at) >= DATE("'.$start_date.'") AND
@@ -731,9 +731,9 @@ class ItemController extends BaseController
 
     public function actionExportToExcel()
     {
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount();
+        $restaurant = Yii::$app->accountManager->getManagedAccount();
 
-        $model = \agent\models\Item::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid])->all();
+        $model = \agent\models\Item::find()->where(['restaurant_uuid' => $restaurant->restaurant_uuid])->all();
 
         header('Access-Control-Allow-Origin: *');
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -775,7 +775,7 @@ class ItemController extends BaseController
      * @return array|string[]
      * @throws NotFoundHttpException
      */
-    public function actionChangeStatus($id, $store_uuid)
+    public function actionChangeStatus($id, $store_uuid = null)
     {
         $model = $this->findModel($id, $store_uuid);
 
@@ -810,9 +810,9 @@ class ItemController extends BaseController
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($item_uuid)
+    protected function findModel($item_uuid, $store_uuid = null)
     {
-        $store = Yii::$app->accountManager->getManagedAccount();
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = Item::findOne(['item_uuid'=>$item_uuid,'restaurant_uuid' => $store->restaurant_uuid]);
 

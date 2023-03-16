@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\Currency;
+use common\models\RestaurantInvoice;
 use common\models\VendorCampaign;
 use Yii;
 use common\models\Restaurant;
@@ -53,124 +54,23 @@ class CronController extends \yii\console\Controller
      */
     public function actionWeeklyReport()
     {
+        $query = Restaurant::find();
 
-        $stores = Restaurant::find()
-            ->all();
-
-        foreach ($stores as $key => $store) {
-
-            //Revenue generated
-            $lastWeekRevenue = $store
-                ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
-
-            $thisWeekRevenue = $store
-                ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
-
-            //Orders received
-            $lastWeekOrdersReceived = $store
-                ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
-
-            $thisWeekOrdersReceived = $store
-                ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
-
-            //customer gained
-            $lastWeekCustomerGained = $store
-                ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
-
-            $thisWeekCustomerGained = $store
-                ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
-
-            // Revenue Generated
-            $revenuePercentage = 0;
-
-            if ($lastWeekRevenue > 0) {
-                if ($thisWeekRevenue > $lastWeekRevenue) { //inc
-                    if ($lastWeekRevenue > 0) {
-                        $increase = $thisWeekRevenue - $lastWeekRevenue;
-
-                        $revenuePercentage = $increase / $lastWeekRevenue * 100;
-                    } else {
-                        $revenuePercentage = 100;
-                    }
-
-                } else if ($thisWeekRevenue < $lastWeekRevenue) { //dec
-                    $decrease = $lastWeekRevenue - $thisWeekRevenue;
-                    $revenuePercentage = $decrease / $lastWeekRevenue * -100;
-                }
+        foreach ($query->batch(100) as $stores) {
+            foreach ($stores as $key => $store) {
+                $store->sendWeeklyReport();
             }
+        }
 
-            // Orders received
-            $ordersReceivedPercentage = 0;
+        //for unpaid invoices
 
+        $query = RestaurantInvoice::find()
+            ->mailNotSent()
+            ->notPaid();
 
-            if ($thisWeekOrdersReceived > $lastWeekOrdersReceived) { //inc
-                if ($lastWeekOrdersReceived > 0) {
-                    $increase = $thisWeekOrdersReceived - $lastWeekOrdersReceived;
-
-                    $ordersReceivedPercentage = $increase / $lastWeekOrdersReceived * 100;
-                } else {
-                    $ordersReceivedPercentage = 100;
-                }
-
-            } else if ($thisWeekOrdersReceived < $lastWeekOrdersReceived) { //dec
-                $decrease = $lastWeekOrdersReceived - $thisWeekOrdersReceived;
-                $ordersReceivedPercentage = $decrease / $lastWeekOrdersReceived * -100;
-            }
-
-
-            //Customer gained
-            $customerGainedPercentage = 0;
-
-            if ($thisWeekCustomerGained > $lastWeekCustomerGained) { // inc
-                if ($lastWeekCustomerGained > 0) {
-                    $increase = $thisWeekCustomerGained - $lastWeekCustomerGained;
-
-                    $customerGainedPercentage = $increase / $lastWeekCustomerGained * 100;
-                } else {
-                    $customerGainedPercentage = 100;
-                }
-
-            } else if ($thisWeekCustomerGained < $lastWeekCustomerGained) { //dec
-                $decrease = $lastWeekCustomerGained - $thisWeekCustomerGained;
-                $customerGainedPercentage = $decrease / $lastWeekCustomerGained * -100;
-            }
-
-            if ($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
-
-                $agentAssignments = $store->getAgentAssignments()
-                    ->andWhere([
-                        'role' => AgentAssignment::AGENT_ROLE_OWNER,
-                        'receive_weekly_stats' => 1
-                    ])
-                    ->all();
-
-                foreach ($agentAssignments as $key => $agentAssignment) {
-
-                    if ($agentAssignment->receive_weekly_stats) {
-
-                        $weeklyStoreSummaryEmail = \Yii::$app->mailer->compose([
-                            'html' => 'weekly-summary',
-                        ], [
-                            'store' => $store,
-                            'agent_name' => $agentAssignment->agent->agent_name,
-                            'revenuePercentage' => $revenuePercentage,
-                            'ordersReceivedPercentage' => $ordersReceivedPercentage,
-                            'customerGainedPercentage' => $customerGainedPercentage,
-                            'thisWeekRevenue' => $thisWeekRevenue,
-                            'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
-                            'thisWeekCustomerGained' => $thisWeekCustomerGained,
-                        ])
-                            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                            ->setTo([$agentAssignment->agent->agent_email])
-                            ->setSubject('Weekly Store Summary');
-
-                        if ($key == 0)
-                            $weeklyStoreSummaryEmail->setBcc(\Yii::$app->params['supportEmail']);
-
-                        $weeklyStoreSummaryEmail->send();
-
-                    }
-                }
+        foreach ($query->batch(100) as $invoices) {
+            foreach ($invoices as $invoice) {
+                $invoice->sendEmail();
             }
         }
     }
@@ -210,7 +110,6 @@ class CronController extends \yii\console\Controller
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
         return self::EXIT_CODE_NORMAL;
     }
-
 
     /**
      * Anything we can help with?
@@ -380,9 +279,9 @@ class CronController extends \yii\console\Controller
     }
 
     public function actionTest() {
-        $tap = PaymentGatewayQueue::find()->offset(1)->one();
+        //$tap = PaymentGatewayQueue::find()->offset(1)->one();
 
-        $tap->enableGateways();
+        //$tap->enableGateways();
 
     }
 

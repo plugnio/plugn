@@ -181,7 +181,15 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                       <span>
                         <b>Payment Method</b>
                         <span style="    padding-left: 10px;">
-                          <?=  $model->payment_method_name ?>
+                          <?php
+                          if(!empty($model->payment_method_name))
+                              echo $model->payment_method_name;
+                          else if(!empty($model->payment_method_name_ar))
+                              echo $model->payment_method_name_ar;
+                          else if($model->paymentMethod)
+                              echo $model->paymentMethod->payment_method_name;
+                          else
+                              echo "KNET"; ?>
                         </span>
                       </span>
 

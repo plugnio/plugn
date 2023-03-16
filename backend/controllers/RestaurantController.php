@@ -106,7 +106,14 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
         }
 
-        $model->paymentGatewayQueue->processQueue();
+        $response = $model->paymentGatewayQueue->processQueue();
+
+        if ($response['operation'] == 'success')
+        {
+            Yii::$app->session->addFlash('success', $response['message']);
+        } else {
+            Yii::$app->session->addFlash('error', print_r($response['message'], true));
+        }
 
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
