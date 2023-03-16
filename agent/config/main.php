@@ -326,10 +326,11 @@ return [
                         'GET <id>' => 'detail',
                         'POST' => 'create',
                         'PATCH <id>' => 'update',
-                        'DELETE <id>' => 'delete',
+                        'DELETE delete/<id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <id>' => 'options',
+                        'OPTIONS delete/<id>' => 'options',
                     ]
                 ],
                 [ // SitemapController
