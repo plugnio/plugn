@@ -564,14 +564,12 @@ class TapPayments extends Component
          //for debug
 
         if (YII_ENV == 'prod') {
-            
-            \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-            
-            \Segment::track([
-                'userId' => 'Tap Payments',
-                'event' => 'Tap Charge Attempt',
-                'properties' => $chargeParams
-            ]);
+             
+            Yii::$app->eventManager->track(
+                'Tap Charge Attempt', 
+                $chargeParams, 
+                null, 
+                'Tap Payments');
         }
 
         $client = new Client();

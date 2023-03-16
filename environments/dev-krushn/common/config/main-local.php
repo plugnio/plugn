@@ -58,6 +58,6 @@ return [
             'baseUrl' => 'http://localhost/plugn/api/web',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ],
+        ]
     ],
 ];
