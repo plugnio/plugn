@@ -158,6 +158,6 @@ return [
             'baseUrl' => 'https://api.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ],
+        ]
     ],
 ];

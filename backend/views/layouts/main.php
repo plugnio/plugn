@@ -91,6 +91,7 @@ AppAsset::register($this);
                   ['label' => 'Plans', 'url' => ['/plan/index']],
                   ['label' => 'Bank', 'url' => ['/bank/index']],
                   ['label' => 'Admins', 'url' => ['/admin/index']],
+                    ['label' => 'Plugn Settings', 'url' => ['/setting/update']],
                 ],
             ],
         ]);
