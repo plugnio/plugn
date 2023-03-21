@@ -118,5 +118,8 @@ return [
         'httpclient' => [
             'class' => 'yii\httpclient\Client',
         ],
+        'eventManager' => [
+            'class' => 'common\components\EventManager',
+        ],
     ],
 ];

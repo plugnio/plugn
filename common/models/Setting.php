@@ -102,7 +102,7 @@ class Setting extends \yii\db\ActiveRecord
 
         //if loaded
 
-        if(Yii::$app->config->has('key'))
+        if(Yii::$app->config->has($key))
         {
             return Yii::$app->config->get($key);
         }

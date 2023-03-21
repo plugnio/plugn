@@ -594,20 +594,17 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             $firstname = $full_name[0];
             $lastname = array_key_exists (1, $full_name) ? $full_name[1] : null;
 
-            \Segment::init ('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-            \Segment::track ([
-                'userId' => $store->restaurant_uuid,
-                'event' => 'Store Created',
-                'type' => 'track',
-                'properties' => [
+            Yii::$app->eventManager->track('Store Created', [
                     'first_name' => trim ($firstname),
                     'last_name' => trim ($lastname),
                     'store_name' => $store->name,
                     'phone_number' => $store->owner_number,
                     'email' => $this->agent_email,
                     'store_url' => $store->restaurant_domain
-                ]
-            ]);
+                ], 
+                null, 
+                $store->restaurant_uuid
+            );
         }
 
         return [

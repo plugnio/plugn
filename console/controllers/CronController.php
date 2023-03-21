@@ -49,6 +49,21 @@ class CronController extends \yii\console\Controller
     public function actionIndex() {
     }
 
+    public function actionTeste()
+    {
+        Yii::$app->eventManager->setUser(1, [
+            "name" => "Rasili"
+        ]);
+
+        Yii::$app->eventManager->track('Test Plugn Event Manager',
+            [
+                'name' => "Rasili"
+            ],
+            null,
+            1
+        );
+    }
+
     /**
      * Weekly Store Summary
      */

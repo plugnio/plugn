@@ -383,28 +383,24 @@ class AuthController extends Controller {
                 $firstname = $full_name[0];
                 $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
 
-                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                \Segment::track([
-                    'userId' => $store->restaurant_uuid,
-                    'event' => 'Store Created',
-                    'type' => 'track',
-                    'properties' => [
+                Yii::$app->eventManager->track('Store Created', [
                         'first_name' => trim($firstname),
                         'last_name' => trim($lastname),
                         'store_name' => $store->name,
                         'phone_number' => $store->owner_phone_country_code . $store->owner_number,
                         'email' => $agent->agent_email,
                         'store_url' => $store->restaurant_domain
-                    ]
-                ]);
+                    ],
+                    null,
+                    $store->restaurant_uuid
+                );
 
-                if (YII_ENV == 'prod') {
-                    $param = [
-                        'email' => Yii::$app->request->getBodyParam('email'),
-                        'password' => Yii::$app->request->getBodyParam('password')
-                    ];
-                    Yii::$app->auth0->createUser($param);
-                }
+                $param = [
+                    'email' => Yii::$app->request->getBodyParam('email'),
+                    'password' => Yii::$app->request->getBodyParam('password')
+                ];
+                
+                Yii::$app->auth0->createUser($param);
 
             }
 
