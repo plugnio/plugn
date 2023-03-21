@@ -393,7 +393,7 @@ class AuthController extends Controller {
                     ],
                     null,
                     $store->restaurant_uuid
-                )
+                );
 
                 $param = [
                     'email' => Yii::$app->request->getBodyParam('email'),
