@@ -1149,7 +1149,7 @@ class Order extends \yii\db\ActiveRecord
             if($this->order_mode == Order::ORDER_MODE_PICK_UP) {
 
                 $isExists = $this->restaurant->getPickupBusinessLocations()
-                    ->andWhere(['business_location_id' => $this->pickup_location_id])
+                    ->andWhere(['business_location.business_location_id' => $this->pickup_location_id])
                     ->exists();
 
                 if (!$isExists)

@@ -22,10 +22,11 @@ class Config extends Component
     public function __construct($config = [])
     {
         if(isset(Yii::$app->request->headers)) {
-            $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+            
+            $restaurant_uuid = Yii::$app->request->headers->get('Store-Id');
 
-            if($restaurantUuid) {
-                $this->load($restaurantUuid);
+            if($restaurant_uuid) {
+                $this->load($restaurant_uuid);
             }
         }
 
@@ -87,7 +88,7 @@ class Config extends Component
 
             $query = Setting::find();
 
-            if($restaurantUuid) {
+            if($restaurant_uuid) {
                 $query->andWhere(['restaurant_uuid' => $restaurant_uuid]);
             } else {
                 $query->andWhere(new Expression('restaurant_uuid IS NULL'));
