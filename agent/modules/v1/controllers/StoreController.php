@@ -367,11 +367,13 @@ class StoreController extends BaseController
         $model->business_type = Yii::$app->request->getBodyParam('business_type');
         $model->license_number = Yii::$app->request->getBodyParam('license_number');
         $model->iban = Yii::$app->request->getBodyParam('iban');
-        $model->identification_file_front_side = Yii::$app->request->getBodyParam('identification_file_front_side');
-        $model->identification_file_back_side = Yii::$app->request->getBodyParam('identification_file_back_side');
 
-        $model->commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
-        $model->authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
+        //file urls
+
+        $identification_file_front_side = Yii::$app->request->getBodyParam('identification_file_front_side');
+        $identification_file_back_side = Yii::$app->request->getBodyParam('identification_file_back_side');
+        $commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
+        $authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
 
         if ($model->country && $model->country->iso != 'KW') {
             $model->business_type = 'corp';
@@ -388,10 +390,13 @@ class StoreController extends BaseController
 
             /*-------- uploading documents-------*/
 
+            //if provided + changed
+
             if (
-                $model->identification_file_front_side &&
+                $identification_file_front_side &&
+                $model->identification_file_front_side != $identification_file_front_side &&
                 !$model->uploadFileFromAwsToCloudinary(
-                    $model->identification_file_front_side,
+                    $identification_file_front_side,
                     'identification_file_front_side'
                 )
             ) {
@@ -400,9 +405,10 @@ class StoreController extends BaseController
             }
 
             if (
-                $model->identification_file_back_side &&
+                $identification_file_back_side &&
+                $model->identification_file_back_side != $identification_file_back_side &&
                 !$model->uploadFileFromAwsToCloudinary(
-                    $model->identification_file_back_side,
+                    $identification_file_back_side,
                     'identification_file_back_side'
                 )
             ) {
@@ -411,9 +417,10 @@ class StoreController extends BaseController
             }
 
             if (
-                $model->commercial_license_file &&
+                $commercial_license_file &&
+                $model->commercial_license_file != $commercial_license_file &&
                 !$model->uploadFileFromAwsToCloudinary(
-                    $model->commercial_license_file,
+                    $commercial_license_file,
                     'commercial_license_file'
                 )
             ) {
@@ -422,9 +429,10 @@ class StoreController extends BaseController
             }
 
             if (
-                $model->authorized_signature_file &&
+                $authorized_signature_file &&
+                $model->authorized_signature_file != $authorized_signature_file &&
                 !$model->uploadFileFromAwsToCloudinary(
-                    $model->authorized_signature_file,
+                    $authorized_signature_file,
                     'authorized_signature_file'
                 )
             ) {

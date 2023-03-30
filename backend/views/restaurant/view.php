@@ -254,7 +254,9 @@ $this->params['breadcrumbs'][] = $this->title;
                   return  $data->owner_first_name && $data->owner_last_name ? $data->owner_first_name . ' ' . $data->owner_last_name : null;
               },
             ],
-            'owner_email',
+            [
+              'attribute' => 'owner_email',
+            ],
             'owner_number',
             'vendor_sector',
             'supplierCode',
