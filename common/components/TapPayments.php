@@ -314,6 +314,7 @@ class TapPayments extends Component
         }
 
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($bussinessEndpoint)
@@ -653,6 +654,7 @@ class TapPayments extends Component
     public function updateBankAccount($wallet_id, $iban, $swift_code = null, $account_number = null)
     {
         $client = new Client();
+
         $response = $client->createRequest()
             ->setMethod('PUT')
             ->setUrl($this->apiEndpoint . "/bankaccount")
