@@ -485,7 +485,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'restaurant_email_notification' => Yii::t('app','Email notification'),
             'show_opening_hours' => Yii::t('app','Show Opening hours'),
             'phone_number_display' => Yii::t('app','Phone number display'),
-            'store_branch_name' => Yii::t('app','Branch name'),
+            'store_branch_name' => Yii::t('app','Github repo branch name'),
             'custom_css' => Yii::t('app','Custom css'),
             'platform_fee' => Yii::t('app','Platform fee'),
             'warehouse_fee' => Yii::t('app','Warehouse fee'),
@@ -517,7 +517,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'iban' => Yii::t('app','IBAN'),
             'owner_first_name' => Yii::t('app','First Name'),
             'owner_last_name' => Yii::t('app','Last Name'),
-            'owner_email' => Yii::t('app','Email Address'),
+            'owner_email' => Yii::t('app','Owner/ Tap account Email Address'),
             'owner_number' => Yii::t('app','Owner Phone Number'),
             'identification_issuing_date' => Yii::t('app','Identification Issuing Date'),
             'identification_expiry_date' => Yii::t('app','Identification Expiry Date'),
@@ -626,7 +626,6 @@ class Restaurant extends \yii\db\ActiveRecord
             $filename = Yii::$app->security->generateRandomString();
 
             $result = Yii::$app->cloudinaryManager->upload (
-
                 $url, [
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
                 ]);
@@ -709,7 +708,6 @@ class Restaurant extends \yii\db\ActiveRecord
         //Upload Authorized Signature file
         if ($this->authorized_signature_file && $this->authorized_signature_file_purpose && $this->authorized_signature_title)
         {
-
             $tmpFile = sys_get_temp_dir () . '/' . $this->authorized_signature_file;
 
             if (!file_put_contents ($tmpFile, file_get_contents ($this->getAuthorizedSignaturePhoto ())))
@@ -763,12 +761,10 @@ class Restaurant extends \yii\db\ActiveRecord
             if (!file_put_contents ($civilIdFrontSideTmpFile, file_get_contents ($this->getCivilIdFrontSidePhoto ())))
                 return Yii::error ('Error reading civil id (front side): ');
 
-
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $civilIdFrontSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
             @unlink ($civilIdFrontSideTmpFile);
-
 
             if ($response->isOk)
                 $this->identification_file_id_front_side = $response->data['id'];
@@ -785,7 +781,6 @@ class Restaurant extends \yii\db\ActiveRecord
             if (!file_put_contents ($civilIdBackSideTmpFile, file_get_contents ($this->getCivilIdBackSidePhoto ())))
                 return Yii::error ('Error reading civil id (back side): ');
 
-
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $civilIdBackSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
@@ -800,7 +795,6 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     public function uploadDocumentsToMyFatoorah() {
-
 
         //Upload Authorized Signature file
         if ($this->authorized_signature_file) {
@@ -953,22 +947,18 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
-     * Return authorized_signature_file
+     * Return authorized_signature_file url
      * @return string
      */
     public function getAuthorizedSignaturePhoto()
     {
-        $photo_url = [];
-
-        if ($this->authorized_signature_file) {
-
-            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                . $this->restaurant_uuid . '/private_documents/'
-                . $this->authorized_signature_file;
-            $photo_url = $url;
+        if (!$this->authorized_signature_file) {
+            return false;
         }
 
-        return $photo_url;
+        return 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+            . $this->restaurant_uuid . '/private_documents/'
+            . $this->authorized_signature_file;
     }
 
     /**
