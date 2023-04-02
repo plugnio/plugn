@@ -32,6 +32,9 @@ use yii\widgets\ActiveForm;
                 <?php echo $form->field($model, 'noOrder')->checkbox(['label' => 'No order in last 30 days']) ?>
             </div>
             <div class="col-md-4">
+                <?php echo $form->field($model, 'noItem')->checkbox(['label' => 'No item added yet']) ?>
+            </div>
+            <div class="col-md-4">
                 <?php echo $form->field($model, 'notActive')->checkbox(['label' => 'In-active for last 30 days']) ?>
             </div>
             <div class="col-md-4">

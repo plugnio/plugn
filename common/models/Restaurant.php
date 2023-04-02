@@ -644,6 +644,34 @@ class Restaurant extends \yii\db\ActiveRecord
             }
     }
 
+    public function alertInActive()
+    {
+        $mailer = Yii::$app->mailer->compose([
+                'html' => 'store/in-active'
+            ])
+            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setSubject("We miss you!");
+
+        $agents = $this->getAgentAssignments()
+            //->andWhere(['email_notification' => true])
+            ->all();
+
+        foreach ($agents as $agentAssignment) {
+            $mailer->setTo($agentAssignment->agent->agent_email)
+                ->send();
+        }
+
+        if ($this->restaurant_email_notification && $this->restaurant_email) {
+            $mailer->setTo($this->restaurant_email)
+                ->send();
+        }
+
+        //mark store as notified
+
+        $this->warned_delete_at = date('Y-m-d');
+        $this->save(false);
+    }
+
     /**
      * send campaign message
      * @param $campaign
@@ -1452,6 +1480,20 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
 
+    }
+
+    /**
+     * delete store + remove from netlify
+     */
+    public function deleteSite() {
+
+        $this->is_deleted = true;
+        $this->save(false);
+
+        //remove from netlify
+
+        if($this->site_id)
+            Yii::$app->netlifyComponent->deleteSite($this->site_id);
     }
 
     /**

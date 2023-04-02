@@ -754,6 +754,8 @@ class CronController extends \yii\console\Controller
         // GET UPDATED CURRENCY DATA FROM API
         $response = Currency::getDataFromApi();
 
+        $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
+
         $campaigns = VendorCampaign::find()
             ->andWhere(['status' => VendorCampaign::STATUS_READY])
             ->all();
@@ -761,6 +763,8 @@ class CronController extends \yii\console\Controller
         foreach ($campaigns as $campaign) {
             $campaign->process();
         }
+
+        $this->stdout( sizeof($campaigns) . " Campaign processed \n", Console::FG_RED, Console::BOLD);
 
         //remind failed build
 
@@ -770,7 +774,35 @@ class CronController extends \yii\console\Controller
         if($failed > 0)
             Yii::error ($failed . ' Stores failed, need to publish manually');
 
-        $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
+        //alert inactive stores
+
+        $query = Restaurant::find()
+            ->andWhere(['!=', 'restaurant.is_deleted', 1])
+            ->andWhere(new Expression("site_id IS NOT NULL"))
+            ->inActive()
+            ->andWhere(new Expression("warned_delete_at IS NULL AND DATE(restaurant_created_at) < DATE('".
+                date('Y-m-d', strtotime("-30 days"))."')"));
+
+        foreach ($query->batch() as $stores) {
+            foreach ($stores as $store) {
+                $store->alertInActive();
+            }
+        }
+
+        //remove inactive stores
+
+        $query = Restaurant::find()
+            ->andWhere(['!=', 'restaurant.is_deleted', 1])
+            ->andWhere(new Expression("site_id IS NOT NULL"))
+            ->inActive()
+            ->andWhere(new Expression("warned_delete_at IS NOT NULL AND DATE(warned_delete_at) < DATE('".
+                date('Y-m-d', strtotime("-7 days"))."')"));
+
+        foreach ($query->batch() as $stores) {
+            foreach ($stores as $store) {
+                $store->deleteSite();
+            }
+        }
     }
 
     /**
@@ -794,6 +826,5 @@ class CronController extends \yii\console\Controller
         else if($response->statusCode == 409) {
             echo 'conflict';
         }
-
     }
 }
