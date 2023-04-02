@@ -55,6 +55,7 @@ class RestaurantController extends Controller {
      * @return mixed
      */
     public function actionIndex() {
+
         $searchModel = new RestaurantSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -333,6 +334,7 @@ class RestaurantController extends Controller {
 
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
     }
+
     /**
      * upgrade store
      * @param $id
@@ -552,10 +554,7 @@ class RestaurantController extends Controller {
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $model->is_deleted = true;
-        $model->save(false);
-
-            //->delete();
+        $model->deleteSite();
 
         return $this->redirect(['index']);
     }
