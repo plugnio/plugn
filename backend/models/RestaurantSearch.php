@@ -5,6 +5,7 @@ namespace backend\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Restaurant;
+use yii\db\Expression;
 
 /**
  * RestaurantSearch represents the model behind the search form of `common\models\Restaurant`.
@@ -15,6 +16,7 @@ class RestaurantSearch extends Restaurant
     public $currency_title;
 
     public $noOrder;
+    public $noItem;
     public $notActive;
 
     /**
@@ -26,7 +28,7 @@ class RestaurantSearch extends Restaurant
              [['restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id',
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
-                 'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'notActive'], 'safe'],
+                 'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'noItem', 'notActive'], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee','version'], 'number'],
          ];
@@ -120,6 +122,12 @@ class RestaurantSearch extends Restaurant
         if($this->noOrder) {
             $query->andWhere( "last_order_at IS NULL OR DATE(last_order_at) < DATE('".
                 date('Y-m-d', strtotime("-30 days"))."')");
+        }
+
+        if($this->noItem) {
+            $query
+                ->joinWith(['items'])
+                ->andWhere( new Expression("item_uuid IS NULL"));
         }
 
         if($this->last_active_at) {
