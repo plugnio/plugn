@@ -192,7 +192,7 @@ class CustomerController extends Controller {
                          'attribute' => 'Total spent',
                          "format" => "raw",
                          "value" => function($data) {
-                           $total_spent = $data->getOrders()
+                           $total_spent = (float) $data->getOrders()
                                            ->andWhere([
                                                'NOT IN',
                                                'order_status' , [
@@ -206,9 +206,9 @@ class CustomerController extends Controller {
                                            ->sum('total_price');
 
 
-                           $total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
+                           //$total_spent = \Yii::$app->formatter->asDecimal($total_spent ? $total_spent : 0 , 3);
 
-                           return  Yii::$app->formatter->asCurrency($total_spent ? $total_spent : 0, $data->currency->code,[
+                           return  Yii::$app->formatter->asCurrency($total_spent, $data->currency->code, [
                                \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                            ]);
                          }
