@@ -804,13 +804,15 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
+                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+
                 //Yii::error ('Error when uploading commercial license document: ' . print_r ($response->data, true));
 
-                $this->addError('commercial_license_file', 'Error when uploading commercial license document: ' . print_r ($response->data, true));
+                $this->addError('commercial_license_file', 'Error when uploading commercial license document: ' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error when uploading commercial license document: ' . print_r ($response->data, true)
+                    "message" => 'Error when uploading commercial license document: ' . $error
                 ];
             }                
         }
@@ -843,13 +845,15 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                $this->addError('identification_file_front_side', 'Error when uploading civil id (front side): ' . print_r($response->data, true));
+                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+
+                $this->addError('identification_file_front_side', 'Error when uploading civil id (front side): ' . $error);
 
                 //Yii::error ('Error when uploading civil id (front side): ' . print_r($response->data, true));
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error when uploading civil id (front side): ' . print_r ($response->data, true)
+                    "message" => 'Error when uploading civil id (front side): ' . $error
                 ];
             }                
 
@@ -884,13 +888,15 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                $this->addError('identification_file_back_side', 'Error when uploading civil id (back side): ' . print_r ($response->data, true));
+                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+
+                $this->addError('identification_file_back_side', 'Error when uploading civil id (back side): ' . $error);
 
                 //Yii::error ('Error when uploading civil id (back side): ' . print_r ($response->data, true));
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error when uploading civil id (back side): ' . print_r ($response->data, true)
+                    "message" => 'Error when uploading civil id (back side): ' . $error
                 ];
             }
         }
