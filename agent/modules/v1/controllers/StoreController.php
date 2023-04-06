@@ -155,6 +155,7 @@ class StoreController extends BaseController
     public function actionConnectDomain()
     {
         $domain = Yii::$app->request->getBodyParam('domain');
+        $purchase = Yii::$app->request->getBodyParam('purchase');
 
         $store = Yii::$app->accountManager->getManagedAccount();
 
@@ -172,24 +173,32 @@ class StoreController extends BaseController
             return self::message("error",$store->getErrors());
         }
 
-        //log to slack
+        //update in netlify
 
-        \Yii::info("[Store Domain Update Request] " . $store->name . " want to change domain from " .
-            $old_domain ." to " . $store->restaurant_domain, __METHOD__);
+        //get domain from url
 
-        \Yii::$app->mailer->compose([
-            'html' => 'domain-update-request',
-        ], [
-                'store_name' => $store->name,
-                'new_domain' => $store->restaurant_domain,
-                'old_domain' => $old_domain
-            ])
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-            ->setTo(Yii::$app->params['adminEmail'])
-            ->setSubject('[Plugn] Agent updated DN')
-            ->send();
+        $domain = str_replace([
+            'http://',
+            'https://',
+            'www.',
+            'www2.',
+        ], ['', '', '', ''], $store->restaurant_domain);
 
-        return self::message("success","Congratulations you have successfully changed your domain name");
+        //call api
+
+        Yii::$app->netlifyComponent->updateSite($store->site_id, [
+            'domain_aliases' => $domain,
+            'ssl' => true,
+            'force_ssl' => true
+        ]);
+
+        //todo: response validation
+
+        if($purchase) {//strpos($domain, '.plugn') > -1
+            return $store->notifyDomainRequest($old_domain);
+        }
+
+        return $store->notifyDomainUpdated($old_domain);
     }
 
     /**

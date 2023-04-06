@@ -153,4 +153,31 @@ class NetlifyComponent extends Component {
 
         return $response;
     }
+
+    /**
+     * update site from netlify
+     * @param $site_id
+     * @param $params
+     * @return \yii\httpclient\Response
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function updateSite($site_id, $params) {
+
+        $apiEndpoint = $this->apiEndpoint . "/sites/" . $site_id;
+
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('PATCH')
+            ->setData($params)
+            ->setUrl($apiEndpoint)
+            ->addHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'User-Agent' => 'request',
+            ])
+            ->send();
+
+        return $response;
+    }
 }
