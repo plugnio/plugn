@@ -50,11 +50,6 @@ class m211103_105549_currency_conversion_table extends Migration
             );
         }
 
-        if (!isset($table->columns['status'])) {
-            $this->addColumn('currency', 'status', $this->tinyInteger(1)
-                ->defaultValue(1)->after('sort_order'));
-        }
-
         Currency::getDataFromApi(false);
     }
 
