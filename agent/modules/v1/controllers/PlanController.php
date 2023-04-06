@@ -75,7 +75,15 @@ class PlanController extends BaseController
         $plan_id = Yii::$app->request->getBodyParam ('plan_id');
         $payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
 
-        $subscription = SubscriptionPayment::initPayment($plan_id, $payment_method_id);
+        $response = SubscriptionPayment::initPayment($plan_id, $payment_method_id);
+
+        //reverting to free plan or error
+
+        if(isset($response['operation'])) {
+            return $response;
+        }
+
+        $subscription = $response;
 
         // Redirect to payment gateway
         Yii::$app->tapPayments->setApiKeys (
