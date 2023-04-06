@@ -638,6 +638,9 @@ class Restaurant extends \yii\db\ActiveRecord
 
     }
 
+    /**
+     * Upload document to tap
+     **/
     public function uploadDocumentsToTap()
     {
 
@@ -647,7 +650,11 @@ class Restaurant extends \yii\db\ActiveRecord
             $tmpFile = sys_get_temp_dir () . '/' . $this->authorized_signature_file;
 
             if (!file_put_contents ($tmpFile, file_get_contents ($this->getAuthorizedSignaturePhoto ())))
-                return Yii::error ('Error reading authorized signature document: ');
+            {
+                Yii::error ('Error reading authorized signature document: ');
+
+                return false;
+            }    
 
             $response = Yii::$app->tapPayments->uploadFileToTap ($tmpFile, $this->authorized_signature_file_purpose, $this->authorized_signature_title);
 
@@ -661,7 +668,9 @@ class Restaurant extends \yii\db\ActiveRecord
             {
                 $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
 
-                return Yii::error ('Error when uploading authorized signature document: ' . $error);
+                Yii::error ('Error when uploading authorized signature document: ' . $error);
+
+                return false;
             }
         }
 
@@ -671,8 +680,11 @@ class Restaurant extends \yii\db\ActiveRecord
             $commercialLicenseTmpFile = sys_get_temp_dir () . '/' . $this->commercial_license_file;
 
             if (!file_put_contents ($commercialLicenseTmpFile, file_get_contents ($this->getCommercialLicensePhoto ())))
-                return Yii::error ('Error reading commercial license document: ');
+            {
+                Yii::error ('Error reading commercial license document: ');
 
+                return false;
+            }
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $commercialLicenseTmpFile, $this->commercial_license_file_purpose, $this->commercial_license_title);
@@ -680,19 +692,29 @@ class Restaurant extends \yii\db\ActiveRecord
             @unlink ($commercialLicenseTmpFile);
 
             if ($response->isOk)
+            {
                 $this->commercial_license_file_id = $response->data['id'];
+            }
+            else 
+            {
+                Yii::error ('Error when uploading commercial license document: ' . print_r ($response->data, true));
 
-            else
-                return Yii::error ('Error when uploading commercial license document: ' . json_encode ($response->data));
+                return false;
+            }                
         }
 
         //Upload Owner civil id front side
+
         if ($this->identification_file_front_side && $this->identification_file_purpose && $this->identification_title) {
 
             $civilIdFrontSideTmpFile = sys_get_temp_dir () . '/' . $this->identification_file_front_side;
 
             if (!file_put_contents ($civilIdFrontSideTmpFile, file_get_contents ($this->getCivilIdFrontSidePhoto ())))
-                return Yii::error ('Error reading civil id (front side): ');
+            {
+                Yii::error ('Error reading civil id (front side): ');
+
+                return false;
+            }    
 
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
@@ -700,34 +722,49 @@ class Restaurant extends \yii\db\ActiveRecord
 
             @unlink ($civilIdFrontSideTmpFile);
 
-
-            if ($response->isOk)
+            if ($response->isOk) {                
                 $this->identification_file_id_front_side = $response->data['id'];
-            else
-                return Yii::error ('Error when uploading civil id (front side): ' . json_encode ($response->data));
+            }
+            else 
+            {
+                Yii::error ('Error when uploading civil id (front side): ' . print_r($response->data, true));
+
+                return false;
+            }                
 
         }
 
         //Upload Owner civil id back side
+
         if ($this->identification_file_back_side && $this->identification_file_purpose && $this->identification_title) {
 
             $civilIdBackSideTmpFile = sys_get_temp_dir () . '/' . $this->identification_file_back_side;
 
             if (!file_put_contents ($civilIdBackSideTmpFile, file_get_contents ($this->getCivilIdBackSidePhoto ())))
-                return Yii::error ('Error reading civil id (back side): ');
+            {
+                Yii::error ('Error reading civil id (back side): ');
 
+                return false;
+            }    
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $civilIdBackSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
             @unlink ($civilIdBackSideTmpFile);
 
-            if ($response->isOk)
+            if ($response->isOk) 
+            {
                 $this->identification_file_id_back_side = $response->data['id'];
-            else
-                return Yii::error ('Error when uploading civil id (back side): ' . json_encode ($response->data));
+            }
+            else 
+            {
+                Yii::error ('Error when uploading civil id (back side): ' . print_r ($response->data, true));
+
+                return false;
+            }
         }
 
+        return true;
     }
 
     public function uploadDocumentsToMyFatoorah() {
@@ -950,7 +987,11 @@ class Restaurant extends \yii\db\ActiveRecord
     public function createTapAccount() {
 
         //Upload documents file on our server before we create an account on tap we gonaa delete them
-        $this->uploadDocumentsToTap();
+        $isSuccess = $this->uploadDocumentsToTap();
+
+        if (!$isSuccess) {
+            return false;
+        }
 
         //Create a business for a vendor on Tap
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
@@ -1080,6 +1121,8 @@ class Restaurant extends \yii\db\ActiveRecord
 
           return false;
         }
+
+        return true;
     }
 
     /**
