@@ -18,11 +18,6 @@ class m211103_105549_currency_conversion_table extends Migration
             ->getSchema()
             ->getTableSchema('currency');
 
-        if (!isset($table->columns['status'])) {
-            $this->addColumn('currency', 'status', $this->tinyInteger(1)
-                ->defaultValue(1)->after('sort_order'));
-        }
-
             if (!isset($table->columns['currency_symbol'])) {
                 $this->addColumn('currency','currency_symbol',$this->string()->after('code'));
             }
@@ -47,6 +42,11 @@ class m211103_105549_currency_conversion_table extends Migration
                     ->defaultValue(2)
                     ->after('rate')
             );
+        }
+
+        if (!isset($table->columns['status'])) {
+            $this->addColumn('currency', 'status', $this->tinyInteger(1)
+                ->defaultValue(1)->after('sort_order'));
         }
 
         Currency::getDataFromApi(false);
