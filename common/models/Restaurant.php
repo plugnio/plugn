@@ -763,7 +763,7 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else
             {
-                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+                $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
 
                 //Yii::error ('Error when uploading authorized signature document: ' . $error);
 
@@ -804,7 +804,7 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+                $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
 
                 //Yii::error ('Error when uploading commercial license document: ' . print_r ($response->data, true));
 
@@ -845,7 +845,7 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+                $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
 
                 $this->addError('identification_file_front_side', 'Error when uploading civil id (front side): ' . $error);
 
@@ -888,7 +888,7 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+                $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
 
                 $this->addError('identification_file_back_side', 'Error when uploading civil id (back side): ' . $error);
 
@@ -926,7 +926,8 @@ class Restaurant extends \yii\db\ActiveRecord
 
 
             if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
-                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?
+                    json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                 return Yii::error('Error when uploading authorized signature document: ' . $errorMessage);
             }
 
