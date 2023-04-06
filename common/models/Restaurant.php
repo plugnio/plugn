@@ -644,6 +644,62 @@ class Restaurant extends \yii\db\ActiveRecord
             }
     }
 
+    public function notifyDomainRequest($old_domain) {
+
+        //if custom domain + want to purchase
+
+        \Yii::info("[Store Domain Update Request] " . $this->name . " want to change domain from " .
+            $old_domain ." to " . $this->restaurant_domain, __METHOD__);
+
+        \Yii::$app->mailer->compose([
+            'html' => 'domain-update-request',
+        ], [
+            'store_name' => $this->name,
+            'new_domain' => $this->restaurant_domain,
+            'old_domain' => $old_domain
+        ])
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setTo(Yii::$app->params['adminEmail'])
+            ->setSubject('[Plugn] Agent updated DN')
+            ->send();
+
+        return self::message("success","Congratulations you have successfully changed your domain name");
+    }
+
+    public function notifyDomainUpdated($old_domain) {
+
+        \Yii::info("[Store Domain Updated] " . $this->name . " changed domain from " .
+            $old_domain ." to " . $this->restaurant_domain, __METHOD__);
+
+        $mailer = \Yii::$app->mailer->compose([
+            'html' => 'store/domain-updated',
+        ], [
+            'store_name' => $this->name,
+            'new_domain' => $this->restaurant_domain,
+            'old_domain' => $old_domain
+        ])
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            //->setTo(Yii::$app->params['adminEmail'])
+            ->setSubject('Store Domain Updated');
+
+        $agents = $this->getAgentAssignments()
+            //->andWhere(['email_notification' => true])
+            ->all();
+
+        foreach ($agents as $agentAssignment) {
+            $mailer->setTo($agentAssignment->agent->agent_email)
+                ->send();
+        }
+
+        if ($this->restaurant_email_notification && $this->restaurant_email) {
+            $mailer->setTo($this->restaurant_email)
+                ->send();
+        }
+
+        return self::message("error", "Congratulations you have successfully changed your domain name");
+
+    }
+
     public function alertInActive()
     {
         $mailer = Yii::$app->mailer->compose([
@@ -3044,5 +3100,17 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public static function find() {
         return new query\RestaurantQuery(get_called_class());
+    }
+
+    /**
+     * @param string $type
+     * @param $message
+     * @return array
+     */
+    public static function message($type = "success", $message) {
+        return [
+            "operation" => $type,
+            "message" => is_string ($message)? Yii::t('agent', $message): $message
+        ];
     }
 }
