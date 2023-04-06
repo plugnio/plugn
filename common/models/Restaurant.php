@@ -763,8 +763,12 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else
             {
-                $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
-
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+                
                 //Yii::error ('Error when uploading authorized signature document: ' . $error);
 
                 $this->addError('authorized_signature_file', 'Error reading authorized signature document' . $error);
@@ -804,7 +808,11 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
 
                 //Yii::error ('Error when uploading commercial license document: ' . print_r ($response->data, true));
 
@@ -845,7 +853,11 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
 
                 $this->addError('identification_file_front_side', 'Error when uploading civil id (front side): ' . $error);
 
@@ -888,7 +900,11 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
 
                 $this->addError('identification_file_back_side', 'Error when uploading civil id (back side): ' . $error);
 
