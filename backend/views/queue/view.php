@@ -18,7 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->queue_id], ['class' => 'btn btn-primary btn-update']) ?>
         <?php
-            if ($model->queue_status == 1) {
+            if (in_array ($model->queue_status, [
+                    Queue::QUEUE_STATUS_FAILED,
+                Queue::QUEUE_STATUS_PENDING,
+                Queue::QUEUE_STATUS_HOLD
+            ])) {
                 echo Html::a('Publish Store',
                     ['publish-store', 'id' => $model->restaurant_uuid],
                     [
@@ -31,12 +35,21 @@ $this->params['breadcrumbs'][] = $this->title;
                 );
             }
         ?>
+
         <?php
-        if ($model->queue_status == 1) {
+        if ($model->queue_status == Queue::QUEUE_STATUS_PENDING) {
             echo Html::a('Delete', ['delete', 'id' => $model->queue_id], [
                 'class' => 'btn btn-danger btn-delete',
                 'data' => [
-                    'confirm' => 'Are you sure you want to delete this item?',
+                    'confirm' => 'Are you sure you want to delete this store?',
+                    'method' => 'post',
+                ],
+            ]);
+
+            echo "&nbsp;".Html::a('Put Hold', ['status-hold', 'id' => $model->queue_id], [
+                'class' => 'btn btn-danger btn-delete',
+                'data' => [
+                    'confirm' => 'Are you sure you want to put on hold this store?',
                     'method' => 'post',
                 ],
             ]);
@@ -59,6 +72,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         return 'Created';
                     } else if ($data->queue_status  == Queue::QUEUE_STATUS_COMPLETE) {
                         return 'Published';
+                    } else if ($data->queue_status  == Queue::QUEUE_STATUS_HOLD) {
+                        return 'On Hold';
+                    }else if ($data->queue_status  == Queue::QUEUE_STATUS_FAILED) {
+                        return 'Failed';
                     }
                 }
             ],

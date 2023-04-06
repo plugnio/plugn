@@ -31,7 +31,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'payment_method_code',
             'vat',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => "{view} {config}",
+                'buttons' => [
+                    'config' => function ($url, $model) {
+
+                            return  Html::a('<span class="glyphicon glyphicon-cog"></span>', ['config', 'code' => $model->payment_method_code], [
+                               // 'class' => 'btn btn-success',
+                                'hidden' => !in_array($model->payment_method_code, ['Moyasar', 'Stripe'])
+                            ]) ;
+                    },
+                ],
+            ],
         ],
     ]); ?>
 

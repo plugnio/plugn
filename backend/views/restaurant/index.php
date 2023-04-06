@@ -27,28 +27,52 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'rowOptions'=>function($model){
-            if ($model->queue->queue_status  == \common\models\Queue::QUEUE_STATUS_PENDING) {
-                return ['class' => 'danger'];
+            if ($model->queue) {
+                if ($model->queue->queue_status == \common\models\Queue::QUEUE_STATUS_PENDING) {
+                    return ['class' => 'danger'];
+                } else if ($model->queue->queue_status == \common\models\Queue::QUEUE_STATUS_HOLD) {
+                    return ['style' => 'background:orange', 'title' => 'Hold'];
+                }
             }
         },
         'columns' => [
             // ['class' => 'yii\grid\SerialColumn'],
             [
+                'attribute' => 'logo',
+                'format' => 'html',
+                'value' => function ($data) {
+                    return Html::img($data->getRestaurantLogoUrl());
+                },
+            ],
+            [
                 'attribute' => 'name',
                 'format' => 'raw',
                 'value' => function ($data) {
-                    if ($data->queue->queue_status == 1) {
-                        $icon = Html::a('<i class="glyphicon glyphicon-minus-sign" style="color:red"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Pending']);
-                    } else if ($data->queue->queue_status == 2) {
-                        $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign" style="color:orange"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Creating']);
-                    } else if ($data->queue->queue_status == 3) {
-                        $icon = Html::a('<i class="glyphicon glyphicon-ok-sign" style="color:green"></i>',['queue/view','id'=>$data->queue->queue_id],['title'=>'Published']);
+                    if ($data->queue) {
+
+                        $icon = "";
+
+                        if ($data->queue->queue_status == 1) {
+                            $icon = Html::a('<i class="glyphicon glyphicon-minus-sign" style="color:red"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Pending']);
+                        } else if ($data->queue->queue_status == 2) {
+                            $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign" style="color:orange"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Creating']);
+                        } else if ($data->queue->queue_status == 3) {
+                            $icon = Html::a('<i class="glyphicon glyphicon-ok-sign" style="color:green"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Published']);
+                        } else if ($data->queue->queue_status == 4) {
+                            $icon = Html::a('<i class="glyphicon glyphicon glyphicon-time" style="color:black"></i>', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Hold']);
+                        } else if ($data->queue->queue_status == 5) {
+                            $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign"></i> Failed', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Failed']);
+
+                        }
+
+                        return $data->name . ' ' . $data->queue->queue_status . '&nbsp;&nbsp;' . $icon;
+                    } else {
+                        return $data->name;
                     }
-                    return $data->name .' '. $data->queue->queue_status.'&nbsp;&nbsp;'.$icon;
                 }
             ],
             'restaurant_domain',
-            [
+            /*[
               'attribute' => 'country_name',
               'value' =>     'country.country_name'
             ],
@@ -56,19 +80,27 @@ $this->params['breadcrumbs'][] = $this->title;
               'label' => 'Currency',
               'attribute' => 'currency_title',
               'value' =>     'currency.title'
-            ],
+            ],*/
             'platform_fee:percent',
-            'warehouse_fee',
-            'warehouse_delivery_charges',
-            'version',
-            'restaurant_created_at:datetime',
-            'referral_code',
+            //'warehouse_fee',
+            //'warehouse_delivery_charges',
+           // 'version',
+           // 'restaurant_created_at:datetime',
+            //'referral_code',
+            'last_active_at',
+            'last_order_at',
+            [
+                 'attribute' => 'restaurant_status',
+                'filter' => \common\models\Restaurant::arrStatus(),
+                 'value' =>   'status',
+            ],
+            'restaurant_created_at:date',
+            //'is_deleted',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'controller' => 'restaurant',
-                'template' => ' {view} {update}'
+                //'template' => ' {view} {update}'
             ],
-
 
             // ['class' => 'yii\grid\ActionColumn','template' => '{view}{update}'],
         ],

@@ -26,13 +26,26 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
+    <?php if($model->queue_status != \common\models\PaymentGatewayQueue::QUEUE_STATUS_COMPLETE) { ?>
+        <?=
+        Html::a('Process payment gateway request', ['restaurant/process-gateway-queue', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to create payment gateway account for this store?',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+    <?php } ?>
+
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
             'payment_gateway_queue_id',
             'restaurant_uuid',
             'payment_gateway',
-            'queue_status',
+            'queueStatusName',
+            'queue_response',
             'queue_created_at',
             'queue_updated_at',
             'queue_start_at',

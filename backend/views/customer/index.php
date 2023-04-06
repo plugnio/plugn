@@ -9,47 +9,16 @@ use common\models\Order;
 /* @var $searchModel frontend\models\CustomerSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->params['restaurant_uuid'] = $storeUuid;
+$this->params['restaurant_uuid'] = $searchModel->restaurant_uuid;
 
 $this->title = 'Customers';
 $this->params['breadcrumbs'][] = $this->title;
 
-$js = "
-$(function () {
-  $('.summary').insertAfter('.top');
-});
-";
-
-
-$this->registerJs($js);
-
-
-$this->registerCss("
-  #DataTables_Table_0_filter, #DataTables_Table_0_paginate{
-    display:none !important
-  }
-  .pagination{
-    justify-content: center !important;
-    margin-top: 1rem !important;
-    padding-bottom: 7px !important;
-
-    margin: 2px 0 !important;
-white-space: nowrap !important;
-  }
-  .page-link{
-    font-size:0.85rem !important;
-    font-weight: 700;
-    padding: 0.65rem 0.911rem;
-  }
-  ");
 ?>
-
 
 <section id="data-list-view" class="data-list-view-header">
 
-  <?php  echo $this->render('_search', ['model' => $searchModel,'restaurant_uuid' => $restaurant->restaurant_uuid]); ?>
-
-  <?php if ($count > 0) { ?>
+  <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
 
   <!-- Data list view starts -->
   <!-- <div class="action-btns d-none">
@@ -68,13 +37,6 @@ white-space: nowrap !important;
         <?=
         GridView::widget([
             'dataProvider' => $dataProvider,
-            'rowOptions' => function($model) {
-                $url = Url::to(['customer/view', 'id' => $model->customer_id, 'storeUuid' => $model->restaurant_uuid]);
-
-                return [
-                    'onclick' => "window.location.href='{$url}'"
-                ];
-            },
               'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
                   'customer_name',
@@ -114,45 +76,13 @@ white-space: nowrap !important;
                           return date('d M, Y - h:i A', strtotime($model->customer_created_at));
                       }
                   ],
+                  ['class' => 'yii\grid\ActionColumn'],
               ],
-              'layout' => '{summary}{items}{pager}',
-              'pager' => [
-                'maxButtonCount' => 7,
-                'prevPageLabel' => 'Previous',
-                'nextPageLabel' => 'Next',
-                'prevPageCssClass' => 'paginate_button page-item previous',
-                'nextPageCssClass' => 'paginate_button page-item next',
-            ],
-              'tableOptions' => ['class' => 'table dataTable data-list-view'],
         ]);
         ?>
 
     </div>
     <!-- DataTable ends -->
-
-  <?php } else {?>
-
-
-    <div class="card">
-      <div style="padding: 70px 0; text-align: center;">
-
-        <div>
-          <img src="https://res.cloudinary.com/plugn/image/upload/v1607881378/emptystate-customer.svg" width="226" alt="" />
-        </div>
-
-        <h3>
-          Manage customer details
-        </h3>
-
-        <p>
-          This is where you can manage your customer information and view their purchase history.
-        </p>
-        <?= Html::a('Add customer', ['create', 'storeUuid' => $storeUuid], ['class' => 'btn btn-primary']) ?>
-      </div>
-    </div>
-
-
-  <?php } ?>
 
 </section>
 <!-- Data list view end -->

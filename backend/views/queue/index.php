@@ -25,8 +25,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'rowOptions'=>function($model){
-            if ($model->queue_status  == Queue::QUEUE_STATUS_PENDING) {
+            if (in_array ($model->queue_status, [
+                    Queue::QUEUE_STATUS_PENDING,
+                    Queue::QUEUE_STATUS_FAILED
+                ])
+            ) {
                 return ['class' => 'danger'];
+            }
+            if ($model->queue_status  == Queue::QUEUE_STATUS_HOLD) {
+                return ['style' => 'background:orange'];
             }
         },
         'columns' => [
@@ -46,9 +53,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         return 'Created';
                     } else if ($data->queue_status  == Queue::QUEUE_STATUS_COMPLETE) {
                         return 'Published';
+                    } else if ($data->queue_status  == Queue::QUEUE_STATUS_HOLD) {
+                        return 'Hold';
+                    } else if ($data->queue_status  == Queue::QUEUE_STATUS_FAILED) {
+                        return 'Failed';
                     }
                 },
-                'filter' => [Queue::QUEUE_STATUS_PENDING=>'Pending',Queue::QUEUE_STATUS_CREATING=>'Creating',Queue::QUEUE_STATUS_COMPLETE=>'Published'],
+                'filter' => [
+                    Queue::QUEUE_STATUS_FAILED=>'Failed',
+                    Queue::QUEUE_STATUS_PENDING=>'Pending',Queue::QUEUE_STATUS_CREATING=>'Creating',Queue::QUEUE_STATUS_COMPLETE=>'Published',Queue::QUEUE_STATUS_HOLD=>'Hold'],
                 'filterInputOptions' => ['class' => 'form-control', 'id' => null, 'prompt' => 'All']
             ],
             'queue_created_at',

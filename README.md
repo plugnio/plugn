@@ -96,3 +96,29 @@ Phpmyadmin is running on localhost port 8080.
 # Every Sunday
 0 0 * * SAT php ~/www/yii cron/weekly-report  > /dev/null 2>&1
 ```
+
+## Database schema 
+
+[https://dbdiagram.io/d/6409f34a296d97641d86b825](https://dbdiagram.io/d/6409f34a296d97641d86b825)
+
+
+## Events 
+
+- Addon Purchase
+- Store Created
+- Premium Plan Purchase
+- Tap Charge Attempt
+- Order Completed
+- Voucher Created
+
+to publish in production
+
+- disable segment to mixpanel flow and config mixpanel from admin 
+- upload 
+- git pull > ./yii init > ./yii migrate 
+- composer require mixpanel.... install mixpanel 
+- test config is there in admin as it should be 
+
+- test from console 
+
+

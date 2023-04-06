@@ -17,9 +17,22 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    "Please verify email to use it" => "",
-    "Ticket comment added successfully" => "",
-    "Ticket created successfully" => "",
+    "Credit card" => "بطاقة ائتمان",
+    "Mada" => "مدى",
+    "Credit card mada" => "بطاقة الائتمان مدى",
+    "STC pay" => "STC pay",
+    "Apple pay" => "دفع أبل",
+    "Stc pay" => "Stc pay",
+    "Apple pay not configured" => "لم يتم تكوين Apple pay",
+    "Apple pay not supported" => "Apple pay غير مدعوم",
+
+    "Is Public?" => "هل عامة؟",
+    'Accept order 24/7' => "اطلب أسبوعًا على مدار الساعة طوال أيام الأسبوع",
+    'Store not delivering to this area.' => "المتجر لا يسلم لهذه المنطقة.",
+    "Custom Subscription Price" => "سعر الاشتراك المخصص",
+    "Please verify email to use it" => "يرجى التحقق من البريد الإلكتروني لاستخدامه",
+    "Ticket comment added successfully" => "تمت إضافة تعليق التذكرة بنجاح",
+    "Ticket created successfully" => "تم إنشاء التذكرة بنجاح",
     'Item Unit Price' => "سعر وحدة الصنف",
     'Min selection must be less than or equal to max selection' => "يجب أن يكون متوسط ​​التحديد أقل من أو يساوي الحد الأقصى للتحديد",
     "Maximum number of orders" => "الحد الأقصى لعدد الطلبات",

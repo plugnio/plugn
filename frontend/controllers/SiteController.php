@@ -2,8 +2,9 @@
 
 namespace frontend\controllers;
 
-use frontend\models\VerifyEmailForm;
 use Yii;
+use agent\models\Currency;
+use frontend\models\VerifyEmailForm;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
@@ -30,6 +31,7 @@ use common\models\SubscriptionPayment;
 use yii\db\Expression;
 use yii\helpers\Url;
 use common\components\TapPayments;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -96,18 +98,18 @@ class SiteController extends Controller
         if (Yii::$app->user->isGuest)
             return $this->redirect(['login']);
 
-            foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
+        foreach (Yii::$app->accountManager->getManagedAccounts() as $managedRestaurant) {
 
-                if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
-                    return $this->redirect(['vendor-dashboard',
-                        'id' => $managedRestaurant->restaurant_uuid
-                    ]);
-                } else {
-                    return $this->redirect(['real-time-orders',
-                        'storeUuid' => $managedRestaurant->restaurant_uuid
-                    ]);
-                }
+            if (Yii::$app->user->identity->isOwner($managedRestaurant->restaurant_uuid)) {
+                return $this->redirect(['vendor-dashboard',
+                    'id' => $managedRestaurant->restaurant_uuid
+                ]);
+            } else {
+                return $this->redirect(['real-time-orders',
+                    'storeUuid' => $managedRestaurant->restaurant_uuid
+                ]);
             }
+        }
     }
 
     /**
@@ -214,6 +216,8 @@ class SiteController extends Controller
 
         $selectedPlan = Plan::findOne($selectedPlanId);
 
+        $fees = $managedRestaurant->custom_subscription_price > 0 ? $managedRestaurant->custom_subscription_price: $selectedPlan->price;
+
         $subscription = new Subscription();
         $subscription->restaurant_uuid = $managedRestaurant->restaurant_uuid;
         $subscription->plan_id = $selectedPlan->plan_id;
@@ -228,8 +232,9 @@ class SiteController extends Controller
                 $payment->restaurant_uuid = $managedRestaurant->restaurant_uuid;
                 $payment->payment_mode = $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
                 $payment->subscription_uuid = $subscription->subscription_uuid; //subscription_uuid
-                $payment->payment_amount_charged = $subscription->plan->price;
+                $payment->payment_amount_charged = $fees;
                 $payment->payment_current_status = "Redirected to payment gateway";
+                $payment->is_sandbox = $managedRestaurant->is_sandbox;
 
                 if ($managedRestaurant->referral_code) {
                     $payment->partner_fee = $payment->payment_amount_charged * $managedRestaurant->partner->commission;
@@ -243,14 +248,18 @@ class SiteController extends Controller
 
 
                     // Redirect to payment gateway
-                    Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+                    Yii::$app->tapPayments->setApiKeys(
+                        \Yii::$app->params['liveApiKey'],
+                        \Yii::$app->params['testApiKey'],
+                        $payment->is_sandbox
+                    );
                     
                     $response = Yii::$app->tapPayments->createCharge(
                         "KWD",
-                        "Upgrade $managedRestaurant->name's plan to " . $subscription_model->plan->name, // Description
+                        "Upgrade $managedRestaurant->name's plan to " . $subscription->plan->name, // Description
                         'Plugn', //Statement Desc.
                          $payment->payment_uuid, // Reference
-                         $subscription_model->plan->price,
+                        $payment->payment_amount_charged,
                          $managedRestaurant->name,
                          $managedRestaurant->getAgents()->one()->agent_email,
                          $managedRestaurant->country->country_code,
@@ -258,7 +267,7 @@ class SiteController extends Controller
                          0, //Comission
                         Url::to(['site/callback'], true),
                         Url::to(['site/payment-webhook'], true),
-                        $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD,
+                        $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET :  TapPayments::GATEWAY_VISA_MASTERCARD,
                         0,
                         0,
                         ''
@@ -336,7 +345,8 @@ class SiteController extends Controller
             'restaurant' => $managedRestaurant,
             'selectedPlan' => Plan::findOne($selectedPlanId),
             'subscription' => $subscription,
-            'paymentMethods' => $payment_methods
+            'paymentMethods' => $payment_methods,
+            'fees' => $fees
         ]);
     }
 
@@ -369,8 +379,6 @@ class SiteController extends Controller
         }
     }
 
-
-
     /**
      * Process callback from TAP payment gateway
      * @param string $tap_id
@@ -378,131 +386,116 @@ class SiteController extends Controller
      */
     public function actionPaymentWebhook() {
 
-      $headers = Yii::$app->request->headers;
-      $headerSignature = $headers->get('hashstring');
+        $headers = Yii::$app->request->headers;
+        $headerSignature = $headers->get('hashstring');
 
-      $charge_id = Yii::$app->request->getBodyParam("id");
-      $status = Yii::$app->request->getBodyParam("status");
-      $amount = Yii::$app->request->getBodyParam("amount");
-      $currency = Yii::$app->request->getBodyParam("currency");
-      $reference = Yii::$app->request->getBodyParam("reference");
-      $destinations = Yii::$app->request->getBodyParam("destinations");
-      $response = Yii::$app->request->getBodyParam("response");
-      $source = Yii::$app->request->getBodyParam("source");
-      $transaction = Yii::$app->request->getBodyParam("transaction");
-      $acquirer = Yii::$app->request->getBodyParam("acquirer");
-
-
-      if($currency_mode = Currency::find()->where(['code' => $currency])->one())
-        $decimal_place = $currency_mode->decimal_place;
-      else
-        throw new ForbiddenHttpException('Invalid Currency code');
-
-      if(isset($reference)){
-        $gateway_reference = $reference['gateway'];
-        $payment_reference = $reference['payment'];
-      }
-
-      if(isset($transaction)){
-        $created = $transaction['created'];
-      }
-
-      $amountCharged = \Yii::$app->formatter->asDecimal($amount, $decimal_place);
-
-      $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amountCharged.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
-
-      $isValidSignature = true;
+        $charge_id = Yii::$app->request->getBodyParam("id");
+        $status = Yii::$app->request->getBodyParam("status");
+        $amount = Yii::$app->request->getBodyParam("amount");
+        $currency = Yii::$app->request->getBodyParam("currency");
+        $reference = Yii::$app->request->getBodyParam("reference");
+        $destinations = Yii::$app->request->getBodyParam("destinations");
+        $response = Yii::$app->request->getBodyParam("response");
+        $source = Yii::$app->request->getBodyParam("source");
+        $transaction = Yii::$app->request->getBodyParam("transaction");
+        $acquirer = Yii::$app->request->getBodyParam("acquirer");
 
 
-      //Check If Enabled Secret Key and If The header has request
-       if ($headerSignature != null)  {
+        if($currency_mode = Currency::find()->where(['code' => $currency])->one()) {
+            $decimal_place = $currency_mode->decimal_place;
+        } else {
+            throw new ForbiddenHttpException('Invalid Currency code');
+        }
 
+        if (isset($reference)){
+            $gateway_reference = $reference['gateway'];
+            $payment_reference = $reference['payment'];
+        }
 
+        if(isset($transaction)){
+            $created = $transaction['created'];
+        }
 
-         $response_message  = null;
+        $amountCharged = \Yii::$app->formatter->asDecimal($amount, $decimal_place);
+        $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amountCharged.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
 
-         if(isset($acquirer)){
-           if(isset($acquirer['response']))
-             $response_message = $acquirer['response']['message'];
-         } else {
-           if(isset($response))
-             $response_message = $response['message'];
-         }
+        $isValidSignature = true;
 
+        //Check If Enabled Secret Key and If The header has request
+        if ($headerSignature != null)  {
+            $response_message  = null;
 
-         $paymentRecord = SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $response_message);
+            if(isset($acquirer) && isset($acquirer['response'])){
+                $response_message = $acquirer['response']['message'];
+            } else if(isset($response)) {
+                $response_message = $response['message'];
+            }
 
-         $isValidSignature = false;
+            $paymentRecord = SubscriptionPayment::updatePaymentStatus($charge_id, $status, $destinations, $source, $reference, $response_message);
 
+            $isValidSignature = false;
 
-           if (!$isValidSignature) {
-                  Yii::$app->tapPayments->setApiKeys(\Yii::$app->params['liveApiKey'], \Yii::$app->params['testApiKey']);
+            if (!$isValidSignature) {
 
-                  $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
-                  if (!$isValidSignature){
+                Yii::$app->tapPayments->setApiKeys(
+                    \Yii::$app->params['liveApiKey'],
+                    \Yii::$app->params['testApiKey'],
+                    $paymentRecord->is_sandbox
+                );
+
+                $isValidSignature = Yii::$app->tapPayments->checkTapSignature($toBeHashedString , $headerSignature);
+                if (!$isValidSignature) {
                     Yii::error('Invalid Signature', __METHOD__);
                     throw new ForbiddenHttpException('Invalid Signature');
-                  }
-           }
+                }
+            }
 
-        $paymentRecord->received_callback = true;
+            $paymentRecord->received_callback = true;
 
-        if($paymentRecord->save(false) && $paymentRecord->payment_current_status == 'CAPTURED' ) {
+            if ($paymentRecord->save(false) && $paymentRecord->payment_current_status == 'CAPTURED' ) {
 
-              Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
-              $subscription_model = $paymentRecord->subscription;
-              $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
+                Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and', ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
+                $subscription_model = $paymentRecord->subscription;
+                $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
+                $valid_for =  $subscription_model->plan->valid_for;
+                $subscription_model->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"));
+                $subscription_model->save(false);
 
-              $valid_for =  $subscription_model->plan->valid_for;
+                foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
 
-              $subscription_model->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"));
+                    \Yii::$app->mailer->compose([
+                           'html' => 'premium-upgrade',
+                               ], [
+                           'subscription' => $subscription_model,
+                           'store' => $paymentRecord->restaurant,
+                       ])
+                       ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                       ->setTo([$agent->agent_email])
+                       ->setBcc(\Yii::$app->params['supportEmail'])
+                       ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
+                       ->send();
+                }
 
-              $subscription_model->save(false);
+                if(YII_ENV == 'prod') {
+                
+                    Yii::$app->eventManager->track('Premium Plan Purchase',  [
+                            'order_id' => $paymentRecord->payment_uuid,
+                            'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
+                            'paymentMethod' => $paymentRecord->payment_mode,
+                            'currency' => 'USD'
+                        ],
+                        null, 
+                        $paymentRecord->restaurant_uuid);
+                }
+            }
 
-              foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
-
-                \Yii::$app->mailer->compose([
-                       'html' => 'premium-upgrade',
-                           ], [
-                       'subscription' => $subscription_model,
-                       'store' => $paymentRecord->restaurant,
-                   ])
-                   ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                   ->setTo([$agent->agent_email])
-                   ->setBcc(\Yii::$app->params['supportEmail'])
-                   ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
-                   ->send();
-              }
-
-          if ($isError) {
-              throw new \Exception($errorMessage);
-          }
-
-
-          if(YII_ENV == 'prod') {
-              //Send event to Segment
-              \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-              \Segment::track([
-                    'userId' => $paymentRecord->restaurant_uuid,
-                    'event' => 'Premium Plan Purchase',
-                    'properties' => [
-                        'order_id' => $paymentRecord->payment_uuid,
-                        'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
-                        'paymentMethod' => $paymentRecord->payment_mode,
-                        'currency' => 'USD'
-                    ]
-                ]);
+            if($paymentRecord) {
+                return [
+                    'operation' => 'success',
+                    'message' => 'Payment status has been updated successfully'
+                ];
             }
         }
-
-        if($paymentRecord){
-          return [
-              'operation' => 'success',
-              'message' => 'Payment status has been updated successfully'
-          ];
-        }
-      }
-
     }
 
 
@@ -1645,7 +1638,6 @@ class SiteController extends Controller
             if($managedRestaurant = $model->login()) {
                 return $this->redirect(['site/vendor-dashboard', 'id' => $managedRestaurant->restaurant_uuid]);
             }
-
         } 
        
         $model->password = '';
@@ -1677,7 +1669,7 @@ class SiteController extends Controller
         $this->layout = 'login';
 
         $store = new Restaurant();
-        $store->version = 3;
+        $store->version = Yii::$app->params['storeVersion'];
         $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
 
         $agent = new Agent();
@@ -1800,12 +1792,7 @@ class SiteController extends Controller
                 $firstname = $full_name[0];
                 $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
 
-                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                \Segment::track([
-                    'userId' => $store->restaurant_uuid,
-                    'event' => 'Store Created',
-                    'type' => 'track',
-                    'properties' => [
+                Yii::$app->eventManager->track('Store Created', [
                         'first_name' => trim($firstname),
                         'last_name' => trim($lastname),
                         'store_name' => $store->name,
@@ -1814,8 +1801,9 @@ class SiteController extends Controller
                         'phone_number' => $store->owner_number,
                         'email' => $agent->agent_email,
                         'store_url' => $store->restaurant_domain
-                    ]
-                ]);
+                    ],
+                    null, 
+                    $store->restaurant_uuid);
 
                 Yii::$app->session->setFlash('storeCreated');
             }
@@ -1896,12 +1884,9 @@ class SiteController extends Controller
      * @return mixed
      * @throws BadRequestHttpException
      */
-    public
-    function actionResetPassword($token)
+    public function actionResetPassword($token)
     {
         $this->layout = 'login';
-
-
         try {
             $model = new ResetPasswordForm($token);
         } catch (InvalidArgumentException $e) {

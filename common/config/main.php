@@ -8,9 +8,9 @@ return [
     'name' => 'Plugn',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
-        'cache' => [
+        /*'cache' => [
             'class' => 'yii\caching\FileCache',
-        ],
+        ],*/
         'formatter' => [
         'thousandSeparator' => ',',
         'decimalSeparator' => '.',
@@ -47,6 +47,12 @@ return [
             'cloud_name' => 'plugn',
             'api_key' => '699963168546398',
             'api_secret' => 'SH2PbVsEsRT9Db257Pn9ZDgHGAU'
+        ],
+        'config' => [
+            'class' => 'common\components\Config'
+        ],
+        'auth0' => [
+            'class' => 'common\components\Auth0',
         ],
         'temporaryBucketResourceManager' => [
             'class' => 'common\components\S3ResourceManager',
@@ -101,7 +107,7 @@ return [
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',
-            'token' => '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',
+            'token' => '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',
             'branch' => 'master'
         ],
         'slack' => [
@@ -111,6 +117,9 @@ return [
         ],
         'httpclient' => [
             'class' => 'yii\httpclient\Client',
+        ],
+        'eventManager' => [
+            'class' => 'common\components\EventManager',
         ],
     ],
 ];

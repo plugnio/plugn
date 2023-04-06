@@ -32,7 +32,7 @@ class PaymentGatewayQueueController extends Controller
               'class' => \yii\filters\AccessControl::className(),
               'rules' => [
                   [
-                      'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                      'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
                       'actions' => ['create', 'update', 'delete'],
                       'roles' => ['@'],
                   ],
@@ -71,6 +71,28 @@ class PaymentGatewayQueueController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+    /**
+     * trigger process manually
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionProcess($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->processQueue();
+
+        if ($response['operation'] == 'success')
+        {
+            Yii::$app->session->addFlash('success', $response['message']);
+        } else {
+            Yii::$app->session->addFlash('error', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $model->payment_gateway_queue_id]);
     }
 
     /**

@@ -13,6 +13,7 @@ use common\fixtures\CityFixture;
 use common\fixtures\CountryFixture;
 use common\fixtures\DeliveryZoneFixture;
 use common\fixtures\RestaurantFixture;
+use common\fixtures\BusinessLocationFixture;
 
 
 class AreaDeliveryZoneCest
@@ -30,6 +31,7 @@ class AreaDeliveryZoneCest
             'countries' => CountryFixture::className(),
             'areaDeliveryZone' => AreaDeliveryZoneFixture::className(),
             'deliveryZones' => DeliveryZoneFixture::className(),
+            'businessLocations' => BusinessLocationFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];
@@ -59,14 +61,17 @@ class AreaDeliveryZoneCest
     }
 
     public function tryToDelete(FunctionalTester $I) {
+
         $model = $this->store->getAreaDeliveryZones()->one();
 
         $I->wantTo('Validate area-delivery-zone > delete api');
+        //$I->haveHttpHeader('Store-Id', $model->restaurant_uuid);
         $I->sendDELETE('v1/area-delivery-zone/' . $model->area_delivery_zone);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
     public function tryToUpdate(FunctionalTester $I) {
+
         $model = $this->store->getAreaDeliveryZones()->one();
 
         $dz = $this->store->getDeliveryZones()->one();

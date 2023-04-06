@@ -12,58 +12,8 @@ use agent\models\Area;
 use agent\models\AreaDeliveryZone;
 
 
-class AreaDeliveryZoneController extends Controller
+class AreaDeliveryZoneController extends BaseController
 {
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors ();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className (),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className (),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        $actions = parent::actions ();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
-
     /**
      * only owner will have access
      */
@@ -111,6 +61,7 @@ class AreaDeliveryZoneController extends Controller
     public function actionList()
     {
         $this->ownerCheck();
+
         $page = Yii::$app->request->get ('page');
         $keyword = Yii::$app->request->get ('keyword');
         $city_id = Yii::$app->request->get ('city_id');
@@ -221,27 +172,27 @@ class AreaDeliveryZoneController extends Controller
 
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
 
-        $delivery_zone_model = DeliveryZone::findOne ([
+        $delivery_zone = DeliveryZone::findOne ([
             'delivery_zone_id' => $delivery_zone_id,
-            'restaurant_uuid' => $store_model->restaurant_uuid
+            'restaurant_uuid' => $store->restaurant_uuid
         ]);
 
-        if (!$delivery_zone_model)
+        if (!$delivery_zone)
             throw new NotFoundHttpException('The requested record does not exist.');
 
-        $area_model = Area::findOne (['area_id' => $area_id]);
+        $area = Area::findOne (['area_id' => $area_id]);
 
-        if (!$area_model)
+        if (!$area)
             throw new NotFoundHttpException('The requested record does not exist.');
 
         $model = new AreaDeliveryZone();
-        $model->restaurant_uuid = $store_model->restaurant_uuid;
-        $model->delivery_zone_id = $delivery_zone_model->delivery_zone_id;
-        $model->area_id = $area_model->area_id;
+        $model->restaurant_uuid = $store->restaurant_uuid;
+        $model->delivery_zone_id = $delivery_zone->delivery_zone_id;
+        $model->area_id = $area->area_id;
 
         if (!$model->save ()) {
             return [
@@ -263,29 +214,30 @@ class AreaDeliveryZoneController extends Controller
     public function actionUpdate($area_delivery_zone_id, $store_uuid = null)
     {
         $this->ownerCheck();
+        
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
 
-        $delivery_zone_model = DeliveryZone::findOne ([
+        $delivery_zone = DeliveryZone::findOne ([
             'delivery_zone_id' => $delivery_zone_id,
-            'restaurant_uuid' => $store_model->restaurant_uuid
+            'restaurant_uuid' => $store->restaurant_uuid
         ]);
 
-        if (!$delivery_zone_model)
+        if (!$delivery_zone)
             throw new NotFoundHttpException('The requested record does not exist.');
 
-        $area_model = Area::findOne (['area_id' => $area_id]);
+        $area = Area::findOne (['area_id' => $area_id]);
 
-        if (!$area_model)
+        if (!$area)
             throw new NotFoundHttpException('The requested record does not exist.');
 
         $model = $this->findModel ($area_delivery_zone_id, $store_uuid);
 
-        $model->delivery_zone_id = $delivery_zone_model->delivery_zone_id;
-        $model->area_id = $area_model->area_id;
+        $model->delivery_zone_id = $delivery_zone->delivery_zone_id;
+        $model->area_id = $area->area_id;
 
         if (!$model->save ()) {
             if (isset($model->errors)) {

@@ -21,58 +21,8 @@ use yii\db\Expression;
 use kartik\mpdf\Pdf;
 
 
-class OrderController extends Controller
+class OrderController extends BaseController
 {
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className(),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];//, 'download-invoice'
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        $actions = parent::actions();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
-
     /**
      * list all orders where status = pending or being prepared
      * @param $type
@@ -80,11 +30,11 @@ class OrderController extends Controller
      */
     public function actionLiveOrders()
     {
-        $store_uuid = Yii::$app->request->get('store_uuid');
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $query = Order::find()
-            ->filterBusinessLocationIfManager($store_uuid)
-            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->andWhere(
                 [
                     'order_status' => [
@@ -109,11 +59,11 @@ class OrderController extends Controller
      */
     public function actionArchiveOrders()
     {
-        $store_uuid = Yii::$app->request->get('store_uuid');
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         $query = Order::find()
-            ->filterBusinessLocationIfManager($store_uuid)
-            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->andWhere(
                 [
                     'order_status' => [
@@ -138,7 +88,8 @@ class OrderController extends Controller
      */
     public function actionList($type = null)
     {
-        $store_uuid = Yii::$app->request->get('store_uuid');
+        $store = Yii::$app->accountManager->getManagedAccount();
+
         $keyword = Yii::$app->request->get('keyword');
         $order_uuid = Yii::$app->request->get('order_uuid');
         $phone = Yii::$app->request->get('phone');
@@ -148,8 +99,8 @@ class OrderController extends Controller
         $customer_id = Yii::$app->request->get('customer_id');
 
         $query = Order::find()
-            ->filterBusinessLocationIfManager($store_uuid)
-            ->andWhere(['restaurant_uuid' => $store_uuid]);
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid]);
 
         # as we already doing some search with keyword textbox so reusing that
         if ($order_uuid) {
@@ -183,7 +134,7 @@ class OrderController extends Controller
             $query->filterByKeyword($keyword);
         }
 
-        $query->andWhere(['restaurant_uuid' => $store_uuid]);
+        $query->andWhere(['restaurant_uuid' => $store->restaurant_uuid]);
 
         if ($type == 'active') {
             $query->andWhere(
@@ -505,9 +456,12 @@ class OrderController extends Controller
             ->orderBy(['order_created_at' => SORT_DESC])
             ->one();
 
+        $totalPendingInvoices = $store->getInvoices()->notPaid()->count();
+
         return [
             'totalPendingOrders' => (int)$totalPendingOrders,
-            'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null
+            'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null,
+            'totalPendingInvoices' => (int)$totalPendingInvoices
         ];
     }
 
@@ -517,9 +471,8 @@ class OrderController extends Controller
     public function actionPlaceAnOrder($store_uuid = null)
     {
         $area_id = Yii::$app->request->getBodyParam("area_id");
-        $delivery_zone_id = Yii::$app->request->getBodyParam("area_delivery_zone");
+        $delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
         $country_id = Yii::$app->request->getBodyParam("country_id");
-        $area_delivery_zone = Yii::$app->request->getBodyParam("area_delivery_zone");
 
         $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
@@ -585,7 +538,8 @@ class OrderController extends Controller
 
             if ($area_id) {
 
-                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
+
                 $order->area_id = $area_id;
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
                 $order->block = Yii::$app->request->getBodyParam("block");
@@ -603,8 +557,9 @@ class OrderController extends Controller
                     $order->office = Yii::$app->request->getBodyParam("office");
 
             } //Delivery other countries
-            else if ($country_id && !$area_id) {
-                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+            else if ($country_id && !$area_id)
+            {
+                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
@@ -746,6 +701,10 @@ class OrderController extends Controller
             ];
         }
 
+        //for manual orders
+
+        $order->deductStock();
+
         $transaction->commit();
 
         return [
@@ -762,6 +721,7 @@ class OrderController extends Controller
     {
         $area_id = Yii::$app->request->getBodyParam("area_id");
         $country_id = Yii::$app->request->getBodyParam("country_id");
+        $delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
 
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -853,8 +813,11 @@ class OrderController extends Controller
                 ];
             }
 
-            if ($area_id) {
-                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+            if ($area_id)
+            {
+                //if delivery zone not specified
+
+                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
 
                 if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
                     $order->floor = Yii::$app->request->getBodyParam("floor");
@@ -866,8 +829,9 @@ class OrderController extends Controller
                     $order->office = Yii::$app->request->getBodyParam("office");
 
             } //Delivery other countries
-            else if ($country_id && !$area_id) {
-                $order->delivery_zone_id = $area_delivery_zone->delivery_zone_id;
+            else if ($country_id && !$area_id)
+            {
+                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
@@ -1270,7 +1234,6 @@ class OrderController extends Controller
             ];
         }
 
-
         if (!$model->save()) {
             if (isset($model->errors)) {
                 return [
@@ -1353,13 +1316,12 @@ class OrderController extends Controller
 
     /**
      * Return order detail
-     * @param type $store_uuid
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid = null, $order_uuid)
+    public function actionDetail($order_uuid)
     {
-        return $this->findModel($order_uuid, $store_uuid);
+        return $this->findModel($order_uuid);
     }
 
     /**
@@ -1607,6 +1569,7 @@ class OrderController extends Controller
         $customer_name = Yii::$app->request->getBodyParam('customer_name');
         $area_name = Yii::$app->request->getBodyParam('area_name');
         $area_id = Yii::$app->request->getBodyParam('area_id');
+        $delivery_zone_id = Yii::$app->request->getBodyParam('delivery_zone_id');
         $unit_type = Yii::$app->request->getBodyParam('unit_type');
         $street = Yii::$app->request->getBodyParam('street');
         $avenue = Yii::$app->request->getBodyParam('avenue');
@@ -1660,6 +1623,7 @@ class OrderController extends Controller
         $model->customer_name = $customer_name;
         $model->area_name = $area_name;
         $model->area_id = $area_id;
+        $model->delivery_zone_id = $delivery_zone_id;
         $model->unit_type = $unit_type;
         $model->street = $street;
         $model->avenue = $avenue;
@@ -1672,17 +1636,28 @@ class OrderController extends Controller
         $model->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($estimated_time_of_arrival));
         $model->special_directions = $special_directions;
 
-        if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
-
-            $areaDeliveryZone = AreaDeliveryZone::find()
+        if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
+        {
+            $query = AreaDeliveryZone::find()
                 ->andWhere([
                     'restaurant_uuid' => $restaurant->restaurant_uuid,
                     'area_id' => $model->area_id
-                ])
-                ->one();
+                ]);
 
-            if ($areaDeliveryZone)
-                $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
+            if($model->delivery_zone_id) {
+                $query->andWhere(['delivery_zone_id' => $model->delivery_zone_id]);
+            }
+
+            $areaDeliveryZone = $query->one();
+
+            if (!$areaDeliveryZone) {
+                return [
+                    'operation' => 'error',
+                    'message' => Yii::t('app', "Store does not deliver to this delivery zone.")
+                ];
+            }
+
+            $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
         }
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -1763,6 +1738,10 @@ class OrderController extends Controller
             }
         }
 
+        //for manual orders
+
+        $model->deductStock();
+
         $transaction->commit();
 
         return [
@@ -1771,12 +1750,25 @@ class OrderController extends Controller
         ];
     }
 
-    public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid)
+    /**
+     * refresh payment status from tap api response
+     * @param $order_uuid
+     * @param $store_uuid
+     * @return string[]|void
+     * @throws NotFoundHttpException
+     */
+    public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid = null)
     {
         try {
-            $payment = Payment::findOne(['order_uuid' => $order_uuid]);
 
-            if (($payment = Payment::find()->where(['payment_uuid' => $payment->payment_uuid, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($store_uuid)->restaurant_uuid])->one()) !== null) {
+            $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+            $payment = Payment::find()->where([
+                'order_uuid' => $order_uuid,//$payment->payment_uuid,
+                'restaurant_uuid' => $store->restaurant_uuid
+            ])->one();
+
+            if ($payment !== null) {
 
                 if ($payment->payment_gateway_name == 'tap') {
                     $transaction_id = $payment->payment_gateway_transaction_id;
@@ -1889,15 +1881,13 @@ class OrderController extends Controller
      */
     protected function findModel($order_uuid, $store_uuid = null)
     {
-        if (!$store_uuid) {
-            $store_uuid = Yii::$app->request->headers->get('Store-Id');
-        }
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = Order::find()
-            ->filterBusinessLocationIfManager($store_uuid)
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
             ->andWhere([
                 'order_uuid' => $order_uuid,
-                'restaurant_uuid' => $store_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one();
 

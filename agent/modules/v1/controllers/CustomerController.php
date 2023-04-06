@@ -11,59 +11,8 @@ use agent\models\Customer;
 use agent\models\Order;
 use yii\web\NotFoundHttpException;
 
-class CustomerController extends Controller
+class CustomerController extends BaseController
 {
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors ();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className (),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className (),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        $actions = parent::actions ();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
-
-
     /**
      * Get all store's Customers
      * @param type $id
@@ -74,7 +23,7 @@ class CustomerController extends Controller
     {
         $keyword = Yii::$app->request->get ('keyword');
 
-        Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $query = Customer::find ();
 
@@ -84,7 +33,7 @@ class CustomerController extends Controller
             $query->orWhere (['like', 'customer_email', $keyword]);
         }
 
-        $query->andWhere (['restaurant_uuid' => $store_uuid]);
+        $query->andWhere (['restaurant_uuid' => $store->restaurant_uuid]);
 
         return new ActiveDataProvider([
             'query' => $query
@@ -129,13 +78,13 @@ class CustomerController extends Controller
         //5 min
         set_time_limit(60 * 5);
 
-        $restaurant_model = Yii::$app->accountManager->getManagedAccount ();
+        $restaurant = Yii::$app->accountManager->getManagedAccount ();
 
         $start_date = Yii::$app->request->get('start_date');
         $end_date = Yii::$app->request->get('end_date');
 
         $query = \common\models\Customer::find ()
-            ->andWhere (['restaurant_uuid' => $restaurant_model->restaurant_uuid])
+            ->andWhere (['restaurant_uuid' => $restaurant->restaurant_uuid])
             ->orderBy (['customer_created_at' => SORT_DESC]);
 
         if($start_date && $end_date) {

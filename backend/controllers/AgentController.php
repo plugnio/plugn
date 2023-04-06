@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\Admin;
+use backend\models\AgentAssignmentSearch;
 use Yii;
 use yii\filters\AccessControl;
 use backend\models\Agent;
@@ -34,7 +35,7 @@ class AgentController extends Controller
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [
-                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
                         'actions' => ['create', 'update', 'delete'],
                         'roles' => ['@'],
                     ],
@@ -62,6 +63,29 @@ class AgentController extends Controller
        ]);
     }
 
+    /**
+     * return list of agent for dropdown
+     * @return string
+     */
+    public function actionDropdown()
+    {
+        $fromPager = Yii::$app->request->get('fromPager');
+        //$keyword = Yii::$app->request->get('keyword');
+
+        $searchModel = new AgentSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        if($fromPager) {
+            return $this->renderPartial ('_dropdown_list', [
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+
+        return $this->renderPartial('dropdown', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
 
     /**
      * Displays a single Agent model.
@@ -71,8 +95,14 @@ class AgentController extends Controller
      */
     public function actionView($id)
     {
+        $searchModel = new AgentAssignmentSearch();
+        $searchModel->agent_id = $id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel
         ]);
     }
 

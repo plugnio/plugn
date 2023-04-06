@@ -124,3 +124,11 @@ a.desc:after {
 .role-2 .btn-update {
     display: none;
 }
+
+.list-group .item {
+    cursor: pointer;
+}
+
+.badge-danger {
+    background: red;
+}

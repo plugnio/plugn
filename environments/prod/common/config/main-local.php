@@ -28,7 +28,10 @@ return [
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
-
+        'walletManager' => [
+            'class' => 'common\components\WalletManager',
+            'apiKey' => 'imx4kpyVCXbi7sVy-zEvEITL63sQWisn',//QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG
+        ],
         'resourceManager' => [
             'class' => 'common\components\S3ResourceManager',
             'authMethod' => \common\components\S3ResourceManager::AUTH_VIA_IAM_ROLE,
@@ -80,7 +83,42 @@ return [
                 'port' => 6379,
                 'database' => 1,
             ]
+        ], 
+
+        //aws
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@common/mail',
+            'transport' => [
+                    'class' => 'Swift_SmtpTransport',
+                    'host' => 'email-smtp.eu-west-1.amazonaws.com',
+                    'username' => 'AKIAWMITDJRKTH5HBB2O',
+                    'password' => 'BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ',
+                    'port' => '587',
+                    'encryption' => 'tls',
+            ],
         ],
+        /*
+
+        //mailgun
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@common/mail',
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.eu.mailgun.org',
+                'username' => 'postmaster@plugn.io',
+                'password' => '2d43d23b68911184532de9f81810f5ca-18e06deb-d74119cb',
+                'port' => '587',
+                'encryption' => 'tls',
+                // 'plugins' => [
+                //     [
+                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
+                //     ],
+                // ],
+            ],
+        ],
+        //sendgrid
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
@@ -97,7 +135,7 @@ return [
                 //     ],
                 // ],
             ],
-        ],
+        ],*/
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
         ],
@@ -115,5 +153,11 @@ return [
             'class' => 'common\components\GithubComponent',
             'branch' => 'master'
         ],
+        'apiUrlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'https://api.plugn.io',
+            'enablePrettyUrl' => false,
+            'showScriptName' => false,
+        ]
     ],
 ];

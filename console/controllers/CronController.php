@@ -3,6 +3,8 @@
 namespace console\controllers;
 
 use common\models\Currency;
+use common\models\RestaurantInvoice;
+use common\models\VendorCampaign;
 use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
@@ -44,144 +46,52 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller
 {
+    public function actionIndex() {
+    }
+
+    public function actionTeste()
+    {
+        Yii::$app->eventManager->setUser(1, [
+            "name" => "Rasili"
+        ]);
+
+        Yii::$app->eventManager->track('Test Plugn Event Manager',
+            [
+                'name' => "Rasili"
+            ],
+            null,
+            1
+        );
+    }
 
     /**
      * Weekly Store Summary
      */
     public function actionWeeklyReport()
     {
+        $query = Restaurant::find();
 
-        $stores = Restaurant::find()
-            ->all();
-
-        foreach ($stores as $key => $store) {
-
-
-            //Revenue generated
-            $lastWeekRevenue = $store
-                ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
-
-            $thisWeekRevenue = $store
-                ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
-
-            //Orders received
-            $lastWeekOrdersReceived = $store
-                ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
-
-            $thisWeekOrdersReceived = $store
-                ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
-
-            //customer gained
-            $lastWeekCustomerGained = $store
-                ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
-
-            $thisWeekCustomerGained = $store
-                ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
-
-            // Revenue Generated
-            $revenuePercentage = 0;
-
-            if ($lastWeekRevenue > 0) {
-                if ($thisWeekRevenue > $lastWeekRevenue) { //inc
-                    if ($lastWeekRevenue > 0) {
-                        $increase = $thisWeekRevenue - $lastWeekRevenue;
-
-                        $revenuePercentage = $increase / $lastWeekRevenue * 100;
-                    } else {
-                        $revenuePercentage = 100;
-                    }
-
-                } else if ($thisWeekRevenue < $lastWeekRevenue) { //dec
-                    $decrease = $lastWeekRevenue - $thisWeekRevenue;
-                    $revenuePercentage = $decrease / $lastWeekRevenue * -100;
-                }
+        foreach ($query->batch(100) as $stores) {
+            foreach ($stores as $key => $store) {
+                $store->sendWeeklyReport();
             }
-
-            // Orders received
-            $ordersReceivedPercentage = 0;
-
-
-            if ($thisWeekOrdersReceived > $lastWeekOrdersReceived) { //inc
-                if ($lastWeekOrdersReceived > 0) {
-                    $increase = $thisWeekOrdersReceived - $lastWeekOrdersReceived;
-
-                    $ordersReceivedPercentage = $increase / $lastWeekOrdersReceived * 100;
-                } else {
-                    $ordersReceivedPercentage = 100;
-                }
-
-            } else if ($thisWeekOrdersReceived < $lastWeekOrdersReceived) { //dec
-                $decrease = $lastWeekOrdersReceived - $thisWeekOrdersReceived;
-                $ordersReceivedPercentage = $decrease / $lastWeekOrdersReceived * -100;
-            }
-
-
-            //Customer gained
-            $customerGainedPercentage = 0;
-
-            if ($thisWeekCustomerGained > $lastWeekCustomerGained) { // inc
-                if ($lastWeekCustomerGained > 0) {
-                    $increase = $thisWeekCustomerGained - $lastWeekCustomerGained;
-
-                    $customerGainedPercentage = $increase / $lastWeekCustomerGained * 100;
-                } else {
-                    $customerGainedPercentage = 100;
-                }
-
-            } else if ($thisWeekCustomerGained < $lastWeekCustomerGained) { //dec
-                $decrease = $lastWeekCustomerGained - $thisWeekCustomerGained;
-                $customerGainedPercentage = $decrease / $lastWeekCustomerGained * -100;
-            }
-
-
-            if ($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
-
-                $agentAssignments = $store->getAgentAssignments()
-                    ->andWhere([
-                        'role' => AgentAssignment::AGENT_ROLE_OWNER,
-                        'receive_weekly_stats' => 1
-                    ])
-                    ->all();
-
-                foreach ($agentAssignments as $key => $agentAssignment) {
-
-                    if ($agentAssignment->receive_weekly_stats) {
-
-                        $weeklyStoreSummaryEmail = \Yii::$app->mailer->compose([
-                            'html' => 'weekly-summary',
-                        ], [
-                            'store' => $store,
-                            'agent_name' => $agentAssignment->agent->agent_name,
-                            'revenuePercentage' => $revenuePercentage,
-                            'ordersReceivedPercentage' => $ordersReceivedPercentage,
-                            'customerGainedPercentage' => $customerGainedPercentage,
-                            'thisWeekRevenue' => $thisWeekRevenue,
-                            'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
-                            'thisWeekCustomerGained' => $thisWeekCustomerGained,
-
-                        ])
-                            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                            ->setTo([$agentAssignment->agent->agent_email])
-                            ->setSubject('Weekly Store Summary');
-
-                        if ($key == 0)
-                            $weeklyStoreSummaryEmail->setBcc(\Yii::$app->params['supportEmail']);
-
-                        $weeklyStoreSummaryEmail->send();
-
-                    }
-
-                }
-
-            }
-
         }
 
+        //for unpaid invoices
+
+        $query = RestaurantInvoice::find()
+            ->mailNotSent()
+            ->notPaid();
+
+        foreach ($query->batch(100) as $invoices) {
+            foreach ($invoices as $invoice) {
+                $invoice->sendEmail();
+            }
+        }
     }
 
     public function actionSiteStatus()
     {
-
         $restaurants = Restaurant::find()
             ->andWhere(['has_deployed' => 0])
             ->all();
@@ -216,7 +126,6 @@ class CronController extends \yii\console\Controller
         return self::EXIT_CODE_NORMAL;
     }
 
-
     /**
      * Anything we can help with?
      * Once either when 2 days passed no products added
@@ -224,6 +133,8 @@ class CronController extends \yii\console\Controller
      */
     public function actionRetentionEmailsWhoPassedTwoDaysAndNoProducts()
     {
+        //todo: why processing all stores, when need only with no orders
+
         $stores = Restaurant::find()
             ->joinWith(['items', 'ownerAgent'])
             ->andWhere(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
@@ -259,6 +170,7 @@ class CronController extends \yii\console\Controller
 
     public function actionRetentionEmailsWhoPassedFiveDaysAndNoSales()
     {
+        //todo: why processing all stores, when need only with no orders
 
         $stores = Restaurant::find()
             ->joinWith(['orders', 'ownerAgent'])
@@ -296,7 +208,6 @@ class CronController extends \yii\console\Controller
 
     public function actionDowngradedStoreSubscription()
     {
-
         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d")));
         $end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d")));
 
@@ -304,13 +215,11 @@ class CronController extends \yii\console\Controller
             ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
             // ->andWhere(['notified_email' => 1])
             ->andWhere(['not', ['subscription_end_at' => null]])
-            ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
+            ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])//todo: try DATE mysql function
             ->with(['plan', 'restaurant'])
             ->all();
 
-
         foreach ($subscriptions as $subscription) {
-
 
             if (date('Y-m-d', strtotime($subscription->subscription_end_at)) == date('Y-m-d')) {
 
@@ -344,7 +253,6 @@ class CronController extends \yii\console\Controller
 
     public function actionNotifyAgentsForSubscriptionThatWillExpireSoon()
     {
-
         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") + 5));
         $end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") + 5));
 
@@ -355,7 +263,6 @@ class CronController extends \yii\console\Controller
             ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
             ->with(['plan', 'restaurant'])
             ->all();
-
 
         foreach ($subscriptions as $subscription) {
 
@@ -386,60 +293,92 @@ class CronController extends \yii\console\Controller
 
     }
 
-    public function actionCreatePaymentGatewayAccount()
-    {
+    public function actionTest() {
+        //$tap = PaymentGatewayQueue::find()->offset(1)->one();
 
-        $queue = PaymentGatewayQueue::find()
-            ->where(['queue_status' => Queue::QUEUE_STATUS_PENDING])
-            ->orderBy(['queue_created_at' => SORT_ASC])
-            ->one();
-
-        if ($queue && $queue->restaurant_uuid) {
-            $queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_CREATING;
-            $queue->save();
-        }
+        //$tap->enableGateways();
 
     }
 
+    /**
+     * todo: why cron? when can just proccess form submit
+     */
+    public function actionCreatePaymentGatewayAccount()
+    {
+        $queue = PaymentGatewayQueue::find()
+            ->where(['IN', 'queue_status', [
+                PaymentGatewayQueue::QUEUE_STATUS_PENDING,
+               // PaymentGatewayQueue::QUEUE_STATUS_CREATING,
+               // PaymentGatewayQueue::QUEUE_STATUS_FAILED
+            ]])
+            ->orderBy(['queue_created_at' => SORT_ASC])
+            ->one();
+
+        if ($queue && $queue->restaurant_uuid)
+        {
+            $queue->processQueue();
+            $queue->save();
+        }
+    }
 
     public function actionCreateBuildJsFile()
     {
-
         $queue = Queue::find()
             ->joinWith('restaurant')
             ->andWhere(['queue_status' => Queue::QUEUE_STATUS_PENDING])
             ->orderBy(['queue_created_at' => SORT_ASC])
             ->one();
 
-        if ($queue && $queue->restaurant_uuid) {
+        if ($queue && $queue->restaurant_uuid)
+        {
+            $this->stdout("File is creating for ".$queue->restaurant_uuid."! \n", Console::FG_RED, Console::BOLD);
+
             $queue->queue_status = Queue::QUEUE_STATUS_CREATING;
-            $queue->save();
+
+            if (!$queue->save()) {
+
+                //Yii::error('[Netlify > While Creating new site]' . json_encode($queue->getErrors()), __METHOD__);
+
+                $queue->queue_status = Queue::QUEUE_STATUS_FAILED;
+                $queue->queue_response = print_r($queue->getErrors(), true);
+                $queue->save(false);
+
+                $this->stdout("issue while creating build ! \n", Console::FG_RED, Console::BOLD);
+
+                echo "<pre>";
+                print_r($queue->getErrors());
+                exit;
+
+                return false;
+            }
+
+            $this->stdout("File has created! \n", Console::FG_RED, Console::BOLD);
         }
-
-        $this->stdout("File has been created! \n", Console::FG_RED, Console::BOLD);
-
     }
 
+    /**
+     * update sitemap for search engines
+     * @return false|int
+     */
     public function actionUpdateSitemap()
     {
-
         $stores = Restaurant::find()
             ->andWhere(['sitemap_require_update' => 1])
-            ->andWhere(['or',
+            /*->andWhere(['or',
                 ['version' => 2],
                 ['version' => 3],
                 ['version' => 4]
             ])
-            ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])
+            ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])//todo: extra load on server just for 1 store?
+            */
             ->all();
 
+        foreach ($stores as $key => $store) {
 
-        if ($stores) {
-            foreach ($stores as $key => $store) {
-
-                if ($store && $store->getItems()->count() > 0) {
+                if ($store) {//&& $store->getItems()->count() > 0
 
                     $dirName = "store";
+
                     if (!file_exists($dirName))
                         $createStoreFolder = mkdir($dirName);
 
@@ -452,7 +391,6 @@ class CronController extends \yii\console\Controller
                     fwrite($sitemap, Yii::$app->fileGeneratorComponent->createSitemapXml($store->restaurant_uuid));
                     fclose($sitemap);
 
-
                     //Create sitemap.xml file
                     $fileToBeUploaded = file_get_contents("store/" . $store->store_branch_name . "/sitemap.xml");
 
@@ -464,13 +402,23 @@ class CronController extends \yii\console\Controller
                     if ($getSitemapXmlSHA->isOk && $getSitemapXmlSHA->data) {
 
                         //Replace test with store branch name
-                        $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent($data, $store->store_branch_name, 'src/sitemap.xml', 'Update sitemap', $getSitemapXmlSHA->data['sha']);
+                        $commitSitemapXmlFileResponse = Yii::$app->githubComponent->createFileContent(
+                            $data,
+                            $store->store_branch_name,
+                            'src/sitemap.xml',
+                            'Update sitemap',
+                            $getSitemapXmlSHA->data['sha']);
 
                         if ($commitSitemapXmlFileResponse->isOk) {
 
+                            Restaurant::updateAll([
+                                'sitemap_require_update' => 0
+                            ], [
+                                'restaurant_uuid' => $store->restaurant_uuid
+                            ]);
 
-                            $store->sitemap_require_update = 0;
-                            $store->save(false);
+                            //$store->sitemap_require_update = 0;
+                            //$store->save(false);
 
                             //Delete sitemap file
                             $dirPath = "store/" . $store->store_branch_name;
@@ -498,7 +446,6 @@ class CronController extends \yii\console\Controller
 
                 }
             }
-        }
 
         return self::EXIT_CODE_NORMAL;
     }
@@ -510,14 +457,24 @@ class CronController extends \yii\console\Controller
     public function actionMakeRefund()
     {
         $refunds = Refund::find()
-            ->joinWith(['store', 'payment', 'currency'])
+            ->joinWith(['store', 'payment', 'currency', 'order'])
             ->where(['refund.refund_reference' => null])
-            ->andWhere(['payment.payment_current_status' => 'CAPTURED'])
+            ->andWhere([
+                'order.is_deleted' => 0,
+                'payment.payment_current_status' => 'CAPTURED'
+            ])
             ->andWhere(['NOT', ['refund.payment_uuid' => null]])
             ->andWhere(new Expression('refund_status IS NULL OR refund_status="" or refund_status = "Initiated"'))
             ->all();
 
         foreach ($refunds as $refund) {
+
+            // in case order is deleted but still exist
+
+            if (!$refund->payment) {
+                Yii::error('Refund Error > Payment id not found for refund id (' . $refund->refund_id. '): ');
+                continue;
+            }
 
             if ($refund->store->is_myfatoorah_enable) {
 
@@ -562,7 +519,11 @@ class CronController extends \yii\console\Controller
 
             } else if ($refund->store->is_tap_enable) {
 
-                Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+                Yii::$app->tapPayments->setApiKeys(
+                    $refund->store->live_api_key,
+                    $refund->store->test_api_key,
+                    $refund->payment->is_sandbox
+                );
 
                 $response = Yii::$app->tapPayments->createRefund(
                     $refund->payment->payment_gateway_transaction_id,
@@ -633,7 +594,17 @@ class CronController extends \yii\console\Controller
 
         foreach ($refunds as $refund)
         {
-            Yii::$app->tapPayments->setApiKeys($refund->store->live_api_key, $refund->store->test_api_key);
+            //todo: what if fatoorah used? instead of tap
+
+            if(!$refund->payment) {
+                continue;
+            }
+            
+            Yii::$app->tapPayments->setApiKeys(
+                $refund->store->live_api_key,
+                $refund->store->test_api_key,
+                $refund->payment->is_sandbox
+            );
 
             $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
 
@@ -663,6 +634,7 @@ class CronController extends \yii\console\Controller
     }
 
     /**
+     * todo: remove and auto expire
      * Update voucher status
      */
     public function actionUpdateVoucherStatus()
@@ -687,24 +659,6 @@ class CronController extends \yii\console\Controller
         }
     }
 
-
-    public function actionUpdateStockQty()
-    {
-        $now = new DateTime('now');
-
-        $payments = Payment::find()
-            ->joinWith('order')
-            ->where(['!=', 'payment.payment_current_status', 'CAPTURED'])
-            ->andWhere(['!=', 'payment.payment_current_status', 'Paid'])
-            ->andWhere(['order.order_status' => Order::STATUS_ABANDONED_CHECKOUT])
-            ->andWhere(['order.items_has_been_restocked' => 0]) // if items hasnt been restocked
-            ->andWhere(['<', 'payment.payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
-
-        foreach ($payments->all() as $payment) {
-            $payment->order->restockItems();
-        }
-    }
-
     /**
      * Method called to find old transactions that haven't received callback and force a callback
      */
@@ -717,7 +671,6 @@ class CronController extends \yii\console\Controller
             ->andWhere(['payment_gateway_name' => 'tap'])
             ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
             ->all();
-
 
         if ($payments) {
             foreach ($payments as $payment) {
@@ -746,14 +699,13 @@ class CronController extends \yii\console\Controller
      */
     public function actionSendReminderEmail()
     {
-
         $now = new DateTime('now');
+
         $orders = Order::find()
             ->andWhere(['order_status' => Order::STATUS_PENDING])
             ->andWhere(['reminder_sent' => 0])
             ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
             ->all();
-
 
         if ($orders) {
 
@@ -772,8 +724,7 @@ class CronController extends \yii\console\Controller
                             }
                         }
 
-
-                        $result = \Yii::$app->mailer->compose([
+                        \Yii::$app->mailer->compose([
                             'html' => 'order-reminder-html',
                         ], [
                             'order' => $order,
@@ -804,5 +755,76 @@ class CronController extends \yii\console\Controller
         $response = Currency::getDataFromApi();
 
         $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
+
+        $campaigns = VendorCampaign::find()
+            ->andWhere(['status' => VendorCampaign::STATUS_READY])
+            ->all();
+
+        foreach ($campaigns as $campaign) {
+            $campaign->process();
+        }
+
+        $this->stdout( sizeof($campaigns) . " Campaign processed \n", Console::FG_RED, Console::BOLD);
+
+        //remind failed build
+
+        $failed = Queue::find()->andWhere (['queue_status' => Queue::QUEUE_STATUS_FAILED])
+            ->count();
+
+        if($failed > 0)
+            Yii::error ($failed . ' Stores failed, need to publish manually');
+
+        //alert inactive stores
+
+        $query = Restaurant::find()
+            ->andWhere(['!=', 'restaurant.is_deleted', 1])
+            ->andWhere(new Expression("site_id IS NOT NULL"))
+            ->inActive()
+            ->andWhere(new Expression("warned_delete_at IS NULL AND DATE(restaurant_created_at) < DATE('".
+                date('Y-m-d', strtotime("-30 days"))."')"));
+
+        foreach ($query->batch() as $stores) {
+            foreach ($stores as $store) {
+                $store->alertInActive();
+            }
+        }
+
+        //remove inactive stores
+
+        $query = Restaurant::find()
+            ->andWhere(['!=', 'restaurant.is_deleted', 1])
+            ->andWhere(new Expression("site_id IS NOT NULL"))
+            ->inActive()
+            ->andWhere(new Expression("warned_delete_at IS NOT NULL AND DATE(warned_delete_at) < DATE('".
+                date('Y-m-d', strtotime("-7 days"))."')"));
+
+        foreach ($query->batch() as $stores) {
+            foreach ($stores as $store) {
+                $store->deleteSite();
+            }
+        }
+    }
+
+    /**
+     * https://docs.github.com/en/rest/branches/branches#merge-a-branch
+     */
+    public function actionUpgrade()
+    {
+        $commitMessage = "testing merge";
+
+        //foreach ()
+
+        $head = "master";
+
+        $base = "develop";
+
+        $response = Yii::$app->githubComponent->mergeABranch($commitMessage, $base, $head);
+
+        if($response->statusCode == 201) {
+            echo 'merged';
+        }
+        else if($response->statusCode == 409) {
+            echo 'conflict';
+        }
     }
 }

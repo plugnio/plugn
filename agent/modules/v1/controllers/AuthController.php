@@ -2,7 +2,9 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\AgentToken;
 use agent\models\Currency;
+use agent\models\PaymentMethod;
 use agent\models\Restaurant;
 use common\models\AgentAssignment;
 use common\models\AgentEmailVerifyAttempt;
@@ -65,7 +67,7 @@ class AuthController extends Controller {
                     
                     return null;
                 }
-
+                
                 if ($agent->validatePassword($password)) {
                     return $agent;
                 }
@@ -91,11 +93,11 @@ class AuthController extends Controller {
             'resend-verification-email',
             'verify-email',
             'is-email-verified',
+            'login-auth0'
         ];
 
         return $behaviors;
     }
-
 
     /**
      * @inheritdoc
@@ -139,6 +141,67 @@ class AuthController extends Controller {
     }
 
     /**
+     * login with auth0 token
+     * @return array
+     */
+    public function actionLoginAuth0()
+    {
+        $accessToken = Yii::$app->request->getBodyParam('accessToken');
+
+        $response = Yii::$app->auth0->getUserInfo($accessToken);
+
+        if(!$response->isOk) {
+            return [
+                "operation" => "error",
+                "message" => "Invalid access token"
+            ];
+        }
+
+        $userInfo = $response->data;
+
+        if(!$userInfo || !$userInfo['email'])
+        {
+            return [
+                "operation" => "error",
+                "message" => "We've faced a problem creating your account, please contact us for assistance.",
+            ];
+        }
+
+        $agent = Agent::find()
+            ->andWhere(['agent_email' => $userInfo['email']])
+            ->one();
+
+        /**
+         * redirect to signup page if no account
+         */
+        if(!$agent)
+        {
+            return [
+                "operation" => "error",
+                "code" => 1,
+                "message" => "Account not found"
+            ];
+        }
+
+        // Email and password are correct, check if his email has been verified
+        // If email has been verified, then allow him to log in
+        /*if ($agent->contact_email_verification != Candidate::EMAIL_VERIFIED) {
+
+            //$agent->generateOtp();
+            //$agent->save(false);
+
+            return [
+                "operation" => "error",
+                "errorType" => "email-not-verified",
+                "message" => Yii::t('candidate', "Please click the verification link sent to you by email to activate your account"),
+                "unVerifiedToken" => $this->_loginResponse($agent)
+            ];
+        }*/
+
+        return $this->_loginResponse($agent);
+    }
+
+    /**
      * signup
      * @return array|string[]
      */
@@ -157,11 +220,21 @@ class AuthController extends Controller {
                 "message" => $agent->errors
             ];
         } else {
+
+            if (YII_ENV == 'prod') {
+                $param = [
+                    'email' => Yii::$app->request->getBodyParam('email'),
+                    'password' => Yii::$app->request->getBodyParam('password')
+                ];
+                Yii::$app->auth0->createUser($param);
+            }
+
             return [
                 "operation" => "success"
             ];
         }
     }
+
     /**
      * register user with store
      * @return mixed
@@ -169,6 +242,7 @@ class AuthController extends Controller {
     public function actionSignup() {
 
         $currencyCode = Yii::$app->request->getBodyParam('currency');
+        $accessToken = Yii::$app->request->getBodyParam('accessToken');
 
         $currency = Currency::findOne(['code' => $currencyCode]);
 
@@ -179,8 +253,18 @@ class AuthController extends Controller {
         $agent->setPassword(Yii::$app->request->getBodyParam ('password'));
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
+        if($accessToken) {
+
+            $response = Yii::$app->auth0->getUserInfo ($accessToken);
+
+            if ($response->isOk && $response->data['email']) {
+                $agent->agent_email = $response->data['email'];
+                $agent->agent_email_verification = Agent::EMAIL_VERIFIED;
+            }
+        }
+
         $store = new Restaurant();
-        $store->version = 3;
+        $store->version = Yii::$app->params['storeVersion'];
         $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
         $store->owner_number = Yii::$app->request->getBodyParam ('owner_number');
         $store->owner_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
@@ -192,7 +276,8 @@ class AuthController extends Controller {
         $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
         $store->country_id = Yii::$app->request->getBodyParam ('country_id');
         $store->currency_id = Yii::$app->request->getBodyParam('currency');
-
+        $store->accept_order_247 = Yii::$app->request->getBodyParam('accept_order_247');
+        
         $store->annual_revenue= Yii::$app->request->getBodyParam ('annual_revenue');
 
         $store->restaurant_email = $agent->agent_email;
@@ -249,8 +334,22 @@ class AuthController extends Controller {
             }
 
             //Enable cash by default
+
+            $paymentMethod = PaymentMethod::find()
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_CASH])
+                ->one();
+
+            if(!$paymentMethod) {
+                $paymentMethod = new PaymentMethod();
+                $paymentMethod->payment_method_code =  PaymentMethod::CODE_CASH;
+                $paymentMethod->payment_method_name = "Cash on delivery";
+                $paymentMethod->payment_method_name_ar = "الدفع عند الاستلام";
+                $paymentMethod->vat = 0;
+                $paymentMethod->save(false);
+            }
+
             $payments_method = new RestaurantPaymentMethod();
-            $payments_method->payment_method_id = 3; //Cash
+            $payments_method->payment_method_id = $paymentMethod->payment_method_id; //Cash
             $payments_method->restaurant_uuid = $store->restaurant_uuid;
             
             if (!$payments_method->save()) {
@@ -284,34 +383,40 @@ class AuthController extends Controller {
                 $firstname = $full_name[0];
                 $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
 
-                \Segment::init('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-                \Segment::track([
-                    'userId' => $store->restaurant_uuid,
-                    'event' => 'Store Created',
-                    'type' => 'track',
-                    'properties' => [
+                Yii::$app->eventManager->track('Store Created', [
                         'first_name' => trim($firstname),
                         'last_name' => trim($lastname),
                         'store_name' => $store->name,
                         'phone_number' => $store->owner_phone_country_code . $store->owner_number,
                         'email' => $agent->agent_email,
                         'store_url' => $store->restaurant_domain
-                    ]
-                ]);
-            }
+                    ],
+                    null,
+                    $store->restaurant_uuid
+                );
 
-            $agent->sendVerificationEmail();
+                $param = [
+                    'email' => Yii::$app->request->getBodyParam('email'),
+                    'password' => Yii::$app->request->getBodyParam('password')
+                ];
+                
+                Yii::$app->auth0->createUser($param);
+
+            }
 
             $transaction->commit();
 
-            return [
-                "operation" => "success",
-                "agent_id" => $agent->agent_id,
-                "message" => Yii::t('agent', "Please click on the link sent to you by email to verify your account"),
-                "unVerifiedToken" => $this->_loginResponse($agent)
-            ];
+            if($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED)
+            {
+                $agent->sendVerificationEmail();
 
-            //return $this->_loginResponse($agent);
+                return [
+                    "operation" => "success",
+                    "agent_id" => $agent->agent_id,
+                    "message" => Yii::t('agent', "Please click on the link sent to you by email to verify your account"),
+                    "unVerifiedToken" => $this->_loginResponse($agent)
+                ];
+            }
 
         /*} catch (\Exception $e) {
             $transaction->rollBack();
@@ -321,10 +426,81 @@ class AuthController extends Controller {
             ];
         }*/
 
-        //return $this->_loginResponse ($agent);
+        return $this->_loginResponse ($agent);
 
     }
+    
+    /**
+     * Update email address
+     * @return type
+     */
+    public function actionUpdateEmail() {
+        $unVerifiedToken = Yii::$app->request->getBodyParam("unVerifiedToken");
+        $new_email = Yii::$app->request->getBodyParam("newEmail");
 
+        $agent = Agent::findIdentityByUnVerifiedTokenToken($unVerifiedToken);
+
+        if (!$agent) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        if (!$new_email) {
+            return [
+                "operation" => "error",
+                "message" => Yii::t('agent', "Agent new email address required")
+            ];
+        }
+
+        if ($new_email == $agent->agent_email || $new_email == $agent->agent_new_email) {
+            return [
+                "operation" => "error",
+                "message" => Yii::t('agent', "Agent new email address is same as old email")
+            ];
+        }
+
+        /**
+         * Opt will expiry after 60 minutes, so user have to login back to update
+         * email
+         *
+        if (!$agent->findByOtp($agent->otp, 60)) {
+        return [
+        "operation" => "error-session-expired",
+        "message" => Yii::t('employer', "Session expired, please log back in")
+        ];
+        }*/
+
+        $agent->scenario = AGENT::SCENARIO_UPDATE_EMAIL;
+
+        if ($agent->agent_email_verification == Agent::EMAIL_VERIFIED) {
+            $agent->agent_new_email = $new_email;
+        } else  {
+            $agent->agent_email = $new_email;
+            $agent->agent_new_email = null;
+        }
+
+        if ($agent->save()) {
+
+            //extend otp to fix: https://www.pivotaltracker.com/story/show/169037267
+
+            //$agent->generateOtp();
+
+            //to verify new email address 
+
+            $agent->sendVerificationEmail();
+
+            return [
+                "operation" => "success",
+                "message" => Yii::t('agent', "Agent Account Info Updated Successfully, please check email to verify new email address"),
+                "unVerifiedToken" => $this->_loginResponse($agent)
+            ];
+        } else {
+            return [
+                "operation" => "error",
+                "message" => $agent->errors
+            ];
+        }
+    }
+    
     /**
      * Re-send manual verification email to agent
      * @return array
@@ -390,6 +566,28 @@ class AuthController extends Controller {
         return [
             'operation' => 'success',
             'message' => Yii::t('agent', 'Please click on the link sent to you by email to verify your account'),
+        ];
+    }
+
+    /**
+     * Check if candidate email already verified
+     */
+    public function actionIsEmailVerified() {
+
+        $token = Yii::$app->request->getBodyParam("token");
+
+        $model = AgentToken::find()
+            ->andWhere(['token_value' => $token])
+            ->one();
+
+        if (!$model || !$model->agent) {
+            return [
+                'status' => 0
+            ];
+        }
+
+        return [
+            'status' => $model->agent->agent_new_email ? 0 : $model->agent->agent_email_verification
         ];
     }
 

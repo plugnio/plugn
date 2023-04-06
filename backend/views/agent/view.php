@@ -2,9 +2,12 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use agent\models\AgentAssignment;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Agent */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $searchModel yii\data\ActiveDataProvider */
 
 $this->title = $model->agent_name;
 $this->params['breadcrumbs'][] = ['label' => 'Agents', 'url' => ['index']];
@@ -47,5 +50,43 @@ $this->params['breadcrumbs'][] = $this->title;
             'agent_updated_at:datetime',
         ],
     ]) ?>
+
+    <h3>Agent's stores</h3>
+
+    <?= \yii\grid\GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+            [
+                'attribute' => 'store_name',
+                'value' =>     'restaurant.name'
+            ],
+            [
+                'attribute' => 'agent_name',
+                'value' =>     'agent.agent_name'
+            ],
+
+            [
+                'attribute' => 'role',
+                'format' => 'html',
+                'value' => function ($data) {
+                    if($data->role == AgentAssignment::AGENT_ROLE_OWNER)
+                        $role = 'Owner';
+                    else  if($data->role == AgentAssignment::AGENT_ROLE_BRANCH_MANAGER)
+                        $role = 'Branch Manager';
+                    else
+                        $role = 'Staff';
+
+                    return $role;
+                },
+            ],
+            'assignment_agent_email:email',
+            'assignment_created_at',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
+
 
 </div>

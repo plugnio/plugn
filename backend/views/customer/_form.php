@@ -27,9 +27,7 @@ use borales\extensions\phoneInput\PhoneInput;
     ?>
     <?= $form->field($model, 'customer_email')->textInput(['maxlength' => true, 'type' => 'email']) ?>
 
-    <div class="form-group" style="background: #f4f6f9; padding-bottom: 10px; margin-bottom: 0px; background:#f4f6f9 ">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'style' => 'width: 100%;height: 50px;']) ?>
-    </div>
+    <?= Html::submitButton('Save', ['class' => 'btn btn-primary']) ?>
 
     <?php ActiveForm::end(); ?>
 

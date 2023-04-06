@@ -33,7 +33,7 @@ class PaymentMethodController extends Controller
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [
-                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
                         'actions' => ['create', 'update', 'delete'],
                         'roles' => ['@'],
                     ],
@@ -109,6 +109,34 @@ class PaymentMethodController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+        ]);
+    }
+
+    /**
+     * edit payment gateway settings
+     * @param $code
+     * @return string
+     */
+    public function actionConfig($code)
+    {
+        $name = "\backend\models\payment\\" . $code;
+
+        $model = new $name ;
+
+        if ($model->load($this->request->post()) && $model->save())
+        {
+            Yii::$app->session->setFlash('success', "Extension $code updated.");
+
+            $this->redirect(['index']);
+        }
+
+        /*$settings = Setting::find()
+            ->andWhere(['code' => $code])
+            ->all();*/
+
+        return $this->render('config/' . strtolower($code), [
+            'model' => $model,
+            "code" => $code
         ]);
     }
 

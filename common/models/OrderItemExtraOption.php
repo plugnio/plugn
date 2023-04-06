@@ -55,6 +55,11 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
         ];
     }
 
+    /**
+     * validate option qty
+     * @param $attribute
+     * @return bool
+     */
     public function validateQty($attribute)
     {
         if(
@@ -65,7 +70,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
             return true;
         }
 
-        if($this->qty > $this->extraOption->stock_qty)
+        if($this->extraOption && $this->qty > $this->extraOption->stock_qty)
         {
             $this->addError($attribute, Yii::t('app', "{name} is currently out of stock and unavailable.", [
                 'name' => Yii::$app->language != 'ar'? $this->extraOption->extra_option_name: $this->extraOption->extra_option_name_ar
@@ -189,10 +194,6 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
                         ]));
                 }
 
-                //Update stock qty
-
-                $extra_option_model->decreaseStockQty($this->qty);
-
                 $this->extra_option_name = $extra_option_model->extra_option_name;
                 $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
                 $this->extra_option_price = $extra_option_model->extra_option_price;
@@ -202,9 +203,12 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
                 return false;
             }
 
-        } else {
-            if(!$this->orderItem->item_variant_uuid && $this->orderItem->item && $this->orderItem->item->track_quantity) {
-                if ($extra_option_model && $extra_option_model->stock_qty !== null && $extra_option_model->stock_qty >= $this->qty)
+        }
+        else
+        {
+            if(!$this->orderItem->item_variant_uuid && $this->orderItem->item && $this->orderItem->item->track_quantity)
+            {
+                if ($extra_option_model && $extra_option_model->stock_qty !== null && $extra_option_model->stock_qty < $this->qty)
                     return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
                         'name' => $extra_option_model->extra_option_name
                     ]));

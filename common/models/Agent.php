@@ -23,6 +23,7 @@ use common\models\AgentToken;
  * @property int $receive_weekly_stats
  * @property int $reminder_email
  * @property string $agent_language_pref
+ * @property string $last_active_at
  * @property string $agent_created_at
  * @property string $agent_updated_at
  *
@@ -40,6 +41,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
     const SCENARIO_CHANGE_PASSWORD = 'change-password';
     const SCENARIO_CREATE_NEW_AGENT = 'create';
+    const SCENARIO_UPDATE_EMAIL = 'update-email';
 
     /**
      * Field for temporary password. If set, it will overwrite the old password on save
@@ -77,7 +79,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             [['agent_email'], 'unique'],
             [['agent_email'], 'email'],
             [['tempPassword'], 'required', 'on' => 'create'],
-            [['tempPassword'], 'safe'],
+            [['tempPassword', 'last_active_at'], 'safe'],
             [['agent_password_reset_token'], 'unique'],
         ];
     }
@@ -90,6 +92,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         $scenarios = parent::scenarios ();
 
         $scenarios['updateLanguagePref'] = ['agent_language_pref'];
+
+        $scenarios['update-email'] = ['agent_email', 'agent_new_semail'];
 
         return $scenarios;
     }
@@ -151,6 +155,10 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         }
     }
 
+    /**
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave ($insert, $changedAttributes);
@@ -436,9 +444,30 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
+    public static function findIdentityByUnVerifiedTokenToken($token, $modelClass = "\agent\models\AgentToken") {
+        $token = $modelClass::find()
+            ->andWhere(['token_value' => $token])
+            ->with('agent')
+            ->one();
+
+        //update last used datetime
+
+        $token->token_last_used_datetime = new Expression('NOW()');
+        $token->save ();
+
+        if ($token && $token->agent) {//&& !$token->agent->deleted
+            return $token->agent;
+        }
+
+        //invalid token
+        $token->delete ();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\agent\models\AgentToken")
     {
-
         $token = $modelClass::find ()->where ([
             'token_value' => $token,
             'token_status' => $modelClass::STATUS_ACTIVE
@@ -512,6 +541,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         $category_model->restaurant_uuid = $store->restaurant_uuid;
         $category_model->title = 'Products';
         $category_model->title_ar = 'منتجات';
+
         if (!$category_model->save ()) {
             return [
                 "operation" => "error",
@@ -564,24 +594,21 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             $firstname = $full_name[0];
             $lastname = array_key_exists (1, $full_name) ? $full_name[1] : null;
 
-            \Segment::init ('2b6WC3d2RevgNFJr9DGumGH5lDRhFOv5');
-            \Segment::track ([
-                'userId' => $store->restaurant_uuid,
-                'event' => 'Store Created',
-                'type' => 'track',
-                'properties' => [
+            Yii::$app->eventManager->track('Store Created', [
                     'first_name' => trim ($firstname),
                     'last_name' => trim ($lastname),
                     'store_name' => $store->name,
                     'phone_number' => $store->owner_number,
                     'email' => $this->agent_email,
                     'store_url' => $store->restaurant_domain
-                ]
-            ]);
+                ], 
+                null, 
+                $store->restaurant_uuid
+            );
         }
 
         return [
-            'operation' => 'success',
+            'operation' => 'success'
         ];
     }
 
@@ -601,6 +628,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getAgentAssignments($modelClass = "\common\models\AgentAssignment")
     {
-        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id']);
+        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id'])
+            ->joinWith(['restaurant'])
+            ->andWhere(['restaurant.is_deleted' => false]);
     }
 }

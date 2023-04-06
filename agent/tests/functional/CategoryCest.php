@@ -9,6 +9,7 @@ use common\fixtures\AgentFixture;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\BusinessLocationFixture;
 use common\fixtures\CategoryFixture;
+use common\fixtures\CategoryItemFixture;
 use common\fixtures\CountryFixture;
 use common\fixtures\RestaurantFixture;
 
@@ -23,6 +24,7 @@ class CategoryCest
             'agents' => AgentFixture::className(),
             'agent_assignments' => AgentAssignmentFixture::className(),
             'categories' => CategoryFixture::className(),
+            'categoryItems' => CategoryItemFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];

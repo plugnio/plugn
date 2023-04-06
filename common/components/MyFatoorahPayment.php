@@ -188,14 +188,13 @@ class MyFatoorahPayment extends Component
         parent::init();
     }
 
-
       /**
        * Set the api keys to use
        * @param  [type] $currency [description]
        */
-      public function setApiKeys($currency)
+      public function setApiKeys($currency, $is_sandbox = false)
       {
-          if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+          if (!$is_sandbox && $this->gatewayToUse == self::USE_LIVE_GATEWAY) {
 
                $this->apiEndpoint = $this->liveApiEndpoint;
 
@@ -204,7 +203,6 @@ class MyFatoorahPayment extends Component
                 } else {
                     $this->apiKey = $this->saudiLiveApiKey;
                 }
-
 
           } else {
 
@@ -215,12 +213,8 @@ class MyFatoorahPayment extends Component
               } else {
                   $this->apiKey = $this->kuwaitTestApiKey;
               }
-
           }
-
       }
-
-
 
     /**
      * uploadSupplierDocument

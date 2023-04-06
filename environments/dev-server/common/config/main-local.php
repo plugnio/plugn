@@ -15,7 +15,12 @@ return [
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
-
+        'walletManager' => [
+            'class' => 'common\components\WalletManager',
+            'apiKey' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+            'apiEndpoint' => 'http://localhost/wallet/webhook/web/v1',
+            'companyWalletUserID' => 'user_fcac8a5f-52a2-11ed-a68e-d85ed3a264df'
+        ],
         'resourceManager' => [
             'class' => 'common\components\S3ResourceManager',
             'region' => 'eu-west-2', // Bucket based in London
@@ -73,6 +78,15 @@ return [
             'viewPath' => '@common/mail',
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
+                'host' => 'email-smtp.eu-west-1.amazonaws.com',
+                'username' => 'AKIAWMITDJRKTH5HBB2O',
+                'password' => 'BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ',
+                'port' => '587',
+                'encryption' => 'tls',
+            ],
+            /*
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.sendgrid.net',
                 'username' => 'apikey',
                 'password' => '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',
@@ -83,8 +97,9 @@ return [
                 //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
                 //     ],
                 // ],
-            ],
+            ],*/
         ],
+
         'cache' => [
             // Use Redis as a cache
             'class' => 'yii\redis\Cache',
@@ -111,5 +126,11 @@ return [
             'class' => 'common\components\GithubComponent',
             'branch' => 'develop'
         ],
+        'apiUrlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'https://api.dev.plugn.io',
+            'enablePrettyUrl' => false,
+            'showScriptName' => false,
+        ]
     ],
 ];

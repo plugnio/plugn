@@ -26,9 +26,15 @@ class m211103_105549_currency_conversion_table extends Migration
                 $this->addColumn('currency','rate',$this->double()->after('currency_symbol'));
             }
 
+
             if (!isset($table->columns['sort_order'])) {
                 $this->addColumn('currency','sort_order',$this->smallInteger(3)->defaultValue(0)->notNull()->after('rate'));
             }
+            
+        if (!isset($table->columns['status'])) {
+            $this->addColumn('currency', 'status', $this->tinyInteger(1)
+                ->defaultValue(1)->after('sort_order'));
+        }
 
             if (!isset($table->columns['datetime'])) {
                 $this->addColumn('currency','datetime',$this->dateTime()->after('sort_order'));

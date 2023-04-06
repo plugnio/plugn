@@ -20,9 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 \yii\web\YiiAsset::register($this);
 
-
-
-
 if ($model->recipient_name || $model->recipient_phone_number || $model->gift_message || $model->sender_name) {
   $this->registerCss('
   .content-header-title::after {

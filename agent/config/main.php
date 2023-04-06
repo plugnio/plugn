@@ -46,153 +46,54 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-                [// OrderController
+                [ // AuthController
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/order',
+                    'controller' => 'v1/auth',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET detail' => 'detail',
-                        'GET stats' => 'stats',
-                        'GET orders-report' => 'orders-report',
-                        'GET total-pending' => 'total-pending',
-                        'GET download-invoice/<id>' => 'download-invoice',
-                        'GET archive-orders' => 'archive-orders',
-                        'GET live-orders' => 'live-orders',
-                        'GET <type>' => 'list',
-                        'GET' => 'list',
-                        'POST <store_uuid>' => 'place-an-order',
-                        'POST' => 'place-an-order',
-                        'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
-                        'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
-                        'POST request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'request-payment-status-from-tap',
-                        'POST create/<store_uuid>' => 'create',
-                        'POST create' => 'create',
-                        'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
-                        'PATCH refund/<order_uuid>' => 'refund',
-                        'PATCH update-order-status/<order_uuid>' => 'update-order-status',
-                        'PATCH <order_uuid>' => 'update',
-                        'PATCH <order_uuid>/<store_uuid>' => 'update',
-                        'DELETE soft-delete/<order_uuid>/<store_uuid>' => 'soft-delete',
-                        'DELETE soft-delete/<order_uuid>' => 'soft-delete',
-                        'DELETE <order_uuid>/<store_uuid>' => 'delete',
-                        'DELETE <order_uuid>' => 'delete',
+                        'GET login' => 'login',
+                        'POST signup-step-one' => 'signup-step-one',
+                        'POST login-auth0' => 'login-auth0',
+                        'POST signup' => 'signup',
+                        'PATCH update-password' => 'update-password',
+                        'POST request-reset-password' => 'request-reset-password',
+                        'POST is-email-verified' => 'is-email-verified',
+                        'POST update-email' => 'update-email',
+                        'POST resend-verification-email' => 'resend-verification-email',
+                        'POST verify-email' => 'verify-email',
+                        // OPTIONS VERBS
+                        'OPTIONS login' => 'options',
+                        'OPTIONS login-auth0' => 'options',
+                        'OPTIONS update-password' => 'options',
+                        'OPTIONS request-reset-password' => 'options',
+                        'OPTIONS signup' => 'options',
+                        'OPTIONS is-email-verified' => 'options',
+                        'OPTIONS update-email' => 'options',
+                        'OPTIONS resend-verification-email' => 'options',
+                        'OPTIONS verify-email' => 'options',
+                        'OPTIONS signup-step-one' => 'options'
+                    ]
+                ],
+                [// AgentController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/agent',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'detail',
+                        //todo: update-email
+                        'GET store-profile' => 'store-profile',
+                        'GET stores' => 'stores',
+                        'GET language-pref' => 'language-pref',
+                        'PATCH language-pref' => 'language-pref',
+                        'PUT update' => 'update-agent-profile',
+                        'POST change-password' => 'change-password',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS stats' => 'options',
-                        'OPTIONS total-active' => 'options',
-                        'OPTIONS orders-report' => 'options',
-                        'OPTIONS detail' => 'options',
-                        'OPTIONS download-invoice/<id>' => 'options',
-                        'OPTIONS refund/<order_uuid>' => 'options',
-                        'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
-                        'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
-                        'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
-                        'OPTIONS update-order-status/<order_uuid>' => 'options',
-                        'OPTIONS request-driver-from-armada/<order_uuid>' => 'options',
-                        'OPTIONS request-driver-from-mashkor/<order_uuid>' => 'options',
-                        'OPTIONS <store_uuid>' => 'options',
-                        'OPTIONS <order_uuid>/<store_uuid>' => 'options',
-                        'OPTIONS <order_uuid>' => 'options',
-                        'OPTIONS <type>' => 'options',
-                        'OPTIONS archive-orders' => 'options',
-                        'OPTIONS live-orders' => 'options',
-                        'OPTIONS create/<store_uuid>' => 'options',
-                        'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS soft-delete/<order_uuid>' => 'options',
-                        'OPTIONS request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'options',
-                    ]
-                ],
-                [// OrderItemController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/order-item',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'PATCH' => 'update',
-                        'DELETE' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options'
-                    ]
-                ],
-                [// AreaDeliveryZoneController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/area-delivery-zone',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        'POST create' => 'create',
-                        'PATCH save' => 'save-details',
-                        'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
-                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS save' => 'options',
-                        'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
-                    ]
-                ],
-                [// CampaignController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/campaign',
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET <id>' => 'detail',
-                        'POST' => 'create',
-                        'PATCH <id>' => 'update',
-                        'DELETE <id>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS <id>' => 'options',
-                    ]
-                ],
-                [// CategoryController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/category',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        'GET item-list' => 'item-list',
-                        'POST create' => 'create',
-                        'POST upload-image' => 'upload-category-image',
-                        'POST update-position' => 'change-position',
-                        'PATCH <category_id>/<store_uuid>' => 'update',
-                        'DELETE <category_id>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS <category_id>' => 'options',
-                        'OPTIONS <category_id>/<store_uuid>' => 'options',
-                        'OPTIONS update-position' => 'options',
-                        'OPTIONS item-list' => 'options',
-                    ]
-                ],
-                [ // SitemapController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/sitemap',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'index',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options'
-                    ]
-                ],
-                [// StaffController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/staff',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        'POST create' => 'create',
-                        'PATCH <assignment_id>/<store_uuid>' => 'update',
-                        'DELETE <assignment_id>/<store_uuid>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS <agent_assignment_id>/<store_uuid>' => 'options',
+                        'OPTIONS store-profile' => 'options',
+                        'OPTIONS stores' => 'options',
+                        'OPTIONS update' => 'options',
+                        'OPTIONS change-password' => 'options',
+                        'OPTIONS language-pref' => 'options'
                     ]
                 ],
                 [// BankController
@@ -205,6 +106,79 @@ return [
                         'OPTIONS' => 'options'
                     ]
                 ],
+
+                [// BankDiscountController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/bank-discount',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST' => 'create',
+                        'POST create' => 'create',
+                        'PATCH update-status' => 'update-bank-discount-status',
+                        'PATCH <bank_discount_id>/<store_uuid>' => 'update',
+                        'PATCH <bank_discount_id>' => 'update',
+                        'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
+                        'DELETE <bank_discount_id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS update-status' => 'options',
+                        'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
+                        'OPTIONS <bank_discount_id>' => 'options',
+                        'OPTIONS create' => 'options'
+                    ]
+                ],
+
+                [// BusinessLocationController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/business-location',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST' => 'create',
+                        'POST create' => 'create',
+                        'PATCH <business_location_id>/<store_uuid>' => 'update',
+                        'PATCH <business_location_id>' => 'update',
+                        'DELETE <business_location_id>/<store_uuid>' => 'delete',
+                        'DELETE <business_location_id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <business_location_id>' => 'options',
+                        'OPTIONS <business_location_id>/<store_uuid>' => 'options',
+                    ]
+                ],
+
+                [// CategoryController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/category',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'GET item-list' => 'item-list',
+                        'POST' => 'create',
+                        'POST create' => 'create',
+                        'POST upload-image' => 'upload-category-image',
+                        'POST update-position' => 'change-position',
+                        'PATCH <category_id>/<store_uuid>' => 'update',
+                        'PATCH <category_id>' => 'update',
+                        'DELETE <category_id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <category_id>' => 'options',
+                        'OPTIONS <category_id>/<store_uuid>' => 'options',
+                        'OPTIONS update-position' => 'options',
+                        'OPTIONS item-list' => 'options',
+                    ]
+                ],
+                
                 [// CurrencyController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/currency',
@@ -240,6 +214,171 @@ return [
                         'OPTIONS detail' => 'options'
                     ]
                 ],
+                [// OrderController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/order',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET detail' => 'detail',
+                        'GET stats' => 'stats',
+                        'GET orders-report' => 'orders-report',
+                        'GET total-pending' => 'total-pending',
+                        'GET download-invoice/<id>' => 'download-invoice',
+                        'GET archive-orders' => 'archive-orders',
+                        'GET live-orders' => 'live-orders',
+                        'GET <type>' => 'list',
+                        'GET' => 'list',
+                        'POST' => 'place-an-order',
+                        'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
+                        'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
+                        'POST request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'request-payment-status-from-tap',
+                        'POST request-driver-from-armada/<order_uuid>' => 'request-driver-from-armada',
+                        'POST request-driver-from-mashkor/<order_uuid>' => 'request-driver-from-mashkor',
+                        'POST request-payment-status-from-tap/<order_uuid>' => 'request-payment-status-from-tap',
+                        'POST create/<store_uuid>' => 'create',
+                        'POST create' => 'create',
+                        'POST <store_uuid>' => 'place-an-order',
+                        'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
+                        'PATCH update-order-status/<order_uuid>' => 'update-order-status',
+                        'PATCH update-order-status/<order_uuid>' => 'update-order-status',
+                        'PATCH refund/<order_uuid>' => 'refund',
+                        'PATCH <order_uuid>/<store_uuid>' => 'update',
+                        'PATCH <order_uuid>' => 'update',
+                        'DELETE soft-delete/<order_uuid>/<store_uuid>' => 'soft-delete',
+                        'DELETE soft-delete/<order_uuid>' => 'soft-delete',
+                        'DELETE <order_uuid>/<store_uuid>' => 'delete',
+                        'DELETE <order_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS stats' => 'options',
+                        'OPTIONS total-active' => 'options',
+                        'OPTIONS orders-report' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS download-invoice/<id>' => 'options',
+                        'OPTIONS refund/<order_uuid>' => 'options',
+                        'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS update-order-status/<order_uuid>' => 'options',
+                        'OPTIONS request-driver-from-armada/<order_uuid>' => 'options',
+                        'OPTIONS request-driver-from-mashkor/<order_uuid>' => 'options',
+                        'OPTIONS <store_uuid>' => 'options',
+                        'OPTIONS <order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS <order_uuid>' => 'options',
+                        'OPTIONS <type>' => 'options',
+                        'OPTIONS archive-orders' => 'options',
+                        'OPTIONS live-orders' => 'options',
+                        'OPTIONS create/<store_uuid>' => 'options',
+                        'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS soft-delete/<order_uuid>' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS soft-delete/<order_uuid>' => 'options',
+                        'OPTIONS request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS request-payment-status-from-tap/<order_uuid>' => 'options',
+                    ]
+                ],
+                [// OrderItemController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/order-item',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'PATCH' => 'update',
+                        'DELETE' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+                [
+                    //PlugnUpdateController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/plugn-update',
+                    'patterns' => [
+                        'GET' => 'index',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+                [// AreaDeliveryZoneController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/area-delivery-zone',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'POST create' => 'create',
+                        'PATCH save' => 'save-details',
+                        'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
+                        'PATCH <area_delivery_zone_id>' => 'update',
+                        'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
+                        'DELETE <area_delivery_zone_id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS save' => 'options',
+                        'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',
+                        'OPTIONS <area_delivery_zone_id>' => 'options',
+                    ]
+                ],
+                [// CampaignController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/campaign',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <id>' => 'update',
+                        'DELETE delete/<id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                        'OPTIONS delete/<id>' => 'options',
+                    ]
+                ],
+                [ // SitemapController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/sitemap',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options'
+                    ]
+                ],
+                [// AddonController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/addon',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET callback' => 'callback',
+                        //'GET payment-webhook' => 'payment-webhook',
+                        'GET <id>' => 'detail',
+                        'POST confirm' => 'confirm',
+                        'POST payment-webhook' => 'payment-webhook',
+                        'PATCH payment-webhook' => 'payment-webhook',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options'
+                    ]
+                ],
+                [// StaffController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/staff',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'PATCH <assignment_id>/<store_uuid>' => 'update',
+                        'PATCH <assignment_id>' => 'update',
+                        'DELETE <assignment_id>/<store_uuid>' => 'delete',
+                        'DELETE <assignment_id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS <agent_assignment_id>/<store_uuid>' => 'options',
+                        'OPTIONS <agent_assignment_id>' => 'options',
+                    ]
+                ],
                 [// TicketController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/ticket',
@@ -261,33 +400,11 @@ return [
                     'controller' => 'v1/area',
                     'patterns' => [
                         'GET' => 'list',
+                        'GET delivery-areas' => 'delivery-areas',
                         'GET <id>' => 'detail',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options'
-                    ]
-                ],
-                [// AgentController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/agent',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'detail',
-                        //todo: update-email
-
-                        'GET store-profile' => 'store-profile',
-                        'GET stores' => 'stores',
-                        'GET language-pref' => 'language-pref',
-                        'PATCH language-pref' => 'language-pref',
-                        'PUT update' => 'update-agent-profile',
-                        'POST change-password' => 'change-password',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS store-profile' => 'options',
-                        'OPTIONS stores' => 'options',
-                        'OPTIONS update' => 'options',
-                        'OPTIONS change-password' => 'options',
-                        'OPTIONS language-pref' => 'options'
+                        'OPTIONS <id>' => 'options'
                     ]
                 ],
                 [// VoucherController
@@ -298,33 +415,17 @@ return [
                         'GET' => 'list',
                         'GET detail' => 'detail',
                         'POST create' => 'create',
-                        'PATCH <voucher_id>/<store_uuid>' => 'update',
                         'PATCH update-status' => 'update-voucher-status',
+                        'PATCH <voucher_id>/<store_uuid>' => 'update',
+                        'PATCH <voucher_id>' => 'update',
                         'DELETE <voucher_id>/<store_uuid>' => 'remove',
+                        'DELETE <voucher_id>' => 'remove',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS update-status' => 'options',
                         'OPTIONS <voucher_id>/<store_uuid>' => 'options',
-                        'OPTIONS create' => 'options'
-                    ]
-                ],
-                [// BankDiscountController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/bank-discount',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        'POST create' => 'create',
-                        'PATCH <bank_discount_id>/<store_uuid>' => 'update',
-                        'PATCH update-status' => 'update-bank-discount-status',
-                        'DELETE <bank_discount_id>/<store_uuid>' => 'delete',
-                        // OPTIONS VERBS
-                        'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options',
-                        'OPTIONS update-status' => 'options',
-                        'OPTIONS <bank_discount_id>/<store_uuid>' => 'options',
+                        'OPTIONS <voucher_id>' => 'options',
                         'OPTIONS create' => 'options'
                     ]
                 ],
@@ -337,14 +438,45 @@ return [
                         'GET detail' => 'detail',
                         'POST create' => 'create',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
-                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
+                        'PATCH <delivery_zone_id>' => 'update',
                         'DELETE cancel-override/<delivery_zone_id>/<store_uuid>' => 'cancel-override',
+                        'DELETE cancel-override/<delivery_zone_id>' => 'cancel-override',
+                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
+                        'DELETE <delivery_zone_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS <delivery_zone_id>/<store_uuid>' => 'options',
                         'OPTIONS cancel-override/<delivery_zone_id>/<store_uuid>' => 'options',
+                        'OPTIONS <delivery_zone_id>' => 'options',
+                        'OPTIONS cancel-override/<delivery_zone_id>' => 'options',
+                    ]
+                ],
+                [// MoyasarController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment/moyasar',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'POST' => 'index',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
+                [// StripeController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment/stripe',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'POST' => 'index',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
                     ]
                 ],
                 [// OpeningHoursController
@@ -354,13 +486,17 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET <day_of_week>/<store_uuid>' => 'detail',
+                        'GET <day_of_week>' => 'detail',
                         'POST <store_uuid>' => 'create',
+                        'POST' => 'create',
                         'PATCH <day_of_week>' => 'update',
                         'DELETE <opening_hour_id>/<store_uuid>' => 'delete',
+                        'DELETE <opening_hour_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS <day_of_week>' => 'options',
                         'OPTIONS <opening_hour_id>/<store_uuid>' => 'options',
+                        'OPTIONS <opening_hour_id>' => 'options',
                     ]
                 ],
                 [// WebLinkController
@@ -372,12 +508,15 @@ return [
                         'GET detail' => 'detail',
                         'POST create' => 'create',
                         'PATCH <web_link_id>/<store_uuid>' => 'update',
+                        'PATCH <web_link_id>' => 'update',
                         'DELETE <web_link_id>/<store_uuid>' => 'delete',
+                        'DELETE <web_link_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS <web_link_id>/<store_uuid>' => 'options',
+                        'OPTIONS <web_link_id>' => 'options',
                     ]
                 ],
                 [// ItemController
@@ -391,10 +530,11 @@ return [
                         'POST' => 'create',
                         'POST update-stock' => 'update-stock-qty',
                         'POST update-position' => 'change-position',
-                        'PATCH <id>' => 'update',
                         'PATCH update-status/<id>/<store_uuid>' => 'change-status',
-                        'DELETE <id>' => 'delete',
+                        'PATCH update-status/<id>' => 'change-status',
+                        'PATCH <id>' => 'update',
                         'DELETE delete-image/<id>/<image>' => 'delete-image',
+                        'DELETE <id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS export-to-excel' => 'options',
@@ -403,6 +543,7 @@ return [
                         'OPTIONS update-position' => 'options',
                         'OPTIONS update-stock' => 'options',
                         'OPTIONS update-status/<id>/<store_uuid>' => 'options',
+                        'OPTIONS update-status/<id>' => 'options',
                         'OPTIONS delete-image/<id>/<image>' => 'options',
                     ]
                 ],
@@ -423,21 +564,30 @@ return [
                         'OPTIONS orders' => 'options'
                     ]
                 ],
-                [// BusinessLocationController
+                [// PaymentMethodController
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/business-location',
+                    'controller' => 'v1/payment-method',
                     'pluralize' => false,
                     'patterns' => [
-                        'GET' => 'list',
-                        'GET detail' => 'detail',
-                        'POST create' => 'create',
-                        'PATCH <business_location_id>/<store_uuid>' => 'update',
-                        'DELETE <business_location_id>/<store_uuid>' => 'delete',
+                        'POST config/<code>' => 'config',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS detail' => 'options',
-                        'OPTIONS create' => 'options',
-                        'OPTIONS <business_location_id>/<store_uuid>' => 'options',
+                        'OPTIONS config/<code>' => 'options',
+                    ]
+                ],
+                [// InvoiceController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/invoice',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET callback' => 'callback',
+                        'GET <id>' => 'detail',
+                        'POST payment-webhook' => 'payment-webhook',
+                        'PATCH payment-webhook' => 'payment-webhook',
+                        'POST pay-by-tap' => 'pay-by-tap',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
                     ]
                 ],
                 [// StoreController
@@ -447,25 +597,65 @@ return [
                     'patterns' => [
                         'GET' => 'detail',
                         'GET status' => 'status',
+                        'GET settings/<code>' => 'settings',
+                        'GET test-tap' => 'test-tap',
+                        'GET view-payment-methods' => 'view-payment-methods',
+                        'GET view-payment-methods/<id>' => 'view-payment-methods',
                         'POST' => 'update',
+                        'POST upgrade' => 'upgrade',
                         'POST connect-domain' => 'connect-domain',
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
                         'POST enable-payment-method/<id>/<paymentMethodId>' => 'enable-payment-method',
-                        'GET view-payment-methods/<id>' => 'view-payment-methods',
                         'POST create-tap-account/<id>' => 'create-tap-account',
                         'POST enable-online-payment/<id>' => 'enable-online-payment',
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
                         'POST disable-cod/<id>' => 'disable-cod',
+                        'POST enable-moyasar' => 'enable-moyasar',
+                        'POST disable-moyasar' => 'disable-moyasar',
+                        'POST enable-moyasar/<id>' => 'enable-moyasar',
+                        'POST disable-moyasar/<id>' => 'disable-moyasar',
+
+                        'POST enable-stripe' => 'enable-stripe',
+                        'POST disable-stripe' => 'disable-stripe',
+                        'POST enable-stripe/<id>' => 'enable-stripe',
+                        'POST disable-stripe/<id>' => 'disable-stripe',
+
                         'POST enable-free-checkout/<id>' => 'enable-free-checkout',
                         'POST disable-free-checkout/<id>' => 'disable-free-checkout',
-                        'POST update-layout' => 'update-layout',
                         'POST update-analytics-integration/<id>' => 'update-analytics-integration',
                         'POST update-delivery-integration/<id>' => 'update-delivery-integration',
+                        'POST enable-cod' => 'enable-cod',
+                        'POST disable-cod' => 'disable-cod',
+                        'POST enable-free-checkout' => 'enable-free-checkout',
+                        'POST disable-free-checkout' => 'disable-free-checkout',
+                        
+                        'POST update-analytics-integration' => 'update-analytics-integration',
+                        'POST update-delivery-integration' => 'update-delivery-integration',
+                        'POST update-layout' => 'update-layout',
+                        'POST update-bank-account' => 'update-bank-account',
+                        'POST update-email-settings' => 'update-email-settings',
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
+                        'PATCH process-gateway-queue/<id>' => 'process-gateway-queue',
+                        'DELETE remove-gateway-queue/<id>' => 'remove-gateway-queue',
+                        'PATCH process-gateway-queue' => 'process-gateway-queue',
+                        'DELETE remove-gateway-queue' => 'remove-gateway-queue',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS test-tap' => 'options',
+                        'OPTIONS upgrade' => 'options',
+                        'OPTIONS enable-moyasar' => 'options',
+                        'OPTIONS disable-moyasar' => 'options',
+                        'OPTIONS enable-moyasar/<id>' => 'options',
+                        'OPTIONS disable-moyasar/<id>' => 'options',
+
+                        'OPTIONS enable-stripe' => 'options',
+                        'OPTIONS disable-stripe' => 'options',
+                        'OPTIONS enable-stripe/<id>' => 'options',
+                        'OPTIONS disable-stripe/<id>' => 'options',
+
                         'OPTIONS connect-domain' => 'options',
+                        'OPTIONS update-bank-account' => 'options',
                         'OPTIONS update-delivery-integration/<id>' => 'options',
                         'OPTIONS update-analytics-integration/<id>' => 'options',
                         'OPTIONS disable-payment-method/<id>/<paymentMethodId>' => 'options',
@@ -480,34 +670,19 @@ return [
                         'OPTIONS disable-free-checkout/<id>' => 'options',
                         'OPTIONS update-layout' => 'options',
                         'OPTIONS update-status/<id>/<status>' => 'options',
-                        'OPTIONS status' => 'options'
-                    ]
-                ],
-
-                [ // AuthController
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'v1/auth',
-                    'pluralize' => false,
-                    'patterns' => [
-                        'GET login' => 'login',
-                        'POST signup-step-one' => 'signup-step-one',
-                        'POST signup' => 'signup',
-                        'PATCH update-password' => 'update-password',
-                        'POST request-reset-password' => 'request-reset-password',
-                        'POST is-email-verified' => 'is-email-verified',
-                        'POST update-email' => 'update-email',
-                        'POST resend-verification-email' => 'resend-verification-email',
-                        'POST verify-email' => 'verify-email',
-                        // OPTIONS VERBS
-                        'OPTIONS login' => 'options',
-                        'OPTIONS update-password' => 'options',
-                        'OPTIONS request-reset-password' => 'options',
-                        'OPTIONS signup' => 'options',
-                        'OPTIONS is-email-verified' => 'options',
-                        'OPTIONS update-email' => 'options',
-                        'OPTIONS resend-verification-email' => 'options',
-                        'OPTIONS verify-email' => 'options',
-                        'OPTIONS signup-step-one' => 'options'
+                        'OPTIONS status' => 'options',
+                        'OPTIONS settings/<code>' => 'options',
+                        'OPTIONS update-email-settings' => 'options',
+                        'OPTIONS process-gateway-queue/<id>' => 'options',
+                        'OPTIONS remove-gateway-queue/<id>' => 'options',
+                        'OPTIONS enable-cod' => 'options',
+                        'OPTIONS disable-cod' => 'options',
+                        'OPTIONS enable-free-checkout' => 'options',
+                        'OPTIONS disable-free-checkout' => 'options',
+                        'OPTIONS update-analytics-integration' => 'options',
+                        'OPTIONS update-delivery-integration' => 'options',
+                        'OPTIONS process-gateway-queue' => 'options',
+                        'OPTIONS remove-gateway-queue' => 'options',
                     ]
                 ],
                 [ // StatsController
@@ -527,6 +702,8 @@ return [
                        'GET callback' => 'callback',
                        'GET <id>' => 'view',
                        'POST confirm' => 'confirm',
+                       'POST payment-webhook' => 'payment-webhook',
+                       'PATCH payment-webhook' => 'payment-webhook',
                        // OPTIONS VERBS
                        'OPTIONS <id>' => 'options'
                    ]

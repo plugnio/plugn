@@ -32,7 +32,7 @@ class AdminController extends Controller {
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [
-                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
                         'actions' => ['create', 'update', 'delete'],
                         'roles' => ['@'],
                     ],
@@ -80,11 +80,16 @@ class AdminController extends Controller {
         $model = new Admin();
         $model->scenario = "create";
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            Yii::info('[Admin Added > ' . $model->admin_name . '] By ' . Yii::$app->user->identity->admin_name, __METHOD__);
+            if ($model->save()) {
+                Yii::info('[Admin Added > ' . $model->admin_name . '] By ' . Yii::$app->user->identity->admin_name, __METHOD__);
 
-            return $this->redirect(['view', 'id' => $model->admin_id]);
+                return $this->redirect(['view', 'id' => $model->admin_id]);
+            } else {
+                print_r($model->getErrors());
+                exit;
+            }
         }
 
         return $this->render('create', [

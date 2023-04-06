@@ -16,7 +16,6 @@ use yii\base\InvalidConfigException;
  */
 class FileGeneratorComponent extends Component
 {
-
     /**
      * @inheritdoc
      */
@@ -24,7 +23,6 @@ class FileGeneratorComponent extends Component
     {
         parent::init();
     }
-
 
     /**
      * Check refund object for status updates

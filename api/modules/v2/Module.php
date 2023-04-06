@@ -2,6 +2,10 @@
 
 namespace api\modules\v2;
 
+use common\models\Restaurant;
+use Yii;
+use yii\web\Response;
+
 /**
  * v2 module definition class
  */
@@ -18,6 +22,26 @@ class Module extends \yii\base\Module
     public function init()
     {
         parent::init();
+
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+        $store = Restaurant::findOne($store_id);
+
+        if($store_id && !$store)
+        {
+            \Yii::$app->getResponse()->setStatusCode(404);
+        }
+
+        /*if($store && $store->enable_debugger)
+        {
+            $component = \Yii::$app->getModule('debug');
+
+            //$component->allowedIPs = Yii::$app->request->userIP;
+
+            $component->bootstrap(\Yii::$app);
+
+            \Yii::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE, [$component, 'setDebugHeaders']);
+        }*/
 
         $lang = \Yii::$app->request->headers->get('language');
 

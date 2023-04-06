@@ -9,55 +9,7 @@ use yii\web\NotFoundHttpException;
 use agent\models\Area;
 
 
-class AreaController extends Controller {
-
-    public function behaviors() {
-        $behaviors = parent::behaviors();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className(),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions() {
-        $actions = parent::actions();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
+class AreaController extends BaseController {
 
     /**
      * @return ActiveDataProvider
@@ -69,6 +21,7 @@ class AreaController extends Controller {
         $store_id = Yii::$app->request->get('store_id');
 
         //valdiate access
+        
         if ($store_id) {
             Yii::$app->accountManager->getManagedAccount($store_id);
         }
@@ -86,6 +39,45 @@ class AreaController extends Controller {
 
         if ($keyword) {
             $query->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * @return ActiveDataProvider
+     */
+    public function actionDeliveryAreas() {
+
+        $keyword = Yii::$app->request->get('keyword');
+        $city_id = Yii::$app->request->get('city_id');
+        $store_id = Yii::$app->request->get('store_id');
+
+        //valdiate access
+
+        $store = Yii::$app->accountManager->getManagedAccount($store_id);
+
+        $query = $store->getAreaDeliveryZones();
+
+        if ($city_id) {
+            $query->andWhere(['city_id' => $city_id]);
+        }
+
+        if ($store_id) {
+            //$query->joinWith('restaurant');
+            $query->andWhere(['restaurant_uuid' => $store_id]);
+        }
+
+        if ($keyword) {
+            $query
+                ->joinWith('area')
+            ->andWhere([
                 'OR',
                 ['like', 'area_name', $keyword],
                 ['like', 'area_name_ar', $keyword]

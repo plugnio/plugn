@@ -8,6 +8,7 @@ use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use yii\base\InvalidConfigException;
 
+
 /**
  * TapPayments class for payment processing
  *
@@ -123,6 +124,7 @@ class TapPayments extends Component
      * @var string Variable for test api key to be stored in
      */
     public $vendorTestApiKey;
+
     private $apiEndpoint = "https://api.tap.company/v2";
 
     /**
@@ -146,8 +148,10 @@ class TapPayments extends Component
         // Set the API key we're going to use
         //These keys we will use it to (upload document - create a business - create a merchant - create an operator)
         if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            Yii::info('Plugn Live gateway');
             $this->plugnScretApiKey = $this->plugnLiveApiKey;
         } else {
+            Yii::info('Plugn Sandbox gateway');
             $this->plugnScretApiKey = $this->plugnTestApiKey;
         }
 
@@ -160,14 +164,16 @@ class TapPayments extends Component
      * @param  [type] $testKey [description]
      * @return [type]          [description]
      */
-    public function setApiKeys($liveKey, $testKey)
+    public function setApiKeys($liveKey, $testKey, $is_sandbox = false)
     {
         $this->vendoerLiveApiKey = $liveKey;
         $this->vendorTestApiKey = $testKey;
 
-        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+        if (!$is_sandbox && $this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            Yii::info('Vendor Live gateway'. $this->vendoerLiveApiKey);
             $this->vendorSecretApiKey = $this->vendoerLiveApiKey;
         } else {
+            Yii::info('Vendor Sandbox gateway'. $this->vendorTestApiKey);
             $this->vendorSecretApiKey = $this->vendorTestApiKey;
         }
     }
@@ -289,7 +295,6 @@ class TapPayments extends Component
 
             array_push($bussinessParams['entity']['documents'], $authorizedSignatureDocument);
 
-
             $commercialLicenseDocument = [
                 "type" => "Commercial License",
                 "number" => 1,
@@ -303,13 +308,13 @@ class TapPayments extends Component
 
             array_push($bussinessParams['entity']['documents'], $commercialLicenseDocument);
 
-
             $bussinessParams['entity']['is_licensed'] = 'true';
         } else {
             $bussinessParams['entity']['is_licensed'] = 'false';
         }
 
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($bussinessEndpoint)
@@ -377,6 +382,7 @@ class TapPayments extends Component
         ];
 
         $client = new Client();
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($operatorEndpoint)
@@ -427,8 +433,24 @@ class TapPayments extends Component
     /**
      * Create a charge for redirect
      */
-    public function createCharge($currency, $desc = "Pay", $statementDesc = "", $ref, $amount ,$firstName, $email, $country_code ,$phone,$platform_fee, $redirectUrl, $webhookUrl , $gateway, $warehouse_fee = 0,$warehouse_delivery_charges = 0, $country_name = null)
-    {
+    public function createCharge(
+        $currency,
+        $desc = "Pay",
+        $statementDesc = "",
+        $ref,
+        $amount ,
+        $firstName,
+        $email,
+        $country_code ,
+        $phone,
+        $platform_fee,
+        $redirectUrl,
+        $webhookUrl ,
+        $gateway,
+        $warehouse_fee = 0,
+        $warehouse_delivery_charges = 0,
+        $country_name = null
+    ) {
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
         $phone =  str_replace(' ', '', $phone);
@@ -473,36 +495,45 @@ class TapPayments extends Component
 
 
         if($platform_fee > 0) {
-           if($gateway == static::GATEWAY_KNET) {
+          
+          if($gateway == static::GATEWAY_KNET) {
 
-                 //if greater than 10KD
-                if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee){
-                  $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
-                }
+            //if greater than 10KD
+            if (($amount * $this->knetGatewayFee) >= $this->minKnetGatewayFee) {
+              $platform_fee = $amount *  ( $platform_fee  - $this->knetGatewayFee );
+            }
 
-                 // if amount greater than  4 and  equal 10
-                 else if  ($amount > $this->minChargeAmount && ( ($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){
-                   $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
-                 }
+            // if amount greater than  4 and  equal 10
+            else if  ($amount > $this->minChargeAmount && ( ($amount * $this->knetGatewayFee) < $this->minKnetGatewayFee)){
+               $platform_fee = ($amount *  $platform_fee ) - $this->minKnetGatewayFee;
+            }
 
-                 //if amount less than or equal 4
-                 else if ($this->minChargeAmount >= $amount) {
-                   $platform_fee = 0.100;
-                 }
-
-          } else if($gateway == static::GATEWAY_BENEFIT)
-              $platform_fee = $amount *  ( $platform_fee  - $this->benefitGatewayFee );
-          else
+            //if amount less than or equal 4
+            else if ($this->minChargeAmount >= $amount) {
+               $platform_fee = 0.100;
+            }
+          } 
+          else if($gateway == static::GATEWAY_BENEFIT) 
+          {
+              $platform_fee = $amount *  ($platform_fee  - $this->benefitGatewayFee );
+          }
+          else 
+          {
              $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
+          }
 
-
-           if($warehouse_fee > 0)
+           if($warehouse_fee > 0) 
+           {
              $charge_amount = $warehouse_fee + $platform_fee;
-          else
+           }
+           else 
+           {
                $charge_amount = $platform_fee;
+           }
 
-         if($warehouse_delivery_charges > 0 && $country_name != null && $country_name == 'Kuwait')
-           $charge_amount = $warehouse_delivery_charges + $charge_amount;
+            if($warehouse_delivery_charges > 0 && $country_name != null && $country_name == 'Kuwait') {
+                $charge_amount = $warehouse_delivery_charges + $charge_amount;
+            }
 
            $destination = [
                "id" => $this->destinationId,
@@ -529,8 +560,18 @@ class TapPayments extends Component
            ];
 
            array_push($chargeParams['destinations']['destination'], $destination);
-
          }
+
+         //for debug
+
+        if (YII_ENV == 'prod') {
+             
+            Yii::$app->eventManager->track(
+                'Tap Charge Attempt', 
+                $chargeParams, 
+                null, 
+                'Tap Payments');
+        }
 
         $client = new Client();
 
@@ -571,8 +612,6 @@ class TapPayments extends Component
             "by" => "PROVIDER"
         ];
 
-
-
         $client = new Client();
         $response = $client->createRequest()
                 ->setMethod('POST')
@@ -601,6 +640,34 @@ class TapPayments extends Component
                     'content-type' => 'application/json',
                 ])
                 ->send();
+
+        return $response;
+    }
+
+    /**
+     * Update bank account connected with wallet
+     * @param  string $wallet_id
+     * @param  string $iban
+     * @param  string $swift_code
+     * @param  string $account_number
+     */
+    public function updateBankAccount($wallet_id, $iban, $swift_code = null, $account_number = null)
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('PUT')
+            ->setUrl($this->apiEndpoint . "/bankaccount")
+            ->setData([
+                'iban' => $iban,
+                'swift_code' => $swift_code,
+                'account_number' => $account_number
+            ])
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
 
         return $response;
     }
@@ -645,6 +712,90 @@ class TapPayments extends Component
         return $response;
     }
 
+    /*public function addDestination($display_name)
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl($this->apiEndpoint . "/destination")
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->setData([
+                'display_name' => $display_name,
+                'business_id' => $swift_code,
+                'business_entity_id' => $account_number,
+                "brand_id" => $brand_id,
+                "branch_id" => $branch_id,
+                "bank_account": [
+                    "iban":
+                ],
+                "settlement_by": "Acquirer"
+            ])
+            ->send();
+
+        return $response;
+    }*/
+
+    public function getDestination($destination_id)
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('GET')
+            ->setUrl($this->apiEndpoint . "/destination/" . $destination_id)
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey, 
+                'content-type' => 'application/json',
+            ])
+            ->send();
+
+        return $response;
+    }
+
+    public function listDestination()
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl($this->apiEndpoint . "/destination/list")
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->setData([
+                "period" => [
+                    "date" => [
+                        "from" => 0,
+                        "to" => time()
+                    ]
+                ],
+                "limit" => 20,
+                "page" => 1
+            ])
+            ->send();
+
+        return $response;
+    }
+
+    public function deleteDestination($destination_id)
+    {
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('DELETE')
+            ->setUrl($this->apiEndpoint . "/destination/" .$destination_id)
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
+
+        return $response;
+    }
 
     /**
      * checkTapSignature

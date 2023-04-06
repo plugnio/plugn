@@ -46,7 +46,7 @@ class OrderQuery extends \yii\db\ActiveQuery
         {
             $deliveryZoneQuery = DeliveryZone::find()
                 ->select('delivery_zone_id')
-                ->where(['business_location_id' => $assignment->business_location_id]);
+                ->where(['delivery_zone.business_location_id' => $assignment->business_location_id]);
 
             $this->andWhere([
                 'OR',

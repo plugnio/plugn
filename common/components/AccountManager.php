@@ -7,6 +7,7 @@ use common\models\AgentAssignment;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\InvalidParamException;
+use yii\db\Expression;
 use yii\web\NotFoundHttpException;
 use agent\models\Restaurant;
 
@@ -61,7 +62,9 @@ class AccountManager  extends BaseObject
 
          // Getting a list of Restaurants this agent manages
         // No cache
-        $this->_managedAccounts = Yii::$app->user->identity->getAgentAssignments()->all();
+        $this->_managedAccounts = Yii::$app->user->identity
+            ->getAgentAssignments()
+            ->all();
 
         parent::__construct($config);
     }

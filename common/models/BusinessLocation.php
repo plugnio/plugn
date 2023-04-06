@@ -71,7 +71,8 @@ class BusinessLocation extends \yii\db\ActiveRecord
             'business_location_name_ar' => Yii::t('app','Location Name in Arabic'),
             'support_pick_up' => Yii::t('app','Support Pick Up'),
             'business_location_tax' => Yii::t('app','Tax / VAT'),
-            'max_num_orders' => Yii::t('app','Maximum number of orders')
+            'max_num_orders' => Yii::t('app','Maximum number of orders'),
+            'is_deleted' => Yii::t('app', 'Is Deleted?'),
         ];
     }
 
@@ -111,9 +112,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
 
         if ($this->scenario == self::SCENARIO_DELETE ) {
 
-
             $businessLocationDeliverZones = $this->getDeliveryZones()->all();
-
 
             foreach ($businessLocationDeliverZones as $key => $deliveryZone) {
               \common\models\AreaDeliveryZone::updateAll([
@@ -185,7 +184,8 @@ class BusinessLocation extends \yii\db\ActiveRecord
     //  */
     // public function getDeliveryZones()
     // {
-    //     return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])->joinWith(['areas']);
+    //     return $this->hasMany(DeliveryZone::className(), ['business_location_id' => 'business_location_id'])
+    //  ->andWhere(['delivery_zone.is_deleted' => 0])->joinWith(['areas']);
     // }
 
     /**
@@ -195,7 +195,8 @@ class BusinessLocation extends \yii\db\ActiveRecord
      */
     public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id'])->where(['is_deleted' => 0]);
+        return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id'])
+            ->andWhere(['delivery_zone.is_deleted' => 0]);
     }
 
     /**
@@ -207,7 +208,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
     public function getDeliveryZoneByCountryId($countryId, $modelClass = "\common\models\DeliveryZone")
     {
         return $this->hasMany($modelClass::className(), ['business_location_id' => 'business_location_id'])
-            ->andWhere(['delivery_zone.country_id' => 1]);
+            ->andWhere(['delivery_zone.country_id' => 0]);
     }
 
      /**

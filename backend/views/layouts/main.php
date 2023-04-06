@@ -42,27 +42,46 @@ AppAsset::register($this);
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
-        $menuItems = [
-
-
-            ['label' => 'Stores', 'url' => ['/restaurant/index']],
-            ['label' => 'Orders', 'url' => ['/order/index']],
-            ['label' => 'Agents', 'url' => ['/agent/index']],
-            ['label' => 'Staffs', 'url' => ['/staff/index']],
-            ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
-            ['label' => 'Payment gateway Queue', 'url' => ['/payment-gateway-queue/index']],
-
-
-
-
+        $menuItems = array_merge($menuItems, [
             [
-            'label' => 'Other',
+                'label' => 'Store',
                 'items' => [
-                  ['label' => 'Refund', 'url' => ['/refund/index']],
-                  ['label' => 'Payment', 'url' => ['/payment/index']],
-                  ['label' => 'Subscription Payment', 'url' => ['/subscription-payment/index']],
-                  ['label' => 'Queue', 'url' => ['/queue/index']],
-                  ['label' => 'Subscription', 'url' => ['/subscription/index']],
+                    ['label' => 'Invoices', 'url' => ['/restaurant-invoice/index']],
+                    ['label' => 'Orders', 'url' => ['/order/index']],
+                    ['label' => 'Stores', 'url' => ['/restaurant/index']],
+                    ['label' => 'Queue', 'url' => ['/queue/index']],
+                    ['label' => 'Restaurant Payment Method', 'url' => ['/restaurant-payment-method/index']],
+                    ['label' => 'Opening Hours', 'url' => ['/opening-hour/index']],
+                    ['label' => 'Agents', 'url' => ['/agent/index']],
+                    ['label' => 'Agent Assignment', 'url' => ['/agent-assignment/index']],
+                    ['label' => 'Subscription', 'url' => ['/subscription/index']],
+                    ['label' => 'Customers', 'url' => ['/customer/index']],
+                    ['label' => 'Debugger', 'url' => Yii::$app->apiUrlManager->getBaseUrl(). '/debug'],
+                ]
+            ],
+            [
+                'label' => 'Payment',
+                'items' => [
+                    ['label' => 'Payment gateway Queue', 'url' => ['/payment-gateway-queue/index']],
+                    ['label' => 'Refund', 'url' => ['/refund/index']],
+                    ['label' => 'Payment', 'url' => ['/payment/index']],
+                    ['label' => 'Subscription Payment', 'url' => ['/subscription-payment/index']],
+                ]
+            ],
+            [
+                'label' => 'Marketing',
+                'items' => [
+                    ['label' => 'Vendor campaign', 'url' => ['/vendor-campaign/index']],
+                    ['label' => 'Pre-built email template', 'url' => ['/prebuilt-email-template/index']],
+                    ['label' => 'Vendor email template', 'url' => ['/vendor-email-template/index']],
+                    ['label' => 'Plugn Updates', 'url' => ['/plugn-update/index'] ],
+                ]
+            ],
+            [
+                'label' => 'Settings',
+                'items' => [
+                    ['label' => 'Add-ons', 'url' => ['/addon/index']],
+                    ['label' => 'Staffs', 'url' => ['/staff/index']],
                   ['label' => 'Partner', 'url' => ['/partner/index']],
                   ['label' => 'Country', 'url' => ['/country/index']],
                   ['label' => 'Cities', 'url' => ['/city/index']],
@@ -71,15 +90,11 @@ AppAsset::register($this);
                   ['label' => 'Payments Method', 'url' => ['/payment-method/index']],
                   ['label' => 'Plans', 'url' => ['/plan/index']],
                   ['label' => 'Bank', 'url' => ['/bank/index']],
-                  ['label' => 'Opening Hours', 'url' => ['/opening-hour/index']],
-
                   ['label' => 'Admins', 'url' => ['/admin/index']],
-
+                    ['label' => 'Plugn Settings', 'url' => ['/setting/update']],
                 ],
             ],
-
-
-        ];
+        ]);
 
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
@@ -101,7 +116,9 @@ AppAsset::register($this);
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
+
         <?= Alert::widget() ?>
+
         <?= $content ?>
     </div>
 </div>

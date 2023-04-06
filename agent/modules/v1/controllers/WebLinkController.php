@@ -8,60 +8,8 @@ use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\WebLink;
 
-class WebLinkController extends Controller
+class WebLinkController extends BaseController
 {
-
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors ();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className (),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className (),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        $actions = parent::actions ();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
-
-
     /**
      * Get all web links
      * @param type $id
@@ -98,10 +46,10 @@ class WebLinkController extends Controller
     {
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
 
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = new WebLink();
-        $model->restaurant_uuid = $store_model->restaurant_uuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
         $model->web_link_type = Yii::$app->request->getBodyParam ("web_link_type");
         $model->url = Yii::$app->request->getBodyParam ("url");
         $model->web_link_title = Yii::$app->request->getBodyParam ("web_link_title");
@@ -202,12 +150,12 @@ class WebLinkController extends Controller
      */
     protected function findModel($web_link_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = WebLink::find ()
             ->andWhere ([
                 'web_link_id' => $web_link_id,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one ();
 

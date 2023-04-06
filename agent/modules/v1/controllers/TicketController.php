@@ -10,59 +10,10 @@ use yii\rest\Controller;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
-class TicketController extends Controller
+class TicketController extends BaseController
 {
-    public function behaviors() {
-        $behaviors = parent::behaviors();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => \Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className(),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions() {
-        $actions = parent::actions();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
-
     /**
      * Get all tickets
-     * @param $store_uuid
      * @return ActiveDataProvider
      */
     public function actionList() {
@@ -83,6 +34,8 @@ class TicketController extends Controller
      */
     public function actionCreate() {
 
+        $attachments = Yii::$app->request->getBodyParam("attachments");
+
         $store = Yii::$app->accountManager->getManagedAccount();
 
         $model = new Ticket();
@@ -90,10 +43,13 @@ class TicketController extends Controller
         $model->agent_id =  Yii::$app->user->getId();
         $model->ticket_detail =  Yii::$app->request->getBodyParam("detail");
         $model->ticket_status = Ticket::STATUS_PENDING;
-        $model->attachments = ArrayHelper::getColumn(
-            Yii::$app->request->getBodyParam("attachments"),
-            'Key'
-        );
+
+        if($attachments) {
+            $model->attachments = ArrayHelper::getColumn(
+                $attachments,
+                'Key'
+            );
+        }
 
         if (!$model->save()) {
             return [
@@ -114,6 +70,8 @@ class TicketController extends Controller
      */
     public function actionComment($ticket_uuid) {
 
+        $attachments = Yii::$app->request->getBodyParam("attachments");
+
         //validate access
 
         $this->findModel($ticket_uuid);
@@ -124,10 +82,12 @@ class TicketController extends Controller
         $model->ticket_comment_detail =  Yii::$app->request->getBodyParam("comment_detail");
         //$model->attachments =  Yii::$app->request->getBodyParam("attachments");
 
-        $model->attachments = ArrayHelper::getColumn(
-            Yii::$app->request->getBodyParam("attachments"),
-            'Key'
-        );
+        if($attachments) {    
+            $model->attachments = ArrayHelper::getColumn(
+                Yii::$app->request->getBodyParam("attachments"),
+                'Key'
+            );
+        }
 
         if (!$model->save()) {
             return [

@@ -9,59 +9,8 @@ use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use agent\models\OpeningHour;
 
-class OpeningHoursController extends Controller
+class OpeningHoursController extends BaseController
 {
-
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors ();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className (),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className (),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        $actions = parent::actions ();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
-
     /**
      * only owner will have access
      */
@@ -86,10 +35,10 @@ class OpeningHoursController extends Controller
      */
     public function actionList($store_uuid = null)
     {
-         $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+         $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $query = OpeningHour::find ()
-            ->andWhere (['restaurant_uuid' => $store_model->restaurant_uuid])
+            ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
             ->orderBy (['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC]);
 
         return new ActiveDataProvider([
@@ -105,7 +54,7 @@ class OpeningHoursController extends Controller
     public function actionCreate($store_uuid = null)
     {
 //        $this->ownerCheck();
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
         $opening_hours = Yii::$app->request->getBodyParam ("opening_hours");
 
         if (is_array ($opening_hours) && sizeof ($opening_hours) > 0) {
@@ -113,7 +62,7 @@ class OpeningHoursController extends Controller
             foreach ($opening_hours as $key => $opening_hour) {
 
                 $model = new OpeningHour();
-                $model->restaurant_uuid = $store_model->restaurant_uuid;
+                $model->restaurant_uuid = $store->restaurant_uuid;
 
                 $model->day_of_week = $opening_hour['day_of_week'];
                 $model->open_at = date('H:i:s', strtotime ($opening_hour['open_at']));
@@ -157,20 +106,20 @@ class OpeningHoursController extends Controller
 
         //validate
 
-        $store_model = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount ();
 
         //remove old
 
         OpeningHour::deleteAll ([
             'day_of_week' => $day_of_week,
-            'restaurant_uuid' => $store_model->restaurant_uuid
+            'restaurant_uuid' => $store->restaurant_uuid
         ]);
 
         //add new timeslots
         foreach ($opening_hours as $key => $opening_hour) {
 
              $model = new OpeningHour;
-             $model->restaurant_uuid = $store_model->restaurant_uuid;
+             $model->restaurant_uuid = $store->restaurant_uuid;
              $model->day_of_week = $day_of_week;
              $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
              $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
@@ -211,9 +160,9 @@ class OpeningHoursController extends Controller
     public function actionDetail($store_uuid = null, $day_of_week)
     {
 //        $this->ownerCheck();
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
-        if (($model = OpeningHour::find ()->where (['day_of_week' => $day_of_week, 'restaurant_uuid' => $store_model->restaurant_uuid])) !== null) {
+        if (($model = OpeningHour::find ()->where (['day_of_week' => $day_of_week, 'restaurant_uuid' => $store->restaurant_uuid])) !== null) {
 
             return new ActiveDataProvider([
                 'query' => $model
@@ -262,12 +211,12 @@ class OpeningHoursController extends Controller
      */
     protected function findModel($opening_hour_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = OpeningHour::find ()
             ->where ([
                 'opening_hour_id' => $opening_hour_id,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])->one ();
 
         if ($model !== null) {

@@ -2,6 +2,7 @@
 
 namespace agent\tests;
 
+use common\fixtures\RestaurantPaymentMethodFixture;
 use Yii;
 use agent\models\Agent;
 use agent\models\PaymentMethod;
@@ -25,15 +26,18 @@ class StoreCest
             'agents' => AgentFixture::className(),
             'agent_assignments' => AgentAssignmentFixture::className(),
             'restaurants' => RestaurantFixture::className(),
+            'restaurants' => RestaurantPaymentMethodFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];
     }
 
     public function _before(FunctionalTester $I) {
 
-        $this->agent = Agent::find()->one();//['agent_email_verification'=>1]
+        $this->payment_method = RestaurantPaymentMethod::find()->one();
 
-        $this->store = $this->agent->getAccountsManaged()->one();
+        $this->store = $this->payment_method->restaurant;
+
+        $this->agent = $this->store->getAgents()->one();//['agent_email_verification'=>1]
 
         $this->token = $this->agent->getAccessToken()->token_value;
 
@@ -49,7 +53,6 @@ class StoreCest
     public function tryToDetail(FunctionalTester $I) {
         $I->wantTo('Validate store > detail api');
         $I->sendGET('v1/store', [
-            'store_uuid' => $this->store->restaurant_uuid
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
@@ -57,7 +60,6 @@ class StoreCest
     public function tryToGetStatus(FunctionalTester $I) {
         $I->wantTo('Validate store > status api');
         $I->sendGET('v1/store/status', [
-            'store_uuid' => $this->store->restaurant_uuid
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
@@ -65,7 +67,6 @@ class StoreCest
     public function tryToUpdate(FunctionalTester $I) {
         $I->wantTo('Validate store > update api');
         $I->sendPOST('v1/store', [
-            'store_uuid' => $this->store->restaurant_uuid,
             'email_notification' => 1,
             'mobile_country_code' => 91,
             'phone_number' => 8758702738,
@@ -92,7 +93,8 @@ class StoreCest
     }
 
     public function tryToDisablePaymentMethod(FunctionalTester $I) {
-        $payment_method = PaymentMethod::find()->one();
+
+        $payment_method = $this->store->getPaymentMethods()->one();
 
         $I->wantTo('Validate store > update payment method api');
         $I->sendPOST('v1/store/disable-payment-method/'. $this->store->restaurant_uuid
@@ -102,7 +104,7 @@ class StoreCest
     }
 
     public function tryToEnablePaymentMethod(FunctionalTester $I) {
-        $payment_method = PaymentMethod::find()->one();
+        $payment_method = $this->store->getPaymentMethods()->one();
 
         $I->wantTo('Validate store > enable payment method api');
         $I->sendPOST('v1/store/enable-payment-method/'. $this->store->restaurant_uuid
@@ -112,7 +114,7 @@ class StoreCest
     }
 
     public function tryToViewPaymentMethod(FunctionalTester $I) {
-        $payment_method = PaymentMethod::find()->one();
+        $payment_method = $this->store->getPaymentMethods()->one();
 
         $I->wantTo('Validate store > view payment method api');
         $I->sendGET('v1/store/view-payment-methods/'. $payment_method->payment_method_id, [

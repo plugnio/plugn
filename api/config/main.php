@@ -8,7 +8,7 @@ return [
     'id' => 'app-api',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'api\controllers',
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log'],//'debug'
     'modules' => [
         'v1' => [
             'basePath' => '@api/modules/v1',
@@ -18,6 +18,10 @@ return [
             'basePath' => '@api/modules/v2',
             'class' => 'api\modules\v2\Module',
         ],
+        /*'debug' => [
+            'class' => 'yii\debug\Module',
+            'allowedIPs' => ['*']//'1.2.3.4', '127.0.0.1', '::1'
+        ]*/
     ],
     'components' => [
         'user' => [
@@ -135,17 +139,19 @@ return [
                     'controller' => 'v2/store',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'GET get-opening-hours' => 'get-opening-hours',
-                        'POST get-delivery-time' => 'get-delivery-time',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         'GET <id>' => 'view',
+                        'POST get-delivery-time' => 'get-delivery-time',
                         // OPTIONS VERBS
                         'OPTIONS get-opening-hours' => 'options',
                         'OPTIONS get-delivery-time' => 'options',
                         'OPTIONS locations/<id>' => 'options',
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                         'OPTIONS <id>' => 'options',
+                        'OPTIONS' => 'options',
                     ]
                 ],
                 [// RestaurantDeliveryController
@@ -172,6 +178,34 @@ return [
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
+                [// MoyasarController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/payment/moyasar',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS callback' => 'options',
+                    ]
+                ],
+                [// StripeController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/payment/stripe',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET client-secret' => 'client-secret',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS client-secret' => 'options',
+                        'OPTIONS callback' => 'options',
+                    ]
+                ],
                 [// PaymentMethodController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/payment',
@@ -190,7 +224,11 @@ return [
                     'controller' => 'v1/order',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
+                        'POST init-order/<id>' => 'init-order',
+                        'POST apply-promo-code/<order_uuid>' => 'apply-promo-code',
+                        'POST instruction/<order_uuid>' => 'instruction',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
@@ -201,6 +239,9 @@ return [
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
+                        'OPTIONS init-order/<id>' => 'options',
+                        'POST instruction/<order_uuid>' => 'instruction',
+                        'OPTIONS apply-promo-code/<order_uuid>' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',
@@ -215,9 +256,11 @@ return [
                     'controller' => 'v2/order',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list',
                         'POST payment-webhook' => 'payment-webhook',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST update-armada-order-status' => 'update-armada-order-status',
+                        'POST init-order/<id>' => 'init-order',
                         'POST <id>' => 'place-an-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
@@ -230,6 +273,7 @@ return [
                         'OPTIONS payment-webhook' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS update-armada-order-status' => 'options',
+                        'OPTIONS init-order/<id>' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS check-for-pending-orders/<restaurant_uuid>' => 'options',
                         'OPTIONS callback' => 'options',

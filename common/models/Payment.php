@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -36,6 +37,7 @@ use yii\web\NotFoundHttpException;
  * @property boolean $received_callback
  * @property string $payment_gateway_name
  * @property string|null $partner_payout_uuid
+ * @property boolean $is_sandbox
  * @property Customer $customer
  * @property Order $order
  * @property Restaurant $restaurant
@@ -43,15 +45,12 @@ use yii\web\NotFoundHttpException;
  */
 class Payment extends \yii\db\ActiveRecord
 {
-
     //Values for `payout_status`
     const PAYOUT_STATUS_PENDING = 0;
     const PAYOUT_STATUS_UNPAID = 1;
     const PAYOUT_STATUS_PAID = 2;
 
-
     const SCENARIO_UPDATE_STATUS_WEBHOOK = 'webhook';
-
 
     /**
      * {@inheritdoc}
@@ -76,6 +75,7 @@ class Payment extends \yii\db\ActiveRecord
             [['payment_uuid'], 'string', 'max' => 36],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message', 'payment_token', 'payment_gateway_name'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
+            [['is_sandbox'], 'boolean'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
@@ -140,6 +140,7 @@ class Payment extends \yii\db\ActiveRecord
             'payment_updated_at' => Yii::t('app', 'Last activity'),
             'received_callback' => Yii::t('app', 'Received Callback'),
             'response_message' => Yii::t('app', 'Response Message'),
+            'is_sandbox' => Yii::t('app', 'Is Sandbox'),
         ];
     }
 
@@ -158,13 +159,16 @@ class Payment extends \yii\db\ActiveRecord
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-
         // Request response about it from TAP
-        Yii::$app->tapPayments->setApiKeys($paymentRecord->restaurant->live_api_key, $paymentRecord->restaurant->test_api_key);
+        Yii::$app->tapPayments->setApiKeys(
+            $paymentRecord->restaurant->live_api_key,
+            $paymentRecord->restaurant->test_api_key,
+            $paymentRecord->is_sandbox
+        );
 
         $response = Yii::$app->tapPayments->retrieveCharge($id);
-        $responseContent = json_decode($response->content);
 
+        $responseContent = json_decode($response->content);
 
         // If there's an error from TAP, exit and display error
         if (isset($responseContent->errors)) {
@@ -179,8 +183,8 @@ class Payment extends \yii\db\ActiveRecord
             return $paymentRecord;
         }
 
-
         $paymentRecord->payment_current_status = $responseContent->status; // 'CAPTURED' ?
+
         $paymentRecord->response_message = $responseContent->response->message;
 
         $isError = false;
@@ -219,12 +223,10 @@ class Payment extends \yii\db\ActiveRecord
                     $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFee;
             }
 
-
             if (isset($responseContent->destinations))
                 $paymentRecord->plugn_fee = $responseContent->destinations->amount;
             else
                 $paymentRecord->plugn_fee = 0;
-
 
             // Update payment method used and the order id assigned to it
             if (isset($responseContent->source->payment_method) && $responseContent->source->payment_method)
@@ -235,14 +237,24 @@ class Payment extends \yii\db\ActiveRecord
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
 
+            \common\models\Payment::onPaymentCaptured($paymentRecord);
+
         } else {
+
+            $amount = Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [
+                \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]);
+
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                 . $paymentRecord->customer->customer_name .
-                ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
+                ' tried to pay ' . $amount .
                 ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
                 print_r($responseContent, true), __METHOD__);
+
+            //notify tech team + vendor
+
+            self::notifyTapError($paymentRecord, $responseContent);
         }
 
         $paymentRecord->save();
@@ -262,10 +274,18 @@ class Payment extends \yii\db\ActiveRecord
      * @param string $source                        transaction's source
      * @param string $response_message
      */
-    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
-    {
+    public static function updatePaymentStatus(
+        $id,
+        $status,
+        $destinations = null ,
+        $source = null,
+        $reference,
+        $response_message = null,
+        $responseContent = []
+    ) {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $id]);
+
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
@@ -278,10 +298,8 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord->payment_current_status = $status; // 'CAPTURED' ?
         $paymentRecord->response_message = $response_message;
 
-
         // On Successful Payments
         if ($status == 'CAPTURED') {
-
 
             // KNET Gateway Fee Calculation
             if ($paymentRecord->payment_mode == \common\components\TapPayments::GATEWAY_KNET) {
@@ -313,7 +331,6 @@ class Payment extends \yii\db\ActiveRecord
                     $paymentRecord->payment_gateway_fee = Yii::$app->tapPayments->benefitGatewayFee;
             }
 
-
             if (isset($destinations))
                 $paymentRecord->plugn_fee = $destinations['amount'];
             else
@@ -329,14 +346,18 @@ class Payment extends \yii\db\ActiveRecord
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
 
+            \common\models\Payment::onPaymentCaptured($paymentRecord);
+
         } else {
             Yii::info('[TAP Payment Issue: ' . $paymentRecord->customer->customer_name . ' - #' . $paymentRecord->order_uuid . ']'
                 . $paymentRecord->restaurant->name . ': ' .$paymentRecord->customer->customer_name .
                 ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
-                ' and has failed at gateway. '. $response_message . ' or maybe card issue.', __METHOD__);
+                ' and has failed at gateway. '. print_r($response_message, true) . ' or maybe card issue.', __METHOD__);
 
+            //notify tech team + vendor
+
+            self::notifyTapError($paymentRecord, $responseContent);
         }
-
 
         return $paymentRecord;
     }
@@ -351,6 +372,7 @@ class Payment extends \yii\db\ActiveRecord
     {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\Payment::find()->where(['payment_gateway_invoice_id' => $invoiceId])->one();
+
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
@@ -365,10 +387,13 @@ class Payment extends \yii\db\ActiveRecord
         if (!$responseContent->IsSuccess) {
 
             $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+
             \Yii::error('[Payment Issue]' . $errorMessage, __METHOD__); // Log error faced by user
+
             throw new NotFoundHttpException(json_encode($errorMessage));
 
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
+
             return $paymentRecord;
         }
 
@@ -397,7 +422,7 @@ class Payment extends \yii\db\ActiveRecord
         $paymentRecord->payment_net_amount = (float)$responseContent->Data->Suppliers[0]->DepositShare;
 
         // Failed Payments
-        if ($responseContent->Data->InvoiceTransactions[0]->TransactionStatus != 'Succss') {
+        if ($responseContent->Data->InvoiceTransactions[0]->TransactionStatus != 'Success') {
 
             Yii::info('[MyFatoorah Payment Issue > ' . $paymentRecord->customer->customer_name . ']'
                 . $paymentRecord->customer->customer_name .
@@ -406,6 +431,10 @@ class Payment extends \yii\db\ActiveRecord
 
             Yii::info('[Response from MyFatoorah for Failed Payment] ' .
                 print_r($responseContent, true), __METHOD__);
+        } else {
+
+            \common\models\Payment::onPaymentCaptured($paymentRecord);
+
         }
 
         $paymentRecord->save();
@@ -417,6 +446,47 @@ class Payment extends \yii\db\ActiveRecord
         return $paymentRecord;
     }
 
+    /**
+     * Update Payment's Status from Myfatoorah Payments
+     * @param  [type]  $id                           [description]
+     * @param boolean $responseContent [description]
+     * @return self                                [description]
+     */
+
+    public static function updatePaymentStatusFromMyFatoorahWebhook($invoiceId, $responseContent)
+    {
+        // Look for payment with same Payment Gateway Transaction ID
+        $paymentRecord = \common\models\Payment::find()->where(['payment_gateway_invoice_id' => $invoiceId, 'received_callback' => 0])->one();
+
+        if (!$paymentRecord) {
+            throw new NotFoundHttpException('The requested payment does not exist in our database.');
+        }
+
+        $paymentRecord->payment_current_status = $responseContent['TransactionStatus']; // 'SUCCESS' ?
+        $paymentRecord->received_callback = 1;
+
+        // On Successful Payments
+        /*if ($responseContent['TransactionStatus'] != 'SUCCESS') {
+            $paymentRecord->order->restockItems();
+        }*/
+
+        // Update payment method used and the order id assigned to it
+        if ($responseContent['PaymentMethod'])
+            $paymentRecord->payment_mode = $responseContent['PaymentMethod'];
+        if ($responseContent['ReferenceId'])
+            $paymentRecord->payment_gateway_order_id = $responseContent['ReferenceId'];
+
+        $paymentRecord->save();
+
+        if (
+            $paymentRecord->payment_current_status == 'Paid' ||
+            $paymentRecord->payment_current_status == 'Success' ||
+            $paymentRecord->payment_current_status == 'SUCCESS') {
+            \common\models\Payment::onPaymentCaptured($paymentRecord);
+        }
+
+        return true;
+    }
 
     /**
      * Returns String value of current status
@@ -439,41 +509,6 @@ class Payment extends \yii\db\ActiveRecord
         return "Couldnt find a status";
     }
 
-
-    /**
-     * Update Payment's Status from Myfatoorah Payments
-     * @param  [type]  $id                           [description]
-     * @param boolean $responseContent [description]
-     * @return self                                [description]
-     */
-
-    public static function updatePaymentStatusFromMyFatoorahWebhook($invoiceId, $responseContent)
-    {
-        // Look for payment with same Payment Gateway Transaction ID
-        $paymentRecord = \common\models\Payment::find()->where(['payment_gateway_invoice_id' => $invoiceId, 'received_callback' => 0])->one();
-        if (!$paymentRecord) {
-            throw new NotFoundHttpException('The requested payment does not exist in our database.');
-        }
-
-        $paymentRecord->payment_current_status = $responseContent['TransactionStatus']; // 'SUCCESS' ?
-        $paymentRecord->received_callback = 1;
-
-        // On Successful Payments
-        if ($responseContent['TransactionStatus'] != 'SUCCESS') {
-            $paymentRecord->order->restockItems();
-        }
-
-        // Update payment method used and the order id assigned to it
-        if ($responseContent['PaymentMethod'])
-            $paymentRecord->payment_mode = $responseContent['PaymentMethod'];
-        if ($responseContent['ReferenceId'])
-            $paymentRecord->payment_gateway_order_id = $responseContent['ReferenceId'];
-
-        $paymentRecord->save();
-
-        return true;
-    }
-
     /**
      * @inheritdoc
      */
@@ -489,41 +524,67 @@ class Payment extends \yii\db\ActiveRecord
     //
     // }
 
+    public static function onPaymentCaptured($payment) {
+
+        if(in_array($payment->order->order_status, [
+            Order::STATUS_DRAFT,
+            Order::STATUS_ABANDONED_CHECKOUT
+        ])) {
+
+            $payment->order->changeOrderStatusToPending();
+            $payment->order->sendPaymentConfirmationEmail($payment);
+
+            $invoicePaymentMethods = PaymentMethod::find()
+                ->andWhere(['IN', 'payment_method_code', ["Moyasar", "Stripe"]])
+                ->all();
+
+            $invoicePaymentMethodIds = ArrayHelper::getColumn($invoicePaymentMethods, 'payment_method_id');
+
+            if ($payment->plugn_fee > 0 && in_array($payment->order->payment_method_id, $invoicePaymentMethodIds))
+            {
+                $invoice = RestaurantInvoice::find()
+                    ->andWhere([
+                        'restaurant_uuid' => $payment->restaurant_uuid,
+                        'currency_code' => $payment->order->currency_code,
+                        'invoice_status' => RestaurantInvoice::STATUS_UNPAID
+                    ])->one();
+
+                if(!$invoice) {
+                    $invoice = new RestaurantInvoice();
+                    $invoice->restaurant_uuid = $payment->restaurant_uuid;
+                    $invoice->payment_uuid = $payment->payment_uuid;
+                    $invoice->amount = $payment->plugn_fee;
+                    $invoice->currency_code = $payment->order->currency_code;
+                }
+                else {
+                    $invoice->amount += $payment->plugn_fee;
+                }
+
+                if(!$invoice->save()) {
+                    Yii::error(print_r($invoice->errors, true));
+                }
+
+                $invoice_item = new InvoiceItem();
+                $invoice_item->invoice_uuid = $invoice->invoice_uuid;
+                $invoice_item->order_uuid = $payment->order_uuid;
+                //$invoice_item->comment = $payment->order_uuid;
+                $invoice_item->total = $payment->plugn_fee;
+
+                if(!$invoice_item->save()) {
+                    Yii::error(print_r($invoice->errors, true));
+                }
+            }
+
+            Yii::info("[" . $payment->restaurant->name . ": " . $payment->customer->customer_name . " has placed an order for " .
+                Yii::$app->formatter->asCurrency($payment->payment_amount_charged, $payment->currency->code, [
+                    \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $payment->currency->decimal_place]) . '] ' . 'Paid with ' .
+                $payment->order->payment_method_name, __METHOD__);
+        }
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-
-        if (
-            !$insert &&
-            (
-                isset($changedAttributes['received_callback']) &&
-                $changedAttributes['received_callback'] == 0 &&
-                (
-                    $this->payment_current_status == 'CAPTURED' ||
-                    $this->payment_current_status == 'SUCCESS' ||
-                    $this->payment_current_status == 'Success'
-                ) &&
-                $this->received_callback
-            )
-        ) {
-
-            $this->order->changeOrderStatusToPending();
-            $this->order->sendPaymentConfirmationEmail();
-
-            Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' .
-            $this->order->payment_method_name, __METHOD__);
-
-        }
-
-        if(!$insert && $this->scenario == self::SCENARIO_UPDATE_STATUS_WEBHOOK && isset($changedAttributes['payment_current_status']) && $changedAttributes['payment_current_status'] != 'CAPTURED' && $this->payment_current_status == 'CAPTURED' && $this->order->order_status == Order::STATUS_ABANDONED_CHECKOUT){
-
-          $this->order->changeOrderStatusToPending();
-          $this->order->sendPaymentConfirmationEmail();
-
-          Yii::info("[" . $this->restaurant->name . ": " . $this->customer->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($this->payment_amount_charged, $this->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $this->currency->decimal_place]) . '] ' . 'Paid with ' .
-           $this->order->payment_method_name, __METHOD__);
-
-        }
 
         if ($this->plugn_fee > 0 && $this->partner_fee == 0 && $this->restaurant->referral_code) {
 
@@ -537,6 +598,55 @@ class Payment extends \yii\db\ActiveRecord
                 'payment_uuid' => $this->payment_uuid
             ]);
         }
+    }
+
+    /**
+     * add tap error in log
+     * @param $paymentRecord
+     * @param $responseContent
+     * @return void
+     */
+    public static function notifyTapError($paymentRecord, $responseContent) {
+
+        $model = new PaymentFailed;
+        $model->payment_uuid = $paymentRecord->payment_uuid;
+        $model->order_uuid = $paymentRecord->order_uuid;
+        $model->customer_id = $paymentRecord->customer_id;
+        $model->response = serialize($responseContent);
+
+        if(!$model->save()) {
+            Yii::error($model->errors);
+        }
+
+        /*
+        //$agents = $paymentRecord->restaurant->getAgentAssignments()->all();
+
+        //foreach ($agents as $agentAssignment) {
+        
+            if ($agentAssignment->email_notification) {
+
+                \Yii::$app->mailer->compose([
+                    'html' => 'payment-failed-html',
+                ], [
+                    'payment' => $paymentRecord,
+                    'responseContent' => $responseContent
+                ])
+                    ->setFrom(Yii::$app->params['supportEmail'])//[$fromEmail => $this->restaurant->name]
+                    //->setTo($agentAssignment->agent->agent_email)
+                    ->setTo(Yii::$app->params['supportEmail'])
+                    ->setSubject('Payment failed for order #' . $paymentRecord->order_uuid . ' from ' . $paymentRecord->restaurant->name)
+                    //->setReplyTo($replyTo)
+                    ->send();
+            }
+        }*/
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentFails($modelClass = "\common\models\PaymentFailed")
+    {
+        return $this->hasMany($modelClass::className(), ['payment_uuid' => 'payment_uuid']);
     }
 
     /**
@@ -595,7 +705,6 @@ class Payment extends \yii\db\ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
-
 
     /**
      * Gets query for [[PartnerUu]].

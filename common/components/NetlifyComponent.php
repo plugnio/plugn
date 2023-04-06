@@ -106,7 +106,6 @@ class NetlifyComponent extends Component {
         return $response;
     }
 
-
     /**
      *  Provision SSL for a site
      * @param type $site_id
@@ -126,6 +125,31 @@ class NetlifyComponent extends Component {
                     'User-Agent' => 'request',
                 ])
                 ->send();
+
+        return $response;
+    }
+
+    /**
+     * delete site from netlify
+     * @param $site_id
+     * @return \yii\httpclient\Response
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function deleteSite($site_id) {
+
+        $apiEndpoint = $this->apiEndpoint . "/sites/" . $site_id;
+
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('DELETE')
+            ->setUrl($apiEndpoint)
+            ->addHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'User-Agent' => 'request',
+            ])
+            ->send();
 
         return $response;
     }

@@ -69,17 +69,16 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
 if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->diggipack_customer_id != null)
   $diggipack_customer_id = $model->deliveryZone->businessLocation->diggipack_customer_id;
 
-
 ?>
 
-
-
 <div class="page-title">
-
+    <h1>
+        <?= Html::encode($this->title) ?>
+    </h1>
     <p>
         <?php
         if ($model->order_status != Order::STATUS_ABANDONED_CHECKOUT && $model->order_status != Order::STATUS_DRAFT) {
-            echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice', 'order_uuid' => $model->order_uuid
+            echo Html::a('<i class="feather icon-file-text"></i> View Invoice', ['view-invoice', 'order_uuid' => $model->order_uuid, 'storeUuid' => $model->restaurant_uuid
                 ], ['class' => 'btn btn-outline-primary mr-1 mb-1', 'style' => 'margin-right: 7px']);
         }
         ?>
@@ -184,6 +183,15 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                             'format' => 'html',
                             'value' => function ($data) {
                                 return '<span  style="font-size:25px; font-weight: 700" >' . $data->orderStatusInEnglish . '</span>';
+                            },
+                        ],
+                        [
+                            'label' => 'Store',
+                            'format' => 'raw',
+                            'value' => function ($data) {
+                                return Html::a(
+                                        $data->restaurant->name,
+                                        \yii\helpers\Url::to(['restaurant/view', 'id' => $data->restaurant_uuid]), ['target' => '_blank']);
                             },
                         ],
                         [
@@ -643,10 +651,12 @@ if ($refundDataProvider->totalCount > 0 && $model->payment) {
             <?php
 
             if($model->restaurant->is_tap_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'CAPTURED')
-              echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid], ['class'=>'btn btn-outline-primary']);
+              echo Html::a('Request Payment Status Update from TAP', ['update-payment-status','id' => $model->payment_uuid],
+                  ['class'=>'btn btn-outline-primary']);
 
             // if($model->restaurant->is_myfatoorah_enable && $model->payment_uuid && $model->payment->payment_current_status  != 'Succss')
-            //   echo Html::a('Request Payment Status Update from MyFatoorah', ['update-payment-status','id' => $model->payment_uuid], ['class'=>'btn btn-outline-primary']);
+            //   echo Html::a('Request Payment Status Update from MyFatoorah', ['update-payment-status','id' => $model->payment_uuid],
+            //  ['class'=>'btn btn-outline-primary']);
 
             ?>
 
@@ -667,7 +677,14 @@ DetailView::widget([
             'label' => 'Payment type',
             'format' => 'html',
             'value' => function ($data) {
-                return $data->payment_method_name;
+                 if(!empty($data->payment_method_name))
+                     return $data->payment_method_name;
+                                else if(!empty($data->payment_method_name_ar))
+                                    return $data->payment_method_name_ar;
+                                else if($data->paymentMethod)
+                                    return $data->paymentMethod->payment_method_name;
+                                else
+                                    echo "KNET";
             },
         ],
         [
@@ -735,6 +752,18 @@ DetailView::widget([
 ])
 ?>
 
+
+                <?php if($model->payment && sizeof($model->payment->paymentFails) > 0) { ?>
+                    <h4>Payment failed response</h4>
+                <?php } ?>
+
+                <?php
+                if ($model->payment) {
+                    foreach($model->payment->paymentFails as $paymentFail) { ?>
+                       <pre> <?php print_r(unserialize($paymentFail->response . '')) ?></pre>
+                    <?php }
+                }
+                ?>
             </div>
         </div>
     </div>

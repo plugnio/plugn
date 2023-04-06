@@ -378,7 +378,7 @@ class OrderController extends Controller
 
         $agentAssignment = $restaurant->getAgentAssignments()
             ->where([
-                'restaurant_uuid' => $restaurant->restaurant_uuid,
+                'agent_assignment.restaurant_uuid' => $restaurant->restaurant_uuid,
                 'agent_id' => Yii::$app->user->identity->agent_id
             ])->one();
 
@@ -405,7 +405,7 @@ class OrderController extends Controller
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $agentAssignment = $restaurant->getAgentAssignments()
-            ->where(['restaurant_uuid' => $restaurant->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
+            ->where(['agent_assignment.restaurant_uuid' => $restaurant->restaurant_uuid, 'agent_id' => Yii::$app->user->identity->agent_id])->one();
 
         $searchModel = new OrderSearch();
 
@@ -482,8 +482,8 @@ class OrderController extends Controller
     {
         $order = $this->findModel($order_uuid, $storeUuid);
 
-        if($order_model->businessLocation)
-            $armadaApiKey = $order_model->businessLocation->armada_api_key;
+        if($order->businessLocation)
+            $armadaApiKey = $order->businessLocation->armada_api_key;
 
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery($order, $armadaApiKey);
 
@@ -514,7 +514,7 @@ class OrderController extends Controller
                 Yii::$app->session->setFlash('errorResponse', "Sorry, we couldn't achieve your request at the moment. Please try again later, or contact our customer support.");
                // Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
 
-              Yii::error('Error while requesting driver from Armada  [' . $order_model->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
+              Yii::error('Error while requesting driver from Armada  [' . $order->restaurant->name . '] ' . json_encode($createDeliveryApiResponse));
             }
 
             return $this->redirect(['view', 'id' => $order_uuid, 'storeUuid' => $storeUuid]);
@@ -527,12 +527,12 @@ class OrderController extends Controller
      * Update payment's status
      * @return mixed
      */
-    public function actionUpdatePaymentStatus($id, $storeUuid)
+    public function actionUpdatePaymentStatus($id)
     {
         try {
             $payment = Payment::findOne($id);
 
-            if (($payment = Payment::find()->where(['payment_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+            if ($payment !== null) {
 
                 if ($payment->payment_gateway_name == 'tap') {
                     $transaction_id = $payment->payment_gateway_transaction_id;
@@ -542,7 +542,7 @@ class OrderController extends Controller
                     Payment::updatePaymentStatusFromMyFatoorah($invoice_id, true);
                 }
 
-                return $this->redirect(['view', 'id' => $payment->order_uuid, 'storeUuid' => $storeUuid]);
+                return $this->redirect(['view', 'id' => $payment->order_uuid]);
             }
 
         } catch (\Exception $e) {
@@ -595,7 +595,10 @@ class OrderController extends Controller
      */
     public function actionViewInvoice($order_uuid, $storeUuid)
     {
-        $order = $this->findModel($order_uuid, $storeUuid);
+        $order = Order::find()
+            ->where(['order_uuid' => $order_uuid, 'restaurant_uuid' => $storeUuid])
+            ->with(['restaurant', 'currency', 'country', 'deliveryZone.country', 'paymentMethod'])
+            ->one();
 
         // Item
         $orderItems = new \yii\data\ActiveDataProvider([
@@ -696,15 +699,12 @@ class OrderController extends Controller
 
                 if ($areaDeliveryZone)
                     $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
-
             }
-
 
             if ($model->validate() && $model->save())
                 return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
 
         }
-
         return $this->render('create', [
             'model' => $model,
             'restaurant' => $restaurant
@@ -747,12 +747,10 @@ class OrderController extends Controller
                 $model->area_id = null;
             }
 
-
             if ($model->validate() && $model->save())
                 return $this->redirect(['update', 'id' => $model->order_uuid, 'storeUuid' => $storeUuid]);
 
         }
-
 
         return $this->render('update', [
             'model' => $model,

@@ -18,6 +18,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'tempPassword')->passwordInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'admin_role')->dropDownList(\backend\models\Admin::getRoleList()) ?>
+
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

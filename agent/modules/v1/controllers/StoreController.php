@@ -5,7 +5,11 @@ namespace agent\modules\v1\controllers;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
+use common\components\TapPayments;
+use common\models\Setting;
 use Yii;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
@@ -17,57 +21,8 @@ use agent\models\TapQueue;
 use common\models\PaymentGatewayQueue;
 
 
-class StoreController extends Controller
+class StoreController extends BaseController
 {
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className(),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        $actions = parent::actions();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
 
     /**
      * only owner will have access
@@ -99,9 +54,54 @@ class StoreController extends Controller
      * Return an overview of the store details
      * @param type $store_uuid
      */
-    public function actionDetail($store_uuid)
+    public function actionDetail($store_uuid = null)
     {
         return $this->findModel($store_uuid);
+    }
+
+    /**
+     * test tap connection
+     * @return void
+     */
+    public function actionTestTap()
+    {
+        $store = $this->findModel();
+
+        Yii::$app->tapPayments->setApiKeys(
+            $store->live_api_key,
+            $store->test_api_key
+        );//$order->restaurant->is_sandbox
+
+        $response = Yii::$app->tapPayments->createCharge(
+            $store->currency->code,
+            "Testing integration", // Description
+            $store->name, //Statement Desc.
+            time(), // Reference
+            1,
+            "test name",
+            "test@localhost.com",
+            "+91",
+            "8758702738",
+            0,
+            Url::to(['order/callback'], true),
+            Url::to(['order/payment-webhook'], true),
+            "src_kw.knet",//src_all
+            0,
+            0,
+            'Kuwait'
+        );
+
+        $responseContent = json_decode($response->content);
+
+        if (isset($responseContent->errors)) {
+
+            return [
+                'operation' => 'error',
+                "message" => "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description
+            ];
+        }
+
+        return self::message("success", 'Integration working fine.');
     }
 
     /**
@@ -114,6 +114,7 @@ class StoreController extends Controller
 
         $store->setScenario(Restaurant::SCENARIO_UPDATE);
 
+        $store->is_sandbox = Yii::$app->request->getBodyParam('is_sandbox');
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
         $store->phone_number_country_code = (int) Yii::$app->request->getBodyParam('mobile_country_code');
@@ -122,12 +123,14 @@ class StoreController extends Controller
         $store->name_ar = Yii::$app->request->getBodyParam('name_ar');
         $store->schedule_interval = Yii::$app->request->getBodyParam('schedule_interval');
         $store->schedule_order = Yii::$app->request->getBodyParam('schedule_order');
-        $store->restaurant_email = Yii::$app->request->getBodyParam('store_email');
+        $store->restaurant_email = Yii::$app->request->getBodyParam('restaurant_email');
         $store->tagline = Yii::$app->request->getBodyParam('tagline');
         $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
         $store->meta_description = Yii::$app->request->getBodyParam("meta_description");
         $store->meta_description_ar = Yii::$app->request->getBodyParam("meta_description_ar");
         $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
+        $store->accept_order_247 = Yii::$app->request->getBodyParam('accept_order_247');
+        $store->is_public = Yii::$app->request->getBodyParam('is_public');
 
         $currencyCode = Yii::$app->request->getBodyParam('currency');
 
@@ -193,7 +196,7 @@ class StoreController extends Controller
      * Disable payment method
      * @return mixed
      */
-    public function actionDisablePaymentMethod($id, $paymentMethodId)
+    public function actionDisablePaymentMethod($id = null, $paymentMethodId)
     {
         $model = $this->findModel($id);
 
@@ -206,10 +209,78 @@ class StoreController extends Controller
     }
 
     /**
+     * Update mail settings
+     * @return mixed
+     */
+    public function actionUpdateEmailSettings()
+    {
+        $model = $this->findModel();
+
+        $host = Yii::$app->request->getBodyParam('host');
+        $username = Yii::$app->request->getBodyParam('username');
+        $password = Yii::$app->request->getBodyParam('password');
+        $port = Yii::$app->request->getBodyParam('port');
+        $encryption = Yii::$app->request->getBodyParam('encryption');
+
+        Setting::setConfig($model->restaurant_uuid, 'mail', 'host', $host);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'username', $username);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'password', $password);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'port', $port);
+        Setting::setConfig($model->restaurant_uuid,'mail', 'encryption', $encryption);
+
+        return self::message("success",'Mail settings updated successfully');
+    }
+
+    /**
+     * return settings for specific module
+     * @param $code
+     * @return array|\yii\db\ActiveRecord[]
+     * @throws NotFoundHttpException
+     */
+    public function actionSettings($code)
+    {
+        $model = $this->findModel();
+
+        $settings = $model->getSettings()
+            ->andWhere(['code' => $code])
+            ->all();
+
+        return ArrayHelper::map($settings, 'key', 'value');
+    }
+
+    /**
+     * upgrade store
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionUpgrade()
+    {
+        $store = $this->findModel();
+
+        $response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        if ($response->isOk)
+        {
+            //$store->sitemap_require_update = 1;
+            $store->version = Yii::$app->params['storeVersion'];
+            $store->save(false);
+
+            return self::message("success","Store will be updated in 2-5 min!");
+        }
+
+        Yii::error('[Github > Error While merging with master]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            return [
+                'operation' => 'error',
+                'message' => $response->data['message']
+            ];
+    }
+
+    /**
      * Enable payment method
      * @return mixed
      */
-    public function actionEnablePaymentMethod($id, $paymentMethodId)
+    public function actionEnablePaymentMethod($id = null, $paymentMethodId)
     {
         $model = $this->findModel($id);
 
@@ -227,7 +298,7 @@ class StoreController extends Controller
      * View payment settings page
      * @return mixed
      */
-    public function actionViewPaymentMethods($id)
+    public function actionViewPaymentMethods($id = null)
     {
         $model = $this->findModel($id);
 
@@ -239,11 +310,48 @@ class StoreController extends Controller
     }
 
     /**
+     * Update bank account in tap account
+     * @return array
+     */
+    public function actionUpdateBankAccount()
+    {
+        $model = $this->findModel();
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_BANK);
+
+        $model->iban = Yii::$app->request->getBodyParam('iban');
+
+        if(!$model->save()) {
+            return [
+                'operation' => 'success',
+                'message' => $model->errors
+            ];
+        }
+
+        Yii::$app->tapPayments->setApiKeys(
+            $model->live_api_key,
+            $model->test_api_key,
+            false// $this->is_sandbox
+        );
+
+        $result = Yii::$app->tapPayments->updateBankAccount($model->wallet_id, $model->iban);
+
+        //print_r($result->content);
+
+        //Yii::debug($result);
+
+        return [
+            'operation' => 'error',
+            'message' => "Bank detail updated successfully"
+        ];
+    }
+
+    /**
      * Create tap account
      * @param type $id
      * @return array
      */
-    public function actionCreateTapAccount($id)
+    public function actionCreateTapAccount($id = null)
     {
         $model = $this->findModel($id);
 
@@ -259,11 +367,13 @@ class StoreController extends Controller
         $model->business_type = Yii::$app->request->getBodyParam('business_type');
         $model->license_number = Yii::$app->request->getBodyParam('license_number');
         $model->iban = Yii::$app->request->getBodyParam('iban');
-        $model->identification_file_front_side = Yii::$app->request->getBodyParam('identification_file_front_side');
-        $model->identification_file_back_side = Yii::$app->request->getBodyParam('identification_file_back_side');
 
-        $model->commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
-        $model->authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
+        //file urls
+
+        $identification_file_front_side = Yii::$app->request->getBodyParam('identification_file_front_side');
+        $identification_file_back_side = Yii::$app->request->getBodyParam('identification_file_back_side');
+        $commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
+        $authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
 
         if ($model->country && $model->country->iso != 'KW') {
             $model->business_type = 'corp';
@@ -272,6 +382,7 @@ class StoreController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
+
             if (!$model->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
@@ -279,10 +390,13 @@ class StoreController extends Controller
 
             /*-------- uploading documents-------*/
 
+            //if provided + changed
+
             if (
-                $model->identification_file_front_side &&
+                $identification_file_front_side &&
+                $model->identification_file_front_side != $identification_file_front_side &&
                 !$model->uploadFileFromAwsToCloudinary(
-                    $model->identification_file_front_side,
+                    $identification_file_front_side,
                     'identification_file_front_side'
                 )
             ) {
@@ -291,9 +405,10 @@ class StoreController extends Controller
             }
 
             if (
-                $model->identification_file_back_side &&
+                $identification_file_back_side &&
+                $model->identification_file_back_side != $identification_file_back_side &&
                 !$model->uploadFileFromAwsToCloudinary(
-                    $model->identification_file_back_side,
+                    $identification_file_back_side,
                     'identification_file_back_side'
                 )
             ) {
@@ -302,9 +417,10 @@ class StoreController extends Controller
             }
 
             if (
-                $model->commercial_license_file &&
+                $commercial_license_file &&
+                $model->commercial_license_file != $commercial_license_file &&
                 !$model->uploadFileFromAwsToCloudinary(
-                    $model->commercial_license_file,
+                    $commercial_license_file,
                     'commercial_license_file'
                 )
             ) {
@@ -313,9 +429,10 @@ class StoreController extends Controller
             }
 
             if (
-                $model->authorized_signature_file &&
+                $authorized_signature_file &&
+                $model->authorized_signature_file != $authorized_signature_file &&
                 !$model->uploadFileFromAwsToCloudinary(
-                    $model->authorized_signature_file,
+                    $authorized_signature_file,
                     'authorized_signature_file'
                 )
             ) {
@@ -330,7 +447,6 @@ class StoreController extends Controller
             $payment_gateway_queue->restaurant_uuid = $model->restaurant_uuid;
             $payment_gateway_queue->payment_gateway =  'tap';
 
-
             if (!$payment_gateway_queue->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
@@ -341,11 +457,12 @@ class StoreController extends Controller
 
             $transaction->commit();
 
-            return self::message("success","Your request has been successfully submitted");
+            return self::message("success", "Your request has been successfully submitted");
         }
         catch (\Exception $e)
         {
             $transaction->rollBack();
+
             return self::message("error",$e->getMessage());
         }
     }
@@ -353,7 +470,7 @@ class StoreController extends Controller
     /**
      *  Enable OnlinePayment
      */
-    public function actionEnableOnlinePayment($id)
+    public function actionEnableOnlinePayment($id = null)
     {
         $model = $this->findModel($id);
 
@@ -416,7 +533,7 @@ class StoreController extends Controller
     /**
      *  Disable OnlinePayment
      */
-    public function actionDisableOnlinePayment($id)
+    public function actionDisableOnlinePayment($id = null)
     {
         $model = $this->findModel($id);
 
@@ -442,7 +559,7 @@ class StoreController extends Controller
     /**
      *  Enable Cash on delivery
      */
-    public function actionEnableCod($id)
+    public function actionEnableCod($id = null)
     {
         $model = $this->findModel($id);
 
@@ -476,7 +593,7 @@ class StoreController extends Controller
     /**
      *  Disable Cash on delivery
      */
-    public function actionDisableCod($id)
+    public function actionDisableCod($id = null)
     {
         $model = $this->findModel($id);
 
@@ -496,9 +613,137 @@ class StoreController extends Controller
     }
 
     /**
+     *  Enable Moyasar
+     */
+    public function actionEnableMoyasar($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_MOYASAR])
+            ->exists();
+
+        if ($payment_method) {
+            return self::message("error",'Moyasar already enabled');
+        }
+
+        $codPaymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_MOYASAR])
+            ->one();
+
+        if(!$codPaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+        }
+
+        $payments_method = new RestaurantPaymentMethod();
+        $payments_method->payment_method_id = $codPaymentMethod->payment_method_id;
+        $payments_method->restaurant_uuid = $model->restaurant_uuid;
+
+        if (!$payments_method->save()) {
+            return self::message("error",$payments_method->getErrors());
+        }
+
+        return self::message("success","Moyasar enabled successfully");
+    }
+
+    /**
+     *  Disable Moyasar
+     */
+    public function actionDisableMoyasar($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_MOYASAR])
+            ->one();
+
+        if (!$payment_method) {
+            throw new BadRequestHttpException('The requested record does not exist.');
+        }
+
+        if (!$payment_method->delete()) {
+            return self::message("error", $payment_method->getErrors());
+        }
+
+        Setting::deleteAll([
+                'restaurant_uuid' => $model->restaurant_uuid,
+                'code' => PaymentMethod::CODE_MOYASAR
+            ]);
+
+        return self::message("success", "Moyasar disabled successfully");
+    }
+
+    /**
+     * enable stripe
+     * @param $id
+     * @return array
+     */
+    public function actionEnableStripe($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPE])
+            ->exists();
+
+        if ($payment_method) {
+            return self::message("error",'Stripe already enabled');
+        }
+
+        $codPaymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPE])
+            ->one();
+
+        if(!$codPaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+        }
+
+        $payments_method = new RestaurantPaymentMethod();
+        $payments_method->payment_method_id = $codPaymentMethod->payment_method_id;
+        $payments_method->restaurant_uuid = $model->restaurant_uuid;
+
+        if (!$payments_method->save()) {
+            return self::message("error", $payments_method->getErrors());
+        }
+
+        return self::message("success","Stripe enabled successfully");
+    }
+
+    /**
+     *  Disable Stripe
+     */
+    public function actionDisableStripe($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPE])
+            ->one();
+
+        if (!$payment_method) {
+            throw new BadRequestHttpException('The requested record does not exist.');
+        }
+
+        if (!$payment_method->delete()) {
+            return self::message("error", $payment_method->getErrors());
+        }
+
+        Setting::deleteAll([
+            'restaurant_uuid' => $model->restaurant_uuid,
+            'code' => PaymentMethod::CODE_STRIPE
+        ]);
+
+        return self::message("success", "Stripe disabled successfully");
+    }
+
+    /**
      *  Enable Free Checkout
      */
-    public function actionEnableFreeCheckout($id)
+    public function actionEnableFreeCheckout($id = null)
     {
         $model = $this->findModel($id);
 
@@ -533,7 +778,7 @@ class StoreController extends Controller
     /**
      *  Disable Free Checkout
      */
-    public function actionDisableFreeCheckout($id)
+    public function actionDisableFreeCheckout($id = null)
     {
         $model = $this->findModel($id);
 
@@ -615,12 +860,14 @@ class StoreController extends Controller
 
         $themeData = Yii::$app->request->getBodyParam('restaurantTheme');
 
-        $restaurantTheme->primary = $themeData['primary'];
-        $restaurantTheme->secondary = $themeData['secondary'];
-        $restaurantTheme->tertiary = $themeData['tertiary'];
-        $restaurantTheme->light = $themeData['light'];
-        $restaurantTheme->medium = $themeData['medium'];
-        $restaurantTheme->dark = $themeData['dark'];
+        if($themeData) {
+            $restaurantTheme->primary = $themeData['primary'];
+            $restaurantTheme->secondary = $themeData['secondary'];
+            $restaurantTheme->tertiary = $themeData['tertiary'];
+            $restaurantTheme->light = $themeData['light'];
+            $restaurantTheme->medium = $themeData['medium'];
+            $restaurantTheme->dark = $themeData['dark'];
+        }
 
         if(!$restaurantTheme->save()) {
             $transaction->rollBack ();
@@ -634,6 +881,45 @@ class StoreController extends Controller
         $transaction->commit ();
 
         return self::message("success","Layout updated successfully");
+    }
+
+    /**
+     * process payment gateway queue
+     * @return void
+     */
+    public function actionProcessGatewayQueue($id = null)
+    {
+        $model = $this->findModel($id);
+
+        if(
+            !$model->paymentGatewayQueue ||
+            $model->paymentGatewayQueue->queue_status == PaymentGatewayQueue::QUEUE_STATUS_COMPLETE
+        )
+        {
+            return self::message("error", "Payment gateway already active");
+        }
+
+        return $model->paymentGatewayQueue->processQueue();
+    }
+
+    /**
+     * remove payment gateway queue
+     * @return void
+     */
+    public function actionRemoveGatewayQueue($id = null)
+    {
+        $store = $this->findModel($id);
+
+        PaymentGatewayQueue::deleteAll(['restaurant_uuid' => $id]);
+
+        $store->payment_gateway_queue_id = null; 
+        $store->is_tap_enable = false;
+
+        if(!$store->save(false)) {
+            return self::message("error", $store->errors);
+        }
+
+        return self::message("success", "Payment gateway queue removed");
     }
 
     /**
@@ -695,7 +981,7 @@ class StoreController extends Controller
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionStatus($store_uuid) {
+    public function actionStatus($store_uuid = null) {
 
         $model = $this->findModel($store_uuid);
 
@@ -713,7 +999,7 @@ class StoreController extends Controller
      * @throws NotFoundHttpException
      * update store status
      */
-    public function actionUpdateStoreStatus($id,$status) {
+    public function actionUpdateStoreStatus($id = null, $status) {
 
         $model = $this->findModel($id);
 
@@ -739,7 +1025,7 @@ class StoreController extends Controller
      * @return Restaurant the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($store_uuid)
+    protected function findModel($store_uuid =  null)
     {
         $model = Yii::$app->accountManager->getManagedAccount($store_uuid);
 

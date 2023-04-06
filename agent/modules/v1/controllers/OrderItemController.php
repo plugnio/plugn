@@ -9,55 +9,7 @@ use agent\models\Order;
 use agent\models\OrderItem;
 
 
-class OrderItemController extends Controller {
-
-    public function behaviors() {
-        $behaviors = parent::behaviors();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
-
-              return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions() {
-        $actions = parent::actions();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
+class OrderItemController extends BaseController {
 
     /**
      * Delete Order Item
@@ -71,6 +23,7 @@ class OrderItemController extends Controller {
         $model = $this->findModel($order_item_id, $order_uuid ,$store_uuid);
         
         $model->qty = Yii::$app->request->getBodyParam("qty");
+        
         $model->customer_instruction = Yii::$app->request->getBodyParam("customer_instructions");
         
           if (!$model->save()) {

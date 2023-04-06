@@ -21,7 +21,7 @@ $(function () {
 $this->registerJs($js);
 ?>
 
-                    <div class="order-search">
+                    <div class="order-search row">
 
                         <?php
                         $form = ActiveForm::begin([
@@ -30,38 +30,30 @@ $this->registerJs($js);
                         ]);
                         ?>
 
-                        <div class="col-6">
+                        <div class="col-md-2">
                             <?= $form->field($model, 'order_uuid') ?>
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-md-2">
                             <?= $form->field($model, 'restaurant_uuid') ?>
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-md-2">
                             <?= $form->field($model, 'customer_id') ?>
                         </div>
 
-
-                        <div class="col-6">
+                        <div class="col-md-2">
                             <?= $form->field($model, 'customer_phone_number') ?>
                         </div>
 
-                        <div class="col-6">
-                          <?php
-                          /*
-                             $form->field($model, 'date_range', [
-                             ])->widget(DateRangePicker::classname(), [
-                                 'presetDropdown' => false,
-                                 'convertFormat' => true,
-                                 'pluginOptions' => ['locale' => ['format' => 'Y-m-d H:m:s']],
-                             ]);*/
-                         ?>
-                        </div>
-
-                        <div class="col-6">
+                        <div class="col-md-2">
                             <?=
                             $form->field($model, 'order_status')->dropDownList([
+
+                                Order::STATUS_DRAFT => 'Draft',
+                                Order::STATUS_PARTIALLY_REFUNDED => 'Partially Refunded',
+                                Order::STATUS_REFUNDED => 'Refunded',
+                                Order::STATUS_ABANDONED_CHECKOUT => 'Abandoned',
                                 Order::STATUS_PENDING => 'Pending',
                                 Order::STATUS_BEING_PREPARED => 'Being prepared',
                                 Order::STATUS_OUT_FOR_DELIVERY => 'Out for delivery',
@@ -73,11 +65,15 @@ $this->registerJs($js);
                         </div>
 
 
-                        <div class="form-group">
-                            <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-                            <?= Html::a('Reset', ['order/index'], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
+                        <div class="col-md-2">
+                            <div class="form-group" style="margin-top: 22px;">
+                                <label class="control-label" for="ordersearch-order_status">&nbsp;</label>
+                                <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+                                <?= Html::a('Reset', ['order/index'], ['class' => 'btn btn-outline-secondary', 'style' => 'margin-left: 10px;']) ?>
+                            </div>
                         </div>
 
                         <?php ActiveForm::end(); ?>
 
             </div>
+<hr/>

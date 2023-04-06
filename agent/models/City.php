@@ -17,8 +17,9 @@ class City extends \common\models\City
                 ->andWhere(['restaurant_uuid' => $store_uuid])
                 ->andWhere(['!=','delivery_zone_id',$delivery_zone_id])
                 ->all();
+
             return $model->getAreas()
-                ->andWhere(['NOT IN','area_id',$allAreas])
+//                ->andWhere(['NOT IN','area_id',$allAreas])
                 ->all();
         };
         $fields['totalDeliveryAreas'] = function ($model) {

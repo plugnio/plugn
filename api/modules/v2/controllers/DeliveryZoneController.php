@@ -115,10 +115,7 @@ class DeliveryZoneController extends Controller {
 
             }
 
-
-
             return array_values($shipping_countries);
-
 
         } else {
             return [
@@ -202,6 +199,7 @@ class DeliveryZoneController extends Controller {
 
               Yii::$app->formatter->language = 'ar-KW';
               $deliveryZone['delivery_time_ar'] = Yii::$app->formatter->asDuration(intval($deliveryTime));
+
               $deliveryZone['tax'] = $deliveryZone['delivery_zone_tax'] ? $deliveryZone['delivery_zone_tax']  : $deliveryZone['businessLocation']['business_location_tax'] ;
 
               return $deliveryZone;
@@ -267,6 +265,7 @@ class DeliveryZoneController extends Controller {
 
 
                   if($countryCities){
+                    
                     $areaDeliveryZones = $store_model->getAreaDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
 
                     foreach ($countryCities as $cityKey => $city) {

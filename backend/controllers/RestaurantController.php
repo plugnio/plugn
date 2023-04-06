@@ -3,10 +3,12 @@
 namespace backend\controllers;
 
 use backend\models\Admin;
+use common\models\PaymentGatewayQueue;
 use Yii;
 use common\models\Restaurant;
 use common\models\TapQueue;
 use backend\models\RestaurantSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -35,7 +37,7 @@ class RestaurantController extends Controller {
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
                     [
-                        'allow' => Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
                         'actions' => ['create', 'update', 'delete'],
                         'roles' => ['@'],
                     ],
@@ -53,6 +55,7 @@ class RestaurantController extends Controller {
      * @return mixed
      */
     public function actionIndex() {
+
         $searchModel = new RestaurantSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -60,6 +63,116 @@ class RestaurantController extends Controller {
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     * return list of restaurant for dropdown
+     * @return string
+     */
+    public function actionDropdown()
+    {
+        $fromPager = Yii::$app->request->get('fromPager');
+        //$keyword = Yii::$app->request->get('keyword');
+
+        $searchModel = new RestaurantSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        if($fromPager) {
+            return $this->renderPartial ('_dropdown_list', [
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+
+        return $this->renderPartial('dropdown', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * process payment gateway queue
+     * @return void
+     */
+    public function actionProcessGatewayQueue($id)
+    {
+        $model = $this->findModel($id);
+
+        if(
+            !$model->paymentGatewayQueue ||
+            $model->paymentGatewayQueue->queue_status == PaymentGatewayQueue::QUEUE_STATUS_COMPLETE
+        )
+        {
+            Yii::$app->session->setFlash('errorResponse', "No payment gateway request in progress");
+
+            return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+        }
+
+        $response = $model->paymentGatewayQueue->processQueue();
+
+        if ($response['operation'] == 'success')
+        {
+            Yii::$app->session->addFlash('success', $response['message']);
+        } else {
+            Yii::$app->session->addFlash('error', print_r($response['message'], true));
+        }
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    /**
+     * test tap connection
+     * @return void
+     */
+    public function actionTestTap($id)
+    {
+        $store = $this->findModel($id);
+
+        Yii::$app->tapPayments->setApiKeys(
+            $store->live_api_key,
+            $store->test_api_key
+        );//$order->restaurant->is_sandbox
+
+        $response = Yii::$app->tapPayments->createCharge(
+            $store->currency->code,
+            "Testing integration", // Description
+            $store->name, //Statement Desc.
+            time(), // Reference
+            1,
+            "test name",
+            "test@localhost.com",
+            "+91",
+            "8758702738",
+            0,
+            Url::to(['order/callback'], true),
+            Url::to(['order/payment-webhook'], true),
+            "src_kw.knet",//src_all
+            0,
+            0,
+            'Kuwait'
+        );
+
+        $responseContent = json_decode($response->content);
+
+        if (isset($responseContent->errors)) {
+            Yii::$app->session->setFlash('errorResponse', "Error: " . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description);
+        } else {
+            Yii::$app->session->setFlash('successResponse', 'Integration working fine.');
+        }
+
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
+    /**
+     * remove payment gateway queue
+     * @return void
+     */
+    public function actionRemoveGatewayQueue($id)
+    {
+        $model = $this->findModel($id);
+
+        PaymentGatewayQueue::deleteAll(['restaurant_uuid' => $id]);
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
     /**
@@ -73,11 +186,11 @@ class RestaurantController extends Controller {
         $model = $this->findModel($id);
 
         // Store theme color
+
         $storeThemeColors = new \yii\data\ActiveDataProvider([
             'query' => $model->getRestaurantTheme(),
             'pagination' => false
         ]);
-
 
         return $this->render('view', [
                     'model' => $this->findModel($id),
@@ -133,9 +246,13 @@ class RestaurantController extends Controller {
         $store = $this->findModel($id);
 
         //Delete src/environments/environment.develop.ts file
+
         $getDevEnvFile = Yii::$app->githubComponent->getFileSHA('src/environments/environment.develop.ts', $store->store_branch_name);
+
         if ($getDevEnvFile->isOk && $getDevEnvFile->data) {
+
             $deleteDevEnvFile = Yii::$app->githubComponent->deleteFile('src/environments/environment.develop.ts', $getDevEnvFile->data['sha'],  $store->store_branch_name);
+
             if (!$deleteDevEnvFile->isOk){
               Yii::error('[Github > Error While deleting environment.develop.ts]' . json_encode($deleteDevEnvFile->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
               Yii::$app->session->setFlash('errorResponse', json_encode($deleteDevEnvFile->data['message']));
@@ -145,6 +262,7 @@ class RestaurantController extends Controller {
 
         //Delete branch-name.txt file
         $getBranchNameFile = Yii::$app->githubComponent->getFileSHA('branch-name.txt', $store->store_branch_name);
+
         if ($getBranchNameFile->isOk && $getBranchNameFile->data) {
             $deleteBranchNameFile = Yii::$app->githubComponent->deleteFile('branch-name.txt', $getBranchNameFile->data['sha'],  $store->store_branch_name);
             if (!$deleteBranchNameFile->isOk){
@@ -187,17 +305,64 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
           }
 
-
         } else {
           Yii::error('[Github > Error While merging with Master-staging]' . json_encode($mergeToMasterResponse->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
           Yii::$app->session->setFlash('errorResponse', json_encode($mergeToMasterResponse->data['message']));
           return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
 
-
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
     }
 
+
+    public function actionToggleDebugger($id)
+    {
+        $store = $this->findModel($id);
+
+        $store->setScenario('toggleDebugger');
+
+        $store->enable_debugger = !$store->enable_debugger;
+
+        if ($store->save())
+        {
+            Yii::$app->session->setFlash('successResponse', "Store debug mode updated!");
+        }
+        else
+        {
+            Yii::$app->session->setFlash('errorResponse', $store->getErrors());
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
+
+    /**
+     * upgrade store
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionUpgrade($id)
+    {
+        $store = $this->findModel($id);
+
+        $response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        if ($response->isOk)
+        {
+            $store->sitemap_require_update = 1;
+            $store->version = Yii::$app->params['storeVersion'];
+            $store->save(false);
+
+            Yii::$app->session->setFlash('successResponse', "Success: Store will be updated in 2-5 min!");
+        }
+        else
+        {
+            Yii::error('[Github > Error While merging with master]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+            Yii::$app->session->setFlash('errorResponse', json_encode($response->data['message']));
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
 
     /**
      * Update sitemap
@@ -386,8 +551,10 @@ class RestaurantController extends Controller {
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id) {
-        $this->findModel($id)->delete();
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $model->deleteSite();
 
         return $this->redirect(['index']);
     }

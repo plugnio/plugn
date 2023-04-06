@@ -44,7 +44,10 @@ $this->params['breadcrumbs'][] = $this->title;
             //'admin_created_at',
             //'admin_updated_at',
 
-            ['class' => 'yii\grid\ActionColumn', 'template' => '{view}'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => (Yii::$app->user->getId() != 7) ? '{view}' : '{view} {update} {delete}',
+            ],
         ],
     ]); ?>
 </div>

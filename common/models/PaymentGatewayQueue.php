@@ -12,6 +12,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int $payment_gateway_queue_id
  * @property string $restaurant_uuid
  * @property int|null $queue_status
+ * @property string|null $queue_response
  * @property string|null $payment_gateway
  * @property string|null $queue_created_at
  * @property string|null $queue_updated_at
@@ -22,13 +23,11 @@ use yii\behaviors\TimestampBehavior;
  */
 class PaymentGatewayQueue extends \yii\db\ActiveRecord
 {
-
-
     //Values for `queue_status`
     const QUEUE_STATUS_PENDING = 1;
     const QUEUE_STATUS_CREATING = 2;
     const QUEUE_STATUS_COMPLETE = 3;
-
+    const QUEUE_STATUS_FAILED = 4;
 
     /**
      * {@inheritdoc}
@@ -47,12 +46,12 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
             [['restaurant_uuid', 'payment_gateway', 'queue_status'], 'required'],
             [['queue_status'], 'integer'],
             [['queue_start_at', 'queue_end_at'], 'safe'],
+            [['queue_response'], 'string'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['payment_gateway'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
-
 
     /**
      *
@@ -70,6 +69,19 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function arrStatusName() {
+        return [
+            self::QUEUE_STATUS_PENDING => 'Pending',
+            self::QUEUE_STATUS_CREATING => 'Creating',
+            self::QUEUE_STATUS_COMPLETE => 'Complete',
+            self::QUEUE_STATUS_FAILED => 'Failed'
+        ];
+    }
+
+    public function getQueueStatusName() {
+        return self::arrStatusName()[$this->queue_status];
+    }
+
     /**
      * @param bool $insert
      * @param array $changedAttributes
@@ -77,21 +89,46 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
      */
     public function afterSave($insert, $changedAttributes)
     {
-        if ($this->queue_status != self::QUEUE_STATUS_CREATING) {
-            return parent::afterSave($insert, $changedAttributes);
+        if(!parent::afterSave($insert, $changedAttributes)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * process queue
+     * @return bool|void
+     */
+    public function processQueue()
+    {
+        if(!$this->restaurant->restaurant_email)
+        {
+            self::updateAll([
+                'queue_status' => self::QUEUE_STATUS_FAILED,
+                'queue_response' => "Store email missing"
+            ], [
+                'payment_gateway_queue_id' => $this->payment_gateway_queue_id
+            ]);
+
+            return [
+                "operation" => "error",
+                "message" => "Restaurant email missing"
+            ];
         }
 
         if ($this->payment_gateway == 'tap')
+        {
             $response = $this->restaurant->createTapAccount();
-        else if ($this->payment_gateway == 'myfatoorah') {
+        }
+        else if ($this->payment_gateway == 'myfatoorah')
+        {
             $response = $this->restaurant->createMyFatoorahAccount();
         }
 
-        if ($response) {
-
+        if ($response['operation'] == 'success')
+        {
             $this->queue_status = self::QUEUE_STATUS_COMPLETE;
-
-            if ($this->validate() && $this->restaurant->restaurant_email) {
 
                 //save
 
@@ -114,10 +151,48 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                     ->setTo([$this->restaurant->restaurant_email])
                     ->setSubject($subject)
                     ->send();
-            }
+
+                //enable all payment gateway by default
+
+                if($this->payment_gateway == 'tap')
+                    $this->enableTapGateways();
+
+        }
+        else
+        {
+            self::updateAll([
+                'queue_status' => self::QUEUE_STATUS_FAILED,
+                'queue_response' => json_encode($response['message'])
+            ], [
+                'payment_gateway_queue_id' => $this->payment_gateway_queue_id
+            ]);
         }
 
-        return parent::afterSave($insert, $changedAttributes);
+        return $response;
+    }
+
+    /**
+     * enable tap payment gateways from tap
+     * @return void
+     */
+    public function enableTapGateways() {
+
+        $subQuery = $this->restaurant->getRestaurantPaymentMethods()
+            ->select('payment_method_id');
+
+        $paymentGateways = PaymentMethod::find()
+            ->andWhere(['LIKE', 'source_id', "src_"])
+            ->andWhere(new Expression("source_id IS NOT NULL"))
+            ->andWhere(['NOT IN', 'payment_method_id', $subQuery])
+            ->all();
+
+        foreach ($paymentGateways as $paymentGateway) {
+            $model = new RestaurantPaymentMethod();
+            $model->payment_method_id = $paymentGateway->payment_method_id;
+            $model->restaurant_uuid = $this->restaurant_uuid;
+            $model->status = RestaurantPaymentMethod::STATUS_ACTIVE;
+            $model->save();
+        }
     }
 
     /**

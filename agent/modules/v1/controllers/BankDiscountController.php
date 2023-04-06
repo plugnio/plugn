@@ -9,55 +9,7 @@ use yii\web\NotFoundHttpException;
 use agent\models\BankDiscount;
 
 
-class BankDiscountController extends Controller {
-
-    public function behaviors() {
-        $behaviors = parent::behaviors();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-              $behaviors['authenticator'] = [
-                  'class' => \yii\filters\auth\HttpBearerAuth::className(),
-              ];
-              // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-              $behaviors['authenticator']['except'] = ['options'];
-
-              return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions() {
-        $actions = parent::actions();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
+class BankDiscountController extends BaseController {
 
     /**
      * only owner will have access
@@ -85,7 +37,7 @@ class BankDiscountController extends Controller {
         $keyword = Yii::$app->request->get('keyword');
         $status = Yii::$app->request->get('status');
 
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $query =  BankDiscount::find()->joinWith('bank');
 
@@ -103,7 +55,7 @@ class BankDiscountController extends Controller {
 
         $query->andWhere(['bank_discount_status' => $status]);
 
-        $query->andWhere(['bank_discount.restaurant_uuid' => $store_uuid]);
+        $query->andWhere(['bank_discount.restaurant_uuid' => $store->restaurant_uuid]);
 
         return new ActiveDataProvider([
           'query' => $query
@@ -116,11 +68,13 @@ class BankDiscountController extends Controller {
      */
     public function actionCreate() {
         $this->ownerCheck();
+        
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
-        Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
         $model = new BankDiscount();
-        $model->restaurant_uuid = $store_uuid;
+        $model->restaurant_uuid = $store->restaurant_uuid;
         $model->bank_id = Yii::$app->request->getBodyParam("bank_id");
         $model->discount_type = (int) Yii::$app->request->getBodyParam("discount_type");
         $model->discount_amount = (int) Yii::$app->request->getBodyParam("discount_amount");
@@ -200,28 +154,31 @@ class BankDiscountController extends Controller {
      * @throws NotFoundHttpException
      */
      public function actionUpdateBankDiscountStatus() {
+         
          $this->ownerCheck();
+
          $store_uuid =  Yii::$app->request->getBodyParam('store_uuid');
          $bank_discount_id =  Yii::$app->request->getBodyParam('bank_discount_id');
          
          $bankDiscountStatus = (int) Yii::$app->request->getBodyParam('bankDiscountStatus');
 
-         $bank_discount_model = $this->findModel($bank_discount_id, $store_uuid);
+         $bank_discount = $this->findModel($bank_discount_id, $store_uuid);
 
          if ($bankDiscountStatus) {
-              $bank_discount_model->bank_discount_status = $bankDiscountStatus;
 
-             if (!$bank_discount_model->save()) {
+              $bank_discount->bank_discount_status = $bankDiscountStatus;
+
+             if (!$bank_discount->save()) {
                  return [
                      "operation" => "error",
-                     "message" => $bank_discount_model->errors
+                     "message" => $bank_discount->errors
                  ];
              }
 
              return [
                  "operation" => "success",
                  "message" => Yii::t ('agent',"Bank Discount Status updated successfully"),
-                 "model" => $bank_discount_model
+                 "model" => $bank_discount
              ];
          }
      }
@@ -243,7 +200,9 @@ class BankDiscountController extends Controller {
      public function actionDelete($bank_discount_id, $store_uuid = null)
      {
          $this->ownerCheck();
+         
          Yii::$app->accountManager->getManagedAccount($store_uuid);
+
          $model =  $this->findModel($bank_discount_id, $store_uuid);
 
          if (!$model->delete())

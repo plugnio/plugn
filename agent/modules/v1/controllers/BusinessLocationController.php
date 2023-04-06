@@ -2,65 +2,16 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\AreaDeliveryZone;
+use agent\models\DeliveryZone;
 use Yii;
-use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\BusinessLocation;
 
 
-class BusinessLocationController extends Controller
+class BusinessLocationController extends BaseController
 {
-
-    public function behaviors()
-    {
-        $behaviors = parent::behaviors ();
-
-        // remove authentication filter for cors to work
-        unset($behaviors['authenticator']);
-
-        // Allow XHR Requests from our different subdomains and dev machines
-        $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className (),
-            'cors' => [
-                'Origin' => Yii::$app->params['allowedOrigins'],
-                'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-                'Access-Control-Request-Headers' => ['*'],
-                'Access-Control-Allow-Credentials' => null,
-                'Access-Control-Max-Age' => 86400,
-                'Access-Control-Expose-Headers' => [
-                    'X-Pagination-Current-Page',
-                    'X-Pagination-Page-Count',
-                    'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
-                ],
-            ],
-        ];
-
-        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
-        $behaviors['authenticator'] = [
-            'class' => \yii\filters\auth\HttpBearerAuth::className (),
-        ];
-        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options'];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        $actions = parent::actions ();
-        $actions['options'] = [
-            'class' => 'yii\rest\OptionsAction',
-            // optional:
-            'collectionOptions' => ['GET', 'POST', 'HEAD', 'OPTIONS'],
-            'resourceOptions' => ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-        ];
-        return $actions;
-    }
 
     /**
      * only owner will have access
@@ -228,7 +179,11 @@ class BusinessLocationController extends Controller
     public function actionDelete($business_location_id, $store_uuid = null)
     {
         $this->ownerCheck();
+
         Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        
+        $transaction = Yii::$app->db->beginTransaction();
+
         $model = $this->findModel ($business_location_id, $store_uuid);
 
         $model->setScenario(BusinessLocation::SCENARIO_DELETE);
@@ -236,6 +191,9 @@ class BusinessLocationController extends Controller
         $model->is_deleted = 1;
 
         if (!$model->save ()) {
+
+            $transaction->rollBack();
+
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -248,6 +206,26 @@ class BusinessLocationController extends Controller
                 ];
             }
         }
+
+        //delete delivery zone areas
+
+        foreach ($model->deliveryZones as $deliveryZone) {
+            AreaDeliveryZone::deleteAll([
+                'is_deleted' => 0,
+            ],[
+                'delivery_zone_id'=> $deliveryZone->delivery_zone_id
+            ]);
+        }
+
+        //delete delivery zones
+
+        DeliveryZone::updateAll([
+            'is_deleted' => 0,
+        ],[
+            'business_location_id' => $model->business_location_id
+        ]);
+
+        $transaction->commit();
 
         return [
             "operation" => "success",
@@ -264,12 +242,12 @@ class BusinessLocationController extends Controller
      */
     protected function findModel($business_location_id, $store_uuid = null)
     {
-        $store_model = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $model = BusinessLocation::find()
             ->where([
                 'business_location_id' => $business_location_id,
-                'restaurant_uuid' => $store_model->restaurant_uuid
+                'restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one();
 
