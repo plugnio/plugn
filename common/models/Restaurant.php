@@ -740,9 +740,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
             if (!file_put_contents ($tmpFile, file_get_contents ($this->getAuthorizedSignaturePhoto ())))
             {
-                Yii::error ('Error reading authorized signature document: ');
+                //Yii::error ('Error reading authorized signature document: ');
 
-                return false;
+                $this->addError('authorized_signature_file', 'Error reading authorized signature document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading authorized signature document'
+                ];
             }    
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
@@ -760,9 +765,14 @@ class Restaurant extends \yii\db\ActiveRecord
             {
                 $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
 
-                Yii::error ('Error when uploading authorized signature document: ' . $error);
+                //Yii::error ('Error when uploading authorized signature document: ' . $error);
 
-                return false;
+                $this->addError('authorized_signature_file', 'Error reading authorized signature document' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading authorized signature document' . $error
+                ];
             }
         }
 
@@ -773,9 +783,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
             if (!file_put_contents ($commercialLicenseTmpFile, file_get_contents ($this->getCommercialLicensePhoto ())))
             {
-                Yii::error ('Error reading commercial license document: ');
+                //Yii::error ('Error reading commercial license document: ');
 
-                return false;
+                $this->addError('commercial_license_file', 'Error reading commercial license document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading commercial license document'
+                ];
             }
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
@@ -789,9 +804,14 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                Yii::error ('Error when uploading commercial license document: ' . print_r ($response->data, true));
+                //Yii::error ('Error when uploading commercial license document: ' . print_r ($response->data, true));
 
-                return false;
+                $this->addError('commercial_license_file', 'Error when uploading commercial license document: ' . print_r ($response->data, true));
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading commercial license document: ' . print_r ($response->data, true)
+                ];
             }                
         }
 
@@ -803,9 +823,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
             if (!file_put_contents ($civilIdFrontSideTmpFile, file_get_contents ($this->getCivilIdFrontSidePhoto ())))
             {
-                Yii::error ('Error reading civil id (front side): ');
+                //Yii::error ('Error reading civil id (front side): ');
 
-                return false;
+                $this->addError('identification_file_front_side', 'Error reading civil id (front side)');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading civil id (front side)'
+                ];
             }    
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
@@ -818,9 +843,14 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                Yii::error ('Error when uploading civil id (front side): ' . print_r($response->data, true));
+                $this->addError('identification_file_front_side', 'Error when uploading civil id (front side): ' . print_r($response->data, true));
 
-                return false;
+                //Yii::error ('Error when uploading civil id (front side): ' . print_r($response->data, true));
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading civil id (front side): ' . print_r ($response->data, true)
+                ];
             }                
 
         }
@@ -833,9 +863,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
             if (!file_put_contents ($civilIdBackSideTmpFile, file_get_contents ($this->getCivilIdBackSidePhoto ())))
             {
-                Yii::error ('Error reading civil id (back side): ');
- 
-                return false;
+                //Yii::error ('Error reading civil id (back side): ');
+
+                $this->addError('identification_file_back_side', 'Error reading civil id (back side)');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading civil id (back side)'
+                ];
             }    
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
@@ -849,13 +884,20 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else 
             {
-                Yii::error ('Error when uploading civil id (back side): ' . print_r ($response->data, true));
+                $this->addError('identification_file_back_side', 'Error when uploading civil id (back side): ' . print_r ($response->data, true));
 
-                return false;
+                //Yii::error ('Error when uploading civil id (back side): ' . print_r ($response->data, true));
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading civil id (back side): ' . print_r ($response->data, true)
+                ];
             }
         }
 
-        return true;
+        return [
+            "operation" => 'success',
+        ];
     }
 
     public function uploadDocumentsToMyFatoorah() {
@@ -1081,13 +1123,10 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         //Upload documents file on our server before we create an account on tap we gonaa delete them
  
-        $isSuccess = $this->uploadDocumentsToTap();
+        $response = $this->uploadDocumentsToTap();
 
-        if (!$isSuccess) {
-            return [
-                "operation" => 'error',
-                "message" => "Error uploading documents"
-            ];
+        if ($response['operation'] == "error") {
+            return $response;
         }
 
         //Create a business for a vendor on Tap if not already exists
