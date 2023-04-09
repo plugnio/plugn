@@ -438,7 +438,7 @@
                                                 <td style="text-align: right;align-content: end;" align="end">
 
                                                     <?= Yii::$app->formatter->asCurrency(
-                                                        $order->total_price,
+                                                        $order->total,
                                                         $order->currency->code,
                                                         [
                                                             \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,

@@ -10,6 +10,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
 $this->params['restaurant_uuid'] = $model->restaurant_uuid;
 
 $this->title = 'Orders';
