@@ -1583,8 +1583,6 @@ class Restaurant extends \yii\db\ActiveRecord
             $currecy->currency_id = $this->currency_id;
             $currecy->save();
         }
-
-
     }
 
     /**
@@ -1599,6 +1597,10 @@ class Restaurant extends \yii\db\ActiveRecord
 
         if($this->site_id)
             Yii::$app->netlifyComponent->deleteSite($this->site_id);
+
+        //todo: remove github branch
+
+        //Yii::$app->githubComponent->
     }
 
     /**

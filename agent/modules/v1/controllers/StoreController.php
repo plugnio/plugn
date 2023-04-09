@@ -265,6 +265,8 @@ class StoreController extends BaseController
             $store->version = Yii::$app->params['storeVersion'];
             $store->save(false);
 
+            //create new store? and delete current one
+
             return self::message("success","Store will be updated in 2-5 min!");
         }
 
