@@ -78,7 +78,7 @@ class ArmadaDelivery extends Component {
                     "block" => $model->block,
                     "street" => $model->street,
                     "buildingNumber" => $model->house_number,
-                    "amount" => $model->total_price,
+                    "amount" => $model->total,
                     "instructions" => $model->special_directions,
                     "paymentType" => $model->payment_method_id == 3 ? 'cash on delivery' : 'paid',
                     "threeDSecure" => true,

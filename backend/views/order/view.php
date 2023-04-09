@@ -558,7 +558,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                     <tbody>
                         <tr>
                             <td colspan="2">Total</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price* $model->currency_rate, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total, $model->currency->code, [\NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place, \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place]) ?></td>
                         </tr>
                     </tbody>
 
@@ -588,7 +588,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                     <tbody class="order-details__summary__net-payment">
                         <tr>
                             <td class="type--bold" colspan="2">Net payment</td>
-                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total_price* $model->currency_rate, $model->currency->code, [
+                            <td style="float: right;"><?= Yii::$app->formatter->asCurrency($model->total, $model->currency->code, [
                                     \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                     \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place])
                                 ?></td>

@@ -83,6 +83,7 @@ use yii\web\BadRequestHttpException;
  * @property boolean estimated_time_of_arrival
  * @property string $diggipack_awb_no
  * @property boolean $is_sandbox
+ * @property decimal $total
  * @property Area
  * @property BankDiscount $bankDiscount
  * @property Country $country
@@ -1100,8 +1101,11 @@ class Order extends \yii\db\ActiveRecord
             $this->tax = $totalPrice * ($this->pickupLocation->business_location_tax / 100);
             $totalPrice += $this->tax;
         }
+
         // new changes done as calculation was not saving while placing an order.
+
         $this->total_price = $totalPrice;
+
         return $totalPrice;
     }
 
@@ -1750,6 +1754,14 @@ class Order extends \yii\db\ActiveRecord
 
             MobileNotification::notifyAgent($heading, $data, $filters, $subtitle, $content);
         }
+    }
+
+    /**
+     * get order total converted to selected currency
+     * @return float
+     */
+    public function getTotal() {
+        return round($this->total_price * $this->currency_rate, $this->currency->decimal_place);
     }
 
     public static function find()

@@ -312,7 +312,8 @@ class OrderController extends Controller
                         'header' => 'Amount Charged',
                         'attribute' => 'total_price',
                         "value" => function ($data) {
-                            return \Yii::$app->formatter->asCurrency($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code, [
+                            return \Yii::$app->formatter->asCurrency($data->payment_uuid ?
+                                $data->payment->payment_amount_charged : $data->total, $data->currency->code, [
                                 \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                             ]);
                         }
@@ -326,7 +327,7 @@ class OrderController extends Controller
                                     \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                 ]);
                             else
-                                return \Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code, [
+                                return \Yii::$app->formatter->asCurrency($data->total, $data->currency->code, [
                                     \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                 ]);
                         }

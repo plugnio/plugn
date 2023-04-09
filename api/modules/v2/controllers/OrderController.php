@@ -431,7 +431,8 @@ class OrderController extends Controller
             $order->changeOrderStatusToPending();
             $order->sendPaymentConfirmationEmail();
 
-            Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
+            Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " .
+                Yii::$app->formatter->asCurrency($order->total, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
             return [
                 'operation' => 'success',
@@ -450,7 +451,7 @@ class OrderController extends Controller
 
         $payment->customer_id = $order->customer->customer_id; //customer id
         $payment->order_uuid = $order->order_uuid;
-        $payment->payment_amount_charged = $order->total_price;
+        $payment->payment_amount_charged = $order->total;
         $payment->payment_current_status = "Redirected to payment gateway";
         $payment->is_sandbox = $restaurant_model->is_sandbox;
 
@@ -503,7 +504,9 @@ class OrderController extends Controller
             $order->payment_uuid = $payment->payment_uuid;
             $order->save(false);
 
-            Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
+            Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
+                Yii::$app->formatter->asCurrency($order->total, $order->currency->code,
+                    [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
 // Redirect to payment gateway
 
@@ -518,7 +521,7 @@ class OrderController extends Controller
                 "Order placed from: " . $order->customer_name, // Description
                 $order->restaurant->name, //Statement Desc.
                 $payment->payment_uuid, // Reference
-                $order->total_price,
+                $order->total,
                 $order->customer_name,
                 $order->customer_email,
                 $order->customer_phone_country_code,
@@ -547,7 +550,7 @@ class OrderController extends Controller
                     "Order placed from: " . $order->customer_name, // Description
                     $order->restaurant->name, //Statement Desc.
                     $payment->payment_uuid, // Reference
-                    $order->total_price,
+                    $order->total,
                     $order->customer_name,
                     $order->customer_email,
                     $order->customer_phone_country_code,
@@ -633,16 +636,19 @@ class OrderController extends Controller
             $order->payment_uuid = $payment->payment_uuid;
             $order->save(false);
 
-            Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
+            Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
+                Yii::$app->formatter->asCurrency($order->total, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
             Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code, $order->restaurant->is_sandbox);
 
-            $initiatePayment = Yii::$app->myFatoorahPayment->initiatePayment($order->total_price, $order->currency->code);
+            $initiatePayment = Yii::$app->myFatoorahPayment->initiatePayment($order->total, $order->currency->code);
+
             $initiatePaymentResponse = json_decode($initiatePayment->content);
 
             if (!$initiatePaymentResponse->IsSuccess) {
 
-                $errorMessage = "Error: " . $initiatePaymentResponse->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+                $errorMessage = "Error: " . $initiatePaymentResponse->Message . " - " . isset($responseContent->ValidationErrors) ?
+                    json_encode($initiatePaymentResponse->ValidationErrors) : $initiatePaymentResponse->Message;
 
                 $paymentFailed = new PaymentFailed();
                 $paymentFailed->payment_uuid = $payment->payment_uuid;
@@ -679,7 +685,7 @@ class OrderController extends Controller
 
             $response = Yii::$app->myFatoorahPayment->createCharge(
                 $order->currency->code,
-                $order->total_price,
+                $order->total,
                 $order->customer_name,
                 $order->customer_email,
                 $order->customer_phone_country_code,
@@ -741,7 +747,7 @@ class OrderController extends Controller
                 'operation' => 'redirecting',
                 'redirectUrl' => $redirectUrl,
                 'orderUuid' => $order->order_uuid,
-                'total_price' => $order->total_price
+                'total_price' => $order->total
             ];
 
         } else {

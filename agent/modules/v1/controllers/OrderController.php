@@ -1056,11 +1056,11 @@ class OrderController extends BaseController
         //     ];
         // }
 
-        if ($refund_amount > $model->total_price) {
+        if ($refund_amount > $model->total) {
             return [
                 "operation" => "error",
                 "message" => Yii::t('agent', "{amount} available for refund!", [
-                    'amount' => \Yii::$app->formatter->asCurrency($model->total_price, $model->currency->code)
+                    'amount' => \Yii::$app->formatter->asCurrency($model->total, $model->currency->code)
                 ])
             ];
         }
@@ -1510,7 +1510,8 @@ class OrderController extends BaseController
                     'header' => Yii::t('agent', 'Amount Charged'),
                     'attribute' => 'total_price',
                     "value" => function ($data) {
-                        return \Yii::$app->formatter->asCurrency($data->payment_uuid ? $data->payment->payment_amount_charged : $data->total_price, $data->currency->code);
+                        return \Yii::$app->formatter->asCurrency($data->payment_uuid ?
+                            $data->payment->payment_amount_charged : $data->total, $data->currency->code);
                     }
                 ],
 
@@ -1520,7 +1521,7 @@ class OrderController extends BaseController
                         if ($data->payment_uuid)
                             return \Yii::$app->formatter->asCurrency($data->payment->payment_net_amount, $data->currency->code);
                         else
-                            return \Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code);
+                            return \Yii::$app->formatter->asCurrency($data->total, $data->currency->code);
                     }
                 ],
                 [

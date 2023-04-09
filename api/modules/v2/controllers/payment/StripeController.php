@@ -82,7 +82,7 @@ class StripeController extends Controller
 
             // Create a PaymentIntent with amount and currency
             $paymentIntent = \Stripe\PaymentIntent::create([
-                'amount' => $order->total_price * pow(10, $order->currency->decimal_place),
+                'amount' => $order->total * pow(10, $order->currency->decimal_place),
                 'currency' => strtolower($order->currency_code),
                 "payment_method_types" => ["card"],
                 /*'automatic_payment_methods' => [
@@ -100,7 +100,7 @@ class StripeController extends Controller
             $payment->restaurant_uuid = $order->restaurant_uuid;
             $payment->customer_id = $order->customer->customer_id; //customer id
             $payment->order_uuid = $order->order_uuid;
-            $payment->payment_amount_charged = $order->total_price;
+            $payment->payment_amount_charged = $order->total;
             $payment->payment_gateway_transaction_id = $paymentIntent->id;
             $payment->payment_gateway_payment_id = $paymentIntent->id;
             $payment->save(false);
@@ -152,13 +152,13 @@ class StripeController extends Controller
         $checkout_session = \Stripe\Checkout\Session::create([
             'line_items' => [[
                 # Provide the exact Price ID (e.g. pr_1234) of the product you want to sell
-                'price' => $order->total_price,
+                'price' => $order->total,
                 'quantity' => 1,
             ]],
             'mode' => 'payment',
             'customer_email' => $order->customer_email,
             'currency' => $order->currency_code,
-            //'amount_total' => $order->total_price,
+            //'amount_total' => $order->total,
             'client_reference_id' => $order->order_uuid,
             'success_url' => Url::to(['payment/stripe/callback', 'order_uuid' => $order->order_uuid], true),
             'cancel_url' => Url::to(['payment/stripe/callback', 'order_uuid' => $order->order_uuid], true),
@@ -174,7 +174,7 @@ class StripeController extends Controller
         $payment->restaurant_uuid = $order->restaurant_uuid;
         $payment->customer_id = $order->customer->customer_id; //customer id
         $payment->order_uuid = $order->order_uuid;
-        $payment->payment_amount_charged = $order->total_price;
+        $payment->payment_amount_charged = $order->total;
         $payment->payment_gateway_transaction_id  = $checkout_session->id;
         $payment->payment_gateway_payment_id = $checkout_session->payment_intent;
         $payment->save(false);

@@ -141,7 +141,7 @@ $this->params['breadcrumbs'][] = $this->title;
                       [
                           'attribute' => 'total_price',
                           "value" => function($data) {
-                                  return Yii::$app->formatter->asCurrency($data->total_price, $data->currency->code, [
+                                  return Yii::$app->formatter->asCurrency($data->total, $data->currency->code, [
                                       \NumberFormatter::MAX_FRACTION_DIGITS => $data->currency->decimal_place
                                   ]);
                           },
