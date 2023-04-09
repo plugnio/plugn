@@ -795,7 +795,16 @@ class Restaurant extends \yii\db\ActiveRecord
             $tmpFile = sys_get_temp_dir () . '/' . $this->authorized_signature_file;
 
             if (!file_put_contents ($tmpFile, file_get_contents ($this->getAuthorizedSignaturePhoto ())))
-                return Yii::error ('Error reading authorized signature document: ');
+            {
+                //Yii::error ('Error reading authorized signature document: ');
+
+                $this->addError('authorized_signature_file', 'Error reading authorized signature document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading authorized signature document'
+                ];
+            }    
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $tmpFile,
@@ -810,9 +819,20 @@ class Restaurant extends \yii\db\ActiveRecord
             }
             else
             {
-                $error = is_object($response->data) || is_array($response->data) ? json_encode ($response->data) :$response->data;
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+                
+                //Yii::error ('Error when uploading authorized signature document: ' . $error);
 
-                return Yii::error ('Error when uploading authorized signature document: ' . $error);
+                $this->addError('authorized_signature_file', 'Error reading authorized signature document' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading authorized signature document' . $error
+                ];
             }
         }
 
@@ -822,8 +842,16 @@ class Restaurant extends \yii\db\ActiveRecord
             $commercialLicenseTmpFile = sys_get_temp_dir () . '/' . $this->commercial_license_file;
 
             if (!file_put_contents ($commercialLicenseTmpFile, file_get_contents ($this->getCommercialLicensePhoto ())))
-                return Yii::error ('Error reading commercial license document: ');
+            {
+                //Yii::error ('Error reading commercial license document: ');
 
+                $this->addError('commercial_license_file', 'Error reading commercial license document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading commercial license document'
+                ];
+            }
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $commercialLicenseTmpFile, $this->commercial_license_file_purpose, $this->commercial_license_title);
@@ -831,51 +859,123 @@ class Restaurant extends \yii\db\ActiveRecord
             @unlink ($commercialLicenseTmpFile);
 
             if ($response->isOk)
+            {
                 $this->commercial_license_file_id = $response->data['id'];
+            }
+            else 
+            {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
 
-            else
-                return Yii::error ('Error when uploading commercial license document: ' . json_encode ($response->data));
+                //Yii::error ('Error when uploading commercial license document: ' . print_r ($response->data, true));
+
+                $this->addError('commercial_license_file', 'Error when uploading commercial license document: ' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading commercial license document: ' . $error
+                ];
+            }                
         }
 
         //Upload Owner civil id front side
+
         if ($this->identification_file_front_side && $this->identification_file_purpose && $this->identification_title) {
 
             $civilIdFrontSideTmpFile = sys_get_temp_dir () . '/' . $this->identification_file_front_side;
 
             if (!file_put_contents ($civilIdFrontSideTmpFile, file_get_contents ($this->getCivilIdFrontSidePhoto ())))
-                return Yii::error ('Error reading civil id (front side): ');
+            {
+                //Yii::error ('Error reading civil id (front side): ');
+
+                $this->addError('identification_file_front_side', 'Error reading civil id (front side)');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading civil id (front side)'
+                ];
+            }    
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $civilIdFrontSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
             @unlink ($civilIdFrontSideTmpFile);
 
-            if ($response->isOk)
+            if ($response->isOk) {  
                 $this->identification_file_id_front_side = $response->data['id'];
-            else
-                return Yii::error ('Error when uploading civil id (front side): ' . json_encode ($response->data));
+            }
+            else 
+            {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                $this->addError('identification_file_front_side', 'Error when uploading civil id (front side): ' . $error);
+
+                //Yii::error ('Error when uploading civil id (front side): ' . print_r($response->data, true));
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading civil id (front side): ' . $error
+                ];
+            }                
 
         }
 
         //Upload Owner civil id back side
+
         if ($this->identification_file_back_side && $this->identification_file_purpose && $this->identification_title) {
 
             $civilIdBackSideTmpFile = sys_get_temp_dir () . '/' . $this->identification_file_back_side;
 
             if (!file_put_contents ($civilIdBackSideTmpFile, file_get_contents ($this->getCivilIdBackSidePhoto ())))
-                return Yii::error ('Error reading civil id (back side): ');
+            {
+                //Yii::error ('Error reading civil id (back side): ');
+
+                $this->addError('identification_file_back_side', 'Error reading civil id (back side)');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading civil id (back side)'
+                ];
+            }    
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $civilIdBackSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
             @unlink ($civilIdBackSideTmpFile);
 
-            if ($response->isOk)
+            if ($response->isOk) 
+            {
                 $this->identification_file_id_back_side = $response->data['id'];
-            else
-                return Yii::error ('Error when uploading civil id (back side): ' . json_encode ($response->data));
+            }
+            else 
+            {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                $this->addError('identification_file_back_side', 'Error when uploading civil id (back side): ' . $error);
+
+                //Yii::error ('Error when uploading civil id (back side): ' . print_r ($response->data, true));
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error when uploading civil id (back side): ' . $error
+                ];
+            }
         }
 
+        return [
+            "operation" => 'success',
+        ];
     }
 
     public function uploadDocumentsToMyFatoorah() {
@@ -898,7 +998,8 @@ class Restaurant extends \yii\db\ActiveRecord
 
 
             if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
-                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?
+                    json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
                 return Yii::error('Error when uploading authorized signature document: ' . $errorMessage);
             }
 
@@ -1100,8 +1201,12 @@ class Restaurant extends \yii\db\ActiveRecord
     public function createTapAccount()
     {
         //Upload documents file on our server before we create an account on tap we gonaa delete them
+ 
+        $response = $this->uploadDocumentsToTap();
 
-        $this->uploadDocumentsToTap();
+        if ($response['operation'] == "error") {
+            return $response;
+        }
 
         //Create a business for a vendor on Tap if not already exists
 
@@ -1265,7 +1370,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 "message" => $operatorApiResponse->data
             ];
         }
-
+ 
         return [
             "operation" => 'success',
         ];
@@ -1534,8 +1639,6 @@ class Restaurant extends \yii\db\ActiveRecord
             $currecy->currency_id = $this->currency_id;
             $currecy->save();
         }
-
-
     }
 
     /**
@@ -1550,6 +1653,10 @@ class Restaurant extends \yii\db\ActiveRecord
 
         if($this->site_id)
             Yii::$app->netlifyComponent->deleteSite($this->site_id);
+
+        //todo: remove github branch
+
+        //Yii::$app->githubComponent->
     }
 
     /**

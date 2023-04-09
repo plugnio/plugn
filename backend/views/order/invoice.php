@@ -1,5 +1,9 @@
 <?php
 
+/* @var $this yii\web\View */
+/* @var $model common\models\Order */
+/* @var $orderItems any */
+
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\grid\GridView;
@@ -129,7 +133,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                   </p>
                   <span style="display: block" >
                     <?=  $model->customer_phone_number ?>
-                  </p>
+                  </span>
               <?php } ?>
 
                 </div>
@@ -601,7 +605,7 @@ if ($model->recipient_name || $model->recipient_phone_number || $model->gift_mes
                           <?php } ?>
                             <tr>
                                 <th><b>Total Price</b></th>
-                                <td><?= Yii::$app->formatter->asCurrency($model->total_price* $model->currency_rate, $model->currency_code, [
+                                <td><?= Yii::$app->formatter->asCurrency($model->total, $model->currency_code, [
                                         \NumberFormatter::MIN_FRACTION_DIGITS => $model->currency->decimal_place,
                                         \NumberFormatter::MAX_FRACTION_DIGITS => $model->currency->decimal_place
                                     ]) ?></td>

@@ -328,7 +328,7 @@ class OrderController extends Controller {
 
                     $payment->customer_id = $order->customer->customer_id; //customer id
                     $payment->order_uuid = $order->order_uuid;
-                    $payment->payment_amount_charged = $order->total_price;
+                    $payment->payment_amount_charged = $order->total;
                     $payment->payment_current_status = "Redirected to payment gateway";
                     $payment->is_sandbox = $order->restaurant->is_sandbox;
 
@@ -344,9 +344,8 @@ class OrderController extends Controller {
                             ];
                         }
 
-
-                          Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
-
+                          Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
+                              Yii::$app->formatter->asCurrency($order->total, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
                         // Redirect to payment gateway
                         Yii::$app->tapPayments->setApiKeys(
@@ -370,7 +369,7 @@ class OrderController extends Controller {
                                 "Order placed from: " . $order->customer_name, // Description
                                 $order->restaurant->name, //Statement Desc.
                                 $payment->payment_uuid, // Reference
-                                $order->total_price,
+                                $order->total,
                                  $order->customer_name,
                                  $order->customer_email,
                                  $order->customer_phone_country_code,
@@ -461,7 +460,8 @@ class OrderController extends Controller {
                         $order->changeOrderStatusToPending();
                         $order->sendPaymentConfirmationEmail();
 
-                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " . Yii::$app->formatter->asCurrency($order->total_price, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
+                        Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " .
+                            Yii::$app->formatter->asCurrency($order->total, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
 
 //                            //Update product inventory

@@ -107,8 +107,8 @@ class MoyasarController extends Controller
 
         $data['validate_merchant_url'] = 'https://api.moyasar.com/v1/applepay/initiate';
 
-        $data['amount'] = $order->total_price;
-        $data['amount_in_halals'] =  $order->total_price * pow(10, $order->currency->decimal_place);
+        $data['amount'] = $order->total;
+        $data['amount_in_halals'] =  $order->total * pow(10, $order->currency->decimal_place);
         $data['language_code'] = Yii::$app->language;
         $data['currency'] = $order->currency_code;// $payment['currency_code'];
         $data['country'] = "KW";
@@ -178,7 +178,7 @@ class MoyasarController extends Controller
 
         $order = $this->findOrder($order_uuid);
 
-        $order_amount = $order->total_price * pow(10, $order->currency->decimal_place);
+        $order_amount = $order->total * pow(10, $order->currency->decimal_place);
 
         //add payment entry for debug
 
@@ -192,7 +192,7 @@ class MoyasarController extends Controller
         $payment->restaurant_uuid = $order->restaurant_uuid;
         $payment->customer_id = $order->customer->customer_id; //customer id
         $payment->order_uuid = $order->order_uuid;
-        $payment->payment_amount_charged = $order->total_price;
+        $payment->payment_amount_charged = $order->total;
         //$payment->is_sandbox = $order->restaurant->is_sandbox;
         $payment->response_message = $message;
         $payment->payment_gateway_fee = $paymentDetail['fee'] / pow(10, $order->currency->decimal_place);//in halals
