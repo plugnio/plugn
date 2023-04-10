@@ -4,6 +4,10 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $failedInPaymentQueue integer */
 /* @var $pendingInPaymentQueue integer */
+/* @var $purchaseDomain */
+/* @var $pendingDomain */
+/* @var $failedInQueue */
+/* @var $failedInQueue */
 
 $this->title = 'Admin dashboard';
 ?>
@@ -39,7 +43,24 @@ $this->title = 'Admin dashboard';
                 <span class="badge badge-warning"><?= $holdInQueue ?> Hold</span>
 
                 <?php if($failedInQueue > 0) { ?>
-                <span class="badge badge-danger"><?= $failedInQueue ?> Failed</span>
+                    <span class="badge badge-danger"><?= $failedInQueue ?> Failed</span>
+                <?php } ?>
+
+                <br />
+                <br />
+
+                <?= Html::a('Go &raquo', ['restaurant/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <h2>Store Domains</h2>
+
+                <?php if($pendingDomain > 0) { ?>
+                <span class="badge badge-warning"><?= $pendingDomain ?> Pending to purchase</span>
+                <?php } ?>
+
+                <?php if($purchaseDomain > 0) { ?>
+                <span class="badge badge-danger"><?= $purchaseDomain ?> need to assign to store</span>
                 <?php } ?>
 
                 <br />
@@ -49,11 +70,30 @@ $this->title = 'Admin dashboard';
             </div>
 
             <div class="col-12 col-lg-4">
+                <h2>Payment Gateway Queue </h2>
+
+                <span class="badge badge-warning"><?= $pendingInPaymentQueue ?> Pending</span>
+
+                <?php if($failedInPaymentQueue > 0) { ?>
+                    <span class="badge badge-danger"><?= $failedInPaymentQueue ?> Failed</span>
+                <?php } ?>
+
+                <br />
+                <br />
+
+                <?= Html::a('Go &raquo', ['payment-gateway-queue/index'], ['class' => 'btn btn-default']) ?>
+            </div>
+
+
+        </div>
+        <div class="row">
+
+            <div class="col-12 col-lg-4">
                 <h2>Store Invoices</h2>
 
                 <span class="badge badge-light"><?= $draft ?> Unpaid</span>
-                    <span class="badge badge-warning"><?= $pending ?> Locked</span>
-                        <span class="badge badge-primary"><?= $paid ?> Paid</span>
+                <span class="badge badge-warning"><?= $pending ?> Locked</span>
+                <span class="badge badge-primary"><?= $paid ?> Paid</span>
 
                 <br />
                 <br />
@@ -61,13 +101,6 @@ $this->title = 'Admin dashboard';
                 <?= Html::a('Go &raquo', ['restaurant-invoice/index'], ['class' => 'btn btn-default']) ?>
             </div>
 
-            <div class="col-12 col-lg-4">
-                <h2>Store Orders</h2>
-
-                <?= Html::a('Go &raquo', ['order/index'], ['class' => 'btn btn-default']) ?>
-            </div>
-        </div>
-        <div class="row">
             <div class="col-12 col-lg-4">
                 <h2>Subscriptions</h2>
 
@@ -78,12 +111,6 @@ $this->title = 'Admin dashboard';
                 <h2>Order Payments</h2>
 
                 <?= Html::a('Go &raquo', ['payment/index'], ['class' => 'btn btn-default']) ?>
-            </div>
-
-            <div class="col-12 col-lg-4">
-                <h2>Agents</h2>
-
-                  <?= Html::a('Go &raquo', ['agent/index'], ['class' => 'btn btn-default']) ?>
             </div>
 
         </div>
@@ -107,19 +134,19 @@ $this->title = 'Admin dashboard';
         </div>
 
         <div class="row">
+
+
             <div class="col-12 col-lg-4">
-                <h2>Payment Gateway Queue </h2>
+                <h2>Agents</h2>
 
-                <span class="badge badge-warning"><?= $pendingInPaymentQueue ?> Pending</span>
+                <?= Html::a('Go &raquo', ['agent/index'], ['class' => 'btn btn-default']) ?>
+            </div>
 
-                <?php if($failedInPaymentQueue > 0) { ?>
-                    <span class="badge badge-danger"><?= $failedInPaymentQueue ?> Failed</span>
-                <?php } ?>
 
-                <br />
-                <br />
+            <div class="col-12 col-lg-4">
+                <h2>Store Orders</h2>
 
-                <?= Html::a('Go &raquo', ['payment-gateway-queue/index'], ['class' => 'btn btn-default']) ?>
+                <?= Html::a('Go &raquo', ['order/index'], ['class' => 'btn btn-default']) ?>
             </div>
         </div>
     </div>
