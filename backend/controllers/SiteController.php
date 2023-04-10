@@ -4,6 +4,7 @@ namespace backend\controllers;
 use backend\models\RestaurantInvoice;
 use common\models\PaymentGatewayQueue;
 use common\models\Queue;
+use common\models\RestaurantDomainRequest;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -97,6 +98,14 @@ class SiteController extends Controller
             'queue_status' => PaymentGatewayQueue::QUEUE_STATUS_PENDING
         ])->count ();
 
+        $pendingDomain = RestaurantDomainRequest::find()
+            ->andWhere(['status' => RestaurantDomainRequest::STATUS_PENDING])
+            ->count();
+
+        $purchaseDomain = RestaurantDomainRequest::find()
+            ->andWhere(['status' => RestaurantDomainRequest::STATUS_PURCHASED])
+            ->count();
+
         return $this->render('index', [
             'draft' => $draft,
             'pending' => $pending,
@@ -105,7 +114,9 @@ class SiteController extends Controller
             "holdInQueue" => $holdInQueue,
             "pendingInQueue" => $pendingInQueue,
             "failedInPaymentQueue" => $failedInPaymentQueue,
-            "pendingInPaymentQueue" => $pendingInPaymentQueue
+            "pendingInPaymentQueue" => $pendingInPaymentQueue,
+            "pendingDomain" => $pendingDomain,
+            "purchaseDomain" => $purchaseDomain
         ]);
     }
 

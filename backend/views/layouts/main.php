@@ -49,6 +49,7 @@ AppAsset::register($this);
                     ['label' => 'Invoices', 'url' => ['/restaurant-invoice/index']],
                     ['label' => 'Orders', 'url' => ['/order/index']],
                     ['label' => 'Stores', 'url' => ['/restaurant/index']],
+                    ['label' => 'Domain Request', 'url' => ['/restaurant-domain-request/index']],
                     ['label' => 'Queue', 'url' => ['/queue/index']],
                     ['label' => 'Restaurant Payment Method', 'url' => ['/restaurant-payment-method/index']],
                     ['label' => 'Opening Hours', 'url' => ['/opening-hour/index']],
