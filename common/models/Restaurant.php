@@ -644,7 +644,19 @@ class Restaurant extends \yii\db\ActiveRecord
             }
     }
 
+    /**
+     * request for new domain
+     * @param $old_domain
+     * @return array
+     */
     public function notifyDomainRequest($old_domain) {
+
+        $model = new RestaurantDomainRequest;
+        $model->restaurant_uuid = $this->restaurant_uuid;
+        $model->created_by = Yii::$app->user->getId();
+        $model->domain = $this->restaurant_domain;
+        $model->status = RestaurantDomainRequest::STATUS_PENDING;
+        $model->save(false);
 
         //if custom domain + want to purchase
 
@@ -663,7 +675,7 @@ class Restaurant extends \yii\db\ActiveRecord
             ->setSubject('[Plugn] Agent updated DN')
             ->send();
 
-        return self::message("success","Congratulations you have successfully changed your domain name");
+        return self::message("success","Our customer service agent will contact you soon!");
     }
 
     public function notifyDomainUpdated($old_domain) {
