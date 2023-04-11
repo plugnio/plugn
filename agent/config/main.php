@@ -709,16 +709,26 @@ return [
                    ]
                ],
                 [ // RestaurantPaymentMethod
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/restaurant-payment-method',
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET all' => 'list-all',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS all' => 'options'
+                    ]
+                ],
+                [ // DomainRequest
                    'class' => 'yii\rest\UrlRule',
-                   'controller' => 'v1/restaurant-payment-method',
+                   'controller' => 'v1/domain-request',
                    'patterns' => [
                        'GET' => 'index',
-                       'GET all' => 'list-all',
                        // OPTIONS VERBS
                        'OPTIONS' => 'options',
-                       'OPTIONS all' => 'options'
                    ]
                ],
+
             ],
         ],
     ],

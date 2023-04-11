@@ -21,6 +21,7 @@ use yii\db\Expression;
  * @property string|null $updated_at
  *
  * @property Agent $createdBy
+ * @property Restaurant $restaurant
  */
 class RestaurantDomainRequest extends \yii\db\ActiveRecord
 {
@@ -103,6 +104,23 @@ class RestaurantDomainRequest extends \yii\db\ActiveRecord
                 'value' => new Expression('NOW()'),
             ],
         ];
+    }
+
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave ($insert, $changedAttributes);
+
+        if (!$insert && isset($changedAttributes['status']) && $this->status == self::STATUS_ASSIGNED) {
+            $this->restaurant->restaurant_domain = $this->domain;
+            $this->restaurant->save(false);
+        }
+
+        return true;
     }
 
     /**
