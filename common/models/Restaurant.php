@@ -680,6 +680,13 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function notifyDomainUpdated($old_domain) {
 
+        $model = new RestaurantDomainRequest;
+        $model->restaurant_uuid = $this->restaurant_uuid;
+        $model->created_by = Yii::$app->user->getId();
+        $model->domain = $this->restaurant_domain;
+        $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
+        $model->save(false);
+
         \Yii::info("[Store Domain Updated] " . $this->name . " changed domain from " .
             $old_domain ." to " . $this->restaurant_domain, __METHOD__);
 
@@ -708,7 +715,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 ->send();
         }
 
-        return self::message("error", "Congratulations you have successfully changed your domain name");
+        return self::message("success", "Congratulations you have successfully changed your domain name");
 
     }
 
@@ -1752,6 +1759,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'noOfItems',
             'categories',
             'paymentGatewayQueue',
+            'restaurantDomainRequests',
             'openingHours',
             'isOpen' => function ($restaurant) {
                 return $restaurant->isOpen ();
@@ -2866,7 +2874,18 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->activeOrders ($this->restaurant_uuid);;
     }
-    
+
+    /**
+     * Gets query for [[RestaurantDomainRequest]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantDomainRequests($modelClass = "\common\models\RestaurantDomainRequest")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->orderBy('created_at DESC');
+    }
+
     /**
      * Gets query for [[Tickets]].
      *

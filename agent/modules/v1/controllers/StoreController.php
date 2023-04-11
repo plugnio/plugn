@@ -6,6 +6,7 @@ use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
 use common\components\TapPayments;
+use common\models\RestaurantDomainRequest;
 use common\models\Setting;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -169,8 +170,24 @@ class StoreController extends BaseController
 
         $store->restaurant_domain = rtrim($domain, '/');
 
-        if (!$store->save()) {
+        //for purchase request not changing store domain until domain available
+
+        if (!$purchase && !$store->save()) {
             return self::message("error",$store->getErrors());
+        }
+
+        //save old/original domain detail
+
+        $isNotOriginalDomain = $store->getRestaurantDomainRequests()->exists();
+
+        if(!$isNotOriginalDomain)
+        {
+            $model = new RestaurantDomainRequest();
+            $model->restaurant_uuid = $store->restaurant_uuid;
+            $model->created_at = $store->restaurant_created_at;
+            $model->domain = $old_domain;
+            $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
+            $model->save(false);
         }
 
         //update in netlify
