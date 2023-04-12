@@ -201,7 +201,7 @@ class NetlifyComponent extends Component {
                 "repo" => "plugnio/plugn-ionic",
                 "private" => true,
                 "branch" => "master",
-                "cmd" => "npm run build",
+                "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
                 "dir" => "www"
             ],
         ];
