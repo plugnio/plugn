@@ -47,10 +47,29 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
+
     }
 
     public function actionTeste()
     {
+        /*$params = [
+            "build_image" => "focal",
+            "repo" => [
+                "provider" => "github",
+                "id" => 70150125,
+                "force_ssl" => true,
+                "installation_id" => "11420049",
+                "repo" => "plugnio/plugn-ionic",
+                "private" => true,
+                "branch" => "master",
+                "cmd" => "npm run build",
+                "dir" => "www"
+            ],
+        ];
+
+        return $this->updateSite($store->site_id, $params);
+
+
         Yii::$app->eventManager->setUser(1, [
             "name" => "Rasili"
         ]);
@@ -61,7 +80,7 @@ class CronController extends \yii\console\Controller
             ],
             null,
             1
-        );
+        );*/
     }
 
     /**
@@ -357,20 +376,22 @@ class CronController extends \yii\console\Controller
     }
 
     /**
+     * **no need this**
+     * -------------------------------------------
      * update sitemap for search engines
      * @return false|int
-     */
+     *
     public function actionUpdateSitemap()
     {
         $stores = Restaurant::find()
             ->andWhere(['sitemap_require_update' => 1])
-            /*->andWhere(['or',
+            *->andWhere(['or',
                 ['version' => 2],
                 ['version' => 3],
                 ['version' => 4]
             ])
             ->andWhere(['!=', 'restaurant_uuid', 'rest_00f54a5e-7c35-11ea-997e-4a682ca4b290'])//todo: extra load on server just for 1 store?
-            */
+            *
             ->all();
 
         foreach ($stores as $key => $store) {
@@ -448,7 +469,7 @@ class CronController extends \yii\console\Controller
             }
 
         return self::EXIT_CODE_NORMAL;
-    }
+    }*/
 
 
     /**

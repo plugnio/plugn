@@ -2,6 +2,7 @@
 
 namespace api\modules\v2\controllers;
 
+use Yii;
 use api\models\Category;
 use api\models\Restaurant;
 use yii\web\Controller;
