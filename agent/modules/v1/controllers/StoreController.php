@@ -283,7 +283,13 @@ class StoreController extends BaseController
     {
         $store = $this->findModel();
 
-        $response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+        //getting conflict on this
+        //$response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        if($store->site_id)
+            $response = Yii::$app->netlifyComponent->upgradeSite($store);
+        else
+            $response = Yii::$app->netlifyComponent->createSite($store->restaurant_domain);
 
         if ($response->isOk)
         {
