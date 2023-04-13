@@ -1501,6 +1501,25 @@ class Order extends \yii\db\ActiveRecord
             isset($changedAttributes['order_status']) && $changedAttributes['order_status'] != self::STATUS_CANCELED && $this->order_status == self::STATUS_CANCELED
         ) {
             $this->restockItems();
+
+            //cancel armada driver
+
+            $armadaApiKey = $this->restaurant->armada_api_key;
+
+            if($this->businessLocation)
+                $armadaApiKey = $this->businessLocation->armada_api_key;
+
+            if($this->armada_tracking_link)
+                Yii::$app->armadaDelivery->cancelDelivery($this, $armadaApiKey);
+
+            /**todo: check aramda order status?
+            $this->armada_order_status
+            pending: the order has been received and is waiting to be dispatched to a driver
+dispatched: the order has been dispatched to a driver who is on his way to the merchant
+en route: the order has been picked up from the merchant and is being delivered to the customer
+complete: the order has been successfully delivered
+canceled: the order has been canceled from the merchant
+failed: the order has failed to find a driver */
         }
 
         //Send SMS To customer
