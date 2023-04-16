@@ -118,7 +118,8 @@ to publish in production
 - git pull > ./yii init > ./yii migrate 
 - composer require mixpanel.... install mixpanel 
 - test config is there in admin as it should be 
-
 - test from console 
+
+`circleci local execute -e SLACK_ACCESS_TOKEN=xoxb-47737144055-4606269551878-bOLPfBq1x0ZvfC4OHbj7WgRP`
 
 

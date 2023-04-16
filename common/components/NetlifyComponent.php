@@ -49,13 +49,14 @@ class NetlifyComponent extends Component {
      * @param type $subdomain
      * @return type
      */
-    public function createSite($custom_domain, $store_branch) {
+    public function createSite($custom_domain, $store_branch = "master") {
 
         $createSiteEndpoint = $this->apiEndpoint . "/sites";
 
         $siteParams = [
             "name" => $store_branch . '-plugn',
             "custom_domain" => $custom_domain,
+            "build_image" => "focal",
             "repo" => [
                 "provider" => "github",
                 "id" => 70150125,
@@ -152,5 +153,59 @@ class NetlifyComponent extends Component {
             ->send();
 
         return $response;
+    }
+
+    /**
+     * update site from netlify
+     * @param $site_id
+     * @param $params
+     * @return \yii\httpclient\Response
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function updateSite($site_id, $params) {
+
+        $apiEndpoint = $this->apiEndpoint . "/sites/" . $site_id;
+
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod('PATCH')
+            ->setData($params)
+            ->setUrl($apiEndpoint)
+            ->addHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'User-Agent' => 'request',
+            ])
+            ->send();
+
+        return $response;
+    }
+
+    /**
+     * upgrade site to newer version
+     * @param $store
+     * @return \yii\httpclient\Response
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function upgradeSite($store) {
+
+        $params = [
+            "build_image" => "focal",
+            "repo" => [
+                "provider" => "github",
+                "id" => 70150125,
+                "force_ssl" => true,
+                "installation_id" => "11420049",
+                "repo" => "plugnio/plugn-ionic",
+                "private" => true,
+                "branch" => "master",
+                "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
+                "dir" => "www"
+            ],
+        ];
+
+        return $this->updateSite($store->site_id, $params);
     }
 }

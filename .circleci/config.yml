@@ -2,14 +2,19 @@
 #
 # Check https://circleci.com/docs/2.0/language-php/ for more details
 #
-version: 2
+version: 2.1
+
+orbs:
+  slack: circleci/slack@4.12.1
 
 jobs:
   build:
-    branches:
-      only:
-        - main
-        - develop
+
+    #branches:
+    #  only:
+    #    - main
+    #    - develop
+
     docker:
       # specify the version you desire here
       - image: cimg/php:7.4.30-browsers
@@ -120,4 +125,14 @@ jobs:
       - store_artifacts:
           path: ~/plugn/console/runtime/logs/report.html
           destination: report
+
+      - slack/notify:
+          channel: C01FNR0K2H0
+          event: fail
+          template: basic_fail_1
+          
+      - slack/notify:
+          channel: C01FNR0K2H0
+          event: pass
+          template: success_tagged_deploy_1    
 

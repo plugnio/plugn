@@ -12,7 +12,8 @@ use common\models\PaymentMethod;
 
 /**
  * ArmadaDelivery class for requesting a driver to deliver an order
- *
+ * https://armadadelivery.github.io
+ * https://documenter.getpostman.com/view/3558382/SWLZgAYt#overview
  * @author Saoud Al-Turki <saoud@pogi.io>
  * @link http://www.pogi.io
  */
@@ -59,7 +60,6 @@ class ArmadaDelivery extends Component {
         parent::init();
     }
 
-
     /**
      * Create a delivery request
      */
@@ -86,20 +86,46 @@ class ArmadaDelivery extends Component {
             ],
         ];
 
+        return $this->_callAPI('POST', '', $armadaApiKey, $deliveryParams);
+    }
 
-      $client = new Client();
+    /**
+     * @param $model
+     * @param $armadaApiKey
+     * @return \yii\httpclient\Response
+     */
+    public function fetchDelivery($model, $armadaApiKey)
+    {
+        return $this->_callAPI(
+            'GET',
+            '/'.$model->armada_delivery_code,
+            $armadaApiKey,
+            []);
+    }
 
-      $response = $client->createRequest()
-              ->setMethod('POST')
-              ->setUrl($this->apiEndpoint)
-              ->setData($deliveryParams)
-              ->addHeaders([
-                  'authorization' => 'Key ' . $armadaApiKey,
-                  'content-type' => 'application/json',
-              ])
-              ->send();
+    public function cancelDelivery($model, $armadaApiKey)
+    {
+        return $this->_callAPI(
+            'POST',
+            '/'.$model->armada_delivery_code.'/cancel',
+            $armadaApiKey,
+            []);
+    }
+
+    private function _callAPI($method, $urlParams, $apiKey, $params) {
+
+        $client = new Client();
+
+        $response = $client->createRequest()
+            ->setMethod($method)
+            ->setUrl($this->apiEndpoint . $urlParams)
+            ->setData($params)
+            ->addHeaders([
+                'authorization' => 'Key ' . $apiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
 
         return $response;
     }
-
 }

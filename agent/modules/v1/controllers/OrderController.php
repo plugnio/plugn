@@ -1259,6 +1259,44 @@ class OrderController extends BaseController
     }
 
     /**
+     * cancel delivery
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionCancelDelivery($id)
+    {
+        $model = $this->findModel($id);
+
+        $model->setScenario(Order::SCENARIO_UPDATE_ARMADA);
+
+        if($model->businessLocation)
+            $armadaApiKey = $model->businessLocation->armada_api_key;
+
+        if(!$armadaApiKey)
+            $armadaApiKey = $model->restaurant->armada_api_key;
+
+        $response = Yii::$app->armadaDelivery->cancelDelivery ($model, $armadaApiKey);
+
+        if ($response->isOk)
+        {
+            //todo: for maskor
+
+            return [
+                "operation" => "success",
+                "message" => Yii::t('agent', "Your request has been successfully cancelled")
+            ];
+        }
+
+        return [
+            "operation" => "error",
+            "code" => 1,
+            "apiResponse" => $response->getContent(),
+            "message" => Yii::t('agent', "We've faced a problem requesting driver from Armada")
+        ];
+    }
+
+    /**
      * Request a driver from Mashkor
      * @param type $order_uuid
      * @param type $store_uuid

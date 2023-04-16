@@ -229,6 +229,7 @@ return [
                         'GET <type>' => 'list',
                         'GET' => 'list',
                         'POST' => 'place-an-order',
+                        'POST cancel-delivery/<id>' => 'cancel-delivery',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
                         'POST request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'request-payment-status-from-tap',
@@ -239,7 +240,6 @@ return [
                         'POST create' => 'create',
                         'POST <store_uuid>' => 'place-an-order',
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
-                        'PATCH update-order-status/<order_uuid>' => 'update-order-status',
                         'PATCH update-order-status/<order_uuid>' => 'update-order-status',
                         'PATCH refund/<order_uuid>' => 'refund',
                         'PATCH <order_uuid>/<store_uuid>' => 'update',
@@ -270,9 +270,9 @@ return [
                         'OPTIONS live-orders' => 'options',
                         'OPTIONS create/<store_uuid>' => 'options',
                         'OPTIONS soft-delete/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS cancel-delivery/<id>' => 'options',
                         'OPTIONS soft-delete/<order_uuid>' => 'options',
                         'OPTIONS create' => 'options',
-                        'OPTIONS soft-delete/<order_uuid>' => 'options',
                         'OPTIONS request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-payment-status-from-tap/<order_uuid>' => 'options',
                     ]
@@ -709,16 +709,26 @@ return [
                    ]
                ],
                 [ // RestaurantPaymentMethod
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/restaurant-payment-method',
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET all' => 'list-all',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS all' => 'options'
+                    ]
+                ],
+                [ // DomainRequest
                    'class' => 'yii\rest\UrlRule',
-                   'controller' => 'v1/restaurant-payment-method',
+                   'controller' => 'v1/domain-request',
                    'patterns' => [
                        'GET' => 'index',
-                       'GET all' => 'list-all',
                        // OPTIONS VERBS
                        'OPTIONS' => 'options',
-                       'OPTIONS all' => 'options'
                    ]
                ],
+
             ],
         ],
     ],

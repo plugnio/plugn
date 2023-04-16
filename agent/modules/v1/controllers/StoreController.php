@@ -6,6 +6,7 @@ use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
 use common\components\TapPayments;
+use common\models\RestaurantDomainRequest;
 use common\models\Setting;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -155,6 +156,7 @@ class StoreController extends BaseController
     public function actionConnectDomain()
     {
         $domain = Yii::$app->request->getBodyParam('domain');
+        $purchase = Yii::$app->request->getBodyParam('purchase');
 
         $store = Yii::$app->accountManager->getManagedAccount();
 
@@ -168,28 +170,52 @@ class StoreController extends BaseController
 
         $store->restaurant_domain = rtrim($domain, '/');
 
-        if (!$store->save()) {
+        //for purchase request not changing store domain until domain available
+
+        if (!$purchase && !$store->save()) {
             return self::message("error",$store->getErrors());
         }
 
-        //log to slack
+        //save old/original domain detail
 
-        \Yii::info("[Store Domain Update Request] " . $store->name . " want to change domain from " .
-            $old_domain ." to " . $store->restaurant_domain, __METHOD__);
+        $isNotOriginalDomain = $store->getRestaurantDomainRequests()->exists();
 
-        \Yii::$app->mailer->compose([
-            'html' => 'domain-update-request',
-        ], [
-                'store_name' => $store->name,
-                'new_domain' => $store->restaurant_domain,
-                'old_domain' => $old_domain
-            ])
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-            ->setTo(Yii::$app->params['adminEmail'])
-            ->setSubject('[Plugn] Agent updated DN')
-            ->send();
+        if(!$isNotOriginalDomain)
+        {
+            $model = new RestaurantDomainRequest();
+            $model->restaurant_uuid = $store->restaurant_uuid;
+            $model->created_at = $store->restaurant_created_at;
+            $model->domain = $old_domain;
+            $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
+            $model->save(false);
+        }
 
-        return self::message("success","Congratulations you have successfully changed your domain name");
+        //update in netlify
+
+        //get domain from url
+
+        $domain = str_replace([
+            'http://',
+            'https://',
+            'www.',
+            'www2.',
+        ], ['', '', '', ''], $store->restaurant_domain);
+
+        //call api
+
+        Yii::$app->netlifyComponent->updateSite($store->site_id, [
+            'domain_aliases' => $domain,
+            'ssl' => true,
+            'force_ssl' => true
+        ]);
+
+        //todo: response validation
+
+        if($purchase) {//strpos($domain, '.plugn') > -1
+            return $store->notifyDomainRequest($old_domain);
+        }
+
+        return $store->notifyDomainUpdated($old_domain);
     }
 
     /**
@@ -257,7 +283,13 @@ class StoreController extends BaseController
     {
         $store = $this->findModel();
 
-        $response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+        //getting conflict on this
+        //$response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        if($store->site_id)
+            $response = Yii::$app->netlifyComponent->upgradeSite($store);
+        else
+            $response = Yii::$app->netlifyComponent->createSite($store->restaurant_domain);
 
         if ($response->isOk)
         {

@@ -644,6 +644,81 @@ class Restaurant extends \yii\db\ActiveRecord
             }
     }
 
+    /**
+     * request for new domain
+     * @param $old_domain
+     * @return array
+     */
+    public function notifyDomainRequest($old_domain) {
+
+        $model = new RestaurantDomainRequest;
+        $model->restaurant_uuid = $this->restaurant_uuid;
+        $model->created_by = Yii::$app->user->getId();
+        $model->domain = $this->restaurant_domain;
+        $model->status = RestaurantDomainRequest::STATUS_PENDING;
+        $model->save(false);
+
+        //if custom domain + want to purchase
+
+        \Yii::info("[Store Domain Update Request] " . $this->name . " want to change domain from " .
+            $old_domain ." to " . $this->restaurant_domain, __METHOD__);
+
+        \Yii::$app->mailer->compose([
+            'html' => 'domain-update-request',
+        ], [
+            'store_name' => $this->name,
+            'new_domain' => $this->restaurant_domain,
+            'old_domain' => $old_domain
+        ])
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setTo(Yii::$app->params['adminEmail'])
+            ->setSubject('[Plugn] Agent updated DN')
+            ->send();
+
+        return self::message("success","Our customer service agent will contact you soon!");
+    }
+
+    public function notifyDomainUpdated($old_domain) {
+
+        $model = new RestaurantDomainRequest;
+        $model->restaurant_uuid = $this->restaurant_uuid;
+        $model->created_by = Yii::$app->user->getId();
+        $model->domain = $this->restaurant_domain;
+        $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
+        $model->save(false);
+
+        \Yii::info("[Store Domain Updated] " . $this->name . " changed domain from " .
+            $old_domain ." to " . $this->restaurant_domain, __METHOD__);
+
+        $mailer = \Yii::$app->mailer->compose([
+            'html' => 'store/domain-updated',
+        ], [
+            'store_name' => $this->name,
+            'new_domain' => $this->restaurant_domain,
+            'old_domain' => $old_domain
+        ])
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            //->setTo(Yii::$app->params['adminEmail'])
+            ->setSubject('Store Domain Updated');
+
+        $agents = $this->getAgentAssignments()
+            //->andWhere(['email_notification' => true])
+            ->all();
+
+        foreach ($agents as $agentAssignment) {
+            $mailer->setTo($agentAssignment->agent->agent_email)
+                ->send();
+        }
+
+        if ($this->restaurant_email_notification && $this->restaurant_email) {
+            $mailer->setTo($this->restaurant_email)
+                ->send();
+        }
+
+        return self::message("success", "Congratulations you have successfully changed your domain name");
+
+    }
+
     public function alertInActive()
     {
         $mailer = Yii::$app->mailer->compose([
@@ -1684,6 +1759,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'noOfItems',
             'categories',
             'paymentGatewayQueue',
+            'restaurantDomainRequests',
             'openingHours',
             'isOpen' => function ($restaurant) {
                 return $restaurant->isOpen ();
@@ -2798,7 +2874,18 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->activeOrders ($this->restaurant_uuid);;
     }
-    
+
+    /**
+     * Gets query for [[RestaurantDomainRequest]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantDomainRequests($modelClass = "\common\models\RestaurantDomainRequest")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->orderBy('created_at DESC');
+    }
+
     /**
      * Gets query for [[Tickets]].
      *
@@ -3151,5 +3238,17 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public static function find() {
         return new query\RestaurantQuery(get_called_class());
+    }
+
+    /**
+     * @param string $type
+     * @param $message
+     * @return array
+     */
+    public static function message($type = "success", $message) {
+        return [
+            "operation" => $type,
+            "message" => is_string ($message)? Yii::t('agent', $message): $message
+        ];
     }
 }
