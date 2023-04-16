@@ -345,7 +345,12 @@ class RestaurantController extends Controller {
     {
         $store = $this->findModel($id);
 
-        $response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+        //$response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        if($store->site_id)
+            $response = Yii::$app->netlifyComponent->upgradeSite($store);
+        else
+            $response = Yii::$app->netlifyComponent->createSite($store->restaurant_domain);
 
         if ($response->isOk)
         {
@@ -357,7 +362,7 @@ class RestaurantController extends Controller {
         }
         else
         {
-            Yii::error('[Github > Error While merging with master]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+            Yii::error('[Error while upgrading site]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
             Yii::$app->session->setFlash('errorResponse', json_encode($response->data['message']));
         }
 
