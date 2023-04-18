@@ -1761,6 +1761,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'paymentGatewayQueue',
             'restaurantDomainRequests',
             'openingHours',
+            'restaurantUploads',
             'isOpen' => function ($restaurant) {
                 return $restaurant->isOpen ();
             },
@@ -3160,6 +3161,16 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])
                 ->where(['partner_status' => Partner::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Gets query for [[RestaurantUploads]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantUploads($modelClass = "\common\models\RestaurantUpload")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
