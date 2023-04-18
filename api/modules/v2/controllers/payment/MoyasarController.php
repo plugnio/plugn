@@ -96,7 +96,7 @@ class MoyasarController extends Controller
         $data['payment_moyasar_payment_methods_json'] = json_encode($data['payment_moyasar_payment_methods']);
 
         // get network support from admin
-        $data['payment_moyasar_network_support'] = [];
+        $data['payment_moyasar_network_support'] = ['mada', 'visa', 'mastercard', 'amex'];
         /*array_push($data['payment_moyasar_network_support'], ($data['payment_moyasar_network_type']['mada'])? 'mada' : '');
         array_push($data['payment_moyasar_network_support'], ($data['payment_moyasar_network_type']['visa'])? 'visa' : '');
         array_push($data['payment_moyasar_network_support'], ($data['payment_moyasar_network_type']['mastercard'])? 'mastercard' : '');
