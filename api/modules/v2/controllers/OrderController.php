@@ -7,6 +7,7 @@ use common\models\CustomerVoucher;
 use common\models\PaymentFailed;
 use kartik\mpdf\Pdf;
 use Yii;
+use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\Voucher;
@@ -79,10 +80,9 @@ class OrderController extends Controller
      */
     public function actionInitOrder($id)
     {
+        $restaurant = Restaurant::findOne($id);
 
-        $restaurant_model = Restaurant::findOne($id);
-
-        if (!$restaurant_model) {
+        if (!$restaurant) {
             return [
                 'operation' => 'error',
                 'message' => 'Invalid Store',
@@ -99,7 +99,7 @@ class OrderController extends Controller
         //as we will calculate after items get saved
         $order->total_price = 0;
         $order->subtotal = 0;
-        $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        $order->restaurant_uuid = $restaurant->restaurant_uuid;
 
         //Save Customer Info
         $order->utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
@@ -168,7 +168,7 @@ class OrderController extends Controller
                 $order->longitude = Yii::$app->request->getBodyParam("deliver_location_longitude"); //optional
 
             //Preorder
-            if ($order->is_order_scheduled != null && $order->is_order_scheduled == true && $restaurant_model->schedule_order) {
+            if ($order->is_order_scheduled != null && $order->is_order_scheduled == true && $restaurant->schedule_order) {
                 $order->scheduled_time_start_from = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
                 $order->scheduled_time_to = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
             }
@@ -259,13 +259,13 @@ class OrderController extends Controller
             }
         }
 
-        if (!$order->is_order_scheduled && !$restaurant_model->isOpen()) {
+        if (!$order->is_order_scheduled && !$restaurant->isOpen()) {
 
             $transaction->rollBack();
 
             return [
                 'operation' => 'error',
-                'message' => $restaurant_model->name . ' is currently closed and is not accepting orders at this time',
+                'message' => $restaurant->name . ' is currently closed and is not accepting orders at this time',
                 'code' => 6
             ];
         }
@@ -356,6 +356,14 @@ class OrderController extends Controller
 
         $transaction->commit();
 
+        //for https://pogi.sentry.io/issues/3889482226/?project=5220572&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
+        
+        \common\models\Restaurant::updateAll([
+            'last_order_at' => new Expression('NOW()')
+        ], [
+            'restaurant_uuid' => $restaurant->restaurant_uuid
+        ]);
+
         return [
             'operation' => 'success',
             'order' => $order
@@ -369,7 +377,7 @@ class OrderController extends Controller
     {
         $order_uuid = Yii::$app->request->getBodyParam('order_uuid');
 
-        $restaurant_model = Restaurant::findOne($id);
+        $restaurant = Restaurant::findOne($id);
 
         if ($order_uuid) {
             $order = $this->findModel($order_uuid);
@@ -447,15 +455,15 @@ class OrderController extends Controller
 
         // Create new payment record
         $payment = new Payment;
-        $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
+        $payment->restaurant_uuid = $restaurant->restaurant_uuid;
 
         $payment->customer_id = $order->customer->customer_id; //customer id
         $payment->order_uuid = $order->order_uuid;
         $payment->payment_amount_charged = $order->total;
         $payment->payment_current_status = "Redirected to payment gateway";
-        $payment->is_sandbox = $restaurant_model->is_sandbox;
+        $payment->is_sandbox = $restaurant->is_sandbox;
 
-        if ($restaurant_model->is_tap_enable) {
+        if ($restaurant->is_tap_enable) {
 
             $payment->payment_mode = $order->paymentMethod->source_id;
             $payment->payment_gateway_name = 'tap';
@@ -504,7 +512,7 @@ class OrderController extends Controller
             $order->payment_uuid = $payment->payment_uuid;
             $order->save(false);
 
-            Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
+            Yii::info("[" . $restaurant->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
                 Yii::$app->formatter->asCurrency($order->total, $order->currency->code,
                     [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
@@ -618,7 +626,7 @@ class OrderController extends Controller
                 'redirectUrl' => $redirectUrl,
             ];
 
-        } else if ($restaurant_model->is_myfatoorah_enable) {
+        } else if ($restaurant->is_myfatoorah_enable) {
 
             $payment->payment_gateway_name = 'myfatoorah';
             $payment->payment_mode = $order->paymentMethod->payment_method_name;
@@ -636,7 +644,7 @@ class OrderController extends Controller
             $order->payment_uuid = $payment->payment_uuid;
             $order->save(false);
 
-            Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
+            Yii::info("[" . $restaurant->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
                 Yii::$app->formatter->asCurrency($order->total, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
             Yii::$app->myFatoorahPayment->setApiKeys($order->currency->code, $order->restaurant->is_sandbox);
@@ -692,7 +700,7 @@ class OrderController extends Controller
                 $order->customer_phone_number,
                 Url::to(['order/my-fatoorah-callback'], true),
                 $order->order_uuid,
-                $restaurant_model->supplierCode,
+                $restaurant->supplierCode,
                 $order->restaurant->platform_fee,
                 $paymentMethodId,
                 $order->paymentMethod->payment_method_code,
