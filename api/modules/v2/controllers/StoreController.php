@@ -271,6 +271,7 @@ class StoreController extends Controller
                     'snapchat_pixil_id' => $restaurant->snapchat_pixil_id,
                     'custom_css' => $restaurant->custom_css,
                     'theme_color' => $themeColor->primary,
+                    'restaurantUploads' => $restaurant->restaurantUploads
                 ];
             } else {
                 return [

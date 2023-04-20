@@ -49,7 +49,7 @@ class BusinessLocationController extends Controller
         $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $businessLocations = BusinessLocation::find()
-            ->where(['restaurant_uuid' => $store->restaurant_uuid])
+            ->where(['business_location.restaurant_uuid' => $store->restaurant_uuid])
             ->all();
 
         return $this->render('index', [
@@ -397,7 +397,14 @@ class BusinessLocationController extends Controller
      */
     protected function findModel($id, $storeUuid)
     {
-        if (($model = BusinessLocation::find()->where(['business_location_id' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model = BusinessLocation::find()->where([
+            'business_location.business_location_id' => $id,
+            'business_location.restaurant_uuid' => $store->restaurant_uuid
+        ])->one();
+
+        if (($model) !== null) {
             return $model;
         }
 

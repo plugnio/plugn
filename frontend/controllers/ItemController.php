@@ -57,7 +57,8 @@ class ItemController extends Controller
     {
         $restaurant = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
-        $model = Item::find()->where(['restaurant_uuid' => $restaurant->restaurant_uuid])->all();
+        $model = Item::find()->where([
+            'item.restaurant_uuid' => $restaurant->restaurant_uuid])->all();
 
         header('Access-Control-Allow-Origin: *');
         header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -239,7 +240,7 @@ class ItemController extends Controller
         $file_name = Yii::$app->request->getBodyParam("file");
 
         if ($model && $file_name) {
-            $item_image = \common\models\ItemImage::find()->where(['item_uuid' => $itemUuid, 'product_file_name' => $file_name])->one();
+            $item_image = \common\models\ItemImage::find()->where(['item_image.item_uuid' => $itemUuid, 'item_image.product_file_name' => $file_name])->one();
             if($item_image)
                 $item_image->delete();
 
@@ -259,7 +260,7 @@ class ItemController extends Controller
 
         $modelItem = new Item;
         $modelItem->restaurant_uuid = $restaurant->restaurant_uuid;
-        $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
+        $categoryQuery = Category::find()->where(['category.restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
 
 
         $modelsOption = [new Option];
@@ -405,7 +406,7 @@ class ItemController extends Controller
     public function actionUpdate($id, $storeUuid)
     {
         $modelItem = $this->findModel($id, $storeUuid);
-        $categoryQuery = Category::find()->where(['restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
+        $categoryQuery = Category::find()->where(['category.restaurant_uuid' => $modelItem->restaurant_uuid])->asArray()->all();
 
         $modelsOption = $modelItem->getOptions()->all();
         $modelsExtraOption = [];
@@ -580,7 +581,11 @@ class ItemController extends Controller
      */
     protected function findModel($id, $storeUuid)
     {
-        if (($model = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->one()) !== null) {
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model  = Item::find()->where(['item_uuid' => $id, 'restaurant_uuid' => $store->restaurant_uuid])->one();
+
+        if (($model) !== null) {
             return $model;
         }
 

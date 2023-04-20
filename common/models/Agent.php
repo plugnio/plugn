@@ -42,6 +42,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     const SCENARIO_CHANGE_PASSWORD = 'change-password';
     const SCENARIO_CREATE_NEW_AGENT = 'create';
     const SCENARIO_UPDATE_EMAIL = 'update-email';
+    const SCENARIO_VERIFY_EMAIL = 'verify-email';
 
     /**
      * Field for temporary password. If set, it will overwrite the old password on save
@@ -93,7 +94,9 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
         $scenarios['updateLanguagePref'] = ['agent_language_pref'];
 
-        $scenarios['update-email'] = ['agent_email', 'agent_new_semail'];
+        $scenarios['update-email'] = ['agent_email', 'agent_new_email'];
+
+        $scenarios['verify-email'] = ['agent_email', 'agent_new_email', 'agent_email_verification', 'agent_auth_key'];
 
         return $scenarios;
     }
@@ -209,6 +212,9 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         }
 
         if ($model->agent_auth_key && $code && $model->agent_auth_key == $code) { //to cope with sql case insensitivity
+
+            $model->setScenario(self::SCENARIO_VERIFY_EMAIL);
+
             //If not verified
             if ($model->agent_email_verification == Agent::EMAIL_NOT_VERIFIED) {
                 //Verify this candidates email
@@ -223,16 +229,23 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             }
 
             $model->agent_auth_key = ''; //remove auth key
-            $model->save(false);
+
+            if($model->save()) {
+                return [
+                    'success' => true,
+                    'data' => $model
+                ];
+            }
 
             return [
-                'success' => true,
-                'data' => $model
+                'success' => false,
+                'message' => Yii::t('agent','This email already registered!')
             ];
+
         } else {
             return [
                 'success' => false,
-                'message' =>Yii::t('agent','This email verification link is no longer valid, please login to send a new one')
+                'message' => Yii::t('agent','This email verification link is no longer valid, please login to send a new one')
             ];
         }
     }

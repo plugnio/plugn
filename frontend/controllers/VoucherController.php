@@ -216,8 +216,8 @@ class VoucherController extends Controller
 
         $model = Voucher::find()
             ->where([
-                'voucher_id' => $id,
-                'restaurant_uuid' => $store->restaurant_uuid
+                'voucher.voucher_id' => $id,
+                'voucher.restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one();
 

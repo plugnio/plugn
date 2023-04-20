@@ -196,7 +196,13 @@ class AgentAssignmentController extends Controller
 
         if (Yii::$app->user->identity->isOwner ($storeUuid)) {
 
-            if (($model = AgentAssignment::find ()->where (['assignment_id' => $assignment_id, 'agent_id' => $agent_id, 'restaurant_uuid' => $store->restaurant_uuid])->one ()) !== null) {
+            $model = AgentAssignment::find ()->where ([
+                'agent_assignment.assignment_id' => $assignment_id,
+                'agent_assignment.agent_id' => $agent_id,
+                'agent_assignment.restaurant_uuid' => $store->restaurant_uuid
+            ])->one ();
+
+            if ($model !== null) {
                 return $model;
             } else {
                 throw new NotFoundHttpException('The requested page does not exist.');

@@ -4,6 +4,7 @@ namespace api\modules\v1\controllers;
 
 use common\models\Currency;
 use Yii;
+use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\Voucher;
@@ -71,14 +72,14 @@ class OrderController extends Controller {
      */
     public function actionPlaceAnOrder($id) {
 
-        $restaurant_model = Restaurant::findOne($id);
+        $restaurant = Restaurant::findOne($id);
 
-        if ($restaurant_model) {
+        if ($restaurant) {
 
             $order = new Order();
             $order->setScenario(Order::SCENARIO_OLD_VERSION);
 
-            $order->restaurant_uuid = $restaurant_model->restaurant_uuid;
+            $order->restaurant_uuid = $restaurant->restaurant_uuid;
 
             //Save Customer Info
             $order->utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
@@ -110,7 +111,7 @@ class OrderController extends Controller {
             {
                 $order->area_id = Yii::$app->request->getBodyParam("area_id");
 
-                if($order->area_id && $areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant_model->restaurant_uuid, 'area_id' =>  $order->area_id])->one())
+                if($order->area_id && $areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant->restaurant_uuid, 'area_id' =>  $order->area_id])->one())
                    $order->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
 
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
@@ -127,7 +128,7 @@ class OrderController extends Controller {
 
 
                 //Preorder
-                if ($order->is_order_scheduled != null && $order->is_order_scheduled == true && $restaurant_model->schedule_order) {
+                if ($order->is_order_scheduled != null && $order->is_order_scheduled == true && $restaurant->schedule_order) {
                     $order->scheduled_time_start_from = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
                     $order->scheduled_time_to = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
                 }
@@ -223,10 +224,10 @@ class OrderController extends Controller {
                 ];
             }
 
-            if (!$order->is_order_scheduled && !$restaurant_model->isOpen()) {
+            if (!$order->is_order_scheduled && !$restaurant->isOpen()) {
                 $response = [
                     'operation' => 'error',
-                    'message' => $restaurant_model->name . ' is currently closed and is not accepting orders at this time',
+                    'message' => $restaurant->name . ' is currently closed and is not accepting orders at this time',
                 ];
             }
 
@@ -258,9 +259,9 @@ class OrderController extends Controller {
 
                     // Create new payment record
                     $payment = new Payment;
-                    $payment->restaurant_uuid = $restaurant_model->restaurant_uuid;
+                    $payment->restaurant_uuid = $restaurant->restaurant_uuid;
                     $payment->payment_mode = $order->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
-                    $payment->is_sandbox = $restaurant_model->is_sandbox;
+                    $payment->is_sandbox = $restaurant->is_sandbox;
 
                     if ($payment->payment_mode == TapPayments::GATEWAY_VISA_MASTERCARD && Yii::$app->request->getBodyParam("payment_token") && Yii::$app->request->getBodyParam("bank_name")) {
 
@@ -344,7 +345,7 @@ class OrderController extends Controller {
                             ];
                         }
 
-                          Yii::info("[" . $restaurant_model->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
+                          Yii::info("[" . $restaurant->name . ": Payment Attempt Started] " . $order->customer_name . ' start attempting making a payment ' .
                               Yii::$app->formatter->asCurrency($order->total, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]), __METHOD__);
 
                         // Redirect to payment gateway
@@ -490,6 +491,14 @@ class OrderController extends Controller {
             ];
         }
 
+        //for https://pogi.sentry.io/issues/3889482226/?project=5220572&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
+
+        \common\models\Restaurant::updateAll([
+            'last_order_at' => new Expression('NOW()')
+        ], [
+            'restaurant_uuid' => $restaurant->restaurant_uuid
+        ]);
+        
         return $response;
     }
 

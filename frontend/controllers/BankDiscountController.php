@@ -173,8 +173,8 @@ class BankDiscountController extends Controller
         Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $model = BankDiscount::find()->where([
-            'bank_discount_id' => $id,
-            'restaurant_uuid' => $storeUuid
+            'bank_discount.bank_discount_id' => $id,
+            'bank_discount.restaurant_uuid' => $storeUuid
         ])->one();
 
         if ($model !== null) {
