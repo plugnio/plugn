@@ -63,8 +63,8 @@ class OrderController extends Controller
 
         $agentAssignment = $restaurant->getAgentAssignments()
             ->where([
-                'restaurant_uuid' => $restaurant->restaurant_uuid,
-                'agent_id' => Yii::$app->user->identity->agent_id
+                'agent_assignment.restaurant_uuid' => $restaurant->restaurant_uuid,
+                'agent_assignment.agent_id' => Yii::$app->user->identity->agent_id
             ])->one();
 
         $searchModel = new OrderSearch();
@@ -711,7 +711,9 @@ class OrderController extends Controller
 
             if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-                $areaDeliveryZone = AreaDeliveryZone::find()->andWhere(['restaurant_uuid' => $restaurant->restaurant_uuid, 'area_id' => $model->area_id])->one();
+                $areaDeliveryZone = AreaDeliveryZone::find()->andWhere([
+                    'area_delivery_zone.restaurant_uuid' => $restaurant->restaurant_uuid,
+                    'area_delivery_zone.area_id' => $model->area_id])->one();
 
                 if ($areaDeliveryZone)
                     $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
@@ -758,7 +760,13 @@ class OrderController extends Controller
 
             if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
                 $model->pickup_location_id = null;
-                if ($areaDeliveryZone = AreaDeliveryZone::find()->where(['restaurant_uuid' => $restaurant->restaurant_uuid, 'area_id' => $model->area_id])->one())
+
+                $areaDeliveryZone = AreaDeliveryZone::find()->where([
+                    'area_delivery_zone.restaurant_uuid' => $restaurant->restaurant_uuid,
+                    'area_delivery_zone.area_id' => $model->area_id
+                ])->one();
+
+                if ($areaDeliveryZone)
                     $model->delivery_zone_id = $areaDeliveryZone->delivery_zone_id;
 
             } else {

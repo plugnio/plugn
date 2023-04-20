@@ -39,7 +39,7 @@ class BusinessLocationSearch extends BusinessLocation
      */
     public function search($params, $restaurantUuid)
     {
-        $query = BusinessLocation::find()->where(['restaurant_uuid' => $restaurantUuid]);
+        $query = BusinessLocation::find()->where(['business_location.restaurant_uuid' => $restaurantUuid]);
 
         // add conditions that should always apply here
 
@@ -57,13 +57,13 @@ class BusinessLocationSearch extends BusinessLocation
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'business_location_id' => $this->business_location_id,
-            'support_pick_up' => $this->support_pick_up,
+            'business_location.business_location_id' => $this->business_location_id,
+            'business_location.support_pick_up' => $this->support_pick_up,
         ]);
 
-        $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
-            ->andFilterWhere(['like', 'business_location_name', $this->business_location_name])
-            ->andFilterWhere(['like', 'business_location_name_ar', $this->business_location_name_ar]);
+        $query->andFilterWhere(['like', 'business_location.restaurant_uuid', $this->restaurant_uuid])
+            ->andFilterWhere(['like', 'business_location.business_location_name', $this->business_location_name])
+            ->andFilterWhere(['like', 'business_location.business_location_name_ar', $this->business_location_name_ar]);
 
         return $dataProvider;
     }

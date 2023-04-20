@@ -214,7 +214,11 @@ class OpeningHourController extends Controller
      */
     protected function findModel($storeUuid, $dayOfWeek)
     {
-        if (($model = OpeningHour::find()->where(['day_of_week' => $dayOfWeek, 'restaurant_uuid' => Yii::$app->accountManager->getManagedAccount($storeUuid)->restaurant_uuid])->all()) !== null) {
+        $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
+        $model  = OpeningHour::find()->where(['day_of_week' => $dayOfWeek, 'restaurant_uuid' => $store->restaurant_uuid])->all();
+
+        if (($model) !== null) {
             return $model;
         }
 
