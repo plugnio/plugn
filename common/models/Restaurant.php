@@ -434,7 +434,8 @@ class Restaurant extends \yii\db\ActiveRecord
             self::SCENARIO_UPDATE => [
                 'country_id', 'restaurant_email_notification', 'demand_delivery','phone_number', 'phone_number_country_code',
                 'name', 'name_ar', 'schedule_interval', 'schedule_order',
-                'restaurant_email', 'tagline', 'tagline_ar', 'currency_id'
+                'restaurant_email', 'tagline', 'tagline_ar', 'currency_id',
+                'owner_first_name', 'owner_last_name', 'owner_number', 'owner_email', 'owner_phone_country_code'
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
                 'armada_api_key', 'mashkor_branch_id'
@@ -1356,6 +1357,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
             return [
                 "operation" => 'success',
+                "message" => "Account created successfully!"
             ];
         }
         else
@@ -1392,6 +1394,7 @@ class Restaurant extends \yii\db\ActiveRecord
  
         return [
             "operation" => 'success',
+            "message" => "Account created successfully!"
         ];
     }
 
