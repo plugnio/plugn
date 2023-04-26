@@ -123,3 +123,8 @@ to publish in production
 `circleci local execute -e SLACK_ACCESS_TOKEN=xoxb-47737144055-4606269551878-bOLPfBq1x0ZvfC4OHbj7WgRP`
 
 
+Todo
+------------------
+update cron > crontab
+
+https://blog.logrocket.com/how-to-run-laravel-docker-compose-ubuntu-v22-04/

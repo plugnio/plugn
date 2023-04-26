@@ -9,7 +9,7 @@
 
 # * * * * * root /script.sh
 
-* * * * * echo 'works';
+#* * * * * echo 'works';
 
 
 

@@ -4,8 +4,11 @@ services:
   mysql:
     image: mysql:5.7
     restart: always
-    volumes:
-      - mysql-data:/var/lib/mysql
+    ports:
+      - 3306:3306    
+      - 33060:33060
+    #volumes:
+    #  - mysql-data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=12345
       - MYSQL_DATABASE=plugn
@@ -15,22 +18,31 @@ services:
       sh -c "echo 'CREATE DATABASE IF NOT EXISTS plugn;CREATE DATABASE IF NOT EXISTS plugn_test;' > /docker-entrypoint-initdb.d/init.sql;
         /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
 
-  redis:
-    image: redis:6.2.3
-    volumes:
-      - redis-data:/data
+  #redis:
+  #  image: redis:6.2.3
+  #  volumes:
+  #    - redis-data:/data
+ 
+  #adminer:
+  #  image: adminer
+  #  restart: always
+  #  ports:
+  #    - 8080:8080
 
   phpmyadmin:
     image: phpmyadmin
+    command: |
+      sudo apt-get update
+      sudo apt-get install -y libpng-dev libmcrypt-dev libreadline-dev zip zlib1g-dev default-mysql-client
     restart: always
-    #ports:
-    #  - 8080:8080
+    ports:
+      - 8080:80 
     environment:
-      - PMA_HOST=mysql
-      - PMA_PORT=8888
+      - PMA_HOST=localhost
+      - PMA_PORT=3306
     depends_on:
       - "mysql"
-
+ 
   # Start container to install composer deps and kill after
   composer-deps:
     build: backend
