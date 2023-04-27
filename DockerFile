@@ -1,5 +1,8 @@
 FROM yiisoftware/yii2-php:7.4-apache
-RUN php composer.phar install --prefer-dist
-RUN  ./init --env=Development --overwrite=All
-RUN bash -c "sleep 20 && ./yii migrate --interactive=0 && ./yii_test migrate --interactive=0"
-RUN bash -c "sleep 20 && ./yii fixture/load '*' --interactive=0"
+#COPY --from=composer /usr/bin/composer /usr/bin/composer
+#RUN composer install --prefer-dist
+#RUN php composer.phar install --prefer-dist
+#RUN init --env=Production --overwrite=All
+#RUN /app/yii migrate --interactive=0 
+#RUN yii_test migrate --interactive=0
+#RUN yii fixture/load "*" --interactive=0

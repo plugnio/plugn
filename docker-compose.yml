@@ -7,34 +7,43 @@ services:
     ports:
       - 3306:3306    
       - 33060:33060
-    expose:
-      - "3306"  
     #volumes:
-      # uncomment if want to import sql file
-      - ./mysql-data:/var/lib/mysql
-      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    #  - mysql-data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=12345
       - MYSQL_DATABASE=plugn
       - MYSQL_USER=plugnuser
       - MYSQL_PASSWORD=12345
-    #entrypoint:
-    #  sh -c "echo 'CREATE DATABASE IF NOT EXISTS plugn;CREATE DATABASE IF NOT EXISTS plugn_test;' > /docker-entrypoint-initdb.d/init.sql;
-    #    ./yii migrate --interactive=0;
-    #    ./yii fixture/load '*' --interactive=0;
-    #    /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
-  
-  redis:
-    image: redis:6.2.3
-    volumes:
-      - redis-data:/data 
+    entrypoint:
+      sh -c "echo 'CREATE DATABASE IF NOT EXISTS plugn;CREATE DATABASE IF NOT EXISTS plugn_test;' > /docker-entrypoint-initdb.d/init.sql;
+        /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
 
+  #redis:
+  #  image: redis:6.2.3
+  #  volumes:
+  #    - redis-data:/data
+ 
   #adminer:
   #  image: adminer
   #  restart: always
   #  ports:
   #    - 8080:8080
 
+  phpmyadmin:
+    image: phpmyadmin
+    command: |
+      sudo apt-get update
+      sudo apt-get install -y libpng-dev libmcrypt-dev libreadline-dev zip zlib1g-dev default-mysql-client
+    restart: always
+    ports:
+      - 8080:80 
+    environment:
+      - PMA_HOST=localhost
+      - PMA_PORT=3306
+    depends_on:
+      - "mysql"
+ 
+  # Start container to install composer deps and kill after
   composer-deps:
     build: backend
     command: composer install
@@ -43,7 +52,7 @@ services:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       # Mount source-code for development
       - ./:/app
-      
+
   # Start container to init dev environment and kill after
   init-environment:
     build: backend
@@ -55,11 +64,11 @@ services:
       - ./:/app
     depends_on:
       - "composer-deps"
-        
+
   # Start container to run db migrations and kill after
   db-migration:
     build: backend
-    command: bash -c "sleep 20 && php yii migrate --interactive=0 && php yii_test migrate --interactive=0"
+    command: bash -c "sleep 20 && ./yii migrate --interactive=0 && ./yii_test migrate --interactive=0"
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
@@ -70,13 +79,11 @@ services:
       - "mysql"
       - "redis"
       - "composer-deps"
-    links:
-      - "mysql" 
-        
+
   # Load fixture data
   load-fixture:
     build: backend
-    command: bash -c "sleep 20 && php yii fixture/load '*' --interactive=0"
+    command: bash -c "sleep 20 && ./yii fixture/load '*' --interactive=0"
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
@@ -84,32 +91,19 @@ services:
       - ./:/app
     depends_on:
       - "db-migration"
-    links:
-      - "mysql" 
-        
-  phpmyadmin:
-    image: phpmyadmin
-    #command: |
-    #  sudo apt-get update
-    #  sudo apt-get install -y libpng-dev libmcrypt-dev libreadline-dev zip zlib1g-dev default-mysql-client
-    restart: always
-    links:
-      - "mysql"
-    ports:
-      - 8080:80 
-    environment:
-      - PMA_HOST=mysql
-      #192.168.0.104
-      - PMA_PORT=3306
-      - PMA_USER=root
-      - PMA_PASSWORD=12345
+
+  cron:
+    build: cron
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
     depends_on:
-      - "mysql"  
-  
+      - "load-fixture"
+
   backend:
     build: backend
-    links:
-      - "mysql"
     ports:
       - 21080:80
     volumes:
@@ -117,16 +111,8 @@ services:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       # Mount source-code for development
       - ./:/app
-    working_dir: /app
-    #command:
-    #  - /usr/local/bin/php composer install
-      #- /usr/local/bin/php /app/init --env="Development [Docker Compose]" --overwrite=All 
-      #- /usr/local/bin/php /app/yii migrate --interactive=0
-      #- /usr/local/bin/php /app/yii fixture/load "*" --interactive=0  
     depends_on:
-      - "phpmyadmin" 
-     # - "common"
-      #load-fixture
+      - "load-fixture"
 
   frontend:
     build: frontend
@@ -138,9 +124,7 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "phpmyadmin"
-    links:
-      - "mysql" 
+      - "load-fixture"
 
   agent:
     build: agent
@@ -152,9 +136,7 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "phpmyadmin"
-    links:
-      - "mysql" 
+      - "load-fixture"
 
   crmapi:
     build: crmapi
@@ -166,9 +148,7 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "phpmyadmin"
-    links:
-      - "mysql" 
+      - "load-fixture"
 
   api:
     build: api
@@ -180,9 +160,7 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "phpmyadmin"
-    links:
-      - "mysql" 
+      - "load-fixture"
 
   shortner:
     build: shortner
@@ -194,33 +172,7 @@ services:
       # Mount source-code for development
       - ./:/app
     depends_on:
-      - "phpmyadmin"
-    links:
-      - "mysql" 
-
-  partner:
-    build: partner
-    ports:
-      - 27080:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-    depends_on:
-      - "phpmyadmin"
-    links:
-      - "mysql" 
-
-  cron:
-    build: cron
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app 
-    links:
-      - "mysql" 
+      - "load-fixture"
 
 volumes:
   mysql-data:
