@@ -3,7 +3,7 @@
 Build production images 
 
 ```bash
-docker compose -f docker-compose-prod.yml up
+docker compose -f docker-compose-prod.yml up --force-recreate
 ```
 
 Step by step 
