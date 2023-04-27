@@ -1,5 +1,11 @@
 ## Set up Docker Dev Environment -1
 
+Build production images 
+
+```bash
+docker compose -f docker-compose-prod.yml up
+```
+
 Step by step 
 
 Run the following command after installing Docker

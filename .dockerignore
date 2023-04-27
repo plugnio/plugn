@@ -37,8 +37,6 @@ phpunit.phar
 /.vagrant
 
 # ignore generated files
-/crmapi/web/index.php
-/crmapi/web/index-test.php
 /crm/web/index.php
 /crm/web/index-test.php
 /frontend/web/index.php

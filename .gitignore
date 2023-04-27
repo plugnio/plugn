@@ -53,3 +53,9 @@ phpunit.phar
 /partner/web/robots.txt
 /crm/config/main-local.php
 /crm/config/params-local.php
+partner/config/main-local.php
+partner/web/index.php
+partner/config/main-local.php
+partner/web/index.php
+partner/web/robots.txt
+partner/config/main-local.php
