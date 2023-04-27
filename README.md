@@ -1,5 +1,7 @@
 ## Set up Docker Dev Environment -1
 
+Step by step 
+
 Run the following command after installing Docker
 
 ```bash
@@ -9,7 +11,12 @@ docker-compose up
 This should set you up with the entire app along with MySQL and Redis. Use the following links to check it out:
 
 * [Backend on localhost:21080](http://localhost:21080)
-* [Store Dashboard API on localhost:23080](http://localhost:23080)
+* [Frontend on localhost:22080](http://localhost:22080)
+* [Agent API on localhost:23080](http://localhost:23080)
+* [CRM API on localhost:23080](http://localhost:24080)
+* [API on localhost:21080](http://localhost:25080)
+* [Shortner on localhost:23080](http://localhost:26080)
+* [Partner on localhost:23080](http://localhost:27080)
 * [Phpmyadmin on localhost:8080](http://localhost:8080)
 
 
@@ -19,6 +26,7 @@ This should set you up with the entire app along with MySQL and Redis. Use the f
 docker-compose exec backend bash
 
 # Now you can run things like
+php composer.phar install 
 ./init
 ./yii migrate
 ```

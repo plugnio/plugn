@@ -1,3 +1,6 @@
+#docker composer 
+mysql-data
+
 # yii console commands
 /yii
 /yii_test
