@@ -86,6 +86,126 @@ class Customer extends \yii\db\ActiveRecord {
         ];
     }
 
+    public static function getTotalCustomersByWeek()
+    {
+        $customer_data = [];
+
+        $date_start = strtotime ('-6 days');//date('w')
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date ('Y-m-d', $date_start + ($i * 86400));
+
+            $customer_data[date ('w', strtotime ($date))] = array(
+                'day' => date ('D', strtotime ($date)),
+                'total' => 0
+            );
+        }
+
+        $rows = Customer::find()
+            ->select(new Expression('customer_created_at, COUNT(*) as total'))
+            ->andWhere(new Expression("DATE(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->groupBy(new Expression('DAYNAME(customer_created_at)'))
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $customer_data[date ('w', strtotime ($result['customer_created_at']))] = array(
+                'day' => date ('D', strtotime ($result['customer_created_at'])),
+                'total' => (int) $result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = Customer::find()
+            ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->count();
+
+        return [
+            'customer_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+        ];
+    }
+
+    public static function getTotalCustomersByMonth()
+    {
+        $customer_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
+
+        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
+            $customer_data[$i] = array(
+                'day'   => $i,
+                'total' => 0
+            );
+        }
+
+        $rows = Customer::find()
+            ->select(new Expression('customer_created_at, COUNT(*) as total'))
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+            ->groupBy(new Expression('DAY(customer_created_at)'))
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $customer_data[date ('j', strtotime ($result['customer_created_at']))] = array(
+                'day' => (int) date ('j', strtotime ($result['customer_created_at'])),
+                'total' => (int) $result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = Customer::find()
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+            ->count();
+
+        return [
+            'customer_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+        ];
+    }
+
+    public static function getTotalCustomersByMonths($months)
+    {
+        $customer_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+        $date_end = date('Y-m-d', strtotime('last day of previous month'));
+        //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
+
+        for ($i = 0; $i <= $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $customer_data[$month] = array(
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'total' => 0
+            );
+        }
+
+        $rows = Customer::find()
+            ->select(new Expression('customer_created_at, COUNT(*) as total'))
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
+            ->groupBy(new Expression('MONTH(customer_created_at)'))
+            ->asArray()
+            ->all();
+
+        foreach ($rows as $result) {
+            $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
+                'month' => Yii::t('app', date ('F', strtotime ($result['customer_created_at']))),
+                'total' => (int) $result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = Customer::find()
+            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
+            ->count();
+
+        return [
+            'customer_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+        ];
+    }
+
     /**
      * Gets query for [[Orders]].
      *
