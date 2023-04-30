@@ -54,3 +54,6 @@ phpunit.phar
 /crm/config/main-local.php
 /crm/config/params-local.php
 
+partner/config/main-local.php
+partner/web/index-test.php
+partner/web/index.php
