@@ -1769,6 +1769,254 @@ failed: the order has failed to find a driver */
         }
     }
 
+    public static function getTotalRevenueByWeek()
+    {
+        $revenue_generated_chart_data = [];
+
+        $date_start = strtotime ('-6 days');//date('w')
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date ('Y-m-d', $date_start + ($i * 86400));
+
+            $revenue_generated_chart_data[date ('w', strtotime ($date))] = array(
+                'day' => date ('D', strtotime ($date)),
+                'total' => 0
+            );
+        }
+
+        $rows = Order::find()
+            ->activeOrders ()
+            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+            ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->groupBy (new Expression('DAY(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $revenue_generated_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
+                'day' => date ('D', strtotime ($result['order_created_at'])),
+                'total' => (float) $result['total']
+            );
+        }
+
+        $number_of_all_revenue_generated = Order::find()
+            ->activeOrders()
+            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->sum('total_price');
+
+        return [
+            'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
+            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+        ];
+    }
+
+    public static function getTotalOrdersByWeek()
+    {
+        $orders_received_chart_data = [];
+
+        $date_start = strtotime ('-6 days');//date('w')
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date ('Y-m-d', $date_start + ($i * 86400));
+
+            $orders_received_chart_data[date ('w', strtotime ($date))] = array(
+                'day' => date ('D', strtotime ($date)),
+                'total' => 0
+            );
+        }
+
+        $rows = Order::find()
+            ->activeOrders ()
+            ->select (new Expression('order_created_at, COUNT(*) as total'))
+            ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->groupBy (new Expression('DAY(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $orders_received_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
+                'day' => date ('D', strtotime ($result['order_created_at'])),
+                'total' => (int) $result['total']
+            );
+        }
+
+        $number_of_all_orders_received = Order::find()
+            ->activeOrders()
+            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+            ->count();
+
+        return [
+            'orders_received_chart_data' => array_values ($orders_received_chart_data),
+            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+        ];
+    }
+
+    public static function getTotalOrdersByMonth()
+    {
+        $orders_received_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+
+        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
+            $orders_received_chart_data[$i] = array(
+                'day'   => $i,
+                'total' => 0
+            );
+        }
+
+        $rows = Order::find()
+            ->activeOrders ()
+            ->select (new Expression('order_created_at, COUNT(*) as total'))
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+            ->groupBy (new Expression('DAY(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $orders_received_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
+                'day' => (int) date ('j', strtotime ($result['order_created_at'])),
+                'total' => (int) $result['total']
+            );
+        }
+
+        $number_of_all_orders_received = Order::find()
+            ->activeOrders()
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+            ->count();
+
+        return [
+            'orders_received_chart_data' => array_values ($orders_received_chart_data),
+            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+        ];
+    }
+
+    public static function getTotalOrdersByMonths($months)
+    {
+        $orders_received_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+        $date_end = date('Y-m-d', strtotime('last day of previous month'));
+        //date('Y') . '-' . date('m') . '-1';
+
+        for ($i = 0; $i <= $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $orders_received_chart_data[$month] = array(
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'total' => 0
+            );
+        }
+
+        $rows = Order::find()
+            ->activeOrders ()
+            ->select (new Expression('order_created_at, COUNT(*) as total'))
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+            ->groupBy (new Expression('MONTH(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
+                'total' => (int) $result['total']
+            );
+        }
+
+        $number_of_all_orders_received = Order::find()
+            ->activeOrders()
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+            ->count();
+
+        return [
+            'orders_received_chart_data' => array_values ($orders_received_chart_data),
+            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+        ];
+    }
+
+    public static function getTotalRevenueByMonth()
+    {
+        $revenue_generated_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+
+        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
+            $revenue_generated_chart_data[$i] = array(
+                'day'   => $i,
+                'total' => 0
+            );
+        }
+
+        $rows = Order::find()
+            ->activeOrders ()
+            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+            ->groupBy (new Expression('DAY(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $revenue_generated_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
+                'day' => (int) date ('j', strtotime ($result['order_created_at'])),
+                'total' => (float) $result['total']
+            );
+        }
+
+        $number_of_all_revenue_generated = Order::find()
+            ->activeOrders()
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+            ->sum('total_price');
+
+        return [
+            'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
+            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+        ];
+    }
+
+    public static function getTotalRevenueByMonths($months)
+    {
+        $revenue_generated_chart_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+        $date_end = date('Y-m-d', strtotime('last day of previous month'));
+        //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
+
+        for ($i = 0; $i <= $months; $i++) {
+
+            $month = date('m', strtotime('-'.($months - $i).' month'));
+
+            $revenue_generated_chart_data[$month] = array(
+                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'total' => 0
+            );
+        }
+
+        $rows = Order::find()
+            ->activeOrders ()
+            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+            ->groupBy (new Expression('MONTH(order.order_created_at)'))
+            ->asArray ()
+            ->all ();
+
+        foreach ($rows as $result) {
+            $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
+                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
+                'total' => (float) $result['total']
+            );
+        }
+
+        $number_of_all_revenue_generated = Order::find()
+            ->activeOrders()
+            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+            ->sum('total_price');
+
+        return [
+            'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
+            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+        ];
+    }
+
     /**
      * get order total converted to selected currency
      * @return float
