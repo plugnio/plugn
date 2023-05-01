@@ -1989,6 +1989,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function beforeDelete()
     {
         $transaction = Yii::$app->db->beginTransaction();
+
         try {
             Queue::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
             Category::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);

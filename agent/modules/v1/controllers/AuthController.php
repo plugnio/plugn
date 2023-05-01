@@ -392,7 +392,7 @@ class AuthController extends Controller {
                         'store_url' => $store->restaurant_domain
                     ],
                     null,
-                    $store->restaurant_uuid
+                    $agent->agent_id
                 );
 
                 $param = [

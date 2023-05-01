@@ -89,14 +89,14 @@ class RestaurantUpload extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'upload_uuid' => Yii::t('common', 'Upload Uuid'),
-            'restaurant_uuid' => Yii::t('common', 'Restaurant Uuid'),
-            'path' => Yii::t('common', 'Path'),
-            'filename' => Yii::t('common', 'Filename'),
-            'content' => Yii::t('common', 'Content'),
-            'created_by' => Yii::t('common', 'Created By'),
-            'created_at' => Yii::t('common', 'Created At'),
-            'updated_at' => Yii::t('common', 'Updated At'),
+            'upload_uuid' => Yii::t('app', 'Upload Uuid'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
+            'path' => Yii::t('app', 'Path'),
+            'filename' => Yii::t('app', 'Filename'),
+            'content' => Yii::t('app', 'Content'),
+            'created_by' => Yii::t('app', 'Created By'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
         ];
     }
 
