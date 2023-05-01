@@ -18,10 +18,10 @@ services:
       sh -c "echo 'CREATE DATABASE IF NOT EXISTS plugn;CREATE DATABASE IF NOT EXISTS plugn_test;' > /docker-entrypoint-initdb.d/init.sql;
         /usr/local/bin/docker-entrypoint.sh --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
 
-  #redis:
-  #  image: redis:6.2.3
-  #  volumes:
-  #    - redis-data:/data
+  redis:
+    image: redis:6.2.3
+    volumes:
+      - redis-data:/data
  
   #adminer:
   #  image: adminer
@@ -92,15 +92,15 @@ services:
     depends_on:
       - "db-migration"
 
-  cron:
-    build: cron
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+  #cron:
+  #  build: cron
+  #  volumes:
+  #    # Re-use local composer cache via host-volume
+  #    - ~/.composer-docker/cache:/root/.composer/cache:delegated
       # Mount source-code for development
-      - ./:/app
-    depends_on:
-      - "load-fixture"
+  #    - ./:/app
+  #  depends_on:
+  #    - "load-fixture"
 
   backend:
     build: backend
