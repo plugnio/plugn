@@ -23,6 +23,9 @@ Thumbs.db
 # composer vendor dir
 /vendor
 
+#composer/docker container mysql-data
+/mysql-data
+
 # composer itself is not needed
 composer.phar
 
@@ -55,7 +58,5 @@ phpunit.phar
 /crm/config/params-local.php
 partner/config/main-local.php
 partner/web/index.php
-partner/config/main-local.php
-partner/web/index.php
 partner/web/robots.txt
-partner/config/main-local.php
+partner/web/index-test.php
