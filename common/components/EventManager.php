@@ -109,13 +109,21 @@ class EventManager extends Component
     }
 
     /**
+     * todo: userId not passing in mixpanel?
      * register event 
      */
     public function track($event, $eventData, $timestamp = null, $userId = null)
     {
-        if($this->_client)
-            $this->_client->track($event, $eventData);
-
+        if($this->_client) {
+            
+            $data = $eventData;
+            
+            if($timestamp)
+                $data["time"] = $timestamp;
+            
+            $this->_client->track($event, $data);
+        }
+        
         if($this->segmentKey) {
 
             $data = [
