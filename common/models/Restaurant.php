@@ -176,6 +176,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_UPDATE_DESIGN_LAYOUT = 'update_design_layout';
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
+    const SCENARIO_RESET_TAP_ACCOUNT = 'resetTapAccount';
     const SCENARIO_CREATE_MYFATOORAH_ACCOUNT = 'myfatoorah_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
     const SCENARIO_CONNECT_DOMAIN = 'domain';
@@ -418,6 +419,42 @@ class Restaurant extends \yii\db\ActiveRecord
                 'phone_number_display',
                 'sitemap_require_update'
             ],
+            self::SCENARIO_RESET_TAP_ACCOUNT => [
+                'business_id',
+                'business_entity_id',
+                'wallet_id',
+                'merchant_id',
+                'operator_id',
+                'live_api_key',
+                'test_api_key',
+                'license_number',
+                'authorized_signature_issuing_date',
+                'authorized_signature_expiry_date',
+                'authorized_signature_title',
+                'authorized_signature_file',
+                'authorized_signature_file_id',
+                'authorized_signature_file_purpose',
+                'iban',
+                'identification_issuing_date',
+                'identification_expiry_date',
+                'identification_file_front_side',
+                'identification_file_id_front_side',
+                'identification_title',
+                'identification_file_purpose',
+                'restaurant_email_notification',
+                'developer_id',
+                'commercial_license_issuing_date',
+                'commercial_license_expiry_date',
+                'commercial_license_title',
+                'commercial_license_file',
+                'commercial_license_file_id',
+                'commercial_license_file_purpose',
+                'live_public_key',
+                'test_public_key',
+                'is_tap_enable',
+                'identification_file_back_side',
+                'identification_file_id_back_side'
+            ],    
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
                 'vendor_sector', 'iban', 'company_name', 'business_type',
@@ -426,6 +463,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
                 'identification_expiry_date'],
+
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
                 'identification_file_back_side', 'restaurant_commercial_license_file', 'owner_identification_file_front_side',

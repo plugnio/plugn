@@ -46,6 +46,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= Html::a('Toggle Debugger', ['toggle-debugger', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
 
+        <?=
+        Html::a('Remove tap account detail', ['reset-tap', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to remove details for this store? This will not remove actual tap account.',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+
         <?php if($model->paymentGatewayQueue && $model->paymentGatewayQueue->queue_status != \common\models\PaymentGatewayQueue::QUEUE_STATUS_COMPLETE) { ?>
 
         <?=

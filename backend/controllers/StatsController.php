@@ -1,7 +1,10 @@
 <?php
 namespace backend\controllers;
 
+use agent\models\Country;
+use common\models\Restaurant;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -153,10 +156,57 @@ class StatsController extends Controller
 
         //Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
 
+        $countries = Country::find()
+            ->select('iso, count(*) as total')
+            ->joinWith(['restaurants'])
+            ->groupBy('country.country_id')
+            ->asArray()
+            ->all();
+
+        $storeByCountry = ArrayHelper::map($countries, 'iso', 'total');
+
+        $totalOrders = Order::find()
+            ->activeOrders()
+            ->count();
+
+        $totalRevenue = Order::find()
+            ->activeOrders()
+            ->sum('total_price');
+
+        //Our profit margin and payment gateway margin separated from that revenue
+
+        $totalPremium = Restaurant::find()
+            ->filterPremium()
+            ->count();
+
+        $totalStores = Restaurant::find()->count();
+
+        $totalFreeStores = $totalStores - $totalPremium;
+
+        $totalStoresWithPaymentGateway = Restaurant::find()
+            ->filterStoresWithPaymentGateway()
+            ->count();
+
+        $totalPlugnDomain = Restaurant::find()
+            ->filterPlugnDomain()
+            ->count();
+
+        $totalCustomDomain = Restaurant::find()
+            ->filterCustomDomain()
+            ->count();
+
         return $this->render('index', array_merge (
-            $customer_data,
-            $revenue_data,
-            $orders_data, [
+             $customer_data,
+             $revenue_data,
+             $orders_data, [
+                "totalOrders" => $totalOrders,
+                "totalRevenue" => $totalRevenue,
+                "totalPremium" => $totalPremium,
+                "totalFreeStores" => $totalFreeStores,
+                "totalStoresWithPaymentGateway" => $totalStoresWithPaymentGateway,
+                "totalPlugnDomain" => $totalPlugnDomain,
+                "totalCustomDomain" => $totalCustomDomain,
+                "storeByCountry" => $storeByCountry,
                 //"most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => "KWD",
                 "numberOfOrders" => (int) $numberOfOrders,
