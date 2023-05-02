@@ -8,5 +8,6 @@ return [
         'urlManager' => [
             'showScriptName' => true,
         ],
+        'apiUrlManager'
     ],
 ];

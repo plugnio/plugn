@@ -176,6 +176,7 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_UPDATE_DESIGN_LAYOUT = 'update_design_layout';
     const SCENARIO_CREATE_STORE_BY_AGENT = 'create-by-agent';
     const SCENARIO_CREATE_TAP_ACCOUNT = 'tap_account';
+    const SCENARIO_RESET_TAP_ACCOUNT = 'resetTapAccount';
     const SCENARIO_CREATE_MYFATOORAH_ACCOUNT = 'myfatoorah_account';
     const SCENARIO_UPLOAD_STORE_DOCUMENT = 'upload';
     const SCENARIO_CONNECT_DOMAIN = 'domain';
@@ -418,6 +419,42 @@ class Restaurant extends \yii\db\ActiveRecord
                 'phone_number_display',
                 'sitemap_require_update'
             ],
+            self::SCENARIO_RESET_TAP_ACCOUNT => [
+                'business_id',
+                'business_entity_id',
+                'wallet_id',
+                'merchant_id',
+                'operator_id',
+                'live_api_key',
+                'test_api_key',
+                'license_number',
+                'authorized_signature_issuing_date',
+                'authorized_signature_expiry_date',
+                'authorized_signature_title',
+                'authorized_signature_file',
+                'authorized_signature_file_id',
+                'authorized_signature_file_purpose',
+                'iban',
+                'identification_issuing_date',
+                'identification_expiry_date',
+                'identification_file_front_side',
+                'identification_file_id_front_side',
+                'identification_title',
+                'identification_file_purpose',
+                'restaurant_email_notification',
+                'developer_id',
+                'commercial_license_issuing_date',
+                'commercial_license_expiry_date',
+                'commercial_license_title',
+                'commercial_license_file',
+                'commercial_license_file_id',
+                'commercial_license_file_purpose',
+                'live_public_key',
+                'test_public_key',
+                'is_tap_enable',
+                'identification_file_back_side',
+                'identification_file_id_back_side'
+            ],    
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
                 'vendor_sector', 'iban', 'company_name', 'business_type',
@@ -426,6 +463,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
                 'identification_expiry_date'],
+
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
                 'identification_file_back_side', 'restaurant_commercial_license_file', 'owner_identification_file_front_side',
@@ -434,7 +472,8 @@ class Restaurant extends \yii\db\ActiveRecord
             self::SCENARIO_UPDATE => [
                 'country_id', 'restaurant_email_notification', 'demand_delivery','phone_number', 'phone_number_country_code',
                 'name', 'name_ar', 'schedule_interval', 'schedule_order',
-                'restaurant_email', 'tagline', 'tagline_ar', 'currency_id'
+                'restaurant_email', 'tagline', 'tagline_ar', 'currency_id',
+                'owner_first_name', 'owner_last_name', 'owner_number', 'owner_email', 'owner_phone_country_code'
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
                 'armada_api_key', 'mashkor_branch_id'
@@ -1356,6 +1395,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
             return [
                 "operation" => 'success',
+                "message" => "Account created successfully!"
             ];
         }
         else
@@ -1392,6 +1432,7 @@ class Restaurant extends \yii\db\ActiveRecord
  
         return [
             "operation" => 'success',
+            "message" => "Account created successfully!"
         ];
     }
 
@@ -1761,6 +1802,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'paymentGatewayQueue',
             'restaurantDomainRequests',
             'openingHours',
+            'restaurantUploads',
             'isOpen' => function ($restaurant) {
                 return $restaurant->isOpen ();
             },
@@ -1985,6 +2027,7 @@ class Restaurant extends \yii\db\ActiveRecord
     public function beforeDelete()
     {
         $transaction = Yii::$app->db->beginTransaction();
+
         try {
             Queue::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
             Category::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
@@ -2123,7 +2166,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
         ];
     }
 
@@ -2279,7 +2322,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
         ];
     }
 
@@ -2443,7 +2486,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
         ];
     }
 
@@ -3160,6 +3203,16 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])
                 ->where(['partner_status' => Partner::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Gets query for [[RestaurantUploads]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantUploads($modelClass = "\common\models\RestaurantUpload")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

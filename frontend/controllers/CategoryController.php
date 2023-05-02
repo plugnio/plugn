@@ -230,8 +230,8 @@ class CategoryController extends Controller {
 
         $model = Category::find()
             ->where([
-                'category_id' => $id,
-                'restaurant_uuid' => $store->restaurant_uuid
+                'category.category_id' => $id,
+                'category.restaurant_uuid' => $store->restaurant_uuid
             ])
             ->one();
 

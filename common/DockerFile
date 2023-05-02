@@ -1,0 +1,8 @@
+FROM yiisoftware/yii2-php:7.4-apache
+WORKDIR /app
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+RUN composer install --prefer-dist
+#RUN php composer.phar install --prefer-dist
+#RUN php init --env="Development [Docker Compose]" --overwrite=All
+#RUN bash -c "sleep 20 && ./yii migrate --interactive=0 && ./yii_test migrate --interactive=0"
+#RUN bash -c "sleep 20 && ./yii fixture/load '*' --interactive=0"

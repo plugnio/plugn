@@ -1,3 +1,6 @@
+#docker composer 
+mysql-data
+
 # yii console commands
 /yii
 /yii_test
@@ -19,6 +22,9 @@ Thumbs.db
 
 # composer vendor dir
 /vendor
+
+#composer/docker container mysql-data
+/mysql-data
 
 # composer itself is not needed
 composer.phar
@@ -50,3 +56,7 @@ phpunit.phar
 /partner/web/robots.txt
 /crm/config/main-local.php
 /crm/config/params-local.php
+partner/config/main-local.php
+partner/web/index.php
+partner/web/robots.txt
+partner/web/index-test.php

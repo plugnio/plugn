@@ -208,6 +208,16 @@ class Subscription extends \yii\db\ActiveRecord {
      *
      * @return \yii\db\ActiveQuery
      */
+    public function getPayment($modelClass = "\common\models\SubscriptionPayment")
+    {
+        return $this->getSubscriptionPayment($modelClass);
+    }
+
+    /**
+     * Gets query for [[PaymentUu]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getSubscriptionPayment($modelClass = "\common\models\SubscriptionPayment")
     {
         return $this->hasOne($modelClass::className(), ['payment_uuid' => 'payment_uuid']);

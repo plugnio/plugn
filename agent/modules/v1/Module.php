@@ -39,5 +39,12 @@ class Module extends \yii\base\Module
                 'restaurant_uuid' => $restaurantUuid
             ]);
         }
+        
+        if(Yii::$app->user->identity) {
+            Yii::$app->eventManager->setUser(Yii::$app->user->getId(), [
+                'name' => trim(Yii::$app->user->identity->agent_name),
+                'email' => Yii::$app->user->identity->agent_email,                    
+            ]);
+        }
     }
 }

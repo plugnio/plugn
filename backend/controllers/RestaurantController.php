@@ -119,6 +119,65 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
+    public function actionResetTap($id)
+    {
+        $store = $this->findModel($id);
+
+        $store->setScenario(Restaurant::SCENARIO_RESET_TAP_ACCOUNT);
+
+        $store->business_id = null;
+        $store->business_entity_id = null;
+        $store->wallet_id = null;
+        $store->merchant_id = null;
+        $store->operator_id = null;
+
+        $store->live_api_key = null;
+        $store->test_api_key = null;
+        $store->license_number = null;
+
+        $store->authorized_signature_issuing_date = null;
+        $store->authorized_signature_expiry_date = null;
+        $store->authorized_signature_title = null;
+        $store->authorized_signature_file = null;
+        $store->authorized_signature_file_id = null;
+        $store->authorized_signature_file_purpose = null;
+        $store->iban = null;
+
+        $store->identification_issuing_date = null;
+        $store->identification_expiry_date = null;
+        $store->identification_file_front_side = null;
+        $store->identification_file_id_front_side = null;
+        $store->identification_title = null;
+        $store->identification_file_purpose = null;
+        $store->restaurant_email_notification = null;
+        $store->developer_id = null;
+
+        $store->commercial_license_issuing_date = null;
+        $store->commercial_license_expiry_date = null;
+        $store->commercial_license_title = null;
+        $store->commercial_license_file = null;
+        $store->commercial_license_file_id = null;
+        $store->commercial_license_file_purpose = null;
+
+        $store->live_public_key = null;
+        $store->test_public_key = null;
+
+        $store->is_tap_enable = null;
+
+        $store->identification_file_back_side = null;
+        $store->identification_file_id_back_side = null;
+
+        if(!$store->save()) {
+            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors));
+        }
+        else 
+        {
+            Yii::$app->session->setFlash('successResponse', 'Tap account detail removed.');
+        }
+
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     /**
      * test tap connection
      * @return void

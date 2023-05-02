@@ -4,6 +4,7 @@ namespace agent\modules\v1\controllers;
 
 use agent\models\PaymentMethod;
 use agent\models\RestaurantPaymentMethod;
+use common\models\RestaurantUpload;
 use Yii;
 use agent\models\Restaurant;
 use yii\web\NotFoundHttpException;
@@ -72,6 +73,7 @@ class PaymentMethodController extends BaseController
         $model->payment_moyasar_api_key = Yii::$app->request->getBodyParam('payment_moyasar_api_key');
         $model->payment_moyasar_payment_type = Yii::$app->request->getBodyParam('payment_moyasar_payment_type');
         $model->payment_moyasar_network_type = Yii::$app->request->getBodyParam('payment_moyasar_network_type');
+        $model->payment_moyasar_apple_domain_association = Yii::$app->request->getBodyParam('payment_moyasar_apple_domain_association');
 
         if ($model->save())
         {
@@ -93,6 +95,25 @@ class PaymentMethodController extends BaseController
                 if (!$payments_method->save()) {
                     return self::message("error", $payments_method->getErrors());
                 }
+            }
+
+            //apple domain association
+
+            $upload = $store->getRestaurantUploads()
+                ->andWhere(['filename' => "apple-developer-merchantid-domain-association"])
+                ->one();
+
+            if(!$upload)
+                $upload = new RestaurantUpload;
+
+            $upload->restaurant_uuid = $store->restaurant_uuid;
+            $upload->content = $model->payment_moyasar_apple_domain_association;
+            $upload->path =  ".well-known";
+            $upload->filename = "apple-developer-merchantid-domain-association";
+            $upload->created_by = Yii::$app->user->getId();
+
+            if (!$upload->save()) {
+                return self::message("error", $upload->getErrors());
             }
 
             return self::message('success', "Extension $code updated.");

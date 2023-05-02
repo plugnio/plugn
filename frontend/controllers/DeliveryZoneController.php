@@ -63,7 +63,7 @@ class DeliveryZoneController extends Controller
             $selectedAreas = Yii::$app->request->post('selectedAreas');
         }
 
-        $cities = City::find()->where(['country_id' => $countryId])->all();
+        $cities = City::find()->where(['city.country_id' => $countryId])->all();
 
         return $this->renderPartial('_cities', [
             'cities' => $cities,
@@ -81,7 +81,10 @@ class DeliveryZoneController extends Controller
         $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
 
         $business_location = BusinessLocation::find()
-            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid, 'business_location_id' => $businessLocationId])
+            ->andWhere([
+                'business_location.restaurant_uuid' => $store->restaurant_uuid,
+                'business_location.business_location_id' => $businessLocationId
+            ])
             ->with(['country'])
             ->one();
 
@@ -90,14 +93,12 @@ class DeliveryZoneController extends Controller
             $searchModel = new DeliveryZoneSearch();
             $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $store->restaurant_uuid, $businessLocationId);
 
-
             return $this->render('index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
                 'business_location' => $business_location,
                 'store' => $store
             ]);
-
         }
     }
 
@@ -105,12 +106,18 @@ class DeliveryZoneController extends Controller
     public function actionDeliverAllAreas($storeUuid, $deliveryZoneId)
     {
         $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
         $model = $this->findModel($deliveryZoneId, $storeUuid);
 
         if ($model) {
             foreach ($model->country->getAreas()->all() as $key => $area) {
 
-                if (!AreaDeliveryZone::find()->where(['area_id' => $area->area_id, 'restaurant_uuid' => $storeUuid])->exists()) {
+                $isExists = AreaDeliveryZone::find()->where([
+                    'area_delivery_zone.area_id' => $area->area_id,
+                    'area_delivery_zone.restaurant_uuid' => $storeUuid
+                ])->exists();
+
+                if (!$isExists) {
                     $delivery_zone_area = new AreaDeliveryZone();
                     $delivery_zone_area->delivery_zone_id = $model->delivery_zone_id;
                     $delivery_zone_area->area_id = $area->area_id;
@@ -131,6 +138,7 @@ class DeliveryZoneController extends Controller
     public function actionRemoveTaxOverride($storeUuid, $deliveryZoneId)
     {
         $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
+
         $model = $this->findModel($deliveryZoneId, $storeUuid);
 
         $model->delivery_zone_tax = null;
@@ -150,7 +158,11 @@ class DeliveryZoneController extends Controller
     {
 
         $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
-        $business_location = BusinessLocation::find()->where(['restaurant_uuid' => $store->restaurant_uuid, 'business_location_id' => $businessLocationId])->one();
+
+        $business_location = BusinessLocation::find()->where([
+            'business_location.restaurant_uuid' => $store->restaurant_uuid,
+            'business_location.business_location_id' => $businessLocationId
+        ])->one();
 
         if ($business_location) {
 
@@ -312,8 +324,8 @@ class DeliveryZoneController extends Controller
         $model = $this->findModel($id, $storeUuid);
 
         $delivery_zone_area = AreaDeliveryZone::findOne([
-            'delivery_zone_id' => $model->delivery_zone_id,
-            'area_id' => $area_id
+            'area_delivery_zone.delivery_zone_id' => $model->delivery_zone_id,
+            'area_delivery_zone.area_id' => $area_id
         ]);
 
         if(!$delivery_zone_area) {
@@ -536,7 +548,7 @@ class DeliveryZoneController extends Controller
     {
         $model = Yii::$app->accountManager->getManagedAccount($storeUuid)
             ->getDeliveryZones()
-            ->where(['delivery_zone_id' => $id])
+            ->where(['delivery_zone.delivery_zone_id' => $id])
             ->one();
 
         if ($model != null)

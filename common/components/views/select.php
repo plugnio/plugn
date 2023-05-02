@@ -73,7 +73,6 @@ $('#".$formModalName."-".$labelAttribute."').on('click', function() {
 	
 ";
 
-
 $this->registerJs($js);
 
 echo $form->field($formModal, $labelAttribute)->textInput ();

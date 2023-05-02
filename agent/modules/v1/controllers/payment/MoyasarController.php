@@ -61,7 +61,7 @@ class MoyasarController extends BaseController
         $data['amount_in_halals'] =  $payment->payment_amount_charged * pow(10, $currency->decimal_place);
         $data['language_code'] = Yii::$app->language;
         $data['currency'] = $currency->code;// $payment['currency_code'];
-        $data['country'] = "KW";
+        $data['country'] = $store->country? $store->country->iso : "KW";
         $data['store_name'] = Yii::$app->params['appName'];
         $data['orderdate'] = $payment['payment_created_at'];
         $data['domain_name'] = Yii::$app->request->hostName;
