@@ -109,21 +109,21 @@ class Addon extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'addon_uuid' => Yii::t('common', 'Addon Uuid'),
-            'name' => Yii::t('common', 'Name'),
-            'name_ar' => Yii::t('common', 'Name - Arabic'),
-            'description' => Yii::t('common', 'Description'),
-            'description_ar' => Yii::t('common', 'Description - Arabic'),
-            'price' => Yii::t('common', 'Price'),
-            'special_price' => Yii::t('common', 'Special Price'),
-            'slug' => Yii::t('common', 'Slug'),
-            'expected_delivery' => Yii::t('common', 'Expected Delivery'),
-            'sort_number' => Yii::t('common', 'Sort Number'),
-            'status' => Yii::t('common', 'Status'),
-            'created_by' => Yii::t('common', 'Created By'),
-            'updated_by' => Yii::t('common', 'Updated By'),
-            'created_at' => Yii::t('common', 'Created At'),
-            'updated_at' => Yii::t('common', 'Updated At'),
+            'addon_uuid' => Yii::t('app', 'Addon Uuid'),
+            'name' => Yii::t('app', 'Name'),
+            'name_ar' => Yii::t('app', 'Name - Arabic'),
+            'description' => Yii::t('app', 'Description'),
+            'description_ar' => Yii::t('app', 'Description - Arabic'),
+            'price' => Yii::t('app', 'Price'),
+            'special_price' => Yii::t('app', 'Special Price'),
+            'slug' => Yii::t('app', 'Slug'),
+            'expected_delivery' => Yii::t('app', 'Expected Delivery'),
+            'sort_number' => Yii::t('app', 'Sort Number'),
+            'status' => Yii::t('app', 'Status'),
+            'created_by' => Yii::t('app', 'Created By'),
+            'updated_by' => Yii::t('app', 'Updated By'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
         ];
     }
 

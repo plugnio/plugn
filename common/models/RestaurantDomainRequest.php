@@ -129,14 +129,14 @@ class RestaurantDomainRequest extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'request_uuid' => Yii::t('common', 'Request Uuid'),
-            'restaurant_uuid' => Yii::t('common', 'Store Uuid'),
-            'domain' => Yii::t('common', 'Domain'),
-            'status' => Yii::t('common', 'Status'),
-            'created_by' => Yii::t('common', 'Created By'),
-            'expire_at' => Yii::t('common', 'Expire By'),
-            'created_at' => Yii::t('common', 'Created At'),
-            'updated_at' => Yii::t('common', 'Updated At'),
+            'request_uuid' => Yii::t('app', 'Request Uuid'),
+            'restaurant_uuid' => Yii::t('app', 'Store Uuid'),
+            'domain' => Yii::t('app', 'Domain'),
+            'status' => Yii::t('app', 'Status'),
+            'created_by' => Yii::t('app', 'Created By'),
+            'expire_at' => Yii::t('app', 'Expire By'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
         ];
     }
 

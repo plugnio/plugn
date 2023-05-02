@@ -2128,7 +2128,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
         ];
     }
 
@@ -2284,7 +2284,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
         ];
     }
 
@@ -2448,7 +2448,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (int) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
         ];
     }
 

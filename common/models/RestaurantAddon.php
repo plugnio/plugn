@@ -77,10 +77,10 @@ class RestaurantAddon extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'ra_uuid' => Yii::t('common', 'Ra Uuid'),
-            'addon_uuid' => Yii::t('common', 'Addon Uuid'),
-            'restaurant_uuid' => Yii::t('common', 'Restaurant Uuid'),
-            'created_at' => Yii::t('common', 'Created At'),
+            'ra_uuid' => Yii::t('app', 'Ra Uuid'),
+            'addon_uuid' => Yii::t('app', 'Addon Uuid'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
+            'created_at' => Yii::t('app', 'Created At'),
         ];
     }
 
