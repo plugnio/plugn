@@ -2,8 +2,10 @@
 
 namespace backend\controllers;
 
+use agent\models\PaymentMethod;
 use backend\models\Admin;
 use common\models\PaymentGatewayQueue;
+use common\models\RestaurantPaymentMethod;
 use Yii;
 use common\models\Restaurant;
 use common\models\TapQueue;
@@ -167,6 +169,9 @@ class RestaurantController extends Controller {
         $store->identification_file_back_side = null;
         $store->identification_file_id_back_side = null;
 
+        $store->payment_gateway_queue_id = null;
+        $store->tap_queue_id = null;
+
         if(!$store->save()) {
             Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors));
         }
@@ -174,6 +179,23 @@ class RestaurantController extends Controller {
         {
             Yii::$app->session->setFlash('successResponse', 'Tap account detail removed.');
         }
+
+        //disable gateway
+
+        RestaurantPaymentMethod::deleteAll([
+            "AND",
+            ['restaurant_uuid' => $id],
+            [
+                'IN',
+                'payment_method_id',
+                PaymentMethod::find()->andWhere(['IN', 'payment_method_code', [
+                    PaymentMethod::CODE_CREDIT_CARD,
+                    PaymentMethod::CODE_KNET,
+                    PaymentMethod::CODE_BENEFIT,
+                    PaymentMethod::CODE_MADA
+                ]])
+            ]
+        ]);
 
         return $this->redirect(['view', 'id' => $id]);
     }
