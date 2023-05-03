@@ -22,6 +22,7 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.3.1/css/all.min.css" rel="stylesheet">
     <?php $this->head() ?>
 </head>
 <body>
@@ -43,7 +44,13 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
         $menuItems = array_merge($menuItems, [
-            ['label' => 'Statistics', 'url' => ['/stats/index']],
+            [
+                'label' => 'Statistics',
+                'items' => [
+                    ['label' => 'Numbers', 'url' => ['/stats/index']],
+                    ['label' => 'Graphs', 'url' => ['/stats/graph']],
+                ]
+            ],
             [
                 'label' => 'Store',
                 'items' => [

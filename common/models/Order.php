@@ -966,10 +966,7 @@ class Order extends \yii\db\ActiveRecord
                     //$delivery_fee = $delivery_fee * $rate;
                     //$subtotal = $subtotal * $rate;
                     $payment_gateway_fee = $this->payment->payment_gateway_fee * $rate;
-
             }
-
-            //todo: what if premium store?
 
             Yii::$app->eventManager->track('Order Completed', [
                     'checkout_id' => $this->order_uuid,
@@ -1935,6 +1932,17 @@ failed: the order has failed to find a driver */
             'orders_received_chart_data' => array_values ($orders_received_chart_data),
             'number_of_all_orders_received' => (int) $number_of_all_orders_received
         ];
+    }
+
+    public static function getTotalOrdersByInterval($interval) {
+        switch ($interval) {
+            case "last-month":
+                return self::getTotalOrdersByMonth();
+            case "week":
+                return self::getTotalOrdersByWeek();
+            default:
+                return self::getTotalOrdersByMonths(str_replace(["last-", "-months"], ["", ""], $interval));
+        }
     }
 
     public static function getTotalRevenueByMonth()
