@@ -1,0 +1,250 @@
+<?php
+use yii\helpers\Html;
+use backend\components\ChartWidget;
+
+$this->title = 'Statistics';
+
+$js = " 
+    var storeByCountry = ".json_encode($storeByCountry).";
+    
+    $(document).ready(function() {
+        $('#world-map-gdp').vectorMap({
+            map: 'world_mill',
+            series: {
+             regions: [{
+                values: storeByCountry,
+                scale: ['#C8EEFF', '#0071A4'],
+                normalizeFunction: 'polynomial'
+             }]
+            },
+            onRegionTipShow: function(e, el, code) {
+                el.html(el.html()+' ('+storeByCountry[code]+' stores)');
+            }
+        }); 
+    });
+ 
+$(function () {
+ 
+  $('input[name=\"date_start\"]').datepicker({
+    format: 'd M yyyy',
+  });
+  
+  $('input[name=\"date_end\"]').datepicker({
+    format: 'd M yyyy',
+  });
+
+});
+
+";
+$this->registerJs($js);
+
+?>
+<div class="site-index">
+    <div class="body-content">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">Stores by country</div>
+
+            <div class="panel-body">
+
+                <?= Html::beginForm(['/stats/graph'], 'POST', ['class' => "form-inline"]); ?>
+
+                <div class="form-group mb-2">
+                    <label for="date_start">Start Date</label>
+                    <?= Html::input('date', 'date_start', null, ["id" => "date_start", "class"=>"form-control"]); ?>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label for="end_start">End Date</label>
+                    <?= Html::input('date', 'date_end', null, ["id" => "date_end", "class"=>"form-control"]); ?>
+                </div>
+
+                <div class="form-group" style="background: #f4f6f9;  margin-bottom: 0px; padding-bottom: 0px; background:#f4f6f9 ">
+                    <?= Html::submitButton('Submit', ['class' => 'btn btn-primary mb-2']) ?>
+                </div>
+                <?= Html::endForm(); ?>
+
+                <br />
+
+                <div id="world-map-gdp"></div>
+            </div>
+        </div>
+
+
+        <div class="grid">
+
+            <div class="row">
+
+                <div class="col-12 col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+
+                            <span class="title">Plugn fees</span>
+
+                            <div class="pull-right">
+                                <?= Html::dropDownList('interval-fees', null, [
+                                    "Week" => "Week",
+                                    "last-month" => "Last 2 month",
+                                    "last-3-month" => "Last 3 month",
+                                    "last-5-month" => "Last 5 month",
+                                    "last-12-month" => "Last 12 month"
+                                ], ["id" => "interval", "class"=>"form-control"]); ?>
+                            </div>
+
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="panel-body">
+                            <?=  ChartWidget::widget([
+                                'id' => "fees" ,
+                                'color' => "red",
+                                'chartdata' => $plugn_fee_chart_data,
+                                'type' => "line",
+                                'title'=> "",
+                                'currency_code'=> $currency_code
+                            ]); ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+
+                            <span class="title">New stores</span>
+
+                            <div class="pull-right">
+                                <?= Html::dropDownList('interval-stores', null, [
+                                    "Week" => "Week",
+                                    "last-month" => "Last 2 month",
+                                    "last-3-month" => "Last 3 month",
+                                    "last-5-month" => "Last 5 month",
+                                    "last-12-month" => "Last 12 month"
+                                ], ["id" => "interval", "class"=>"form-control"]); ?>
+                            </div>
+
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="panel-body">
+                            <?=  ChartWidget::widget([
+                                'id' => "store" ,
+                                'color' => "red",
+                                'chartdata' => $store_created_chart_data,
+                                'type' => "line",
+                                'title'=> "",
+                                'currency_code'=> $currency_code
+                            ]); ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <span class="title">Revenue Generated</span>
+                            <div class="pull-right">
+                                <?= Html::dropDownList('interval-revenue', null, [
+                                    "Week" => "Week",
+                                    "last-month" => "Last 2 month",
+                                    "last-3-month" => "Last 3 month",
+                                    "last-5-month" => "Last 5 month",
+                                    "last-12-month" => "Last 12 month"
+                                ], ["id" => "interval", "class"=>"form-control"]); ?>
+                            </div>
+
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="panel-body">
+                            <?=  ChartWidget::widget([
+                        'id' => "revenue" ,
+                        'color' => "red",
+                        'chartdata' => $revenue_generated_chart_data,
+                        'type' => "line",
+                        'title'=> "",
+                        'currency_code'=> $currency_code
+                    ]); ?>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+
+                            <span class="title">Customers Gained</span>
+
+                            <div class="pull-right">
+                                <?= Html::dropDownList('interval-revenue', null, [
+                                    "Week" => "Week",
+                                    "last-month" => "Last 2 month",
+                                    "last-3-month" => "Last 3 month",
+                                    "last-5-month" => "Last 5 month",
+                                    "last-12-month" => "Last 12 month"
+                                ], ["id" => "interval", "class"=>"form-control"]); ?>
+                            </div>
+
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="panel-body">
+                            <?=  ChartWidget::widget([
+                                'id' => "customer" ,
+                                'color' => "blue",
+                                'chartdata' => $customer_chart_data,
+                                'type' => "line",
+                                'title'=> "",
+                                'currency_code'=> $currency_code
+                            ]); ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+
+                            <span class="title">Orders Received</span>
+
+                            <div class="pull-right">
+                                <?= Html::dropDownList('interval-revenue', null, [
+                                    "Week" => "Week",
+                                    "last-month" => "Last 2 month",
+                                    "last-3-month" => "Last 3 month",
+                                    "last-5-month" => "Last 5 month",
+                                    "last-12-month" => "Last 12 month"
+                                ], ["id" => "interval", "class"=>"form-control"]); ?>
+                            </div>
+
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="panel-body">
+                            <?=  ChartWidget::widget([
+                                'id' => "order" ,
+                                'color' => "green",
+                                'chartdata' => $orders_received_chart_data,
+                                'type' => "line",
+                                'title'=> "",
+                                'currency_code'=> $currency_code
+                            ]); ?>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- END .row -->
+        </div>
+
+    </div>
+
+</div>
+
+<style type="text/css">
+    .panel-heading .title {
+        font-size: 16px;
+        padding-top: 8px;
+        display: inline-block;
+    }
+</style>

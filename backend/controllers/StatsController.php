@@ -2,7 +2,9 @@
 namespace backend\controllers;
 
 use agent\models\Country;
+use common\models\Payment;
 use common\models\Restaurant;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
@@ -31,7 +33,7 @@ class StatsController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index'],
+                        'actions' => ['index', 'graph'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -65,9 +67,6 @@ class StatsController extends Controller
      */
     public function actionIndex()
     {
-        $interval = Yii::$app->request->get('interval');
-        $type = Yii::$app->request->get('type');
- 
         $numberOfOrders = Order::find()
             ->activeOrders()
             ->count();
@@ -98,82 +97,11 @@ class StatsController extends Controller
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
             ->sum('order_item.qty');*/
 
-        switch ($interval) {
-            case 'last-month':
-                $customer_data = Customer::getTotalCustomersByMonth();
-
-                $revenue_data = Order::getTotalRevenueByMonth();
-
-                $orders_data = Order::getTotalOrdersByMonth();
- 
-                break;
-
-            case 'last-2-months':
-                $customer_data = Customer::getTotalCustomersByMonths(2);
-
-                $revenue_data = Order::getTotalRevenueByMonths(2);
-
-                $orders_data = Order::getTotalOrdersByMonths(2);
- 
-                break; 
-
-            case 'last-3-months':
-                $customer_data = Customer::getTotalCustomersByMonths(3);
-
-                $revenue_data = Order::getTotalRevenueByMonths(3);
-
-                $orders_data = Order::getTotalOrdersByMonths(3);
- 
-                break;
-
-            case 'last-5-months':
-                #https://www.pivotaltracker.com/story/show/179023519
-                $customer_data = Customer::getTotalCustomersByMonths(5);
-
-                $revenue_data = Order::getTotalRevenueByMonths(5);
-
-                $orders_data = Order::getTotalOrdersByMonths(5);
- 
-                break;
-
-            case 'last-12-months':
-                #https://www.pivotaltracker.com/story/show/179023519
-                $customer_data = Customer::getTotalCustomersByMonths(12);
-
-                $revenue_data = Order::getTotalRevenueByMonths(12);
-
-                $orders_data = Order::getTotalOrdersByMonths(12);
- 
-                break;
-
-            default:
-                $customer_data = Customer::getTotalCustomersByWeek();
-
-                $revenue_data = Order::getTotalRevenueByWeek();
-
-                $orders_data = Order::getTotalOrdersByWeek();
-        }
-
         //Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
-
-        $countries = Country::find()
-            ->select('iso, count(*) as total')
-            ->joinWith(['restaurants'])
-            ->groupBy('country.country_id')
-            ->asArray()
-            ->all();
-
-        $storeByCountry = ArrayHelper::map($countries, 'iso', 'total');
 
         $totalOrders = Order::find()
             ->activeOrders()
             ->count();
-
-        $totalRevenue = Order::find()
-            ->activeOrders()
-            ->sum('total_price');
-
-        //Our profit margin and payment gateway margin separated from that revenue
 
         $totalPremium = Restaurant::find()
             ->filterPremium()
@@ -195,18 +123,33 @@ class StatsController extends Controller
             ->filterCustomDomain()
             ->count();
 
-        return $this->render('index', array_merge (
-             $customer_data,
-             $revenue_data,
-             $orders_data, [
+        $payments = Payment::find()
+            ->select(new Expression("currency_code, SUM(payment_gateway_fee) as payment_gateway_fees, 
+                SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
+            ->joinWith(['order'])
+            ->filterPaid()
+            ->groupBy('order.currency_code')
+            ->asArray()
+            ->all();
+
+        $revenues = Order::find()
+            ->select(new Expression("currency_code, SUM(total_price) as total_price"))
+            ->activeOrders()
+            ->groupBy('order.currency_code')
+            ->asArray()
+            ->all();
+
+        //Our profit margin and payment gateway margin separated from that revenue
+
+        return $this->render('index', [
+                 "payments" => $payments,
                 "totalOrders" => $totalOrders,
-                "totalRevenue" => $totalRevenue,
+                "revenues" => $revenues,
                 "totalPremium" => $totalPremium,
                 "totalFreeStores" => $totalFreeStores,
                 "totalStoresWithPaymentGateway" => $totalStoresWithPaymentGateway,
                 "totalPlugnDomain" => $totalPlugnDomain,
                 "totalCustomDomain" => $totalCustomDomain,
-                "storeByCountry" => $storeByCountry,
                 //"most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => "KWD",
                 "numberOfOrders" => (int) $numberOfOrders,
@@ -215,7 +158,113 @@ class StatsController extends Controller
                 "today_revenue_generated" => (float) $today_revenue_generated,//Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode),//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
                 //"today_sold_items" => (int) $today_sold_items,
                 "today_orders_received" => (float)  $today_orders_received, //Yii::$app->formatter->asCurrency($today_orders_received, $currencyCode)//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
-            ]
+        ]);
+    }
+
+    public function actionGraph()
+    {
+        $interval = Yii::$app->request->get('interval');
+        $type = Yii::$app->request->get('type');
+
+        switch ($interval) {
+            case 'last-month':
+                $store_data = Restaurant::getTotalStoresByMonth();
+
+                $customer_data = Customer::getTotalCustomersByMonth();
+
+                $revenue_data = Order::getTotalRevenueByMonth();
+
+                $orders_data = Order::getTotalOrdersByMonth();
+
+                $fees_data = Payment::getTotalFeesByMonth();
+
+                break;
+
+            case 'last-2-months':
+                $store_data = Restaurant::getTotalStoresByMonths(2);
+
+                $customer_data = Customer::getTotalCustomersByMonths(2);
+
+                $revenue_data = Order::getTotalRevenueByMonths(2);
+
+                $orders_data = Order::getTotalOrdersByMonths(2);
+
+                $fees_data = Payment::getTotalFeesByMonths(2);
+
+                break;
+
+            case 'last-3-months':
+                $store_data = Restaurant::getTotalStoresByMonths(3);
+
+                $customer_data = Customer::getTotalCustomersByMonths(3);
+
+                $revenue_data = Order::getTotalRevenueByMonths(3);
+
+                $orders_data = Order::getTotalOrdersByMonths(3);
+
+                $fees_data = Payment::getTotalFeesByMonths(3);
+
+                break;
+
+            case 'last-5-months':
+                $store_data = Restaurant::getTotalStoresByMonths(5);
+
+                #https://www.pivotaltracker.com/story/show/179023519
+                $customer_data = Customer::getTotalCustomersByMonths(5);
+
+                $revenue_data = Order::getTotalRevenueByMonths(5);
+
+                $orders_data = Order::getTotalOrdersByMonths(5);
+
+                $fees_data = Payment::getTotalFeesByMonths(5);
+
+                break;
+
+            case 'last-12-months':
+                $store_data = Restaurant::getTotalStoresByMonths(12);
+
+                #https://www.pivotaltracker.com/story/show/179023519
+                $customer_data = Customer::getTotalCustomersByMonths(12);
+
+                $revenue_data = Order::getTotalRevenueByMonths(12);
+
+                $orders_data = Order::getTotalOrdersByMonths(12);
+
+                $fees_data = Payment::getTotalFeesByMonths(12);
+                break;
+
+            default:
+                $store_data = Restaurant::getTotalStoresByWeek(5);
+
+                $customer_data = Customer::getTotalCustomersByWeek();
+
+                $revenue_data = Order::getTotalRevenueByWeek();
+
+                $orders_data = Order::getTotalOrdersByWeek();
+
+                $fees_data = Payment::getTotalFeesByWeek();
+        }
+
+        //Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+
+        $countries = Country::find()
+            ->select('iso, count(*) as total')
+            ->joinWith(['restaurants'])
+            ->groupBy('country.country_id')
+            ->asArray()
+            ->all();
+
+        $storeByCountry = ArrayHelper::map($countries, 'iso', 'total');
+
+        return $this->render('graphs', array_merge (
+            $store_data,
+            $customer_data,
+            $revenue_data,
+            $fees_data,
+            $orders_data, [
+                "storeByCountry" => $storeByCountry,
+                "currency_code" => "KWD"
+             ]
         ));
     }
 }

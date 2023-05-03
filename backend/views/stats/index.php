@@ -4,37 +4,32 @@ use backend\components\ChartWidget;
 
 $this->title = 'Statistics';
 
-$js = " 
-    var storeByCountry = ".json_encode($storeByCountry).";
-    
-    $(document).ready(function() {
-        $('#world-map-gdp').vectorMap({
-            map: 'world_mill',
-            series: {
-             regions: [{
-                values: storeByCountry,
-                scale: ['#C8EEFF', '#0071A4'],
-                normalizeFunction: 'polynomial'
-             }]
-            },
-            onRegionTipShow: function(e, el, code) {
-                el.html(el.html()+' ('+storeByCountry[code]+' stores)');
-            }
-        }); 
-    });
-";
-
-$this->registerJs($js);
 ?>
 
 <div class="site-index">
  	<div class="body-content">
 
-        <div id="world-map-gdp"></div>
+    <div class="grid">
+        <h3>Stats</h3>
+
+        <?= Html::beginForm(['/stats/graph'], 'POST', ['class' => "form-inline"]); ?>
+
+        <div class="form-group mb-2">
+            <label for="date_start">Start Date</label>
+            <?= Html::input('date', 'date_start', null, ["id" => "date_start", "class"=>"form-control"]); ?>
+        </div>
+
+        <div class="form-group mb-2">
+            <label for="end_start">End Date</label>
+            <?= Html::input('date', 'date_end', null, ["id" => "date_end", "class"=>"form-control"]); ?>
+        </div>
+
+        <div class="form-group" style="background: #f4f6f9;  margin-bottom: 0px; padding-bottom: 0px; background:#f4f6f9 ">
+            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary mb-2']) ?>
+        </div>
+        <?= Html::endForm(); ?>
 
         <div class="row">
-
-            <!--Our profit margin and payment gateway margin separated from that revenue -->
 
                     <div class="col-xl-3 col-lg-4">
                         <div class="card card-stats mb-4 mb-xl-0">
@@ -53,30 +48,14 @@ $this->registerJs($js);
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-lg-4">
-                        <div class="card card-stats mb-4 mb-xl-0">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <h5 class="card-title text-uppercase text-muted mb-0">Total revenue generated from that revenue</h5>
-                                        <span class="h2 font-weight-bold mb-0"><?= $totalRevenue ?></span>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                                            <i class="fa fa-chart-pie"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
                     <div class="col-xl-3 col-lg-4">
                         <div class="card card-stats mb-4 mb-xl-0">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col">
                                         <h5 class="card-title text-uppercase text-muted mb-0">Number of premium stores</h5>
-                                        <span class="h2 font-weight-bold mb-0"><?= $totalPremium ?></span>
+                                        <span class="h2 font-weight-bold mb-0"><?= Yii::$app->formatter->asCurrency($totalPremium, "KWD") ?></span>
                                     </div>
                                     <div class="col-auto">
                                         <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
@@ -160,43 +139,95 @@ $this->registerJs($js);
 
                 </div>
 
-        <hr />
-
+        <h3>Revenues</h3>
         <div class="row">
-          <div class="col-12 col-lg-4">
-          	<?=  ChartWidget::widget([
-                  'id' => "revenue" ,
-                  'color' => "red",
-                  'chartdata' => $revenue_generated_chart_data,
-                  'type' => "line",
-                  'title'=> "Revenue Generated",
-                  'currency_code'=> $currency_code
-            ]); ?>
-          </div>
 
-          <div class="col-12 col-lg-4">
-            <?=  ChartWidget::widget([
-                  'id' => "customer" ,
-                  'color' => "blue",
-                  'chartdata' => $customer_chart_data,
-                  'type' => "line",
-                  'title'=> "Customers Gained",
-                  'currency_code'=> $currency_code
-            ]); ?>
-          </div>
-          
-          <div class="col-12 col-lg-4">
-            <?=  ChartWidget::widget([
-                  'id' => "order" ,
-                  'color' => "green",
-                  'chartdata' => $orders_received_chart_data,
-                  'type' => "line",
-                  'title'=> "Orders Received",
-                  'currency_code'=> $currency_code
-            ]); ?>
-          </div>
+        <?php foreach ($revenues as $revenue) { ?>
+               <div class="col-xl-3 col-lg-4">
+                <div class="card card-stats mb-4 mb-xl-0">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">Revenue in <?= $revenue['currency_code'] ?></h5>
+                                <span class="h2 font-weight-bold mb-0">
+                                            <?= Yii::$app->formatter->asCurrency($revenue['total_price'], $revenue['currency_code']) ?></span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                                    <i class="fa fa-chart-pie"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+        </div>
+    </div>
 
-      </div><!-- END .row -->
+        <!--Our profit margin and payment gateway margin separated from that revenue -->
+        <div class="grid">
+        <?php foreach($payments as $payment) { ?>
+
+            <div class="row">
+
+                <h3><?= $payment['currency_code'] ?></h3>
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card card-stats mb-4 mb-xl-0">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Payment gateway fees</h5>
+                                    <span class="h2 font-weight-bold mb-0">
+                                        <?= Yii::$app->formatter->asCurrency($payment['payment_gateway_fees'], $payment['currency_code']) ?> </span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                                        <i class="fa fa-chart-pie"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card card-stats mb-4 mb-xl-0">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Plugn fees</h5>
+                                    <span class="h2 font-weight-bold mb-0">
+                                        <?= Yii::$app->formatter->asCurrency($payment['plugn_fees'], $payment['currency_code']) ?></span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                                        <i class="fa fa-chart-pie"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card card-stats mb-4 mb-xl-0">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title text-uppercase text-muted mb-0">Partner fees</h5>
+                                    <span class="h2 font-weight-bold mb-0">
+                                        <?= Yii::$app->formatter->asCurrency($payment['partner_fees'], $payment['currency_code']) ?></span>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                                        <i class="fa fa-chart-pie"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
 
     </div>
 

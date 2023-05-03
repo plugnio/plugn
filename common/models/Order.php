@@ -966,10 +966,7 @@ class Order extends \yii\db\ActiveRecord
                     //$delivery_fee = $delivery_fee * $rate;
                     //$subtotal = $subtotal * $rate;
                     $payment_gateway_fee = $this->payment->payment_gateway_fee * $rate;
-
             }
-
-            //todo: what if premium store?
 
             Yii::$app->eventManager->track('Order Completed', [
                     'checkout_id' => $this->order_uuid,

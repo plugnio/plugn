@@ -43,7 +43,13 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
         $menuItems = array_merge($menuItems, [
-            ['label' => 'Statistics', 'url' => ['/stats/index']],
+            [
+                'label' => 'Statistics',
+                'items' => [
+                    ['label' => 'Numbers', 'url' => ['/stats/index']],
+                    ['label' => 'Graphs', 'url' => ['/stats/graph']],
+                ]
+            ],
             [
                 'label' => 'Store',
                 'items' => [
