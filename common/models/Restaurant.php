@@ -453,7 +453,9 @@ class Restaurant extends \yii\db\ActiveRecord
                 'test_public_key',
                 'is_tap_enable',
                 'identification_file_back_side',
-                'identification_file_id_back_side'
+                'identification_file_id_back_side',
+                'payment_gateway_queue_id',
+                'tap_queue_id'
             ],    
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
