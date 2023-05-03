@@ -2090,6 +2090,17 @@ class Restaurant extends \yii\db\ActiveRecord
         }
     }
 
+    public static function getTotalStoresByInterval($interval) {
+        switch ($interval) {
+            case "last-month":
+                return self::getTotalStoresByMonth();
+            case "week":
+                return self::getTotalStoresByWeek();
+            default:
+                return self::getTotalStoresByMonths(str_replace(["last-", "-months"], ["", ""], $interval));
+        }
+    }
+
     public function getTotalCustomersByWeek()
     {
         $customer_data = [];

@@ -147,12 +147,27 @@ class OrderQuery extends \yii\db\ActiveQuery
             ->count ();
     }
 
-    public function filterByCreatedDate($date_range){
+    public function filterByCreatedDate($date_range) {
         // do we have values? if so, add a filter to our query
         if (!empty($date_range) && strpos($date_range, '-') !== false) {
             list($start_date, $end_date) = explode(' - ', $date_range);
             return $this->andFilterWhere(['between', 'order_created_at', $start_date, $end_date]);
         }
+    }
+
+    public function filterByDateRange($date_start, $date_end) {
+
+        if(!$date_start || !$date_end) {
+            return $this;
+        }
+
+        $start = date('Y-m-d', strtotime($date_start));
+        $end = date('Y-m-d', strtotime($date_end));
+
+        return $this->andWhere(new Expression("DATE(order_created_at) > DATE('".$start."')
+            AND DATE(order_created_at) < DATE('".$end."')"));
+
+        //return $this->andWhere(['between', 'order_created_at', $start, $end]);
     }
 
     /**

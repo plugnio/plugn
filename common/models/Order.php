@@ -1934,6 +1934,17 @@ failed: the order has failed to find a driver */
         ];
     }
 
+    public static function getTotalOrdersByInterval($interval) {
+        switch ($interval) {
+            case "last-month":
+                return self::getTotalOrdersByMonth();
+            case "week":
+                return self::getTotalOrdersByWeek();
+            default:
+                return self::getTotalOrdersByMonths(str_replace(["last-", "-months"], ["", ""], $interval));
+        }
+    }
+
     public static function getTotalRevenueByMonth()
     {
         $revenue_generated_chart_data = [];

@@ -206,6 +206,17 @@ class Customer extends \yii\db\ActiveRecord {
         ];
     }
 
+    public static function getTotalCustomersByInterval($interval) {
+        switch ($interval) {
+            case "last-month":
+                return self::getTotalCustomersByMonth();
+            case "week":
+                return self::getTotalCustomersByWeek();
+            default:
+                return self::getTotalCustomersByMonths(str_replace(["last-", "-months"], ["", ""], $interval));
+        }
+    }
+
     /**
      * Gets query for [[Orders]].
      *

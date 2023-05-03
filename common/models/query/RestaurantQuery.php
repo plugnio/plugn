@@ -40,6 +40,17 @@ class RestaurantQuery extends \yii\db\ActiveQuery
             ->andWhere( new Expression("item_uuid IS NULL AND last_order_at IS NULL"));
     }
 
+    public function filterByDateRange($date_start, $date_end) {
+        if(!$date_start || !$date_end) {
+            return $this;
+        }
+
+        $start = date('Y-m-d', strtotime($date_start));
+        $end = date('Y-m-d', strtotime($date_end));
+
+        return $this->andWhere(['between', 'restaurant_created_at', $start, $end]);
+    }
+
     public function filterPremium()
     {
         return $this

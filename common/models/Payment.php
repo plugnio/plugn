@@ -658,7 +658,7 @@ class Payment extends \yii\db\ActiveRecord
 
         $rows = self::find()
             ->filterPaid()
-            ->select(new Expression('payment_updated_at, SUM("plugn_fee") as total'))
+            ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
             ->andWhere(new Expression("DATE(payment_updated_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
             ->groupBy(new Expression('DAYNAME(payment_updated_at)'))
             ->asArray()
@@ -697,7 +697,7 @@ class Payment extends \yii\db\ActiveRecord
 
         $rows = self::find()
             ->filterPaid()
-            ->select(new Expression('payment_updated_at, SUM("plugn_fee") as total'))
+            ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
             ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL 1 MONTH)')
             ->groupBy(new Expression('DAY(payment_updated_at)'))
             ->asArray()
@@ -716,8 +716,8 @@ class Payment extends \yii\db\ActiveRecord
             ->count();
 
         return [
-            'store_created_chart_data' => array_values($customer_data),
-            'number_of_all_customer_gained' => (int) $number_of_payments
+            'plugn_fee_chart_data' => array_values($customer_data),
+            'number_of_payments' => (int) $number_of_payments
         ];
     }
 
@@ -741,7 +741,7 @@ class Payment extends \yii\db\ActiveRecord
 
         $rows = self::find()
             ->filterPaid()
-            ->select(new Expression('payment_updated_at, SUM("plugn_fee") as total'))
+            ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
             ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
             ->groupBy(new Expression('MONTH(payment_updated_at)'))
@@ -750,7 +750,7 @@ class Payment extends \yii\db\ActiveRecord
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['payment_updated_at']))] = array(
-                'month' => Yii::t('app', date ('F', strtotime ($result['restaurant_created_at']))),
+                'month' => Yii::t('app', date ('F', strtotime ($result['payment_updated_at']))),
                 'total' => (int) $result['total']
             );
         }
@@ -762,9 +762,20 @@ class Payment extends \yii\db\ActiveRecord
             ->count();
 
         return [
-            'store_created_chart_data' => array_values($customer_data),
-            'number_of_all_customer_gained' => (int) $number_of_payments
+            'plugn_fee_chart_data' => array_values($customer_data),
+            'number_of_payments' => (int) $number_of_payments
         ];
+    }
+
+    public static function getTotalFeesByInterval($interval) {
+        switch ($interval) {
+            case "last-month":
+                return self::getTotalFeesByMonth();
+            case "week":
+                return self::getTotalFeesByWeek();
+            default:
+                return self::getTotalFeesByMonths(str_replace(["last-", "-months"], ["", ""], $interval));
+        }
     }
 
     public static function find()

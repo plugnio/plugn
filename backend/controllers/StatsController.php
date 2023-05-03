@@ -2,6 +2,7 @@
 namespace backend\controllers;
 
 use agent\models\Country;
+use backend\components\ChartWidget;
 use common\models\Payment;
 use common\models\Restaurant;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
@@ -14,6 +15,7 @@ use common\models\Customer;
 use common\models\Order;
 use common\models\Item;
 use yii\db\Expression;
+use yii\web\Response;
 
 
 /**
@@ -33,7 +35,7 @@ class StatsController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'graph'],
+                        'actions' => ['index', 'graph', 'graph-fees', 'graph-stores', 'graph-orders', 'graph-customers'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -67,7 +69,10 @@ class StatsController extends Controller
      */
     public function actionIndex()
     {
-        $numberOfOrders = Order::find()
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+
+        /*$numberOfOrders = Order::find()
             ->activeOrders()
             ->count();
 
@@ -87,7 +92,7 @@ class StatsController extends Controller
             ->andWhere(new Expression("date(customer_created_at) = date(NOW())"))
             ->count();
 
-        /*$today_sold_items = OrderItem::find()
+        $today_sold_items = OrderItem::find()
             ->joinWith('order')
             ->activeOrders($store->restaurant_uuid)
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
@@ -101,29 +106,37 @@ class StatsController extends Controller
 
         $totalOrders = Order::find()
             ->activeOrders()
+            ->filterByDateRange($date_start, $date_end)
             ->count();
 
         $totalPremium = Restaurant::find()
+            ->filterByDateRange($date_start, $date_end)
             ->filterPremium()
             ->count();
 
-        $totalStores = Restaurant::find()->count();
+        $totalStores = Restaurant::find()
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
 
         $totalFreeStores = $totalStores - $totalPremium;
 
         $totalStoresWithPaymentGateway = Restaurant::find()
+            ->filterByDateRange($date_start, $date_end)
             ->filterStoresWithPaymentGateway()
             ->count();
 
         $totalPlugnDomain = Restaurant::find()
+            ->filterByDateRange($date_start, $date_end)
             ->filterPlugnDomain()
             ->count();
 
         $totalCustomDomain = Restaurant::find()
+            ->filterByDateRange($date_start, $date_end)
             ->filterCustomDomain()
             ->count();
 
         $payments = Payment::find()
+            ->filterByDateRange($date_start, $date_end)
             ->select(new Expression("currency_code, SUM(payment_gateway_fee) as payment_gateway_fees, 
                 SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
             ->joinWith(['order'])
@@ -133,6 +146,7 @@ class StatsController extends Controller
             ->all();
 
         $revenues = Order::find()
+            ->filterByDateRange($date_start, $date_end)
             ->select(new Expression("currency_code, SUM(total_price) as total_price"))
             ->activeOrders()
             ->groupBy('order.currency_code')
@@ -142,6 +156,8 @@ class StatsController extends Controller
         //Our profit margin and payment gateway margin separated from that revenue
 
         return $this->render('index', [
+            "date_start" => $date_start,
+            "date_end" => $date_end,
                  "payments" => $payments,
                 "totalOrders" => $totalOrders,
                 "revenues" => $revenues,
@@ -152,12 +168,6 @@ class StatsController extends Controller
                 "totalCustomDomain" => $totalCustomDomain,
                 //"most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => "KWD",
-                "numberOfOrders" => (int) $numberOfOrders,
-                "itemsCount" => (int) $itemsCount,
-                "today_customer_gained" => (int) $today_customer_gained,
-                "today_revenue_generated" => (float) $today_revenue_generated,//Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode),//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
-                //"today_sold_items" => (int) $today_sold_items,
-                "today_orders_received" => (float)  $today_orders_received, //Yii::$app->formatter->asCurrency($today_orders_received, $currencyCode)//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
         ]);
     }
 
@@ -266,5 +276,125 @@ class StatsController extends Controller
                 "currency_code" => "KWD"
              ]
         ));
+    }
+
+    public function actionGraphFees() {
+
+        $interval = Yii::$app->request->post('interval');
+
+        $fees_data = Payment::getTotalFeesByInterval($interval);
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $categories = [];
+
+        $seriesData = [];
+
+        foreach ($fees_data["plugn_fee_chart_data"] as $row) {
+            if (isset($row['month'])) {
+                $categories[] = $row['month'];
+            } else if (isset($row['day'])) {
+                $categories[] = $row['day'];
+            } else if (isset($row['item_name'])) {
+                $categories = $row['item_name'];
+            }
+
+            $seriesData[] = $row['total'];
+        }
+
+        return [
+            "categories" => $categories,
+            "seriesData" => $seriesData
+        ];
+    }
+
+    public function actionGraphCustomers() {
+
+        $interval = Yii::$app->request->post('interval');
+
+        $fees_data = Customer::getTotalCustomersByInterval($interval);
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $categories = [];
+
+        $seriesData = [];
+
+        foreach ($fees_data["customer_chart_data"] as $row) {
+            if (isset($row['month'])) {
+                $categories[] = $row['month'];
+            } else if (isset($row['day'])) {
+                $categories[] = $row['day'];
+            } else if (isset($row['item_name'])) {
+                $categories = $row['item_name'];
+            }
+
+            $seriesData[] = $row['total'];
+        }
+
+        return [
+            "categories" => $categories,
+            "seriesData" => $seriesData
+        ];
+    }
+
+    public function actionGraphStores() {
+
+        $interval = Yii::$app->request->post('interval');
+
+        $fees_data = Restaurant::getTotalStoresByInterval($interval);
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $categories = [];
+
+        $seriesData = [];
+
+        foreach ($fees_data["store_created_chart_data"] as $row) {
+            if (isset($row['month'])) {
+                $categories[] = $row['month'];
+            } else if (isset($row['day'])) {
+                $categories[] = $row['day'];
+            } else if (isset($row['item_name'])) {
+                $categories = $row['item_name'];
+            }
+
+            $seriesData[] = $row['total'];
+        }
+
+        return [
+            "categories" => $categories,
+            "seriesData" => $seriesData
+        ];
+    }
+
+    public function actionGraphOrders() {
+
+        $interval = Yii::$app->request->post('interval');
+
+        $fees_data = Order::getTotalOrdersByInterval($interval);
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $categories = [];
+
+        $seriesData = [];
+
+        foreach ($fees_data["orders_received_chart_data"] as $row) {
+            if (isset($row['month'])) {
+                $categories[] = $row['month'];
+            } else if (isset($row['day'])) {
+                $categories[] = $row['day'];
+            } else if (isset($row['item_name'])) {
+                $categories = $row['item_name'];
+            }
+
+            $seriesData[] = $row['total'];
+        }
+
+        return [
+            "categories" => $categories,
+            "seriesData" => $seriesData
+        ];
     }
 }
