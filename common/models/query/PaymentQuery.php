@@ -27,4 +27,13 @@ class PaymentQuery extends \yii\db\ActiveQuery
             "Paid",
         ]]);
     }
+
+    public function filterByCountry($country_id) {
+        if(!$country_id) {
+            return $this;
+        }
+
+        return $this->joinWith(['restaurant'])
+            ->andWhere (['restaurant.country_id' => $country_id]);
+    }
 }

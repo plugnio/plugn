@@ -202,6 +202,15 @@ class OrderQuery extends \yii\db\ActiveQuery
         ]);
     }
 
+    public function filterByCountry($country_id) {
+        if(!$country_id) {
+            return $this;
+        }
+
+        return $this->joinWith(['restaurant'])
+            ->andWhere (['restaurant.country_id'=> $country_id]);
+    }
+
     /**
      * Orders successfully placed
      */
