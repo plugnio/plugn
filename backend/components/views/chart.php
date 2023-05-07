@@ -114,9 +114,11 @@ if($subtitle) {
       };";
     } 
 
-    $js .= "$(document).ready(function() {
-      chart_". $id ." = new ApexCharts(document.getElementById('chart_". $id ."'), chartOptions_". $id .");
-      chart_". $id .".render();
+    $js .= "
+ 
+    $(document).ready(function() {
+      window.chart_". $id ." = new ApexCharts(document.getElementById('chart_". $id ."'), chartOptions_". $id .");
+      window.chart_". $id .".render();
     });  ";
 
 $this->registerJs($js);

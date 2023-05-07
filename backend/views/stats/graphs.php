@@ -19,7 +19,10 @@ $js = "
              }]
             },
             onRegionTipShow: function(e, el, code) {
-                el.html(el.html()+' ('+storeByCountry[code]+' stores)');
+                if(storeByCountry[code])
+                    el.html(el.html()+' ('+storeByCountry[code]+' stores)');
+                else 
+                    el.html(el.html()+' (No store yet)');    
             }
         }); 
     });
@@ -30,7 +33,7 @@ $js = "
                             data: data
                         }]);    
                          
-                       chart_fees.updateOptions ({
+                       chart.updateOptions ({
                             xaxis: {
                                 categories: categories
                             }
@@ -55,7 +58,7 @@ $(function () {
 					$('input[name=\"interval-fees\"]').prop('disabled', false);
 				},
 				success: function(json) {
-				 	 setChartData(chart_fees, 'fees', json.seriesData, json.categories);		                
+				 	 setChartData(window.chart_fees, 'fees', json.seriesData, json.categories);		                
 				}
 			});
   });
@@ -76,7 +79,7 @@ $(function () {
 					$('input[name=\"interval-stores\"]').prop('disabled', false);
 				},
 				success: function(json) {
-				 	 setChartData(chart_stores, 'stores', json.seriesData, json.categories);		                
+				 	 setChartData(window.chart_store , 'stores', json.seriesData, json.categories);		                
 				}
 			});
   });
@@ -97,7 +100,7 @@ $(function () {
 					$('input[name=\"interval-customers\"]').prop('disabled', false);
 				},
 				success: function(json) {
-				 	 setChartData(chart_customers, 'customers', json.seriesData, json.categories);		                
+				 	 setChartData(window.chart_customer, 'customers', json.seriesData, json.categories);		                
 				}
 			});
   });
@@ -118,7 +121,7 @@ $(function () {
 					$('input[name=\"interval-orders\"]').prop('disabled', false);
 				},
 				success: function(json) {
-				 	 setChartData(chart_orders, 'orders', json.seriesData, json.categories);		                
+				 	 setChartData(window.chart_order, 'orders', json.seriesData, json.categories);		                
 				}
 			});
   });
