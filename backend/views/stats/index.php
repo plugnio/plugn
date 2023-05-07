@@ -117,13 +117,48 @@ $this->title = 'Statistics';
             <?= Html::input('date', 'date_end', $date_end, ["id" => "date_end", "class"=>"form-control"]); ?>
         </div>
 
+        <div class="form-group mb-2">
+            <label for="end_start">Country</label>
+            <?= Html::dropdownList('country_id', $country_id, $countries, ["id" => "country_id", "class"=>"form-control"]); ?>
+        </div>
+
         <div class="form-group" style="background: #f4f6f9;  margin-bottom: 0px; padding-bottom: 0px; background:#f4f6f9 ">
             <?= Html::submitButton('Submit', ['class' => 'btn btn-primary mb-2']) ?>
         </div>
+
+        <?= Html::a('Clear', \yii\helpers\Url::to(['stats/index']), ['class' => 'btn btn-secondary mb-2']) ?>
+
         <?= Html::endForm(); ?>
 
         <div class="row">
 
+            <div class="col-xl-3 col-lg-4">
+                <div class="card card-stats mb-4 mb-xl-0">
+                    <div class="card-body">
+
+                        <h5 class="card-title text-uppercase text-muted mb-0">In-active Stores</h5>
+                        <span class="h2 font-weight-bold mb-0"><?= $inActiveStores ?></span>
+
+                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- END .col-xl-3 -->
+
+            <div class="col-xl-3 col-lg-4">
+                <div class="card card-stats mb-4 mb-xl-0">
+                    <div class="card-body">
+
+                        <h5 class="card-title text-uppercase text-muted mb-0">Active Stores</h5>
+                        <span class="h2 font-weight-bold mb-0"><?= $activeStores ?></span>
+
+                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
                 <div class="card card-stats mb-4 mb-xl-0">
@@ -203,7 +238,27 @@ $this->title = 'Statistics';
 
         </div>
 
-        <h3>Revenues</h3>
+        <h3>Stores by Payment Methods</h3>
+
+        <div class="row">
+
+            <?php foreach ($storesByPaymentMethods as $storesByPaymentMethod) { ?>
+                <div class="col-xl-3 col-lg-4">
+                    <div class="card card-stats mb-4 mb-xl-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-uppercase text-muted mb-0"><?= $storesByPaymentMethod['payment_method_name'] ?></h5>
+                            <span class="h2 font-weight-bold mb-0">
+                                            <?= $storesByPaymentMethod['total'] ?></span>
+                            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                                <i class="fa fa-chart-pie"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+
+        <h3>Vendors' Revenues</h3>
 
         <div class="row">
 

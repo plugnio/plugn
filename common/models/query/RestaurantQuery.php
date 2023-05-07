@@ -28,6 +28,12 @@ class RestaurantQuery extends \yii\db\ActiveQuery
         return parent::one ($db);
     }
 
+    public function filterByNoOrderIn30Days()
+    {
+        return $this->andWhere (new Expression("restaurant.last_order_at IS NULL OR 
+            DATE(restaurant.last_order_at) < DATE(NOW() - INTERVAL 30 DAY)"));
+    }
+
     /**
      * no order & no item
      * @param null $db
@@ -77,6 +83,14 @@ class RestaurantQuery extends \yii\db\ActiveQuery
             ->andWhere(['restaurant_payment_method.status' => 1])
             ->andWhere(['NOT IN', 'restaurant_payment_method.payment_method_id', $subQuery]);
             //->andWhere(["is_tap_enable" => true]);
+    }
+
+    public function filterByCountry($country_id) {
+        if(!$country_id) {
+            return $this;
+        }
+
+        return $this->andWhere (['restaurant.country_id' => $country_id]);
     }
 
     public function filterPlugnDomain($db = null)

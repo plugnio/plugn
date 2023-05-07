@@ -2,6 +2,7 @@
 namespace backend\controllers;
 
 use agent\models\Country;
+use agent\models\RestaurantPaymentMethod;
 use backend\components\ChartWidget;
 use common\models\Payment;
 use common\models\Restaurant;
@@ -71,6 +72,7 @@ class StatsController extends Controller
     {
         $date_start = Yii::$app->request->get('date_start');
         $date_end = Yii::$app->request->get('date_end');
+        $country_id = Yii::$app->request->get('country_id');
 
         /*$numberOfOrders = Order::find()
             ->activeOrders()
@@ -105,32 +107,46 @@ class StatsController extends Controller
         //Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
 
         $totalOrders = Order::find()
+            ->filterByCountry($country_id)
             ->activeOrders()
             ->filterByDateRange($date_start, $date_end)
             ->count();
 
         $totalPremium = Restaurant::find()
+            ->filterByCountry($country_id)
             ->filterByDateRange($date_start, $date_end)
             ->filterPremium()
             ->count();
 
         $totalStores = Restaurant::find()
+            ->filterByCountry($country_id)
             ->filterByDateRange($date_start, $date_end)
             ->count();
 
         $totalFreeStores = $totalStores - $totalPremium;
 
+        $inActiveStores = Restaurant::find()
+            ->filterByCountry($country_id)
+            ->filterByNoOrderIn30Days()
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $activeStores = $totalStores - $inActiveStores;
+
         $totalStoresWithPaymentGateway = Restaurant::find()
+            ->filterByCountry($country_id)
             ->filterByDateRange($date_start, $date_end)
             ->filterStoresWithPaymentGateway()
             ->count();
 
         $totalPlugnDomain = Restaurant::find()
+            ->filterByCountry($country_id)
             ->filterByDateRange($date_start, $date_end)
             ->filterPlugnDomain()
             ->count();
 
         $totalCustomDomain = Restaurant::find()
+            ->filterByCountry($country_id)
             ->filterByDateRange($date_start, $date_end)
             ->filterCustomDomain()
             ->count();
@@ -140,6 +156,7 @@ class StatsController extends Controller
             ->select(new Expression("currency_code, SUM(payment_gateway_fee) as payment_gateway_fees, 
                 SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
             ->joinWith(['order'])
+            ->filterByCountry($country_id)
             ->filterPaid()
             ->groupBy('order.currency_code')
             ->asArray()
@@ -148,16 +165,36 @@ class StatsController extends Controller
         $revenues = Order::find()
             ->filterByDateRange($date_start, $date_end)
             ->select(new Expression("currency_code, SUM(total_price) as total_price"))
+            ->filterByCountry($country_id)
             ->activeOrders()
             ->groupBy('order.currency_code')
             ->asArray()
             ->all();
 
+        $storesByPaymentMethods = RestaurantPaymentMethod::find()
+            ->joinWith(['paymentMethod'])
+            ->select(new Expression('payment_method.payment_method_name, COUNT(*) as total'))
+            ->filterByCountry($country_id)
+            ->filterActive()
+            ->groupBy('restaurant_payment_method.payment_method_id')
+            ->asArray()
+            ->all();
+
         //Our profit margin and payment gateway margin separated from that revenue
+
+        $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
+        $countries = ["0" => "All"] + $countries;
+
+       // array_unshift($countries, "All");//
 
         return $this->render('index', [
             "date_start" => $date_start,
             "date_end" => $date_end,
+                 "inActiveStores" => $inActiveStores,
+                 "activeStores" => $activeStores,
+                 "storesByPaymentMethods" => $storesByPaymentMethods,
+                 "country_id" => $country_id,
+                 "countries" => $countries,
                  "payments" => $payments,
                 "totalOrders" => $totalOrders,
                 "revenues" => $revenues,

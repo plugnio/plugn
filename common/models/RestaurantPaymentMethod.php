@@ -48,6 +48,13 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
     }
 
     /**
+     * @return query\RestaurantPaymentMethodQuery
+     */
+    public static function find() {
+        return new query\RestaurantPaymentMethodQuery(get_called_class());
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels() {
