@@ -39,6 +39,7 @@ class LoginAsset extends AssetBundle {
       'js/intlTelInput-jquery.js',
 
     ];
+    
     public $depends = [
         'yii\web\YiiAsset',
     ];

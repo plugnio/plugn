@@ -17,6 +17,9 @@ return [
         'request' => [
             'csrfParam' => '_csrf-backend',
         ],
+        'assetManager' => [
+          'linkAssets' => true,
+        ],
         'user' => [
             'identityClass' => 'backend\models\Admin',
             'enableAutoLogin' => true,
