@@ -51,6 +51,7 @@ AppAsset::register($this);
                     ['label' => 'Graphs', 'url' => ['/stats/graph']],
                 ]
             ],
+            ['label' => 'Report', 'url' => ['/report/index']],
             [
                 'label' => 'Store',
                 'items' => [

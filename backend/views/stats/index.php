@@ -99,6 +99,7 @@ $this->title = 'Statistics';
         content: "Filter by date range";
     }
 </style>
+
 <div class="site-index">
  	<div class="body-content">
 
