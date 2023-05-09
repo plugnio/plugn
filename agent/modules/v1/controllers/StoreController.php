@@ -1059,6 +1059,17 @@ class StoreController extends BaseController
     }
 
     /**
+     * delete store
+     * @return array
+     */
+    public function actionDelete()
+    {
+        $model = $this->findModel();
+
+        return $model->deleteSite ();
+    }
+
+    /**
      * Finds the Restaurant model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id

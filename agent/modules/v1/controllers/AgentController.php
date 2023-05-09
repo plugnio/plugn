@@ -44,6 +44,37 @@ class AgentController extends BaseController
         return Yii::$app->user->identity;
     }
 
+    public function actionDelete()
+    {
+        $model = Yii::$app->user->identity;
+
+        //if there is store
+
+        $stores = $model->getAccountsManaged()->count();
+
+        if($stores > 0) {
+            return [
+                "operation" => "error",
+                "message" => Yii::t('agent', "Please delete store(s) first to delete profile!"),
+            ];
+        }
+
+        $model->setScenario(Agent::SCENARIO_DELETE);
+        $model->deleted = true;
+
+        if (!$model->save ()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return [
+            'model' => Yii::t('agent', "Agent profile updated successfully"),
+            "operation" => "success",
+        ];
+    }
+
     /**
      * update store profile
      * @param $store_uuid

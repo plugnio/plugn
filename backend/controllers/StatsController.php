@@ -198,6 +198,7 @@ class StatsController extends Controller
                  "payments" => $payments,
                 "totalOrders" => $totalOrders,
                 "revenues" => $revenues,
+                "totalStores" => $totalStores,
                 "totalPremium" => $totalPremium,
                 "totalFreeStores" => $totalFreeStores,
                 "totalStoresWithPaymentGateway" => $totalStoresWithPaymentGateway,
