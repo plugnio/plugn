@@ -174,6 +174,18 @@ $this->title = 'Statistics';
                     </div>
                 </div>
             </div><!-- END .col-xl-3 -->
+            
+            <div class="col-xl-3 col-lg-4">
+                <div class="card card-stats mb-4 mb-xl-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Number of stores created</h5>
+                        <span class="h2 font-weight-bold mb-0"><?= $totalStores ?></span>
+                        <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
                 <div class="card card-stats mb-4 mb-xl-0">
