@@ -187,7 +187,8 @@ class Restaurant extends \yii\db\ActiveRecord
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
     const SCENARIO_CURRENCY = 'currency';
-    const SCENARIO_UPDATE_STATUS = '';
+    const SCENARIO_UPDATE_STATUS = 'update-status';
+    const SCENARIO_DELETE = 'delete';
 
     public $restaurant_delivery_area;
     public $restaurant_payments_method;
@@ -381,6 +382,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $scenarios = parent::scenarios();
 
         return array_merge($scenarios, [
+            self::SCENARIO_DELETE => ['is_deleted'],
             self::SCENARIO_UPDATE_BANK => ['iban'],
             self::SCENARIO_TOGGLE_DEBUGGER => ['enable_debugger'],
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
@@ -1708,8 +1710,15 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function deleteSite() {
 
+        $this->setScenario(self::SCENARIO_DELETE);
         $this->is_deleted = true;
-        $this->save(false);
+
+        if(!$this->save()) {
+            return [
+                "operation" => "error",
+                "message" => $this->errors
+            ];
+        }
 
         //remove from netlify
 
@@ -1719,6 +1728,13 @@ class Restaurant extends \yii\db\ActiveRecord
         //todo: remove github branch
 
         //Yii::$app->githubComponent->
+
+        Yii::info ($this->name . ' Store deleted by user #' . $this->restaurant_uuid);
+
+        return [
+            'message' => Yii::t('agent', "Store deleted successfully"),
+            "operation" => "success",
+        ];
     }
 
     /**

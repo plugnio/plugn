@@ -43,6 +43,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     const SCENARIO_CREATE_NEW_AGENT = 'create';
     const SCENARIO_UPDATE_EMAIL = 'update-email';
     const SCENARIO_VERIFY_EMAIL = 'verify-email';
+    const SCENARIO_DELETE = 'delete';
 
     /**
      * Field for temporary password. If set, it will overwrite the old password on save
@@ -97,6 +98,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         $scenarios['update-email'] = ['agent_email', 'agent_new_email'];
 
         $scenarios['verify-email'] = ['agent_email', 'agent_new_email', 'agent_email_verification', 'agent_auth_key'];
+
+        $scenarios['SCENARIO_DELETE'] = ['deleted'];
 
         return $scenarios;
     }
@@ -632,7 +635,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     public function getAccountsManaged($modelClass = "\common\models\Restaurant")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->via ('agentAssignments');
+            ->via ('agentAssignments')
+            ->andWhere(['is_deleted' => false]);
     }
 
     /**

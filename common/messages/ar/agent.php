@@ -1,5 +1,7 @@
 <?php
 return [
+    "Please delete store(s) first to delete profile!" => "يرجى حذف المتجر (المتاجر) أولاً لحذف الملف الشخصي!",
+    "Store deleted successfully" => "تم حذف المتجر بنجاح",
     "Mail settings updated successfully" => "تم تحديث إعدادات البريد بنجاح",
     "Store will be updated in 2-5 min!" => "سيتم تحديث المتجر في 2-5 دقائق!",
     "This email verification link is no longer valid, please login to send a new one" => "لم يعد رابط التحقق من البريد الإلكتروني هذا صالحًا ، يرجى تسجيل الدخول لإرسال رابط جديد",

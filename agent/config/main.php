@@ -87,6 +87,7 @@ return [
                         'PATCH language-pref' => 'language-pref',
                         'PUT update' => 'update-agent-profile',
                         'POST change-password' => 'change-password',
+                        'DELETE' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS store-profile' => 'options',
@@ -639,9 +640,12 @@ return [
                         'PATCH process-gateway-queue/<id>' => 'process-gateway-queue',
                         'DELETE remove-gateway-queue/<id>' => 'remove-gateway-queue',
                         'PATCH process-gateway-queue' => 'process-gateway-queue',
+                        'PATCH delete-store' => 'delete',
                         'DELETE remove-gateway-queue' => 'remove-gateway-queue',
+                        'DELETE' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS delete-store' => 'options',
                         'OPTIONS test-tap' => 'options',
                         'OPTIONS upgrade' => 'options',
                         'OPTIONS enable-moyasar' => 'options',
