@@ -402,16 +402,9 @@ class AuthController extends Controller {
                 
                 Yii::$app->auth0->createUser($param);
 
-                //https://hooks.zapier.com/hooks/catch/3784096/oeap6qy
+                //Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/oeap6qy/oeap6qy", $store->attributes + $agent->attributes);
 
-                Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/3784096/366cqik", [
-                    'first_name' => trim($firstname),
-                    'last_name' => trim($lastname),
-                    'store_name' => $store->name,
-                    'phone_number' => $store->owner_phone_country_code . $store->owner_number,
-                    'email' => $agent->agent_email,
-                    'store_url' => $store->restaurant_domain
-                ]);
+                //Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/3784096/366cqik",  $store->attributes + $agent->attributes);
             }
 
             $transaction->commit();
