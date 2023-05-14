@@ -80,8 +80,12 @@ $('#agentassignment-agentname').on('click', function() {
         e.preventDefault();
         e.stopPropagation();
     
+        var url = $(e.target).attr('href');
+
+        url += url.includes('?')? '&fromPager=1': '?fromPager=1';
+
         $.ajax({
-				url: $(e.target).attr('href') + '&fromPager=1',
+				url: url,
 				dataType: 'html',
 				success: function(html) {
 					$('#modal-agent .list-wrapper').html(html);
@@ -97,8 +101,12 @@ $('#agentassignment-agentname').on('click', function() {
 
         const value = Object.fromEntries(data.entries());
 
+        var url = '". Url::to(['agent/dropdown']) ."';
+
+        url += url.includes('?') ? '&fromPager=1': '?fromPager=1';
+
         $.ajax({
-				url: '". Url::to(['agent/dropdown']) ."&fromPager=1',
+				url: url,
 				dataType: 'html',
 				data: value,
 				success: function(html) {
