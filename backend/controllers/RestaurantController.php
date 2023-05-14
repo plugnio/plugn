@@ -443,8 +443,9 @@ class RestaurantController extends Controller {
         }
         else
         {
-            Yii::error('[Error while upgrading site]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-            Yii::$app->session->setFlash('errorResponse', json_encode($response->data['message']));
+            Yii::error('[Error while upgrading site]' . json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            Yii::$app->session->setFlash('errorResponse', json_encode($response->data));
         }
 
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
