@@ -51,6 +51,9 @@ return [
         'config' => [
             'class' => 'common\components\Config'
         ],
+        'zapier' => [
+            'class' => 'common\components\Zapier'
+        ],
         'auth0' => [
             'class' => 'common\components\Auth0',
         ],

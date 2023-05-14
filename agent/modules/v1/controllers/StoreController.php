@@ -24,7 +24,6 @@ use common\models\PaymentGatewayQueue;
 
 class StoreController extends BaseController
 {
-
     /**
      * only owner will have access
      */
