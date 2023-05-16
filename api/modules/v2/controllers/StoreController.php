@@ -65,7 +65,7 @@ class StoreController extends Controller
     public function actionList()
     {
         $query = Restaurant::find()
-            ->andWhere(['is_public' => true])
+            //->andWhere(['is_public' => true])
             ->orderBy('restaurant_created_at DESC');
 
         return new ActiveDataProvider([
