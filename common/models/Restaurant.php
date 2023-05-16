@@ -1263,6 +1263,30 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function createTapAccount()
     {
+        if(!$this->authorized_signature_title) {
+            $this->authorized_signature_title = 'Authorized Signature';
+        }
+
+        if(!$this->authorized_signature_file_purpose) {
+            $this->authorized_signature_file_purpose = 'customer_signature';
+        }
+
+        if(!$this->commercial_license_title) {
+            $this->commercial_license_title = 'Commercial License';
+        }
+
+        if(!$this->commercial_license_file_purpose) {
+            $this->commercial_license_file_purpose = 'customer_signature';
+        }
+
+        if(!$this->identification_file_purpose) {
+            $this->identification_file_purpose = 'identity_document';
+        }
+
+        if(!$this->identification_title) {
+            $this->identification_title = "Owner's civil id";
+        }
+
         //Upload documents file on our server before we create an account on tap we gonaa delete them
  
         $response = $this->uploadDocumentsToTap();
