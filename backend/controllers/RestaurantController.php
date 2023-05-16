@@ -139,27 +139,28 @@ class RestaurantController extends Controller {
 
         $store->authorized_signature_issuing_date = null;
         $store->authorized_signature_expiry_date = null;
-        $store->authorized_signature_title = null;
+
+        //$store->authorized_signature_title = null;
         $store->authorized_signature_file = null;
         $store->authorized_signature_file_id = null;
-        $store->authorized_signature_file_purpose = null;
+        //$store->authorized_signature_file_purpose = null;
         $store->iban = null;
 
         $store->identification_issuing_date = null;
         $store->identification_expiry_date = null;
         $store->identification_file_front_side = null;
         $store->identification_file_id_front_side = null;
-        $store->identification_title = null;
-        $store->identification_file_purpose = null;
+        //$store->identification_title = null;
+        //$store->identification_file_purpose = null;
         $store->restaurant_email_notification = null;
         $store->developer_id = null;
 
         $store->commercial_license_issuing_date = null;
         $store->commercial_license_expiry_date = null;
-        $store->commercial_license_title = null;
+        //$store->commercial_license_title = null;
         $store->commercial_license_file = null;
         $store->commercial_license_file_id = null;
-        $store->commercial_license_file_purpose = null;
+        //$store->commercial_license_file_purpose = null;
 
         $store->live_public_key = null;
         $store->test_public_key = null;
@@ -188,7 +189,7 @@ class RestaurantController extends Controller {
             [
                 'IN',
                 'payment_method_id',
-                PaymentMethod::find()->andWhere(['IN', 'payment_method_code', [
+                PaymentMethod::find()->select('payment_method_id')->andWhere(['IN', 'payment_method_code', [
                     PaymentMethod::CODE_CREDIT_CARD,
                     PaymentMethod::CODE_KNET,
                     PaymentMethod::CODE_BENEFIT,
@@ -443,8 +444,9 @@ class RestaurantController extends Controller {
         }
         else
         {
-            Yii::error('[Error while upgrading site]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
-            Yii::$app->session->setFlash('errorResponse', json_encode($response->data['message']));
+            Yii::error('[Error while upgrading site]' . json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            Yii::$app->session->setFlash('errorResponse', json_encode($response->data));
         }
 
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);

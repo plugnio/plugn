@@ -44,8 +44,12 @@ $('#".$formModalName."-".$labelAttribute."').on('click', function() {
         e.preventDefault();
         e.stopPropagation();
     
+    	var url = $(e.target).attr('href');
+
+    	url += url.includes('?')? '&fromPager=1': '?fromPager=1';
+
         $.ajax({
-				url: $(e.target).attr('href') + '?fromPager=1',
+				url: url,
 				dataType: 'html',
 				success: function(html) {
 					$('#modal-". $modalName ." .list-wrapper').html(html);
@@ -61,8 +65,12 @@ $('#".$formModalName."-".$labelAttribute."').on('click', function() {
 
         const value = Object.fromEntries(data.entries());
 
+		var url = '". $action ."';
+
+    	url += url.includes('?') ? '&fromPager=1': '?fromPager=1';
+
         $.ajax({
-				url: '". $action ."?fromPager=1',
+				url: url,
 				dataType: 'html',
 				data: value,
 				success: function(html) {

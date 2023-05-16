@@ -266,6 +266,7 @@ class Restaurant extends \yii\db\ActiveRecord
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
             [['name', 'name_ar', 'restaurant_email'], 'required', 'on' => 'default'],
             [['name', 'owner_number', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
@@ -1262,6 +1263,30 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function createTapAccount()
     {
+        if(!$this->authorized_signature_title) {
+            $this->authorized_signature_title = 'Authorized Signature';
+        }
+
+        if(!$this->authorized_signature_file_purpose) {
+            $this->authorized_signature_file_purpose = 'customer_signature';
+        }
+
+        if(!$this->commercial_license_title) {
+            $this->commercial_license_title = 'Commercial License';
+        }
+
+        if(!$this->commercial_license_file_purpose) {
+            $this->commercial_license_file_purpose = 'customer_signature';
+        }
+
+        if(!$this->identification_file_purpose) {
+            $this->identification_file_purpose = 'identity_document';
+        }
+
+        if(!$this->identification_title) {
+            $this->identification_title = "Owner's civil id";
+        }
+
         //Upload documents file on our server before we create an account on tap we gonaa delete them
  
         $response = $this->uploadDocumentsToTap();
