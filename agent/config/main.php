@@ -604,6 +604,7 @@ return [
                         'GET view-payment-methods/<id>' => 'view-payment-methods',
                         'POST' => 'update',
                         'POST upgrade' => 'upgrade',
+                        'POST create' => 'create',
                         'POST connect-domain' => 'connect-domain',
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
                         'POST enable-payment-method/<id>/<paymentMethodId>' => 'enable-payment-method',
@@ -652,7 +653,7 @@ return [
                         'OPTIONS disable-moyasar' => 'options',
                         'OPTIONS enable-moyasar/<id>' => 'options',
                         'OPTIONS disable-moyasar/<id>' => 'options',
-
+                        'OPTIONS create' => 'options',
                         'OPTIONS enable-stripe' => 'options',
                         'OPTIONS disable-stripe' => 'options',
                         'OPTIONS enable-stripe/<id>' => 'options',

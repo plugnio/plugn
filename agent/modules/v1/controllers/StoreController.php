@@ -154,6 +154,65 @@ class StoreController extends BaseController
     }
 
     /**
+     * add new store
+     * @return array|string[]
+     */
+    public function actionCreate()
+    {
+        $store = new Restaurant();
+
+        $store->is_sandbox = Yii::$app->request->getBodyParam('is_sandbox');
+        $store->country_id = Yii::$app->request->getBodyParam('country_id');
+        $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
+        $store->phone_number_country_code = (int) Yii::$app->request->getBodyParam('mobile_country_code');
+        $store->phone_number = Yii::$app->request->getBodyParam('mobile');
+        $store->name = Yii::$app->request->getBodyParam('name');
+        $store->name_ar = Yii::$app->request->getBodyParam('name_ar');
+        $store->schedule_interval = Yii::$app->request->getBodyParam('schedule_interval');
+        $store->schedule_order = Yii::$app->request->getBodyParam('schedule_order');
+        $store->restaurant_email = Yii::$app->request->getBodyParam('restaurant_email');
+        $store->tagline = Yii::$app->request->getBodyParam('tagline');
+        $store->tagline_ar = Yii::$app->request->getBodyParam('tagline_ar');
+        $store->meta_description = Yii::$app->request->getBodyParam("meta_description");
+        $store->meta_description_ar = Yii::$app->request->getBodyParam("meta_description_ar");
+        $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
+        $store->accept_order_247 = Yii::$app->request->getBodyParam('accept_order_247');
+        $store->is_public = Yii::$app->request->getBodyParam('is_public');
+
+        $store->owner_first_name = Yii::$app->request->getBodyParam('owner_first_name');
+        $store->owner_last_name = Yii::$app->request->getBodyParam('owner_last_name');
+        $store->owner_email = Yii::$app->request->getBodyParam('owner_email');
+        $store->owner_number = Yii::$app->request->getBodyParam('owner_number');
+        $store->owner_phone_country_code = Yii::$app->request->getBodyParam('owner_phone_country_code');
+
+        $currencyCode = Yii::$app->request->getBodyParam('currency');
+
+        $currency = Currency::findOne(['code' => $currencyCode]);
+
+        if($currency) {
+            $store->currency_id = $currency->currency_id;
+        }
+
+        if (!$store->save()) {
+            return self::message("error",$store->getErrors());
+        }
+
+        //assign agent to store
+
+        $response = $store->setupStore(Yii::$app->user->identity);
+
+        if($response['operation'] != 'success') {
+            return $response;
+        }
+
+        return [
+            "operation" => "success",
+            "restaurant_uuid" => $store->restaurant_uuid,
+            "message" => 'Store created successfully'
+        ];
+    }
+
+    /**
      * Displays  Real time orders
      *
      * @return mixed
