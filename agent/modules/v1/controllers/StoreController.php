@@ -36,6 +36,7 @@ class StoreController extends BaseController
         }
 
         if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['detail'])) {
+
             throw new \yii\web\BadRequestHttpException(
                 Yii::t('agent', 'You are not allowed to manage store. Please contact with store owner')
             );

@@ -340,6 +340,7 @@ class AuthController extends Controller {
      * @return type
      */
     public function actionUpdateEmail() {
+
         $unVerifiedToken = Yii::$app->request->getBodyParam("unVerifiedToken");
         $new_email = Yii::$app->request->getBodyParam("newEmail");
 
@@ -439,6 +440,7 @@ class AuthController extends Controller {
             $currentDatetime = new \DateTime();
 
             if ($agent->agent_limit_email && $currentDatetime < $emailLimitDatetime) {
+
                 $difference = $currentDatetime->diff($emailLimitDatetime);
                 $minuteDifference = (int) $difference->i;
                 $secondDifference = (int) $difference->s;
@@ -683,21 +685,26 @@ class AuthController extends Controller {
 
         $assignment = $agent->getAgentAssignments()->one();
 
-        if(!$assignment) {
+        /*if(!$assignment) {
           return [
               "operation" => "error",
               'message' => Yii::t ('agent', "You're not assigned to any store")
           ];
-        }
+        }*/
 
-        $selectedStore = $assignment->getRestaurant()
-            ->select([
-                'restaurant_uuid',
-                'name',
-                'name_ar',
-                'restaurant_domain'
-            ])
-            ->one();
+        $selectedStore = null;
+
+        if($assignment)
+        {
+            $selectedStore = $assignment->getRestaurant()
+                ->select([
+                    'restaurant_uuid',
+                    'name',
+                    'name_ar',
+                    'restaurant_domain'
+                ])
+                ->one();
+        }
 
         $stores = $agent->getAccountsManaged()
             ->select([
@@ -717,7 +724,7 @@ class AuthController extends Controller {
             "agent_email" => $agent->agent_email,
             "agent_new_email" => $agent->agent_new_email,
             "language_pref" => $agent->agent_language_pref,
-            "role" => (int) $assignment->role,
+            "role" =>  $assignment? (int) $assignment->role: null,
             "selectedStore" => $selectedStore,
             "stores" => $stores
         ];

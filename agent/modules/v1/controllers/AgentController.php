@@ -9,7 +9,6 @@ use yii\rest\Controller;
 
 class AgentController extends BaseController
 {
-
     /**
      * return stores assigned
      * @return mixed
