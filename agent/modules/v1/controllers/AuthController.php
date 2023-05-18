@@ -211,7 +211,6 @@ class AuthController extends Controller {
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
         $agent->agent_name = Yii::$app->request->getBodyParam('name');
         $agent->agent_email = Yii::$app->request->getBodyParam('email');
-        $agent->setPassword(Yii::$app->request->getBodyParam('password'));
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
         if (!$agent->validate()) {
