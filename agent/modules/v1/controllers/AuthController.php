@@ -93,7 +93,8 @@ class AuthController extends Controller {
             'resend-verification-email',
             'verify-email',
             'is-email-verified',
-            'login-auth0'
+            'login-auth0',
+            'locate'
         ];
 
         return $behaviors;
@@ -669,6 +670,14 @@ class AuthController extends Controller {
         $agent->save(false);
 
         return $this->_loginResponse($agent);
+    }
+
+    /**
+     * return user location detail by user ip address
+     * @return type
+     */
+    public function actionLocate() {
+        return Yii::$app->ipstack->locate();
     }
 
     /**

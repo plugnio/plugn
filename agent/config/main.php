@@ -52,6 +52,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
+                        'GET locate' => 'locate',
                         'POST signup-step-one' => 'signup-step-one',
                         'POST login-auth0' => 'login-auth0',
                         'POST signup' => 'signup',
@@ -63,6 +64,7 @@ return [
                         'POST verify-email' => 'verify-email',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
+                        'OPTIONS locate' => 'options',
                         'OPTIONS login-auth0' => 'options',
                         'OPTIONS update-password' => 'options',
                         'OPTIONS request-reset-password' => 'options',
