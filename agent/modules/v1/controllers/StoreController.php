@@ -1128,6 +1128,24 @@ class StoreController extends BaseController
         return $model->deleteSite ();
     }
 
+    public function actionDeactivate()
+    {
+        $model = $this->findModel();
+
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_STATUS);
+
+        $model->restaurant_status = Restaurant::RESTAURANT_STATUS_CLOSED;
+
+        if(!$model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return self::message("success", "Status changed successfully");
+    }
+
     /**
      * Finds the Restaurant model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

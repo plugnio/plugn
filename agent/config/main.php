@@ -641,6 +641,8 @@ return [
                         'POST update-email-settings' => 'update-email-settings',
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
                         'PATCH process-gateway-queue/<id>' => 'process-gateway-queue',
+                        'PATCH deactivate' => 'deactivate',
+                        'POST deactivate' => 'deactivate',
                         'PATCH process-gateway-queue' => 'process-gateway-queue',
                         'POST remove-store' => 'delete',
                         'PATCH remove-store' => 'delete',
@@ -651,6 +653,7 @@ return [
                         'DELETE' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS deactivate' => 'options',
                         'OPTIONS remove-store' => 'options',
                         'OPTIONS delete-store' => 'options',
                         'OPTIONS test-tap' => 'options',
