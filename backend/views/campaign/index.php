@@ -4,18 +4,18 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\models\VendorCampaignSearch */
+/* @var $searchModel backend\models\CampaignSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Vendor Email Campaigns');
+$this->title = 'Campaigns';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="vendor-campaign-index">
+<div class="campaign-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a(Yii::t('app', 'Create Vendor Campaign'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Campaign', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -26,21 +26,19 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'campaign_uuid',
-            'template_uuid',
-            'progress',
+            'utm_uuid',
+            'utm_source',
+            'utm_medium',
+            'utm_campaign',
             [
-                'attribute' => 'status',
-                'filter' => [
-                    0 => 'Draft',
-                    1 => "In Process",
-                    2 => "Completed",
-                    3 => "In Queue"
-                ],
-                'value' => function($model) {
-                    return $model->statusName;
+                'label' => 'Total registration',
+                "format" => "raw",
+                "value" => function($model) {
+                    return $model->getRestaurantByCampaigns()->count();
                 }
             ],
+            //'utm_content',
+            //'utm_term',
             //'created_at',
             //'updated_at',
 

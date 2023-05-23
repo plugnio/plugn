@@ -1714,7 +1714,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
             //Add opening hrs
             
-            for ($i = 0; $i < 7; ++$i) 
+            /*for ($i = 0; $i < 7; ++$i)
             {
                 $opening_hour = new OpeningHour();
                 $opening_hour->restaurant_uuid = $this->restaurant_uuid;
@@ -1722,7 +1722,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 $opening_hour->open_at = 0;
                 $opening_hour->close_at = '23:59:59';
                 $opening_hour->save ();
-            }
+            }*/
 
             $currecy = new RestaurantCurrency();
             $currecy->restaurant_uuid = $this->restaurant_uuid;

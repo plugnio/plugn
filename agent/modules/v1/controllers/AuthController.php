@@ -6,6 +6,7 @@ use agent\models\AgentToken;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\Restaurant;
+use common\models\RestaurantByCampaign;
 use common\models\AgentAssignment;
 use common\models\AgentEmailVerifyAttempt;
 use common\models\BusinessLocation;
@@ -67,7 +68,7 @@ class AuthController extends Controller {
                     
                     return null;
                 }
-
+                
                 if ($agent->validatePassword($password)) {
                     return $agent;
                 }
@@ -243,6 +244,7 @@ class AuthController extends Controller {
 
         $currencyCode = Yii::$app->request->getBodyParam('currency');
         $accessToken = Yii::$app->request->getBodyParam('accessToken');
+        $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
 
         $currency = Currency::findOne(['code' => $currencyCode]);
 
@@ -307,6 +309,20 @@ class AuthController extends Controller {
                 $transaction->rollBack();
 
                 return $response;
+            }
+
+            if($utm_id) {
+                $rbc = new RestaurantByCampaign();
+                $rbc->restaurant_uuid = $store->restaurant_uuid;
+                $rbc->utm_uuid = $utm_id;
+
+                if (!$rbc->save()) {
+                    $rbc->rollBack();
+                    return [
+                        "operation" => "error",
+                        "message" => $rbc->errors
+                    ];
+                }
             }
 
             $transaction->commit();

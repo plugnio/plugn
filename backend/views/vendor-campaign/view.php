@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\VendorCampaign */
 
 $this->title = $model->campaign_uuid;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Vendor Campaigns'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Vendor Email Campaigns'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 \yii\web\YiiAsset::register($this);
