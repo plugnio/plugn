@@ -1228,6 +1228,8 @@ class OrderController extends Controller
 
                 $order = $this->findModel($order_uuid, $restaurant_uuid);
 
+                //check order not contain discounted item
+
                 $order->setScenario(Order::SCENARIO_APPLY_VOUCHER);
 
                 $order->voucher_id = $voucher->voucher_id;
@@ -1246,7 +1248,12 @@ class OrderController extends Controller
 
                 $order->total_price = round($order->calculateOrderTotalPrice($itemTotal), $order->currency->decimal_place);
 
-                $order->save();
+                if(!$order->save()) {
+                    return [
+                        'operation' => 'error',
+                        'message' => $order->errors
+                    ];
+                }
             }
 
             return [

@@ -23,6 +23,7 @@ use yii\db\Expression;
  * @property int|null $max_redemption
  * @property int|null $limit_per_customer
  * @property int|null $minimum_order_amount
+ * @property int|null $exclude_discounted_items
  * @property int is_deleted
  * @property string|null $voucher_created_at
  * @property string|null $voucher_updated_at
@@ -71,7 +72,7 @@ class Voucher extends \yii\db\ActiveRecord {
             /*['discount_amount', 'compare', 'compareValue' => 0, 'operator' => '>', 'when' => function($model) {
                 return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
             }],*/
-            ['is_deleted', 'integer'],
+            [['exclude_discounted_items', 'is_deleted'], 'integer'],
             [['discount_amount'], 'integer', 'min' => 1, 'when' => function($model) {
                 return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
             }],
@@ -115,7 +116,8 @@ class Voucher extends \yii\db\ActiveRecord {
             'voucher_updated_at' => Yii::t('app','Updated At'),
             'max_redemption' => Yii::t('app','Max Redemption'),
             'limit_per_customer' => Yii::t('app','Limit Per Customer'),
-            'minimum_order_amount' => Yii::t('app','Minimum Order Amount')
+            'minimum_order_amount' => Yii::t('app','Minimum Order Amount'),
+            'exclude_discounted_items' => Yii::t('app', 'exclude_discounted_items')
         ];
     }
 
@@ -177,10 +179,12 @@ class Voucher extends \yii\db\ActiveRecord {
     }
 
     public function isValid($phone_number) {
+
         $isValid = true;
 
         //Make sure today within selected duration
         if ($this->valid_from && $this->valid_until) {
+
             $today = date('Y-m-d');
             $today = date('Y-m-d', strtotime($today));
 
@@ -203,7 +207,6 @@ class Voucher extends \yii\db\ActiveRecord {
           $customer_model = Customer::find()->where(['customer_phone_number' => '+' .  $phone_number, 'restaurant_uuid' => $this->restaurant_uuid])->one();
 
           if ($customer_model) {
-
 
               $customerVoucher = CustomerVoucher::find()->where(['customer_id' => $customer_model->customer_id, 'voucher_id' => $this->voucher_id])->count();
 
