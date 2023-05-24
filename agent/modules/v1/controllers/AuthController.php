@@ -6,6 +6,7 @@ use agent\models\AgentToken;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\Restaurant;
+use common\models\RestaurantByCampaign;
 use common\models\AgentAssignment;
 use common\models\AgentEmailVerifyAttempt;
 use common\models\BusinessLocation;
@@ -93,7 +94,8 @@ class AuthController extends Controller {
             'resend-verification-email',
             'verify-email',
             'is-email-verified',
-            'login-auth0'
+            'login-auth0',
+            'locate'
         ];
 
         return $behaviors;
@@ -211,7 +213,6 @@ class AuthController extends Controller {
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
         $agent->agent_name = Yii::$app->request->getBodyParam('name');
         $agent->agent_email = Yii::$app->request->getBodyParam('email');
-        $agent->setPassword(Yii::$app->request->getBodyParam('password'));
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
         if (!$agent->validate()) {
@@ -243,6 +244,7 @@ class AuthController extends Controller {
 
         $currencyCode = Yii::$app->request->getBodyParam('currency');
         $accessToken = Yii::$app->request->getBodyParam('accessToken');
+        $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
 
         $currency = Currency::findOne(['code' => $currencyCode]);
 
@@ -250,7 +252,7 @@ class AuthController extends Controller {
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
         $agent->agent_name = Yii::$app->request->getBodyParam ('name');
         $agent->agent_email = Yii::$app->request->getBodyParam ('email');
-        $agent->setPassword(Yii::$app->request->getBodyParam ('password'));
+        //$agent->setPassword(Yii::$app->request->getBodyParam ('password'));
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
         if($accessToken) {
@@ -301,110 +303,26 @@ class AuthController extends Controller {
                 ];
             }
 
-            //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
+            $response = $store->setupStore($agent);
 
-            $category = new Category();
-            $category->restaurant_uuid = $store->restaurant_uuid;
-            $category->title = 'Products';
-            $category->title_ar = 'منتجات';
-
-            if (!$category->save()) {
-                $transaction->rollBack();
-                return [
-                    "operation" => "error",
-                    "message" => $category->errors
-                ];
-            }
-
-            //Create a business Location for a store by default named "Main Branch".
-            $business_location = new BusinessLocation();
-            $business_location->restaurant_uuid = $store->restaurant_uuid;
-            $business_location->country_id = $store->country_id;
-            $business_location->support_pick_up = 1;
-            $business_location->business_location_name = 'Main Branch';
-            $business_location->business_location_name_ar = 'الفرع الرئيسي';
-
-            if (!$business_location->save()) {
+            if($response['operation'] != 'success') {
                 $transaction->rollBack();
 
-                return [
-                    "operation" => "error",
-                    "message" => $business_location->errors
-                ];
+                return $response;
             }
 
-            //Enable cash by default
+            if($utm_id) {
+                $rbc = new RestaurantByCampaign();
+                $rbc->restaurant_uuid = $store->restaurant_uuid;
+                $rbc->utm_uuid = $utm_id;
 
-            $paymentMethod = PaymentMethod::find()
-                ->andWhere(['payment_method_code' => PaymentMethod::CODE_CASH])
-                ->one();
-
-            if(!$paymentMethod) {
-                $paymentMethod = new PaymentMethod();
-                $paymentMethod->payment_method_code =  PaymentMethod::CODE_CASH;
-                $paymentMethod->payment_method_name = "Cash on delivery";
-                $paymentMethod->payment_method_name_ar = "الدفع عند الاستلام";
-                $paymentMethod->vat = 0;
-                $paymentMethod->save(false);
-            }
-
-            $payments_method = new RestaurantPaymentMethod();
-            $payments_method->payment_method_id = $paymentMethod->payment_method_id; //Cash
-            $payments_method->restaurant_uuid = $store->restaurant_uuid;
-            
-            if (!$payments_method->save()) {
-                $transaction->rollBack();
-                return [
-                    "operation" => "error",
-                    "message" => $payments_method->errors
-                ];
-            }
-
-            $assignment_agent = new AgentAssignment();
-            $assignment_agent->agent_id = $agent->agent_id;
-            $assignment_agent->assignment_agent_email = $agent->agent_email;
-            $assignment_agent->role = AgentAssignment::AGENT_ROLE_OWNER;
-            $assignment_agent->restaurant_uuid = $store->restaurant_uuid;
-            $assignment_agent->business_location_id = $business_location->business_location_id;
-            
-            if (!$assignment_agent->save()) {
-                $transaction->rollBack();
-                return [
-                    "operation" => "error",
-                    "message" => $assignment_agent->errors
-                ];
-            }
-
-            \Yii::info("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
-
-            if (YII_ENV == 'prod') {
-
-                $full_name = explode(' ', $agent->agent_name);
-                $firstname = $full_name[0];
-                $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
-
-                Yii::$app->eventManager->track('Store Created', [
-                        'first_name' => trim($firstname),
-                        'last_name' => trim($lastname),
-                        'store_name' => $store->name,
-                        'phone_number' => $store->owner_phone_country_code . $store->owner_number,
-                        'email' => $agent->agent_email,
-                        'store_url' => $store->restaurant_domain
-                    ],
-                    null,
-                    $agent->agent_id
-                );
-
-                $param = [
-                    'email' => Yii::$app->request->getBodyParam('email'),
-                    'password' => Yii::$app->request->getBodyParam('password')
-                ];
-                
-                Yii::$app->auth0->createUser($param);
-
-                //Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/oeap6qy/oeap6qy", $store->attributes + $agent->attributes);
-
-                //Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/3784096/366cqik",  $store->attributes + $agent->attributes);
+                if (!$rbc->save()) {
+                    $rbc->rollBack();
+                    return [
+                        "operation" => "error",
+                        "message" => $rbc->errors
+                    ];
+                }
             }
 
             $transaction->commit();
@@ -438,6 +356,7 @@ class AuthController extends Controller {
      * @return type
      */
     public function actionUpdateEmail() {
+
         $unVerifiedToken = Yii::$app->request->getBodyParam("unVerifiedToken");
         $new_email = Yii::$app->request->getBodyParam("newEmail");
 
@@ -537,6 +456,7 @@ class AuthController extends Controller {
             $currentDatetime = new \DateTime();
 
             if ($agent->agent_limit_email && $currentDatetime < $emailLimitDatetime) {
+
                 $difference = $currentDatetime->diff($emailLimitDatetime);
                 $minuteDifference = (int) $difference->i;
                 $secondDifference = (int) $difference->s;
@@ -769,6 +689,14 @@ class AuthController extends Controller {
     }
 
     /**
+     * return user location detail by user ip address
+     * @return type
+     */
+    public function actionLocate() {
+        return Yii::$app->ipstack->locate();
+    }
+
+    /**
      * Return agent data after successful login
      * @param type $agent
      * @return type
@@ -781,21 +709,26 @@ class AuthController extends Controller {
 
         $assignment = $agent->getAgentAssignments()->one();
 
-        if(!$assignment) {
+        /*if(!$assignment) {
           return [
               "operation" => "error",
               'message' => Yii::t ('agent', "You're not assigned to any store")
           ];
-        }
+        }*/
 
-        $selectedStore = $assignment->getRestaurant()
-            ->select([
-                'restaurant_uuid',
-                'name',
-                'name_ar',
-                'restaurant_domain'
-            ])
-            ->one();
+        $selectedStore = null;
+
+        if($assignment)
+        {
+            $selectedStore = $assignment->getRestaurant()
+                ->select([
+                    'restaurant_uuid',
+                    'name',
+                    'name_ar',
+                    'restaurant_domain'
+                ])
+                ->one();
+        }
 
         $stores = $agent->getAccountsManaged()
             ->select([
@@ -815,7 +748,7 @@ class AuthController extends Controller {
             "agent_email" => $agent->agent_email,
             "agent_new_email" => $agent->agent_new_email,
             "language_pref" => $agent->agent_language_pref,
-            "role" => (int) $assignment->role,
+            "role" =>  $assignment? (int) $assignment->role: null,
             "selectedStore" => $selectedStore,
             "stores" => $stores
         ];

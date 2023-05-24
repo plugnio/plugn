@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\VendorCampaign */
 
-$this->title = Yii::t('app', 'Create Vendor Campaign');
+$this->title = Yii::t('app', 'Create Vendor Email Campaign');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Vendor Campaigns'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

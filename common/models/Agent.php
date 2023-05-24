@@ -169,7 +169,10 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     {
         parent::afterSave ($insert, $changedAttributes);
 
-        if (!$insert && $this->agent_password_hash && isset($changedAttributes['agent_password_hash'])) {
+        if (
+            !$insert && $this->agent_password_hash &&
+            isset($changedAttributes['agent_password_hash'])
+        ) {
             $this->sendPasswordUpdatedEmail ();
         }
     }
@@ -262,8 +265,17 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         $this->generateAuthKey();
 
         //Update agent's last email limit timestamp
-        $this->agent_limit_email = new Expression('NOW()');
-        $this->save(false);
+        //$this->agent_limit_email = new Expression('NOW()');
+        //$this->save(false);
+
+        //to fix: password reset email on signup
+
+        self::updateAll([
+            'agent_auth_key' => $this->agent_auth_key,
+            'agent_limit_email' => new Expression('NOW()')
+        ], [
+            "agent_id" => $this->agent_id
+        ]);
 
         if ($this->agent_new_email) {
             $email = $this->agent_new_email;

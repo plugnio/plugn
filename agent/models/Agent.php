@@ -2,6 +2,7 @@
 
 namespace agent\models;
 
+use Yii;
 use yii\db\Expression;
 use yii\web\IdentityInterface;
 
@@ -17,14 +18,25 @@ class Agent extends \common\models\Agent implements IdentityInterface {
     public function fields()
     {
         $fields = parent::fields();
+
         $fields['agentAssignment'] = function($model) {
+
+            $restaurantUuid = Yii::$app->request->get('store_uuid');
+
+            if(!$restaurantUuid) {
+                $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+            }
+
+            if(!$restaurantUuid)
+                return null;
 
             $agent = \Yii::$app->accountManager->getManagedAccount ();
 
             return $this->getAgentAssignments()
-                ->andWhere(['agent_assignment.restaurant_uuid'=>$agent['restaurant_uuid']])
+                ->andWhere(['agent_assignment.restaurant_uuid'=> $agent['restaurant_uuid']])
                 ->one();
         };
+
         return $fields;
     }
 

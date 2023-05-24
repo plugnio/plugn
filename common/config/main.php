@@ -54,6 +54,10 @@ return [
         'zapier' => [
             'class' => 'common\components\Zapier'
         ],
+        'ipstack' => [
+            'class' => 'common\components\Ipstack',
+            'accessKey' => 'fac3c2117d877e078e3e8fa7839d8204'
+        ],
         'auth0' => [
             'class' => 'common\components\Auth0',
         ],

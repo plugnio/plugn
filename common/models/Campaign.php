@@ -154,6 +154,16 @@ class Campaign extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[RestaurantByCampaigns]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantByCampaigns()
+    {
+        return $this->hasMany(RestaurantByCampaign::className(), ['utm_uuid' => 'utm_uuid']);
+    }
+
+    /**
      * Gets query for [[Restaurant]].
      *
      * @return \yii\db\ActiveQuery

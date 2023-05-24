@@ -74,7 +74,7 @@ class VoucherController extends BaseController
         $model->max_redemption = Yii::$app->request->getBodyParam("max_redemption") ? Yii::$app->request->getBodyParam("max_redemption") : 0;
         $model->limit_per_customer = Yii::$app->request->getBodyParam("limit_per_customer") ? Yii::$app->request->getBodyParam("limit_per_customer") : 0;
         $model->minimum_order_amount = Yii::$app->request->getBodyParam("minimum_order_amount") ? Yii::$app->request->getBodyParam("minimum_order_amount") : 0;
-
+        $model->exclude_discounted_items = Yii::$app->request->getBodyParam("exclude_discounted_items");
 
         if (!$model->save()) {
             return [
@@ -111,7 +111,7 @@ class VoucherController extends BaseController
 
         $model->limit_per_customer = Yii::$app->request->getBodyParam("limit_per_customer") ? Yii::$app->request->getBodyParam("limit_per_customer") : 0;
         $model->minimum_order_amount = Yii::$app->request->getBodyParam("minimum_order_amount") ? Yii::$app->request->getBodyParam("minimum_order_amount") : 0;
-
+        $model->exclude_discounted_items = Yii::$app->request->getBodyParam("exclude_discounted_items");
 
         if (!$model->save()) {
             if (isset($model->errors)) {

@@ -81,7 +81,8 @@ AppAsset::register($this);
             [
                 'label' => 'Marketing',
                 'items' => [
-                    ['label' => 'Vendor campaign', 'url' => ['/vendor-campaign/index']],
+                    ['label' => 'Vendor campaign', 'url' => ['/campaign/index']],
+                    ['label' => 'Vendor Email campaign', 'url' => ['/vendor-campaign/index']],
                     ['label' => 'Pre-built email template', 'url' => ['/prebuilt-email-template/index']],
                     ['label' => 'Vendor email template', 'url' => ['/vendor-email-template/index']],
                     ['label' => 'Plugn Updates', 'url' => ['/plugn-update/index'] ],
