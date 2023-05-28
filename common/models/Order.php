@@ -528,10 +528,25 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateVoucherId($attribute)
     {
-        $voucher = Voucher::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'voucher_id' => $this->voucher_id, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->exists();
+        $voucher = Voucher::find()->where([
+            'restaurant_uuid' => $this->restaurant_uuid,
+            'voucher_id' => $this->voucher_id,
+            'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE
+        ])->exists();
 
         if (!$voucher || !$this->voucher->isValid($this->customer_phone_number))
+        {
             $this->addError($attribute, Yii::t('app',"Voucher code is invalid or expired"));
+            return null;
+        }
+
+        $discountedItems =  $this->getItems ()->andWhere (['>', 'compare_at_price', 0])->count();
+
+        if($this->voucher->exclude_discounted_items && $discountedItems > 0)
+        {
+            $this->addError($attribute, Yii::t('app',"Voucher code can not be applied for discounted items"));
+            return null;
+        }
     }
 
     /**
