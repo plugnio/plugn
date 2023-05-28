@@ -432,7 +432,7 @@ class RestaurantController extends Controller {
         if($store->site_id)
             $response = Yii::$app->netlifyComponent->upgradeSite($store);
         else
-            $response = Yii::$app->netlifyComponent->createSite($store->restaurant_domain);
+            $response = Yii::$app->netlifyComponent->createSite( str_replace("https://", "", $store->restaurant_domain));
 
         if ($response->isOk)
         {
