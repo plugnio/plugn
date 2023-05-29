@@ -952,36 +952,45 @@ class Order extends \yii\db\ActiveRecord
             ];
         }
 
+        $plugn_fee = 0;
+        $payment_gateway_fee = 0;
+        $plugn_fee_kwd = 0;
+
+        //$total_price = $this->total_price;
+        //$delivery_fee = $this->delivery_fee;
+        //$subtotal = $this->subtotal;
+        //$currency = $this->currency_code;
+
+        $kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+        //using store currency instead of user as user can have any currency but totals will be in store currency
+
+        $rateKWD = $kwdCurrency->rate / $this->restaurant->currency->rate;
+
+        $rate = 1 / $this->restaurant->currency->rate;// to USD
+
+        if ($this->payment_uuid) {
+
+            $plugn_fee_kwd = ($this->payment->plugn_fee + $this->payment->partner_fee) * $rateKWD;
+
+            $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * $rate;
+
+            //$total_price = $total_price * $rate;
+            //$delivery_fee = $delivery_fee * $rate;
+            //$subtotal = $subtotal * $rate;
+            $payment_gateway_fee = $this->payment->payment_gateway_fee * $rate;
+        }
+
+        if($this->restaurant->sourceCampaign) {
+
+            $this->restaurant->sourceCampaign->updateCounters([
+                'no_of_orders' => 1,
+                'total_commission' => $plugn_fee,
+                "total_gateway_fee" => $payment_gateway_fee
+            ]);
+        }
+
         if (YII_ENV == 'prod' && !$this->is_sandbox) {
-
-            $plugn_fee = 0;
-            $payment_gateway_fee = 0;
-            $plugn_fee_kwd = 0;
-
-            //$total_price = $this->total_price;
-            //$delivery_fee = $this->delivery_fee;
-            //$subtotal = $this->subtotal;
-            //$currency = $this->currency_code;
-
-            $kwdCurrency = Currency::findOne(['code' => 'KWD']);
-
-            //using store currency instead of user as user can have any currency but totals will be in store currency
-
-            $rateKWD = $kwdCurrency->rate / $this->restaurant->currency->rate;
-
-            $rate = 1 / $this->restaurant->currency->rate;// to USD
-
-            if ($this->payment_uuid) {
-
-                    $plugn_fee_kwd = ($this->payment->plugn_fee + $this->payment->partner_fee) * $rateKWD;
-
-                    $plugn_fee = ($this->payment->plugn_fee + $this->payment->partner_fee) * $rate;
-
-                    //$total_price = $total_price * $rate;
-                    //$delivery_fee = $delivery_fee * $rate;
-                    //$subtotal = $subtotal * $rate;
-                    $payment_gateway_fee = $this->payment->payment_gateway_fee * $rate;
-            }
 
             Yii::$app->eventManager->track('Order Completed', [
                     'checkout_id' => $this->order_uuid,

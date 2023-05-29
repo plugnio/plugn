@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\RestaurantSearch;
 use Yii;
 use common\models\Campaign;
 use backend\models\CampaignSearch;
@@ -52,8 +53,13 @@ class CampaignController extends Controller
      */
     public function actionView($id)
     {
+        $searchModel = new RestaurantSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $id);
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
