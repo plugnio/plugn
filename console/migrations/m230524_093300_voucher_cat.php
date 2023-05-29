@@ -21,7 +21,6 @@ class m230524_093300_voucher_cat extends Migration
         $this->addColumn('voucher', 'exclude_discounted_items', $this->boolean()->after('minimum_order_amount')
             ->defaultValue(true));
 
-
         $this->createTable('voucher_item', [
             "vi_uuid" => $this->char(60)->notNull(), // used as reference id
             "voucher_id" => $this->bigInteger(20)->notNull(),

@@ -17,6 +17,11 @@ use yii\db\Expression;
  * @property string|null $utm_campaign e.g. promotion, sale, etc.
  * @property string|null $utm_content Any call-to-action or headline, e.g. buy-now.
  * @property string|null $utm_term Keywords for your paid search campaigns
+ * @property number|null $investment
+ * @property number|null $no_of_stores
+ * @property number|null $no_of_orders
+ * @property number|null $total_commission
+ * @property number|null $total_gateway_fee
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -42,6 +47,7 @@ class Campaign extends \yii\db\ActiveRecord
             [['utm_uuid', 'restaurant_uuid'], 'string', 'max' => 60],
             [['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'], 'string', 'max' => 100],
             [['utm_uuid'], 'unique'],
+            [['investment', 'no_of_stores', 'no_of_orders', 'total_commission', 'total_gateway_fee'], 'number'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
@@ -87,6 +93,11 @@ class Campaign extends \yii\db\ActiveRecord
             'utm_campaign' => Yii::t('app', 'Utm Campaign'),
             'utm_content' => Yii::t('app', 'Utm Content'),
             'utm_term' => Yii::t('app', 'Utm Term'),
+            'investment' => Yii::t('app', 'Investment'),
+            'no_of_stores' => Yii::t('app', 'Total Stores'),
+            'no_of_orders' => Yii::t('app', 'Total Orders'),
+            'total_commission' => Yii::t('app', 'Total Commission'),
+            'total_gateway_fee' => Yii::t('app', 'Total Gateway Fee'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
@@ -161,6 +172,17 @@ class Campaign extends \yii\db\ActiveRecord
     public function getRestaurantByCampaigns()
     {
         return $this->hasMany(RestaurantByCampaign::className(), ['utm_uuid' => 'utm_uuid']);
+    }
+
+    /**
+     * Gets query for [[StoresByCampaigns]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoresByCampaigns()
+    {
+        return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via('restaurantByCampaigns');
     }
 
     /**
