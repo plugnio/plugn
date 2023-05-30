@@ -939,6 +939,8 @@ class Order extends \yii\db\ActiveRecord
 
         $this->deductStock();
 
+        $this->sendOrderNotification();
+
         $productsList = null;
 
         foreach ($this->orderItems as $orderedItem) {
@@ -1019,7 +1021,6 @@ class Order extends \yii\db\ActiveRecord
 
         //test commission in kwd / test commission in USD from 1) kwd store 2) SAR store
 
-        $this->sendOrderNotification();
     }
 
     /**

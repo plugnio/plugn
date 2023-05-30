@@ -12,6 +12,20 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Restaurants', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+$js = "
+        $(function () {
+           $('#tabs li').click(function (e) {
+               $('#tabs li').removeClass('active');
+               $(this).toggleClass('active'); 
+               
+               $('.tab-content').addClass('hidden');
+               $('#tab-' + $(this).attr('id')).removeClass('hidden');
+           });
+       });";
+
+$this->registerJs($js);
+
 ?>
 <div class="restaurant-view">
     <h1>
@@ -149,27 +163,26 @@ $this->params['breadcrumbs'][] = $this->title;
 
     </p>
 
+    <ul class="nav nav-tabs" id="tabs">
+        <li class="active" id="general">
+            <a href="#">Details</a>
+        </li>
+        <li id="payment"><a href="#">Tap payment</a></li>
+        <li id="fees"><a href="#">Our Fees</a></li>
+        <li id="theme"><a href="#">Theme color</a></li>
+        <li id="seo"><a href="#">SEO</a></li>
+        <li id="settings"><a href="#">Settings</a></li>
+    </ul>
+
+    <br />
+
+    <div id="tab-general" class="tab-content">
     <?=
     DetailView::widget([
         'model' => $model,
         'attributes' => [
-          'payment_gateway_queue_id',
-          [
-              'label' => 'is_tap_enable',
-              'value' => function ($data) {
-                  return $data->is_tap_enable ? 'Yes' : 'No';
-              },
-              'format' => 'raw'
-          ],
-          [
-              'label' => 'is_myfatoorah_enable',
-              'value' => function ($data) {
-                  return $data->is_myfatoorah_enable ? 'Yes' : 'No';
-              },
-              'format' => 'raw'
-          ],
+
           'retention_email_sent',
-            'tap_queue_id',
             'version',
             'sitemap_require_update',
             'country.country_name',
@@ -215,8 +228,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_domain',
             'thumbnail_image',
             'logo',
-            'identification_file_front_side',
-            'identification_file_back_side',
             [
                 'attribute' => 'thumbnail_image',
                 'format' => 'html',
@@ -264,32 +275,7 @@ $this->params['breadcrumbs'][] = $this->title;
                   return  $data->owner_first_name && $data->owner_last_name ? $data->owner_first_name . ' ' . $data->owner_last_name : null;
               },
             ],
-            [
-              'attribute' => 'owner_email',
-            ],
             'owner_number',
-            'vendor_sector',
-            'supplierCode',
-            'business_id',
-            'developer_id',
-            'business_entity_id',
-            'merchant_id',
-            'authorized_signature_file_id',
-            'commercial_license_file_id',
-            'identification_file_id_front_side',
-            'identification_file_id_back_side',
-            'identification_title',
-            'commercial_license_title',
-            'authorized_signature_title',
-
-            'wallet_id',
-            'operator_id',
-
-            'live_api_key',
-            'test_api_key',
-
-            'live_public_key',
-            'test_public_key',
 
             'store_branch_name',
             'custom_css:text',
@@ -297,37 +283,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'currency_id',
             'country_id',
 
-            'meta_title',
-            'meta_title_ar',
 
-            'meta_description',
-            'meta_description_ar',
 
             'phone_number_country_code',
 
-            'license_number',
-            'not_for_profit',
-            'authorized_signature_file_purpose',
-            'authorized_signature_file_id',
-            'authorized_signature_file',
-            'authorized_signature_title',
-            'authorized_signature_expiry_date',
-            'authorized_signature_issuing_date',
 
             'owner_phone_country_code',
 
-            'identification_issuing_date',
-            'identification_expiry_date',
-            'identification_file_purpose',
 
             'armada_api_key',
             'phone_number_display',
 
             'store_layout',
-            'commercial_license_issuing_date',
-            'commercial_license_expiry_date',
-            'commercial_license_file',
-            'commercial_license_file_purpose',
+
 
             'show_opening_hours',
 
@@ -336,7 +304,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'schedule_order',
 
             'has_deployed',
-            'tap_queue_id',
 
             'snapchat_pixil_id',
             'default_language',
@@ -347,19 +314,109 @@ $this->params['breadcrumbs'][] = $this->title;
             'annual_revenue',
             'referral_code',
             'custom_subscription_price',
-
-            'is_public:boolean',
-            'is_sandbox:boolean',
-            'is_under_maintenance:boolean',
-            'is_deleted:boolean',
-            'enable_debugger:boolean',
-            'accept_order_247:boolean'
         ],
     ])
     ?>
+    </div>
 
+    <div id="tab-settings" class="tab-content hidden">
+        <?=
+        DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'is_public:boolean',
+                'is_sandbox:boolean',
+                'is_under_maintenance:boolean',
+                'is_deleted:boolean',
+                'enable_debugger:boolean',
+                'accept_order_247:boolean'
+            ]
+        ]); ?>
+    </div>
 
-    <h2>Theme color</h2>
+    <div id="tab-seo" class="tab-content hidden">
+        <?=
+        DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'meta_title',
+                'meta_title_ar',
+
+                'meta_description',
+                'meta_description_ar',
+            ]
+        ]); ?>
+    </div>
+
+    <div id="tab-payment" class="tab-content hidden">
+        <?=
+        DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'tap_queue_id',
+                [
+                    'attribute' => 'owner_email',
+                ],
+                'payment_gateway_queue_id',
+                [
+                    'label' => 'is_tap_enable',
+                    'value' => function ($data) {
+                        return $data->is_tap_enable ? 'Yes' : 'No';
+                    },
+                    'format' => 'raw'
+                ],
+                [
+                    'label' => 'is_myfatoorah_enable',
+                    'value' => function ($data) {
+                        return $data->is_myfatoorah_enable ? 'Yes' : 'No';
+                    },
+                    'format' => 'raw'
+                ],
+                'tap_queue_id',
+                'identification_file_front_side',
+                'identification_file_back_side',
+                'vendor_sector',
+                'supplierCode',
+                'business_id',
+                'developer_id',
+                'business_entity_id',
+                'merchant_id',
+                'authorized_signature_file_id',
+                'commercial_license_file_id',
+                'identification_file_id_front_side',
+                'identification_file_id_back_side',
+                'identification_title',
+                'commercial_license_title',
+                'authorized_signature_title',
+                'license_number',
+                'not_for_profit',
+                'authorized_signature_file_purpose',
+                'authorized_signature_file_id',
+                'authorized_signature_file',
+                'authorized_signature_title',
+                'authorized_signature_expiry_date',
+                'authorized_signature_issuing_date',
+
+                'wallet_id',
+                'operator_id',
+
+                'live_api_key',
+                'test_api_key',
+
+                'live_public_key',
+                'test_public_key',
+                'identification_issuing_date',
+                'identification_expiry_date',
+                'identification_file_purpose',
+                'commercial_license_issuing_date',
+                'commercial_license_expiry_date',
+                'commercial_license_file',
+                'commercial_license_file_purpose',
+            ]
+        ]); ?>
+    </div>
+
+    <div id="tab-theme" class="tab-content hidden">
 
     <div class="card">
 
@@ -381,7 +438,71 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
 
     </div>
+    </div>
 
+    <div id="tab-fees" class="tab-content hidden">
 
+    <?php if(empty($payments)) { ?>
+        <p>~ no orders yet ~</p>
+    <?php } ?>
+
+    <?php foreach($payments as $payment) { ?>
+
+        <h5><?= $payment['currency_code'] ?></h5>
+
+        <div class="row">
+
+            <div class="col-xl-3 col-lg-4">
+                <div class="card card-stats mb-4 mb-xl-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Payment gateway fees</h5>
+                        <span class="h2 font-weight-bold mb-0">
+                                        <?= Yii::$app->formatter->asCurrency($payment['payment_gateway_fees'], $payment['currency_code']) ?> </span>
+                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                            <i class="fa fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-4">
+                <div class="card card-stats mb-4 mb-xl-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Plugn fees</h5>
+                        <span class="h2 font-weight-bold mb-0">
+                                        <?= Yii::$app->formatter->asCurrency($payment['plugn_fees'], $payment['currency_code']) ?></span>
+                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                            <i class="fa fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-4">
+                <div class="card card-stats mb-4 mb-xl-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Partner fees</h5>
+                        <span class="h2 font-weight-bold mb-0">
+                                        <?= Yii::$app->formatter->asCurrency($payment['partner_fees'], $payment['currency_code']) ?></span>
+                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                            <i class="fa fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-4">
+                <div class="card card-stats mb-4 mb-xl-0">
+                    <div class="card-body">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Store revenue</h5>
+                        <span class="h2 font-weight-bold mb-0">
+                                        <?= Yii::$app->formatter->asCurrency($payment['payment_net_amount'], $payment['currency_code']) ?></span>
+                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
+                            <i class="fa fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    <?php } ?>
+    </div>
 
 </div>

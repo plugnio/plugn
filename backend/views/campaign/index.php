@@ -35,13 +35,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'no_of_orders',
             'total_commission',
             'total_gateway_fee',
-            [
+            /*[
                 'label' => 'Total registration',
                 "format" => "raw",
                 "value" => function($model) {
                     return $model->getRestaurantByCampaigns()->count();
                 }
-            ],
+            ],*/
             //'utm_content',
             //'utm_term',
             //'created_at',

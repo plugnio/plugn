@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h3>Stores</h3>
 
-    <?= GridView::widget([
+    <?= \yii\grid\GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         /*'rowOptions' => function($model){
@@ -75,16 +75,23 @@ $this->params['breadcrumbs'][] = $this->title;
             'restaurant_uuid',
             'name',
             'restaurant_domain',
-             /*todo:
-              * Total orders of that store till now
-
-Total revenue made by that store till now
-
-Total Commission made by us from that store till now
-
-Total Payment gateway commission from that store till now
-              */
             'restaurant_created_at:date',
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}',
+                'buttons' => [
+                    'view' => function ($url, $data) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-eye"></span>',
+                            ['restaurant/view', 'id' => $data->restaurant_uuid],
+                            [
+                                'title' => 'View',
+                                'data-pjax' => '0',
+                            ]
+                        );
+                    },
+                ],
+            ],
         ],
     ]); ?>
 

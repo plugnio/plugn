@@ -10,6 +10,7 @@ use Yii;
 use common\models\Restaurant;
 use common\models\TapQueue;
 use backend\models\RestaurantSearch;
+use yii\db\Expression;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -267,16 +268,24 @@ class RestaurantController extends Controller {
 
         $model = $this->findModel($id);
 
-        // Store theme color
-
         $storeThemeColors = new \yii\data\ActiveDataProvider([
             'query' => $model->getRestaurantTheme(),
             'pagination' => false
         ]);
 
+        $payments = $model->getPayments()
+            ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
+                SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
+            ->joinWith(['order'])
+            ->filterPaid()
+            ->groupBy('order.currency_code')
+            ->asArray()
+            ->all();
+
         return $this->render('view', [
-                    'model' => $this->findModel($id),
-                    'storeThemeColors' => $storeThemeColors
+            'model' => $this->findModel($id),
+            'storeThemeColors' => $storeThemeColors,
+            "payments" => $payments
         ]);
     }
 
