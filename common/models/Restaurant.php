@@ -1958,12 +1958,23 @@ class Restaurant extends \yii\db\ActiveRecord
             'categories',
             'paymentGatewayQueue',
             'restaurantDomainRequests',
-            'openingHours',
+            'openingHours' => function ($restaurant) {
+                if($this->accept_order_247)
+                    return null;
+
+                return $restaurant->openingHours;
+            },
             'restaurantUploads',
             'isOpen' => function ($restaurant) {
+                if($this->accept_order_247)
+                    return true;
+
                 return $restaurant->isOpen ();
             },
             'reopeningAt' => function($restaurant) {
+                if($this->accept_order_247)
+                    return null;
+
                 return OpeningHour::getReopeningAt($restaurant);
             },
             'webLinks' => function($restaurant) {
@@ -3158,6 +3169,37 @@ class Restaurant extends \yii\db\ActiveRecord
     public function getCampaigns($modelClass = "\common\models\Campaign")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[SourceCampaign]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSourceCampaign($modelClass = "\common\models\Campaign")
+    {
+        return $this->hasOne ($modelClass::className (), ['utm_uuid' => 'utm_uuid'])
+            ->via('restaurantByCampaign');
+    }
+
+    /**
+     * Gets query for [[Payments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments($modelClass = "\common\models\Payment")
+    {
+        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[RestaurantByCampaign]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantByCampaign($modelClass = "\common\models\RestaurantByCampaign")
+    {
+        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

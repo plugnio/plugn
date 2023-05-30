@@ -50,10 +50,15 @@ class RestaurantSearch extends Restaurant
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $source_utm_uuid = null)
     {
         $query = Restaurant::find()->joinWith(['country', 'currency'])
             ->orderBy(['restaurant_created_at' => SORT_DESC]);
+
+        if($source_utm_uuid) {
+            $query->joinWith(['restaurantByCampaign'])
+                ->andWhere(['utm_uuid' => $source_utm_uuid]);
+        }
 
         // add conditions that should always apply here
 

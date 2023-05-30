@@ -93,6 +93,13 @@ class RestaurantByCampaign extends \yii\db\ActiveRecord
         ];
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        $this->campaign->updateCounters(['no_of_stores' => 1]);
+    }
+
     /**
      * Gets query for [[Restaurant]].
      *
@@ -104,11 +111,11 @@ class RestaurantByCampaign extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Utm]].
+     * Gets query for [[Campaign]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUtm($modelClass = "\common\models\Campaign")
+    public function getCampaign($modelClass = "\common\models\Campaign")
     {
         return $this->hasOne($modelClass::className(), ['utm_uuid' => 'utm_uuid']);
     }

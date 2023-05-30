@@ -5,6 +5,8 @@ use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Campaign */
+/* @var $searchModel backend\models\RestaurantSearch */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = $model->utm_uuid;
 $this->params['breadcrumbs'][] = ['label' => 'Campaigns', 'url' => ['index']];
@@ -34,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </a>
 
     <h3>Campaign detail</h3>
+
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
@@ -43,16 +46,53 @@ $this->params['breadcrumbs'][] = $this->title;
             'utm_campaign',
             'utm_content',
             'utm_term',
-            [
-                'label' => 'Total registration',
-                "format" => "raw",
-                "value" => function($model) {
-                    return $model->getRestaurantByCampaigns()->count();
-                }
-            ],
+            'investment',
+            'no_of_stores',
+            'no_of_orders',
+            'total_commission',
+            'total_gateway_fee',
             'created_at',
             'updated_at',
         ],
     ]) ?>
+
+    <h3>Stores</h3>
+
+    <?= \yii\grid\GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        /*'rowOptions' => function($model){
+            if ($model->queue) {
+                if ($model->queue->queue_status == \common\models\Queue::QUEUE_STATUS_PENDING) {
+                    return ['class' => 'danger'];
+                } else if ($model->queue->queue_status == \common\models\Queue::QUEUE_STATUS_HOLD) {
+                    return ['style' => 'background:orange', 'title' => 'Hold'];
+                }
+            }
+        },*/
+        'columns' => [
+            // ['class' => 'yii\grid\SerialColumn'],
+            'restaurant_uuid',
+            'name',
+            'restaurant_domain',
+            'restaurant_created_at:date',
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}',
+                'buttons' => [
+                    'view' => function ($url, $data) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-eye"></span>',
+                            ['restaurant/view', 'id' => $data->restaurant_uuid],
+                            [
+                                'title' => 'View',
+                                'data-pjax' => '0',
+                            ]
+                        );
+                    },
+                ],
+            ],
+        ],
+    ]); ?>
 
 </div>

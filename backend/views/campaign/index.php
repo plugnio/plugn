@@ -30,13 +30,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'utm_source',
             'utm_medium',
             'utm_campaign',
-            [
+            'investment',
+            'no_of_stores',
+            'no_of_orders',
+            'total_commission',
+            'total_gateway_fee',
+            /*[
                 'label' => 'Total registration',
                 "format" => "raw",
                 "value" => function($model) {
                     return $model->getRestaurantByCampaigns()->count();
                 }
-            ],
+            ],*/
             //'utm_content',
             //'utm_term',
             //'created_at',
@@ -45,6 +50,5 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
-
 
 </div>
