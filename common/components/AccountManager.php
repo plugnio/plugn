@@ -53,7 +53,7 @@ class AccountManager  extends BaseObject
         ]);
 //
         //todo: increase on production?
-        $cacheDuration = 60 * 60 * 24; //1 day then delete from cache
+        $cacheDuration = 0; //60 * 60 * 24 1 day then delete from cache
 
         $this->_managedAccounts = Restaurant::getDb()->cache(function($db) {
             return Yii::$app->user->identity->getAgentAssignments()
