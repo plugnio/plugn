@@ -6,24 +6,55 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\PaymentSearch */
 /* @var $form yii\widgets\ActiveForm */
+
+$js = "
+
+    $(function() {
+        $('.btn-download-excel').click(function() {
+            $('.payment-search form').attr('action', '". \yii\helpers\Url::to(['payment/export-to-excel'])."');
+            $('.payment-search form input[name=\"r\"]').val('payment/export-to-excel');
+            $('.payment-search form').submit();
+        });
+    });
+
+";
+
+$this->registerJs($js);
+
 ?>
 
 <div class="payment-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
-        'method' => 'get',
+        'method' => 'get'
     ]); ?>
 
+    <div class="row">
+    <div class="col-md-2">
     <?= $form->field($model, 'payment_uuid') ?>
+    </div>
 
+    <div class="col-md-2">
     <?= $form->field($model, 'restaurant_uuid') ?>
+    </div>
 
+    <div class="col-md-2">
     <?= $form->field($model, 'customer_id') ?>
+    </div>
 
-    <?= $form->field($model, 'order_uuid') ?>
+    <div class="col-md-2">
+        <?= $form->field($model, 'payment_gateway_order_id') ?>
+    </div>
 
-    <?= $form->field($model, 'payment_gateway_order_id') ?>
+    <div class="col-md-2">
+        <?= $form->field($model, 'date_from')->textInput(["type"=>"date"]) ?>
+    </div>
+
+    <div class="col-md-2">
+    <?= $form->field($model, 'date_to')->textInput(["type"=>"date"]) ?>
+    </div>
+    </div>
 
     <?php // echo $form->field($model, 'payment_gateway_transaction_id') ?>
 
@@ -65,9 +96,19 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'payment_gateway_name') ?>
 
-    <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+    <div class="row">
+        <div class="col-md-12">
+        <div class="form-group">
+            <label class="control-label" for="ordersearch-order_status">&nbsp;</label>
+
+            <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
+
+            <?= Html::button('Download as Excel', ['class' => 'btn btn-warning btn-download-excel']) ?>
+
+            <?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+
+        </div>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>
