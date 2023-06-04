@@ -361,7 +361,7 @@ class Restaurant extends \yii\db\ActiveRecord
                   return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
-            [['restaurant_email_notification', 'demand_delivery','schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable','supplierCode'], 'integer'],
+            [['restaurant_email_notification', 'demand_delivery', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable', 'supplierCode'], 'integer'],
             [['schedule_interval'], 'required','when' => function($model) {
                     return $model->schedule_order;
                 }
@@ -477,9 +477,10 @@ class Restaurant extends \yii\db\ActiveRecord
             ],
             self::SCENARIO_UPDATE => [
                 'country_id', 'restaurant_email_notification', 'demand_delivery','phone_number', 'phone_number_country_code',
-                'name', 'name_ar', 'schedule_interval', 'schedule_order',
-                'restaurant_email', 'tagline', 'tagline_ar', 'currency_id',
-                'owner_first_name', 'owner_last_name', 'owner_number', 'owner_email', 'owner_phone_country_code'
+                'name', 'name_ar', 'schedule_interval', 'schedule_order', 'is_sandbox',
+                'restaurant_email', 'tagline', 'tagline_ar', 'currency_id', 'meta_description', 'meta_description_ar',
+                'owner_first_name', 'owner_last_name', 'owner_number', 'owner_email', 'owner_phone_country_code',
+                "enable_gift_message", "accept_order_247", "is_public", "currency_id"
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
                 'armada_api_key', 'mashkor_branch_id'
@@ -1959,8 +1960,8 @@ class Restaurant extends \yii\db\ActiveRecord
             'paymentGatewayQueue',
             'restaurantDomainRequests',
             'openingHours' => function ($restaurant) {
-                if($this->accept_order_247)
-                    return null;
+                //if($this->accept_order_247)
+                //    return null;
 
                 return $restaurant->openingHours;
             },

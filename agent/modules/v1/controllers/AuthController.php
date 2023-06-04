@@ -68,7 +68,7 @@ class AuthController extends Controller {
                     
                     return null;
                 }
-                
+
                 if ($agent->validatePassword($password)) {
                     return $agent;
                 }
