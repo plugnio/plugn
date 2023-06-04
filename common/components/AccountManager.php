@@ -41,7 +41,7 @@ class AccountManager  extends BaseObject
         }
 
           // Getting a list of Restaurants this agent manages
-        $cacheDependency = Yii::createObject([
+        /*$cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
             'sql' => 'SELECT '.Yii::$app->user->identity->agent_id.', COUNT(*) FROM agent_assignment WHERE agent_id='.Yii::$app->user->identity->agent_id,
@@ -59,14 +59,14 @@ class AccountManager  extends BaseObject
             return Yii::$app->user->identity->getAgentAssignments()
                 //->limit(10)
                 ->all();
-        }, $cacheDuration, $cacheDependency);
+        }, $cacheDuration, $cacheDependency);*/
 
 
          // Getting a list of Restaurants this agent manages
         // No cache
-        /*$this->_managedAccounts = Yii::$app->user->identity
+        $this->_managedAccounts = Yii::$app->user->identity
             ->getAgentAssignments()
-            ->all();*/
+            ->all();
 
         parent::__construct($config);
     }
