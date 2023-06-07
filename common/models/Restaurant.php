@@ -421,7 +421,8 @@ class Restaurant extends \yii\db\ActiveRecord
                 'restaurant_logo',
                 'restaurant_thumbnail_image',
                 'phone_number_display',
-                'sitemap_require_update'
+                'sitemap_require_update',
+                "custom_css"
             ],
             self::SCENARIO_RESET_TAP_ACCOUNT => [
                 'business_id',
