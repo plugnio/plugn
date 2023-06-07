@@ -1943,10 +1943,50 @@ class Restaurant extends \yii\db\ActiveRecord
         if($this->accept_order_247)
           return true;
 
-        return OpeningHour::find()
-            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
-            ->andWhere(new Expression("TIME(open_at) < NOW() AND TIME(close_at) > NOW()"))    
-            ->exists();
+        /*(TIME(open_at) < TIME(close_at)  AND (TIME(open_at) < NOW() AND TIME(close_at) > NOW()))
+        OR
+        (
+            (TIME(open_at) > TIME(close_at))  AND
+            (
+                (TIME(open_at) < NOW() AND TIME(close_at) > TIME("23:59:59")) ||
+                (TIME("00:00:00") < NOW() AND TIME(close_at) > NOW())
+            )
+        )
+
+        (
+            TIME(open_at) < TIME(close_at)  AND TIME(open_at) < NOW() AND TIME(close_at) > NOW()
+        )
+        OR
+        (
+            TIME(open_at) > TIME(close_at)  AND
+            (
+                TIME(open_at) < NOW() AND TIME(close_at) + interval '1 day' > NOW()
+            )
+        )*/
+
+        $timeslots = OpeningHour::find()
+            ->andWhere([
+                'restaurant_uuid' => $this->restaurant_uuid,
+                'day_of_week' => date('w', strtotime("now"))
+            ])
+            //->andWhere(new Expression("TIME(open_at) < NOW() AND TIME(close_at) > NOW()"))
+            ->all();
+
+        foreach ($timeslots as $timeslot)
+        {
+            if(strtotime($timeslot->open_at) < strtotime($timeslot->close_at))
+            {
+                if(strtotime($timeslot->open_at) < time() && strtotime($timeslot->close_at) > time())
+                    return true;
+
+            //store open after 12:00 AM /  1 day = 60*60*24 = 86400
+            } else  if(strtotime($timeslot->open_at) < time() && strtotime($timeslot->close_at) + 86400 > time())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

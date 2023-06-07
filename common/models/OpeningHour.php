@@ -171,6 +171,7 @@ class OpeningHour extends \yii\db\ActiveRecord
 
 
                     $tmwDate = date('Y-m-d', strtotime("1 day"));
+
                     if ($tmwDate == date('Y-m-d', strtotime($startAt))) {
                         Yii::$app->formatter->locale = 'en';
                         $en = 'Opens Tomorrow at ' . Yii::$app->formatter->asDate($startAt, 'php:h:i A');
