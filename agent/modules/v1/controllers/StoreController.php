@@ -917,6 +917,8 @@ class StoreController extends BaseController
 
         //restaurant
 
+        $model->custom_css = Yii::$app->request->getBodyParam('custom_css');
+
         $model->default_language = Yii::$app->request->getBodyParam('default_language');
         $model->store_layout = Yii::$app->request->getBodyParam('store_layout');
         $model->phone_number_display = Yii::$app->request->getBodyParam('phone_number_display');
