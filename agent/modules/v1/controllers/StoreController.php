@@ -367,7 +367,7 @@ class StoreController extends BaseController
             return self::message("success","Store will be updated in 2-5 min!");
         }
 
-        Yii::error('[Error while upgrading site]' . json_encode($response->data['message']) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+        Yii::error('[Error while upgrading site]' . isset($response->data['message'])? json_encode($response->data['message']): json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
 
             return [
                 'operation' => 'error',
