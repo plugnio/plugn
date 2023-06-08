@@ -9,8 +9,17 @@ use yii\httpclient\Client;
 class Auth0 extends Component
 {
     private $apiEndpoint = "https://bawes.us.auth0.com";
+
     private $client_id = "zBLi5rqikntjIFqS4iJY7RQx6445yf5w";
+
     private $connection = "Username-Password-Authentication";
+
+    public $domain;
+    public $clientId;
+    public $clientSecret;
+    public $cookieSecret;
+
+    private $_client;
 
     /**
      * @inheritdoc
@@ -31,8 +40,32 @@ class Auth0 extends Component
         }
 
         parent::init();
+
+        $this->_client = new \Auth0\SDK\Auth0([
+            'domain' => $this->domain,
+            'clientId' => $this->clientId,
+            'clientSecret' => $this->clientSecret,
+            'cookieSecret' => $this->cookieSecret,
+        ]);
     }
 
+
+    public function login($callbackUrl) {
+        return $this->_client->login($callbackUrl);
+    }
+
+    public function exchange($callbackUrl) {
+        return $this->_client->exchange($callbackUrl);
+    }
+
+    public function getCredentials() {
+        return $this->_client->getCredentials();
+    }
+
+    public function logout() {
+        return $this->_client->clear();
+    }
+    
     /**
      * return user info
      * @param $accessToken

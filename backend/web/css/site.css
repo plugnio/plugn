@@ -174,3 +174,21 @@ a.desc:after {
 #world-map-gdp .jvectormap-container{
     min-height: 400px;
 }
+
+.btn-login-bawes {
+    border: 2px solid #2B546A;
+    height: 52px;
+    width: 220px;
+}
+
+.btn-login-bawes img {
+    height: 100%;
+}
+
+
+
+
+
+
+
+

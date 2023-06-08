@@ -10,6 +10,8 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use backend\models\LoginForm;
+use backend\models\Admin;
+use yii\helpers\Url;
 
 /**
  * Site controller
@@ -28,7 +30,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['login', 'error', 'callback-auth0', 'login-auth0'],
                         'allow' => true,
                     ],
                     [
@@ -142,6 +144,96 @@ class SiteController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    public function actionLoginAuth0()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $loginUrl = Yii::$app->auth0->login(Url::to(['site/callback-auth0'], true));;
+
+        return $this->redirect($loginUrl);
+    }
+
+    public function actionCallbackAuth0()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $exchange = Yii::$app->auth0->exchange(Url::to(['site/index'], true));
+
+        if(!$exchange)
+        {
+            return $this->redirect(['site/login']);
+        }
+
+        $session = Yii::$app->auth0->getCredentials();
+
+        if ($session) {
+
+            $user = Admin::findByEmail($session->user);
+
+            if (!$user) {
+                Yii::$app->session->addFlash('error', "Email not registered as admin");
+                return $this->redirect(['site/index']);
+            }
+
+            if (Yii::$app->user->login($user, 3600 * 24 * 30)) {//
+                return $this->redirect(['site/index']);
+            }
+        }
+
+        return $this->redirect(['site/index']);
+    }
+
+    public function actionProcessAuth0()
+    {
+        $session = Yii::$app->auth0->getCredentials();
+
+        if ($session === null) {
+            // The user isn't logged in.
+            return $this->redirect(['site/login']);
+        }
+
+        /**
+         * The user is logged in.
+         * (
+        [given_name] => Kathrecha
+        [family_name] => Krushn
+        [nickname] => kathrechakrushn
+        [name] => Kathrecha Krushn
+        [picture] => https://lh3.googleusercontent.com/a/ALm5wu1wHV3MEVxErjfznzjR3dlfY9-kfz3XzXS-sL0hvA=s96-c
+        [locale] => en
+        [email] => kathrechakrushn@gmail.com
+        [email_verified] => 1
+        ) */
+
+        $user = Admin::findByEmail($session->user);
+
+        if(!$user)
+        {
+            /*$user = new User();
+            $user->username = isset($session->user['nickname'])? $session->user['nickname']: $session->user['name'];
+            $user->email = $session->user['email'];
+            $user->bank_account_name = $session->user['name'];
+
+            //$user->email_verified = $session->user['email_verified'];
+
+            if(!$user->save())
+            {*/
+            Yii::$app->session->addFlash('error', "Email not registered as admin");
+            return $this->redirect(['site/index']);
+        }
+
+        if(Yii::$app->user->login($user, 3600 * 24 * 30))
+        {
+            return $this->goBack();
+        }
+
+        return $this->redirect(['site/login']);
     }
 
     /**

@@ -29,7 +29,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 </div>
 
+
             <?php ActiveForm::end(); ?>
+            
+            <?= Html::a('<img src="https://dash.dev.plugn.io/assets/img/icon-bawes.svg" /> Login with Bawes', ['site/login-auth0'], ['class' => 'btn btn-login-bawes', 'name' => 'login-auth0']) ?>
+            
         </div>
     </div>
 </div>
