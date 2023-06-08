@@ -152,6 +152,8 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
+        Yii::$app->auth0->logout();
+
         $loginUrl = Yii::$app->auth0->login(Url::to(['site/callback-auth0'], true));;
 
         return $this->redirect($loginUrl);
