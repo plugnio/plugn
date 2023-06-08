@@ -46,7 +46,6 @@ return [
              * https://plugn-uploads.s3.amazonaws.com/folderName/fileName.jpg
              */
         ],
-
         'log' => [
             'targets' => [
                 [

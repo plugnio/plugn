@@ -52,7 +52,8 @@
         "mixpanel/mixpanel-php" : "^2.10",
         "yiisoft/yii2-redis": "~2.0.0",
         "aws/aws-sdk-php": "^3.183",
-        "stripe/stripe-php": "^10.6"
+        "stripe/stripe-php": "^10.6",
+        "auth0/auth0-php": "^8.3"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -73,7 +74,8 @@
             "enabled": false
         },
         "allow-plugins": {
-            "yiisoft/yii2-composer": true
+            "yiisoft/yii2-composer": true,
+            "php-http/discovery": true
         }
     },
     "repositories": [
