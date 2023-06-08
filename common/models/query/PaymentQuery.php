@@ -2,6 +2,8 @@
 
 namespace common\models\query;
 
+use yii\db\Expression;
+
 class PaymentQuery extends \yii\db\ActiveQuery
 {
     public function filterByDateRange($date_start, $date_end) {
@@ -16,7 +18,7 @@ class PaymentQuery extends \yii\db\ActiveQuery
         if($start == $end) {
             return $this->andWhere(new Expression("DATE(payment_created_at) = DATE('".$start."')"));
         }
-        
+
         return $this->andWhere(new Expression("DATE(payment_created_at) >= DATE('".$start."')
             AND DATE(payment_created_at) <= DATE('".$end."')"));
 
