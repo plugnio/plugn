@@ -13,7 +13,14 @@ class PaymentQuery extends \yii\db\ActiveQuery
         $start = date('Y-m-d', strtotime($date_start));
         $end = date('Y-m-d', strtotime($date_end));
 
-        return $this->andWhere(['between', 'payment_created_at', $start, $end]);
+        if($start == $end) {
+            return $this->andWhere(new Expression("DATE(payment_created_at) = DATE('".$start."')"));
+        }
+        
+        return $this->andWhere(new Expression("DATE(payment_created_at) >= DATE('".$start."')
+            AND DATE(payment_created_at) <= DATE('".$end."')"));
+
+        //return $this->andWhere(['between', 'payment_created_at', $start, $end]);
     }
 
     public function filterPaid()
