@@ -4,7 +4,7 @@ namespace common\components;
 
 use yii\base\Component;
 use yii\httpclient\Client;
-
+use yii\helpers\Url;
 
 class Auth0 extends Component
 {
@@ -50,6 +50,7 @@ class Auth0 extends Component
                 'client_id' => $this->clientId,
                 'client_secret' => $this->clientSecret,
                 'cookie_secret' => $this->cookieSecret,
+                'redirect_uri' => Url::to(['site/callback-auth0'], true)
             ]);
         }
     }
