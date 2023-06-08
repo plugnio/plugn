@@ -166,6 +166,10 @@ class OrderQuery extends \yii\db\ActiveQuery
 
         //return $this->andWhere(['between', 'payment_created_at', $start, $end]);
 
+        if($start == $end) {
+            return $this->andWhere(new Expression("DATE(order_created_at) = DATE('".$start."')"));
+        }
+
         return $this->andWhere(new Expression("DATE(order_created_at) >= DATE('".$start."')
             AND DATE(order_created_at) <= DATE('".$end."')"));
 
