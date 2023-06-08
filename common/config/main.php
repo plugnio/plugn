@@ -60,10 +60,6 @@ return [
         ],
         'auth0' => [
             'class' => 'common\components\Auth0',
-            'domain' => 'bawes.us.auth0.com',
-            'clientId' => "zBLi5rqikntjIFqS4iJY7RQx6445yf5w",
-            'clientSecret' => "Dt9rgs6ghpEHqKHLJf5NDp8Sps26U7OE65eYYBc3AHiWQjUNCkrjelvU18-1tCis",
-            'cookieSecret' => "woZaulpAn0qo24K1Ve6dzBgw__936d9m"// Yii::$app->request->cookieValidationKey,
         ],
         'temporaryBucketResourceManager' => [
             'class' => 'common\components\S3ResourceManager',

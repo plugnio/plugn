@@ -4,7 +4,7 @@ namespace common\components;
 
 use yii\base\Component;
 use yii\httpclient\Client;
-
+use yii\helpers\Url;
 
 class Auth0 extends Component
 {
@@ -41,12 +41,18 @@ class Auth0 extends Component
 
         parent::init();
 
-        $this->_client = new \Auth0\SDK\Auth0([
-            'domain' => $this->domain,
-            'clientId' => $this->clientId,
-            'clientSecret' => $this->clientSecret,
-            'cookieSecret' => $this->cookieSecret,
-        ]);
+        if($this->clientId && $this->clientSecret && $this->cookieSecret && $this->domain) {
+            $this->_client = new \Auth0\SDK\Auth0([
+                'domain' => $this->domain,
+                'clientId' => $this->clientId,
+                'clientSecret' => $this->clientSecret,
+                'cookieSecret' => $this->cookieSecret,
+                'client_id' => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'cookie_secret' => $this->cookieSecret,
+                'redirect_uri' => Url::to(['site/callback-auth0'], true)
+            ]);
+        }
     }
 
 
@@ -59,11 +65,21 @@ class Auth0 extends Component
     }
 
     public function getCredentials() {
-        return $this->_client->getCredentials();
+        if (method_exists($this->_client, 'getCredentials')) {
+            return $this->_client->getCredentials();
+        }
+
+        return $this->_client->getUser();
     }
 
     public function logout() {
-        return $this->_client->clear();
+        if (method_exists($this->_client, 'clear')) {
+            return $this->_client->clear();
+        }
+
+        if (method_exists($this->_client, 'logout')) {
+            return $this->_client->logout();
+        }
     }
     
     /**
