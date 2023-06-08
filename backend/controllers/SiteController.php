@@ -155,7 +155,7 @@ class SiteController extends Controller
         $loginUrl = Yii::$app->auth0->login(Url::to(['site/callback-auth0'], true));;
 
         return $this->redirect($loginUrl);
-    }
+    } 
 
     public function actionCallbackAuth0()
     {
@@ -174,7 +174,7 @@ class SiteController extends Controller
 
         if ($session) {
 
-            $user = Admin::findByEmail($session->user);
+            $user = Admin::findByEmail(isset($session->user)? $session->user['email']:  $session['email']);
 
             if (!$user) {
                 Yii::$app->session->addFlash('error', "Email not registered as admin");
