@@ -47,6 +47,9 @@ class Auth0 extends Component
                 'clientId' => $this->clientId,
                 'clientSecret' => $this->clientSecret,
                 'cookieSecret' => $this->cookieSecret,
+                'client_id' => $this->clientId,
+                'client_secret' => $this->clientSecret,
+                'cookie_secret' => $this->cookieSecret,
             ]);
         }
     }
