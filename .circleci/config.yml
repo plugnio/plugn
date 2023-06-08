@@ -95,6 +95,11 @@ jobs:
 
       #---------- Store app --------------#
 
+
+      - run:
+          name: Codeception test packages 
+          command: composer require codeception/module-rest --dev  
+
       - run:
           name: Run Store app Codeception functional tests and store result output
           command: cd ./api && ../vendor/bin/codecept run functional --xml --html --fail-fast
