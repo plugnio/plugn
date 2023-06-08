@@ -65,7 +65,11 @@ class Auth0 extends Component
     }
 
     public function getCredentials() {
-        return $this->_client->getCredentials();
+        if (method_exists($this->_client, 'getCredentials')) {
+            return $this->_client->getCredentials();
+        }
+
+        return $this->_client->getUser();
     }
 
     public function logout() {
