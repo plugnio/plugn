@@ -41,12 +41,14 @@ class Auth0 extends Component
 
         parent::init();
 
-        $this->_client = new \Auth0\SDK\Auth0([
-            'domain' => $this->domain,
-            'clientId' => $this->clientId,
-            'clientSecret' => $this->clientSecret,
-            'cookieSecret' => $this->cookieSecret,
-        ]);
+        if($this->clientId && $this->clientSecret && $this->cookieSecret && $this->domain) {
+            $this->_client = new \Auth0\SDK\Auth0([
+                'domain' => $this->domain,
+                'clientId' => $this->clientId,
+                'clientSecret' => $this->clientSecret,
+                'cookieSecret' => $this->cookieSecret,
+            ]);
+        }
     }
 
 
