@@ -73,7 +73,13 @@ class Auth0 extends Component
     }
 
     public function logout() {
-        return $this->_client->clear();
+        if (method_exists($this->_client, 'clear')) {
+            return $this->_client->clear();
+        }
+
+        if (method_exists($this->_client, 'logout')) {
+            return $this->_client->logout();
+        }
     }
     
     /**
