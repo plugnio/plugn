@@ -23,7 +23,7 @@ class SubscriptionPaymentSearch extends SubscriptionPayment
     public function rules()
     {
         return [
-            [['payment_uuid', 'restaurant_uuid', 'subscription_uuid', 'payment_gateway_order_id', 'payment_gateway_transaction_id', 'payment_mode', 'payment_current_status', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'payment_created_at', 'payment_updated_at', 'response_message', 'payment_token', 'partner_payout_uuid','store_name'], 'safe'],
+            [['currency_code', 'payment_uuid', 'restaurant_uuid', 'subscription_uuid', 'payment_gateway_order_id', 'payment_gateway_transaction_id', 'payment_mode', 'payment_current_status', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'payment_created_at', 'payment_updated_at', 'response_message', 'payment_token', 'partner_payout_uuid','store_name'], 'safe'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee', 'partner_fee'], 'number'],
             [['received_callback', 'payout_status'], 'integer'],
         ];

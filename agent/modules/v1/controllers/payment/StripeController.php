@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers\payment;
 
+use agent\models\Restaurant;
 use Yii;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
@@ -41,13 +42,17 @@ class StripeController extends BaseController
 
         if($plan_id) {
 
-            $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id);
+            $store = $this->findStore();
+
+            $currency_code = Yii::$app->request->getBodyParam ('currency');
+
+            $currency = $currency_code? Currency::findOne(['code' => $currency_code]): $store->currency;
+
+            $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id, $currency);
 
             if(isset($subscription['message'])) {
                 return $subscription;
-            }    
-
-            $currency = Currency::findOne(['code' => 'INR']);//todo: KWD
+            }
 
             $payment = $subscription->subscriptionPayment;
 
@@ -80,6 +85,8 @@ class StripeController extends BaseController
 
             return [
                 'operation' => 'success',
+                "currency_code" => $currency->code,
+                "amount" => $payment->payment_amount_charged * pow(10, $currency->decimal_place),
                 'clientSecret' => $paymentIntent->client_secret,
                 "stripePublishableKey" => $stripePublishableKey,
                 'success_url' => Url::to(['payment/stripe/callback', 'intent_id' => $paymentIntent->id], true),
@@ -208,6 +215,24 @@ class StripeController extends BaseController
             SubscriptionPayment::onPaymentCaptured($payment);
 
         return $payment;
+    }
+
+    /**
+     * Finds the Restaurant model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Restaurant the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findStore($store_uuid =  null)
+    {
+        $model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
     }
 
     /**
