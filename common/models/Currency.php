@@ -151,7 +151,7 @@ class Currency extends \yii\db\ActiveRecord
                     $model->code = $currency;
                 }
 
-                $model->title = isset($arrCurrencyName[$currency]) ? $arrCurrencyName[$currency] : null;
+                $model->title = isset($arrCurrencyName[$currency]) ? $arrCurrencyName[$currency] : $currency;
                 $model->currency_symbol = isset($arrCurrencySymbol[$currency]) ? $arrCurrencySymbol[$currency] : null;
                 $model->rate = $rate;
 
@@ -160,7 +160,10 @@ class Currency extends \yii\db\ActiveRecord
                     if($useTransaction)
                         $transaction->rollBack();
 
-                    return $model->errors;
+                    return [
+                        "errors" => $model->errors,
+                        "values" => $model->attributes
+                    ];
                 }
             }
 

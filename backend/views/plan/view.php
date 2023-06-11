@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Plan */
@@ -36,5 +37,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'platform_fee',
         ],
     ]) ?>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            'currency',
+            'price',
+            'created_at',
+            //'updated_at',
+
+            //['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); ?>
 
 </div>
