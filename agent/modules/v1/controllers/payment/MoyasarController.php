@@ -4,6 +4,7 @@ namespace agent\modules\v1\controllers\payment;
 
 use agent\models\Currency;
 use agent\models\PaymentMethod;
+use agent\models\Restaurant;
 use common\models\InvoicePayment;
 use common\models\SubscriptionPayment;
 use Yii;
@@ -11,6 +12,7 @@ use common\models\Setting;
 use yii\helpers\Url;
 use agent\modules\v1\controllers\BaseController;
 use yii\web\Cookie;
+use yii\web\NotFoundHttpException;
 
 
 class MoyasarController extends BaseController
@@ -41,9 +43,13 @@ class MoyasarController extends BaseController
 
         if($plan_id) {
 
-            $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id);
+            $store = $this->findStore();
 
-            $currency = Currency::findOne(['code' => 'KWD']);
+            $currency_code = Yii::$app->request->getBodyParam ('currency');
+
+            $currency = $currency_code? Currency::findOne(['code' => $currency_code]): $store->currency;
+
+            $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id, $currency);
 
             $data['description'] = "Upgrade $store->name's plan to " . $subscription->plan->name;
 
@@ -241,6 +247,24 @@ class MoyasarController extends BaseController
         curl_setopt($curl, CURLOPT_TIMEOUT, 60);
 
         return json_decode(curl_exec($curl), true);
+    }
+
+    /**
+     * Finds the Restaurant model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Restaurant the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findStore($store_uuid =  null)
+    {
+        $model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
     }
 
     /**

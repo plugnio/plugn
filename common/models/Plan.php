@@ -14,6 +14,7 @@ use Yii;
  * @property float|null $platform_fee
  *
  * @property Subscription[] $subscriptions
+ * @property PlanPrice[] $planPrices
  */
 class Plan extends \yii\db\ActiveRecord
 {
@@ -84,6 +85,16 @@ class Plan extends \yii\db\ActiveRecord
             Yii::$app->db->createCommand()->batchInsert('plan_price',
                 ['plan_id', 'currency', 'price', "created_at", "updated_at"], $data)->execute();
         }
+    }
+
+    /**
+     * Gets query for [[PlanPrices]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPlanPrices($modelClass = "\common\models\PlanPrice")
+    {
+        return $this->hasMany($modelClass::className(), ['plan_id' => 'plan_id']);
     }
 
     /**

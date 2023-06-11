@@ -68,6 +68,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             [['payment_gateway_order_id', 'payment_current_status'], 'string'],
             [['payment_amount_charged', 'payment_net_amount', 'payment_gateway_fee','partner_fee'], 'number'],
             [['payment_uuid'], 'string', 'max' => 36],
+            [['currency_code'], 'string', 'max' => 3],
             [['payment_gateway_transaction_id', 'payment_mode', 'payment_udf1', 'payment_udf2', 'payment_udf3', 'payment_udf4', 'payment_udf5', 'response_message', 'payment_token'], 'string', 'max' => 255],
             [['payment_uuid'], 'unique'],
             [['is_sandbox'], 'boolean'],
@@ -270,12 +271,13 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      */
     public static function onPaymentCaptured($paymentRecord) {
 
-        if(YII_ENV == 'prod') {
+        if(YII_ENV == 'prod')
+        {
             //Send event to Segment
            
             Yii::$app->eventManager->track('Premium Plan Purchase',  [
                     'order_id' => $paymentRecord->payment_uuid,
-                    'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
+                    'value' => ( $paymentRecord->payment_amount_charged / $paymentRecord->currency->rate),
                     'paymentMethod' => $paymentRecord->payment_mode,
                     'currency' => 'USD'
                 ],
@@ -287,31 +289,31 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and',
             ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
 
-        $subscription_model = $paymentRecord->subscription;
-        $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
+        $subscription =$paymentRecord->subscription;
+        $subscription->subscription_status = Subscription::STATUS_ACTIVE;
 
-        $valid_for =  $subscription_model->plan->valid_for;
+        $valid_for =  $subscription->plan->valid_for;
 
-        $subscription_model->subscription_end_at = date(
+        $subscription->subscription_end_at = date(
             'Y-m-d', strtotime(
-                date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"
+                date('Y-m-d H:i:s',  strtotime($subscription->subscription_start_at)) . " + $valid_for MONTHS"
             )
         );
 
-        $subscription_model->save(false);
+        $subscription->save(false);
 
-        foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
+        foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
 
             \Yii::$app->mailer->compose([
                 'html' => 'premium-upgrade',
             ], [
-                'subscription' => $subscription_model,
+                'subscription' => $subscription,
                 'store' => $paymentRecord->restaurant,
             ])
                 ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                 ->setTo([$agent->agent_email])
                 ->setBcc(\Yii::$app->params['supportEmail'])
-                ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
+                ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name)
                 ->send();
         }
     }
@@ -380,25 +382,21 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         return $paymentRecord;
     }
 
-    public static function initPayment($plan_id, $payment_method_id) {
-
-        //todo: support multi currency
-        //$payment->currency_code = "KWD";
-        //$payment->currency_value = 1;
+    public static function initPayment($plan_id, $payment_method_id, $currency = null) {
 
         $store = Yii::$app->accountManager->getManagedAccount ();
 
         $selectedPlan = Plan::findOne ($plan_id);
 
-        $subscription_model = new Subscription();
-        $subscription_model->restaurant_uuid = $store->restaurant_uuid;
-        $subscription_model->plan_id = $selectedPlan->plan_id;
-        $subscription_model->payment_method_id = $payment_method_id;
+        $subscription = new Subscription();
+        $subscription->restaurant_uuid = $store->restaurant_uuid;
+        $subscription->plan_id = $selectedPlan->plan_id;
+        $subscription->payment_method_id = $payment_method_id;
 
-        if (!$subscription_model->save ()) {
+        if (!$subscription->save ()) {
             return [
                 "operation" => 'error',
-                "message" => $subscription_model->getErrors ()
+                "message" => $subscription->getErrors ()
             ];
         }
 
@@ -411,11 +409,38 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             ];
         }
 
+        if($currency && $currency->code != "KWD") {
+
+            $kwdCurrency = \agent\models\Currency::find()
+                ->andWhere(['code' => "KWD"])
+                ->one();
+
+            if($store->custom_subscription_price > 0)
+            {
+                $planPriceUSD = $store->custom_subscription_price / $kwdCurrency->rate;
+
+                $payment_amount_charged = round($planPriceUSD * $currency->rate, $currency->decimal_place);
+            }
+            else
+            {
+                $planPrice = $subscription->plan->getPlanPrices()
+                    ->andWhere(['currency' => $currency->code])
+                    ->one();
+ 
+                $payment_amount_charged = round($planPrice->price, $currency->decimal_place);
+            }
+        }
+        else
+        {
+            $payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price : $subscription->plan->price;
+        }
+
         $payment = new \agent\models\SubscriptionPayment;
         $payment->restaurant_uuid = $store->restaurant_uuid;
-        $payment->payment_mode = $subscription_model->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
-        $payment->subscription_uuid = $subscription_model->subscription_uuid; //subscription_uuid
-        $payment->payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price: $subscription_model->plan->price;
+        $payment->payment_mode = $subscription->paymentMethod->payment_method_name;// == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+        $payment->subscription_uuid = $subscription->subscription_uuid; //subscription_uuid
+        $payment->payment_amount_charged = $payment_amount_charged;
+        $payment->currency_code = $currency ? $currency->code: "KWD";
         $payment->payment_current_status = "Redirected to payment gateway";
         $payment->is_sandbox = false;//$store->is_sandbox;
 
@@ -427,12 +452,11 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         }
 
         //Update payment_uuid in order
-        $subscription_model->payment_uuid = $payment->payment_uuid;
-        $subscription_model->save (false);
+        $subscription->payment_uuid = $payment->payment_uuid;
+        $subscription->save (false);
 
-        return $subscription_model;
+        return $subscription;
     }
-
 
     /**
      * @return \yii\db\ActiveQuery
@@ -457,6 +481,12 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency($modelClass = "\common\models\Currency") {
+        return $this->hasOne($modelClass::className(), ['currency_code' => 'currency']);
+    }
 
     /**
      * Gets query for [[PartnerPayout]].
@@ -467,16 +497,15 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
            return $this->hasOne(PartnerPayout::className(), ['partner_payout_uuid' => 'partner_payout_uuid']);
      }
 
-
-
     /**
      * Gets query for [[Currency]].
      *
      * @return \yii\db\ActiveQuery
-     */
+     *
     public function getCurrency($modelClass = "\common\models\Currency")
     {
         return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
-    }
-
+    }*/
 }
+
+
