@@ -75,6 +75,7 @@ class Option extends \yii\db\ActiveRecord {
 //                    return $model->min_qty != null;
 //                }
 //            ],
+            [['sort_number'], 'integer'],
             [['min_qty'], 'integer', 'min' => 0],
             //[['max_qty'], 'integer', 'min' => 1],
             // an inline validator defined as an anonymous function

@@ -767,7 +767,7 @@ class CronController extends \yii\console\Controller
         return self::EXIT_CODE_NORMAL;
     }
 
-    /**
+        /**
      * Method called by cron once a day to update currency
      */
     public function actionDaily()
@@ -775,7 +775,7 @@ class CronController extends \yii\console\Controller
         // GET UPDATED CURRENCY DATA FROM API
         $response = Currency::getDataFromApi();
 
-        $this->stdout($response . " \n", Console::FG_RED, Console::BOLD);
+        $this->stdout(print_r($response, true) . " \n", Console::FG_RED, Console::BOLD);
 
         $campaigns = VendorCampaign::find()
             ->andWhere(['status' => VendorCampaign::STATUS_READY])

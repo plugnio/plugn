@@ -137,6 +137,7 @@ class ItemController extends BaseController
                     $optionModel->max_qty = $max_qty;
                     $optionModel->min_qty = $min_qty;
                     $optionModel->is_required = $option['is_required'];
+                    $optionModel->sort_number = isset($option['sort_number'])? $option['sort_number']: 1;
                     $optionModel->option_type = isset($option['option_type'])? $option['option_type']: 1;
 
                     if (!$optionModel->save()) {
@@ -342,6 +343,7 @@ class ItemController extends BaseController
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
                     $optionModel->is_required = $option['is_required'];
+                    $optionModel->sort_number = isset($option['sort_number'])? $option['sort_number']: 1;
                     $optionModel->option_type = isset($option['option_type'])? $option['option_type']: 1;
                     $optionModel->max_qty = $max_qty;
                     $optionModel->min_qty = $min_qty;

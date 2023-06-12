@@ -2,59 +2,40 @@
 
 namespace backend\controllers;
 
-use backend\models\Admin;
 use Yii;
-use common\models\Plan;
-use common\models\PlanSearch;
+use common\models\PlanPrice;
+use backend\models\PlanPriceSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use common\models\PlanPrice;
-use backend\models\PlanPriceSearch;
 
 /**
- * PlanController implements the CRUD actions for Plan model.
+ * PlanPriceController implements the CRUD actions for PlanPrice model.
  */
-class PlanController extends Controller
+class PlanPriceController extends Controller
 {
-  public $enableCsrfValidation = false;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function behaviors() {
-      return [
-          'verbs' => [
-              'class' => VerbFilter::className(),
-              'actions' => [
-                  'delete' => ['POST'],
-              ],
-          ],
-          'access' => [
-              'class' => \yii\filters\AccessControl::className(),
-              'rules' => [
-                  [
-                      'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
-                      'actions' => ['create', 'update', 'delete'],
-                      'roles' => ['@'],
-                  ],
-                  [//allow authenticated users only
-                      'allow' => true,
-                      'roles' => ['@'],
-                  ],
-              ],
-          ],
-      ];
-  }
-
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
+    }
 
     /**
-     * Lists all Plan models.
+     * Lists all PlanPrice models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new PlanSearch();
+        $searchModel = new PlanPriceSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -64,35 +45,29 @@ class PlanController extends Controller
     }
 
     /**
-     * Displays a single Plan model.
+     * Displays a single PlanPrice model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
-        $searchModel = new PlanPriceSearch;
-        $searchModel->plan_id = $id;
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
         return $this->render('view', [
             'model' => $this->findModel($id),
-            "searchModel" => $searchModel,
-            "dataProvider" => $dataProvider
         ]);
     }
 
     /**
-     * Creates a new Plan model.
+     * Creates a new PlanPrice model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Plan();
+        $model = new PlanPrice();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->plan_id]);
+            return $this->redirect(['view', 'id' => $model->plan_price_id]);
         }
 
         return $this->render('create', [
@@ -101,7 +76,7 @@ class PlanController extends Controller
     }
 
     /**
-     * Updates an existing Plan model.
+     * Updates an existing PlanPrice model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -112,7 +87,7 @@ class PlanController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->plan_id]);
+            return $this->redirect(['view', 'id' => $model->plan_price_id]);
         }
 
         return $this->render('update', [
@@ -121,7 +96,7 @@ class PlanController extends Controller
     }
 
     /**
-     * Deletes an existing Plan model.
+     * Deletes an existing PlanPrice model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -135,18 +110,18 @@ class PlanController extends Controller
     }
 
     /**
-     * Finds the Plan model based on its primary key value.
+     * Finds the PlanPrice model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Plan the loaded model
+     * @return PlanPrice the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Plan::findOne($id)) !== null) {
+        if (($model = PlanPrice::findOne($id)) !== null) {
             return $model;
         }
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }
