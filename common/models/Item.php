@@ -512,7 +512,8 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getOptions($modelClass = "\common\models\Option")
     {
-        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->orderBy("sort_number");
     }
 
     /**
