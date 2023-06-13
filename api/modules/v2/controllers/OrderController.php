@@ -390,7 +390,6 @@ class OrderController extends Controller
 
             $order = $response['order'];
         }
-
         //Apply promo code
 
         $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
@@ -523,7 +522,6 @@ class OrderController extends Controller
                 $order->restaurant->test_api_key,
                 $order->restaurant->is_sandbox
             );
-
             $response = Yii::$app->tapPayments->createCharge(
                 $order->currency->code,
                 "Order placed from: " . $order->customer_name, // Description
@@ -594,7 +592,9 @@ class OrderController extends Controller
             if ($responseContent->id) {
 
                 $chargeId = $responseContent->id;
-                $redirectUrl = $responseContent->transaction->url;
+
+                $redirectUrl = isset($responseContent->transaction->url)?
+                    $responseContent->transaction->url: null;
 
                 $payment->payment_gateway_transaction_id = $chargeId;
 
@@ -618,6 +618,10 @@ class OrderController extends Controller
                     'message' => 'Payment Issue > Charge id is missing',
                     'code' => 17
                 ];
+            }
+
+            if(!$redirectUrl) {
+                $redirectUrl = Url::to(['order/callback', 'tap_id' => $payment->payment_gateway_transaction_id]);
             }
 
             return [
