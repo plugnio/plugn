@@ -246,6 +246,7 @@ class Item extends \yii\db\ActiveRecord
             'currency',
             'options',
             'itemImages',
+            'itemVideos',
             'extraOptions',
             'itemVariants',
             'itemSchema'

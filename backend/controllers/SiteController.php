@@ -5,6 +5,7 @@ use backend\models\RestaurantInvoice;
 use common\models\PaymentGatewayQueue;
 use common\models\Queue;
 use common\models\RestaurantDomainRequest;
+use common\models\Subscription;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -108,11 +109,16 @@ class SiteController extends Controller
             ->andWhere(['status' => RestaurantDomainRequest::STATUS_PURCHASED])
             ->count();
 
+        $premiumStores = Subscription::find()
+            ->filterPremium()
+            ->count();
+
         return $this->render('index', [
             'draft' => $draft,
             'pending' => $pending,
             'paid' => $paid,
             "failedInQueue" => $failedInQueue,
+            "premiumStores" => $premiumStores,
             "holdInQueue" => $holdInQueue,
             "pendingInQueue" => $pendingInQueue,
             "failedInPaymentQueue" => $failedInPaymentQueue,
