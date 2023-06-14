@@ -1295,13 +1295,16 @@ class Restaurant extends \yii\db\ActiveRecord
         $response = $this->uploadDocumentsToTap();
 
         if ($response['operation'] == "error") {
+
+            Yii::error('Error while uploading doc for Business [' . $this->name . '] ' . json_encode($response));
+
             return $response;
         }
 
         //Create a business for a vendor on Tap if not already exists
 
-        if(!$this->business_id || !$this->business_entity_id || !$this->developer_id)
-        {
+        //if(!$this->business_id || !$this->business_entity_id || !$this->developer_id)
+        //{
             $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
             if ($businessApiResponse->isOk)
@@ -1334,12 +1337,12 @@ class Restaurant extends \yii\db\ActiveRecord
                     "message" => $businessApiResponse->data
                 ];
             }
-        }
+        //}
 
         //Create a merchant on Tap if not already added
 
-        if(!$this->merchant_id || !$this->wallet_id)
-        {
+        //if(!$this->merchant_id || !$this->wallet_id)
+        //{
             $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount(
                 $this->company_name .'-'. $this->business_id,
                 $this->currency->code,
@@ -1374,7 +1377,7 @@ class Restaurant extends \yii\db\ActiveRecord
                     "message" => $merchantApiResponse->data
                 ];
             }
-        }
+       // }
 
         //Create an Operator
 
@@ -3452,7 +3455,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getPaymentGatewayQueue()
     {
-        return $this->hasOne(PaymentGatewayQueue::className(), ['payment_gateway_queue_id' => 'payment_gateway_queue_id']);
+        return $this->hasOne(PaymentGatewayQueue::className(), ['payment_gateway_queue_id' => 'payment_gateway_queue_id'])
+            ;
     }
 
 

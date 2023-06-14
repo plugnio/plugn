@@ -48,6 +48,14 @@ class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
 
+        $model = Restaurant::findOne("rest_20ea8b98-504b-11ec-973b-069e9504599a");
+
+        $response = $model->createTapAccount();
+
+       // $response = Yii::$app->tapPayments->createBussiness($model);
+
+        var_dump($response);
+
     }
 
     public function actionTeste()
