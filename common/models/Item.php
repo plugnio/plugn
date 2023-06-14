@@ -246,6 +246,7 @@ class Item extends \yii\db\ActiveRecord
             'currency',
             'options',
             'itemImages',
+            'itemVideos',
             'extraOptions',
             'itemVariants',
             'itemSchema'
@@ -514,6 +515,16 @@ class Item extends \yii\db\ActiveRecord
     {
         return $this->hasMany($modelClass::className(), ['item_uuid' => 'item_uuid'])
             ->orderBy("sort_number");
+    }
+
+    /**
+     * Gets query for [[ItemVideos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVideos($model = 'common\models\ItemVideo')
+    {
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**

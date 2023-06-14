@@ -30,5 +30,4 @@ class Item extends \common\models\Item {
 
       return $fields;
   }
-
 }

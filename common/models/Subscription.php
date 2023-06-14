@@ -255,4 +255,10 @@ class Subscription extends \yii\db\ActiveRecord {
         return $this->restaurant? $this->restaurant->name: null;
     }
 
+    /**
+     * @return query\SubscriptionQuery
+     */
+    public static function find() {
+        return new query\SubscriptionQuery(get_called_class());
+    }
 }
