@@ -104,6 +104,11 @@ $this->title = 'Admin dashboard';
             <div class="col-12 col-lg-4">
                 <h2>Subscriptions</h2>
 
+                <span class="badge badge-primary"><?= $premiumStores ?> Premium </span>
+
+                <br />
+                <br />
+
                 <?= Html::a('Go &raquo', ['subscription/index'], ['class' => 'btn btn-default']) ?>
             </div>
 
