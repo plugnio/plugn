@@ -4,6 +4,7 @@ namespace agent\modules\v1\controllers;
 
 use common\models\ItemVariant;
 use common\models\ItemVariantOption;
+use common\models\ItemVideo;
 use Yii;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -173,6 +174,9 @@ class ItemController extends BaseController
             // save images
             $itemImages = Yii::$app->request->getBodyParam ("itemImages");
             $model->saveItemImages($itemImages);
+
+            $itemVideos = Yii::$app->request->getBodyParam ("itemVideos", []);
+            $model->saveItemVideos($itemVideos);
 
             //save categories
             $itemCategories = Yii::$app->request->getBodyParam ("itemCategories");
@@ -415,6 +419,9 @@ class ItemController extends BaseController
 
             $model->saveItemImages($itemImages);
 
+            $itemVideos = Yii::$app->request->getBodyParam ("itemVideos", []);
+            $model->saveItemVideos($itemVideos);
+
             //save categories
             $itemCategories = Yii::$app->request->getBodyParam ("itemCategories");
             $arrCategoryIds = ArrayHelper::getColumn ($itemCategories, 'category_id');
@@ -642,11 +649,68 @@ class ItemController extends BaseController
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
+    public function actionDeleteVideo($id)
+    {
+        $restaurant = Yii::$app->accountManager->getManagedAccount();
+
+        $model = ItemVideo::findOne(['item_video_id'=>$id]);
+
+        //check ownership
+
+        $exists = $restaurant->getItems()->andWhere(['item_uuid' => $model->item_uuid])->exists();
+
+        if(!$exists) {
+            return [
+                "operation" => "error",
+                "message" => "We've faced a problem deleting the item"
+            ];
+        }
+
+        if ($model && !$model->delete()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem deleting the item"
+                ];
+            }
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Item video deleted successfully"
+        ];
+    }
+
+    /**
+     * @param $id
+     * @return array|string[]
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionDeleteImage($id, $image)
     {
-        $itemImage = ItemImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
+        $restaurant = Yii::$app->accountManager->getManagedAccount();
 
-        if ($itemImage && !$itemImage->delete()) {
+        $model = ItemImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
+
+        //check ownership
+
+        $exists = $restaurant->getItems()->andWhere(['item_uuid' => $model->item_uuid])->exists();
+
+        if(!$exists) {
+            return [
+                "operation" => "error",
+                "message" => "We've faced a problem deleting the item"
+            ];
+        }
+
+        if ($model && !$model->delete()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",

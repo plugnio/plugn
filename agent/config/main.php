@@ -537,6 +537,7 @@ return [
                         'PATCH update-status/<id>' => 'change-status',
                         'PATCH <id>' => 'update',
                         'DELETE delete-image/<id>/<image>' => 'delete-image',
+                        'DELETE delete-video/<id>' => 'delete-video',
                         'DELETE <id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -548,6 +549,7 @@ return [
                         'OPTIONS update-status/<id>/<store_uuid>' => 'options',
                         'OPTIONS update-status/<id>' => 'options',
                         'OPTIONS delete-image/<id>/<image>' => 'options',
+                        'OPTIONS delete-video/<id>' => 'options',
                     ]
                 ],
                 [// CustomerController

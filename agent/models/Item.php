@@ -3,6 +3,7 @@
 namespace agent\models;
 
 use common\models\ItemImage;
+use common\models\ItemVideo;
 use common\models\Option;
 use Yii;
 use yii\base\BaseObject;
@@ -37,6 +38,57 @@ class Item extends \common\models\Item {
     }
 
     /**
+     * Upload item videos to Cloudinary
+     * @param $videos
+     * @return array|false
+     * @throws \yii\base\Exception
+     */
+    public function saveItemVideos($videos)
+    {
+        foreach ($videos as $video) {
+
+            $model = new ItemVideo();
+            $model->item_uuid = $this->item_uuid;
+            $model->youtube_video_id = $video['youtube_video_id'];
+
+            if (isset($video['product_file_name'])) {
+
+                // check if same image exist then skip
+
+                $exist = $this->getItemVideos()->andWhere(['product_file_name'=>$video['product_file_name']])->exists();
+
+                if ($exist) {
+                    continue;
+                }
+
+                try {
+
+                    $url = Yii::$app->temporaryBucketResourceManager->getUrl($video['product_file_name']);
+
+                    $filename = Yii::$app->security->generateRandomString();
+
+                    $result = Yii::$app->cloudinaryManager->upload(
+                        $url,
+                        [
+                            'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
+                        ]
+                    );
+
+                    $model->product_file_name = basename($result['ObjectURL']);
+
+                } catch (\Cloudinary\Error $err) {
+                    //Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+
+                    //todo: show cloudinary error in api response
+                    return false;
+                }
+            }
+
+            $model->save(false);
+        }
+    }
+
+    /**
      * Upload item image  to Cloudinary
      * @param $images
      * @return array|false
@@ -49,11 +101,15 @@ class Item extends \common\models\Item {
         if (count($images) > 0) {
             foreach ($images as $img) {
                 if ($img['product_file_name']) {
+
                     // check if same image exist then skip
+
                     $exist = $this->getItemImages()->andWhere(['product_file_name'=>$img['product_file_name']])->exists();
+
                     if ($exist) {
                         continue;
                     }
+
                     try {
                         $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
                         $filename = Yii::$app->security->generateRandomString();
@@ -88,6 +144,7 @@ class Item extends \common\models\Item {
         return array_merge ($fields, [
             'itemImage',
             'itemImages',
+            'itemVideos',
             'categoryItems',
             'currency'
         ]);
@@ -96,6 +153,17 @@ class Item extends \common\models\Item {
     public function getOptions($modelClass = "\agent\models\Option")
     {
         return parent::getOptions($modelClass);
+    }
+
+
+    /**
+     * Gets query for [[ItemImages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVideos($model = '\common\models\ItemVideo')
+    {
+        return parent::getItemVideos($model);
     }
 
     /**

@@ -517,6 +517,16 @@ class Item extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[ItemVideos]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVideos($model = 'common\models\ItemVideo')
+    {
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+    /**
      * Gets query for [[ItemImages]].
      *
      * @return \yii\db\ActiveQuery
