@@ -80,7 +80,8 @@ class InvoiceItem extends \yii\db\ActiveRecord
                 }
             ],
             [
-                'class' => TimestampBehavior::className()
+                'class' => TimestampBehavior::className(),
+                'value' => new Expression('NOW()'),
             ]
         ];
     }

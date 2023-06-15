@@ -217,6 +217,10 @@ class StripeController extends Controller
         );
 
        // $payment->payment_gateway_fee = $paymentDetail['fee'] / pow(10, $order->currency->decimal_place);//todo: fees from stripe?
+
+        //$payment->payment_gateway_fee = $paymentIntent->application_fee_amount;
+        //$payment-> currency
+
         $payment->received_callback = true;
 
         // Net amount after deducting gateway fee

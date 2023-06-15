@@ -4,7 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
-
+use yii\db\Expression;
 
 /**
  * This is the model class for table "item_video".
@@ -52,6 +52,7 @@ class ItemVideo extends \yii\db\ActiveRecord
         return [
             [
                 'class' => TimestampBehavior::className(),
+                'value' => new Expression('NOW()'),
             ],
         ];
     }

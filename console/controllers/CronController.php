@@ -41,6 +41,9 @@ use yii\helpers\Console;
 use yii\helpers\ArrayHelper;
 use yii\db\Expression;
 
+
+use common\models\Setting;
+
 /**
  * All Cron actions related to this project
  */
@@ -48,47 +51,6 @@ class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
 
-        $model = Restaurant::findOne("rest_20ea8b98-504b-11ec-973b-069e9504599a");
-
-        $response = $model->createTapAccount();
-
-       // $response = Yii::$app->tapPayments->createBussiness($model);
-
-        var_dump($response);
-
-    }
-
-    public function actionTeste()
-    {
-        /*$params = [
-            "build_image" => "focal",
-            "repo" => [
-                "provider" => "github",
-                "id" => 70150125,
-                "force_ssl" => true,
-                "installation_id" => "11420049",
-                "repo" => "plugnio/plugn-ionic",
-                "private" => true,
-                "branch" => "master",
-                "cmd" => "npm run build",
-                "dir" => "www"
-            ],
-        ];
-
-        return $this->updateSite($store->site_id, $params);
-
-
-        Yii::$app->eventManager->setUser(1, [
-            "name" => "Rasili"
-        ]);
-
-        Yii::$app->eventManager->track('Test Plugn Event Manager',
-            [
-                'name' => "Rasili"
-            ],
-            null,
-            1
-        );*/
     }
 
     /**
