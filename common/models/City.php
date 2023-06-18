@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "city".
  *
  * @property int $city_id
+ * @property int $state_id
  * @property int $country_id
  * @property string $city_name
  * @property string $city_name_ar
@@ -33,6 +34,7 @@ class City extends \yii\db\ActiveRecord
         return [
             [['city_name', 'city_name_ar', 'country_id'], 'required'],
             [['city_name', 'city_name_ar'], 'string', 'max' => 255],
+            [['state_id'], 'exist', 'skipOnError' => true, 'targetClass' => State::className (), 'targetAttribute' => ['state_id' => 'state_id']],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className (), 'targetAttribute' => ['country_id' => 'country_id']],
         ];
     }
@@ -44,6 +46,7 @@ class City extends \yii\db\ActiveRecord
     {
         return [
             'city_id' => Yii::t('app','City ID'),
+            'state_id' => Yii::t('app','State ID'),
             'country_id' => Yii::t('app','Country ID'),
             'city_name' => Yii::t('app','City Name'),
             'city_name_ar' => Yii::t('app','City Name in Arabic'),
@@ -55,7 +58,9 @@ class City extends \yii\db\ActiveRecord
      */
     public function extraFields() {
         return [
-          'areas'
+           'areas',
+           'state',
+           'country'
         ];
     }
 
@@ -67,6 +72,16 @@ class City extends \yii\db\ActiveRecord
     public function getCountry($modelClass = "\common\models\Country")
     {
         return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
+    }
+
+    /**
+     * Gets query for [[State]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getState($modelClass = "\common\models\State")
+    {
+        return $this->hasMany($modelClass::className(), ['state_id' => 'state_id']);
     }
 
     /**

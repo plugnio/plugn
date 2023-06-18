@@ -95,6 +95,7 @@ AppAsset::register($this);
                     ['label' => 'Staffs', 'url' => ['/staff/index']],
                   ['label' => 'Partner', 'url' => ['/partner/index']],
                   ['label' => 'Country', 'url' => ['/country/index']],
+                  ['label' => 'States', 'url' => ['/state/index']],
                   ['label' => 'Cities', 'url' => ['/city/index']],
                   ['label' => 'Areas', 'url' => ['/area/index']],
                   ['label' => 'Currency', 'url' => ['/currency/index']],
