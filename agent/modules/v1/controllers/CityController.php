@@ -19,6 +19,7 @@ class CityController extends BaseController {
 
         $keyword = Yii::$app->request->get('keyword');
         $country_id = Yii::$app->request->get('country_id');
+        $state_id = Yii::$app->request->get('state_id');
         $store_uuid = Yii::$app->request->get('store_uuid');
         $delivery_zone_id = Yii::$app->request->get('delivery_zone_id');
 
@@ -39,6 +40,10 @@ class CityController extends BaseController {
               ['like', 'city_name', $keyword],
               ['like', 'city_name_ar', $keyword]
           ]);
+        }
+
+        if($state_id) {
+            $query->andWhere(['state_id' => $state_id]);
         }
 
         $query->andWhere(['country_id' => $country_id]);

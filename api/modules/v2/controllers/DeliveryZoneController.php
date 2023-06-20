@@ -2,17 +2,22 @@
 
 namespace api\modules\v2\controllers;
 
+use agent\models\Country;
+use api\models\State;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
+use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use api\models\Item;
 use api\models\Category;
-use common\models\City;
+use api\models\City;
 use api\models\Restaurant;
 use common\models\ItemImage;
 use common\models\AreaDeliveryZone;
 use common\models\DeliveryZone;
+use yii\web\NotFoundHttpException;
 
 class DeliveryZoneController extends Controller {
 
@@ -57,72 +62,44 @@ class DeliveryZoneController extends Controller {
         return $actions;
     }
 
-
     /**
      * Return List of countries available for delivery
      */
     public function actionListOfCountries($restaurant_uuid) {
 
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+        $store_model = $this->findStore($restaurant_uuid);
 
-            $deliveryZones = $store_model->getDeliveryZones()
-                ->with('country')
-                ->asArray()
-                ->all();
+        $subQuery = $store_model->getDeliveryZones()
+            ->select('delivery_zone.country_id')
+            ->distinct();
 
-            $shipping_countries = [];
+        $countries = Country::find()
+            ->andWhere(['IN', 'country.country_id', $subQuery])
+            ->all();
 
-            foreach ($deliveryZones as $key => $deliveryZone) {
+        $data = [];
 
-                if(empty($deliveryZone['country']))
-                {
-                    continue;
-                }
+        foreach ($countries as $country) {
 
-              if(
-                  !array_search(
-                      $deliveryZone['country']['country_id'],
-                      array_column($shipping_countries, 'country_id')
-                  )
-              )
-                $isExist = false;
+            $areas = $store_model->getAreaDeliveryZones()
+                ->andWhere(new Expression('state_id IS NOT NULL OR city_id IS NOT NULL OR area_id IS NOT NULL'))
+                ->andWhere(['area_delivery_zone.country_id' => $country->country_id])
+                ->count();
 
-                  foreach ($shipping_countries as  $shipping_country) {
-                      if($deliveryZone['country']['country_id'] == $shipping_country['country_id'])
-                          $isExist = true;
-                  }
+            $deliveryZone = null;
 
-              if(!$isExist)
-                $shipping_countries[] = $deliveryZone['country'];
-            }
+                $deliveryZone = $store_model->getDeliveryZones()
+                    ->andWhere(['delivery_zone.country_id' => $country->country_id])
+                    ->one();
 
-
-            foreach ($shipping_countries as $key => $shippingCountry) {
-
-                if($areaDeliveryZone = $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->one()){
-                  $shipping_countries[$key]['areas'] =
-                  !isset($areaDeliveryZone['area_id']) &&  $areaDeliveryZone->area_id  == null ? 0 : $store_model->getAreaDeliveryZonesForSpecificCountry($shippingCountry['country_id'])->count();
-
-
-                if($shipping_countries[$key]['areas'] == 0){
-                  $countryDeliveryZone = $store_model->getCountryDeliveryZones($shippingCountry['country_id'])->one();
-                  $shipping_countries[$key]['delivery_zone_id'] = strval($countryDeliveryZone['delivery_zone_id']);
-                }
-
-              }  else {
-                unset($shipping_countries[$key]);
-              }
-
-            }
-
-            return array_values($shipping_countries);
-
-        } else {
-            return [
-                'operation' => 'error',
-                'message' => 'Store Uuid is invalid'
-            ];
+            $data[] = array_merge($country->attributes, [
+                'areas' => $areas,
+                'deliveryZone' => $deliveryZone,
+                'delivery_zone_id' => $deliveryZone? $deliveryZone->delivery_zone_id : null
+            ]);
         }
+
+        return $data;
     }
 
     /**
@@ -191,8 +168,6 @@ class DeliveryZoneController extends Controller {
               else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
                 $deliveryTimeInMin = $deliveryTimeInMin *  60;
 
-
-
               $deliveryZone['delivery_time_in_min'] = $deliveryTimeInMin;
 
               $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryTime);
@@ -203,7 +178,6 @@ class DeliveryZoneController extends Controller {
               $deliveryZone['tax'] = $deliveryZone['delivery_zone_tax'] ? $deliveryZone['delivery_zone_tax']  : $deliveryZone['businessLocation']['business_location_tax'] ;
 
               return $deliveryZone;
-
 
             }
             else {
@@ -257,14 +231,12 @@ class DeliveryZoneController extends Controller {
 
         if ($store_model = Restaurant::findOne($restaurant_uuid)) {
 
-
           $countryCities = City::find()
                   ->andWhere(['country_id' => $country_id])
                   ->asArray()
                   ->all();
-
-
-                  if($countryCities){
+          
+                  if($countryCities) {
                     
                     $areaDeliveryZones = $store_model->getAreaDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
 
@@ -302,7 +274,71 @@ class DeliveryZoneController extends Controller {
         }
     }
 
+    /**
+     * Return list of states available for delivery
+     */
+    public function actionStates($country_id) {
 
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
+        $country = Country::findOne($country_id);
 
+        if(!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getStates("\api\models\State");
+
+        if($store_id) {
+            $query->joinWith('areaDeliveryZones', true, 'inner join')
+                ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * Return list of cities available for delivery
+     */
+    public function actionCities($state_id) {
+
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+        $state = State::findOne($state_id);
+
+        if(!$state) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $state->getCities("\api\models\City");
+
+        if($store_id) {
+            $query->joinWith('areaDeliveryZones', true, 'inner join')
+                ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * Finds the Item model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Item the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findStore($id)
+    {
+        $model = Restaurant::findOne($id);
+
+        if ($model !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
 }

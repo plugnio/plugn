@@ -206,6 +206,15 @@ return [
                         'OPTIONS detail' => 'options'
                     ]
                 ],
+                [// StateController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/state',
+                    'patterns' => [
+                        'GET' => 'list',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
                 [// CityController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/city',
@@ -309,12 +318,14 @@ return [
                         'GET' => 'list',
                         'POST create' => 'create',
                         'PATCH save' => 'save-details',
+                        'PATCH save-cities' => 'save-cities',
                         'PATCH <area_delivery_zone_id>/<store_uuid>' => 'update',
                         'PATCH <area_delivery_zone_id>' => 'update',
                         'DELETE <area_delivery_zone_id>/<store_uuid>' => 'delete',
                         'DELETE <area_delivery_zone_id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS save-cities' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS save' => 'options',
                         'OPTIONS <area_delivery_zone_id>/<store_uuid>' => 'options',

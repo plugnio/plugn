@@ -53,6 +53,8 @@ class m230618_115655_cities extends Migration
                 }
 
                 $country_id = $country->country_id;
+
+                $countries[$city['country']] = $country_id;
             }
 
             if(isset($states[$city['subcountry']])) {
@@ -67,16 +69,19 @@ class m230618_115655_cities extends Migration
                 }
 
                 $state_id = $state->state_id;
+
+                $states[$city['subcountry']] = $state_id;
             }
 
             $data[] = [
                 'country_id' => $country_id,
                 'state_id' => $state_id,
                 'city_name' => $city['name'],
+                'city_name_ar' => $city['name'],
             ];
         }
 
-        Yii::$app->db->createCommand()->batchInsert('city', ['country_id', 'state_id', 'city_name'], $data)->execute();
+        Yii::$app->db->createCommand()->batchInsert('city', ['country_id', 'state_id', 'city_name', 'city_name_ar'], $data)->execute();
     }
 
     /**

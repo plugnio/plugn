@@ -104,6 +104,8 @@ return [
                     'controller' => 'v2/delivery-zone',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET cities/<state_id>' => 'cities',
+                        'GET states/<country_id>' => 'states',
                         'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
                         'GET list-pickup-locations/<restaurant_uuid>' => 'list-pickup-locations',
                         'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
@@ -112,6 +114,8 @@ return [
                         // 'GET <restaurant_uuid>' => 'delivery-zone',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS cities' => 'options',
+                        'OPTIONS states' => 'options',
                         'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
                         'OPTIONS list-pickup-locations/<restaurant_uuid>' => 'options',
                         'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',
