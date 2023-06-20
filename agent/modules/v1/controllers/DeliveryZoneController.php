@@ -106,19 +106,18 @@ class DeliveryZoneController extends BaseController
         $model->delivery_fee = (float)Yii::$app->request->getBodyParam("delivery_fee");
         $model->min_charge = (float)Yii::$app->request->getBodyParam("min_charge");
         $model->delivery_zone_tax = (float)Yii::$app->request->getBodyParam("delivery_zone_tax");
-
+        $model->deliver_whole_country = Yii::$app->request->getBodyParam("deliver_whole_country");
 
         if ($model->save()) {
 
-          if($model->country->getAreas()->count() == 0){
-
-            $area_delivery_zone = new AreaDeliveryZone();
-            $area_delivery_zone->delivery_zone_id = $model->delivery_zone_id;
-            $area_delivery_zone->country_id = $model->country_id;
-            $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
-            $area_delivery_zone->save(false);
-
-          }
+            if($model->deliver_whole_country) 
+            {
+                $area_delivery_zone = new AreaDeliveryZone();
+                $area_delivery_zone->delivery_zone_id = $model->delivery_zone_id;
+                $area_delivery_zone->country_id = $model->country_id;
+                $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
+                $area_delivery_zone->save(false);
+            }
 
 
         } else {
@@ -160,7 +159,7 @@ class DeliveryZoneController extends BaseController
         $model->delivery_fee = (float)Yii::$app->request->getBodyParam("delivery_fee");
         $model->min_charge = (float)Yii::$app->request->getBodyParam("min_charge");
         $model->delivery_zone_tax = (float)Yii::$app->request->getBodyParam("delivery_zone_tax");
-
+        $model->deliver_whole_country = Yii::$app->request->getBodyParam("deliver_whole_country");
 
         if (!$model->save()) {
             if (isset($model->errors)) {
@@ -176,6 +175,17 @@ class DeliveryZoneController extends BaseController
             }
         }
 
+        if($model->deliver_whole_country) 
+        {
+            AreaDeliveryZone::deleteAll(['delivery_zone_id' => $delivery_zone_id]);
+
+            $area_delivery_zone = new AreaDeliveryZone();
+            $area_delivery_zone->delivery_zone_id = $model->delivery_zone_id;
+            $area_delivery_zone->country_id = $model->country_id;
+            $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
+            $area_delivery_zone->save(false);
+        }
+        
         return [
             "operation" => "success",
             "message" => Yii::t('agent',"Delivery zone updated successfully"),

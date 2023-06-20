@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $area_delivery_zone
  * @property int $delivery_zone_id
+ * @property int $state_id
  * @property int $city_id
  * @property int $area_id
  * @property string $restaurant_uuid
@@ -37,6 +38,7 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
             [['delivery_zone_id', 'restaurant_uuid'], 'required'],
             [['delivery_zone_id', 'area_id', 'is_deleted'], 'integer'],
             [['delivery_zone_id', 'area_id'], 'unique', 'targetAttribute' => ['delivery_zone_id', 'area_id']],
+            [['state_id'], 'exist', 'skipOnError' => true, 'targetClass' => State::className(), 'targetAttribute' => ['state_id' => 'state_id']],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['area_id'], 'exist', 'skipOnError' => true, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'city_id']],
@@ -54,9 +56,26 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
             'area_delivery_zone_id' => Yii::t('app', 'Area Delivery Zone ID'),
             'delivery_zone_id' => Yii::t('app', 'Delivery Zone ID'),
             'area_id' => Yii::t('app', 'Area ID'),
+            'state_id' => Yii::t('app', 'State ID'),
+            'country_id' => Yii::t('app', 'Country ID'),
             'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
             'is_deleted' => Yii::t('app', 'Is Deleted?'),
         ];
+    }
+
+    public function beforeSave($insert)
+    {
+        if ($insert) {
+
+            if($this->area_id) {
+                $this->country_id = $this->area->city? $this->area->city->country_id: null;
+                $this->city_id = $this->area->city_id;
+            } else {
+                $this->country_id = $this->deliveryZone->country_id;
+            }
+        }
+
+        return parent::beforeSave($insert);
     }
 
     /**
@@ -68,23 +87,6 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
 
         parent::afterSave($insert, $changedAttributes);
 
-        if ($insert) {
-
-          if($this->area_id) {
-            $this->country_id = $this->area->city? $this->area->city->country_id: null;
-            $this->city_id = $this->area->city_id;
-          } else {
-            $this->country_id = $this->deliveryZone->country_id;
-          }
-
-          self::updateAll([
-              'country_id' => $this->country_id,
-              'city_id' => $this->city_id
-          ], [
-              'area_delivery_zone' => $this->area_delivery_zone
-          ]);
-        }
-
         return true;
     }
 
@@ -92,9 +94,31 @@ class AreaDeliveryZone extends \yii\db\ActiveRecord
         return [
             'area',
             'city',
+            'state',
+            'country',
             'deliveryZone',
             'businessLocation'
         ];
+    }
+
+    /**
+     * Gets query for [[Country]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCountry($modelClass = "\common\models\Country")
+    {
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
+    }
+
+    /**
+     * Gets query for [[State]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getState($modelClass = "\common\models\State")
+    {
+        return $this->hasOne($modelClass::className(), ['state_id' => 'state_id']);
     }
 
     /**

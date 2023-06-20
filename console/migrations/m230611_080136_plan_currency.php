@@ -22,7 +22,7 @@ class m230611_080136_plan_currency extends Migration
             "plan_price_id" => $this->primaryKey(), // used as reference id
             "plan_id" => $this->integer(11)->notNull(),
             'currency' => $this->char(3)->notNull(),
-            "price" => $this->decimal(9, 3),
+            "price" => $this->decimal(20, 3),
             "created_at" => $this->dateTime(),
             "updated_at" => $this->dateTime(),
         ], $tableOptions);

@@ -57,12 +57,32 @@ class State extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
+    {
+        return $this->hasMany($modelClass::className(), ['state_id' => 'state_id']);
+    }
+    
+    /**
+     * Gets query for [[Cities]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCities($modelClass = "\common\models\City")
+    {
+        return $this->hasMany($modelClass::className(), ['state_id' => 'state_id']);
+    }
+
+    /**
      * Gets query for [[Country]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCountry()
+    public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne(Country::className(), ['country_id' => 'country_id']);
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
     }
 }

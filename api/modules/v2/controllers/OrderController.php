@@ -133,8 +133,13 @@ class OrderController extends Controller
         //if the order mode = 1 => Delivery
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-            if (Yii::$app->request->getBodyParam("area_id") && Yii::$app->request->getBodyParam("area_delivery_zone")) {
+                $order->address_1 = Yii::$app->request->getBodyParam('address_1');
+                $order->address_2 = Yii::$app->request->getBodyParam('address_2');
+                $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
+                $order->city = Yii::$app->request->getBodyParam("city");
+
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
+                $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
                 $order->area_id = Yii::$app->request->getBodyParam("area_id");
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
                 $order->block = Yii::$app->request->getBodyParam("block");
@@ -150,15 +155,6 @@ class OrderController extends Controller
 
                 if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
                     $order->office = Yii::$app->request->getBodyParam("office");
-
-            } else if (Yii::$app->request->getBodyParam("country_id") && !Yii::$app->request->getBodyParam("area_id") && !Yii::$app->request->getBodyParam("area_delivery_zone")) {
-                $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
-                $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
-                $order->address_1 = Yii::$app->request->getBodyParam('address_1');
-                $order->address_2 = Yii::$app->request->getBodyParam('address_2');
-                $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
-                $order->city = Yii::$app->request->getBodyParam("city");
-            }
 
             $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
 
