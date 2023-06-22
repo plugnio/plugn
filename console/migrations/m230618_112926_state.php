@@ -4089,6 +4089,8 @@ class m230618_112926_state extends Migration
                 $country->save(false);
 
                 $country_id = $country->country_id;
+
+                $countries[$state['country']] = $country_id;
             }
 
             $data[] = [

@@ -10,6 +10,7 @@ return [
     'agent_auth_key' => Yii::$app->getSecurity()->generateRandomString(),
     'agent_password_hash' => Yii::$app->getSecurity()->generatePasswordHash('12345'),
     'agent_password_reset_token' => null,
+    'agent_email_verification' => 1,
     'agent_status' => 10,
     'email_notification' => 1,
     'reminder_email' => 1,
