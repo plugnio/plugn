@@ -36,9 +36,12 @@ class m230619_190800_state extends Migration
 
         $country = \agent\models\Country::findOne(['iso' => 'KW']);
 
-        \common\models\DeliveryZone::updateAll(['deliver_whole_country' => 1], [
-            '!=', 'country_id', $country->country_id
-        ]);
+        if($country)
+        {
+            \common\models\DeliveryZone::updateAll(['deliver_whole_country' => 1], [
+                '!=', 'country_id', $country->country_id
+            ]);
+        }
     }
 
     /**

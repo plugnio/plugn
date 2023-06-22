@@ -7,6 +7,7 @@ use yii\db\Migration;
  */
 class m230618_115655_cities extends Migration
 {
+    //yii migrate/to m230618_115655_cities
     /**
      * {@inheritdoc}
      */
@@ -42,6 +43,9 @@ class m230618_115655_cities extends Migration
 
         foreach ($json_data as $city) {
 
+            if($city['country'] == "Kuwait")
+                continue;
+
             if(isset($countries[$city['country']])) {
                 $country_id = $countries[$city['country']];
             } else {
@@ -76,8 +80,8 @@ class m230618_115655_cities extends Migration
             $data[] = [
                 'country_id' => $country_id,
                 'state_id' => $state_id,
-                'city_name' => $city['name'],
-                'city_name_ar' => $city['name'],
+                'city_name' => $city['name'],//htmlentities($city['name'], ENT_COMPAT, "UTF-8"),
+                'city_name_ar' => $city['name']//htmlentities($city['name'], ENT_COMPAT, "UTF-8")
             ];
         }
 
