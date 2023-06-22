@@ -281,6 +281,8 @@ class DeliveryZoneController extends Controller {
 
         $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
+        $keyword = Yii::$app->request->get("keyword");
+
         $country = Country::findOne($country_id);
 
         if(!$country) {
@@ -292,6 +294,10 @@ class DeliveryZoneController extends Controller {
         if($store_id) {
             $query->joinWith('areaDeliveryZones', true, 'inner join')
                 ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
+        }
+
+        if($keyword) {
+            $query->andWhere(['like', 'name', $keyword]);
         }
 
         return new ActiveDataProvider([
@@ -306,6 +312,8 @@ class DeliveryZoneController extends Controller {
 
         $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
+        $keyword = Yii::$app->request->get("keyword");
+
         $state = State::findOne($state_id);
 
         if(!$state) {
@@ -317,6 +325,14 @@ class DeliveryZoneController extends Controller {
         if($store_id) {
             $query->joinWith('areaDeliveryZones', true, 'inner join')
                 ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
+        }
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'city_name', $keyword],
+                ['like', 'city_name_ar', $keyword]   
+            ]);
         }
 
         return new ActiveDataProvider([
