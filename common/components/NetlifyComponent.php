@@ -45,17 +45,21 @@ class NetlifyComponent extends Component {
     /**
      * creates a new site.
      * @param type $name the name of the site (mysite.netlify.app)
-     * @param type $custom_domain the custom domain of the site (www.example.com)
+     * @param type $store
      * @param type $subdomain
      * @return type
      */
-    public function createSite($custom_domain, $store_branch = "master") {
+    public function createSite($store, $store_branch = "master") {
 
         $createSiteEndpoint = $this->apiEndpoint . "/sites";
 
+       // $domain = str_replace("https://", "", $store->restaurant_domain);
+
+        $url = parse_url($store->restaurant_domain);
+
         $siteParams = [
-            "name" => $store_branch . '-plugn',
-            "custom_domain" => $custom_domain,
+            "name" => $store->restaurant_uuid,
+            "custom_domain" => $url['host'],
             "build_image" => "focal",
             "repo" => [
                 "provider" => "github",
@@ -65,7 +69,7 @@ class NetlifyComponent extends Component {
                 "repo" => "plugnio/plugn-ionic",
                 "private" => true,
                 "branch" => $store_branch,
-                "cmd" => "npm run build",
+                "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
                 "dir" => "www"
             ],
         ];
