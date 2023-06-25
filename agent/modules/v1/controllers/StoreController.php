@@ -6,6 +6,7 @@ use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
 use common\components\TapPayments;
+use common\models\Queue;
 use common\models\RestaurantDomainRequest;
 use common\models\Setting;
 use Yii;
@@ -348,18 +349,31 @@ class StoreController extends BaseController
     {
         $store = $this->findModel();
 
+        if(!$store->site_id) {
+            return [
+                'operation' => 'error',
+                'message' => "Site not published yet, can't update unpublished site!"
+            ];
+        }
+
         //getting conflict on this
         //$response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
 
         if($store->site_id)
             $response = Yii::$app->netlifyComponent->upgradeSite($store);
         else
-            $response = Yii::$app->netlifyComponent->createSite($store->restaurant_domain);
+            $response = Yii::$app->netlifyComponent->createSite($store);
 
         if ($response->isOk)
         {
             //$store->sitemap_require_update = 1;
             $store->version = Yii::$app->params['storeVersion'];
+
+            if(!$store->site_id)
+            {
+                $store->site_id = $response->data['site_id'];
+            }
+
             $store->save(false);
 
             //create new store? and delete current one

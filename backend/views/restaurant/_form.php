@@ -174,6 +174,8 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'restaurant_domain')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'site_id')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'app_id')->textInput(['maxlength' => true]) ?>
 
     <?=
