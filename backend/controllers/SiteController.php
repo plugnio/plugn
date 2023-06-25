@@ -4,6 +4,7 @@ namespace backend\controllers;
 use backend\models\RestaurantInvoice;
 use common\models\PaymentGatewayQueue;
 use common\models\Queue;
+use common\models\Restaurant;
 use common\models\RestaurantDomainRequest;
 use common\models\Subscription;
 use Yii;
@@ -93,6 +94,10 @@ class SiteController extends Controller
             'queue_status' => Queue::QUEUE_STATUS_PENDING
         ])->count ();
 
+        $notPublished = Restaurant::find()
+            ->andWhere(['has_deployed' => 0, 'is_deleted' => 0])
+            ->count();
+
         $failedInPaymentQueue = PaymentGatewayQueue::find()->andWhere ([
             'queue_status' => PaymentGatewayQueue::QUEUE_STATUS_FAILED
         ])->count ();
@@ -117,6 +122,7 @@ class SiteController extends Controller
             'draft' => $draft,
             'pending' => $pending,
             'paid' => $paid,
+            'notPublished' => $notPublished,
             "failedInQueue" => $failedInQueue,
             "premiumStores" => $premiumStores,
             "holdInQueue" => $holdInQueue,

@@ -17,17 +17,25 @@ use yii\widgets\ActiveForm;
 
     <div class="grid">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <?= $form->field($model, 'restaurant_uuid') ?>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <?= $form->field($model, 'name_ar') ?>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <?= $form->field($model, 'platform_fee') ?>
+            </div>
+            <div class="col-md-3">
+            <?= $form->field($model, 'has_deployed')->dropDownList([
+                null => 'All',
+                1 => 'Yes',
+                0 =>'No',
+            ]) ?>
             </div>
         </div>
         <div class="row">
+
             <div class="col-md-4">
                 <?php echo $form->field($model, 'noOrder')->checkbox(['label' => 'No order in last 30 days']) ?>
             </div>
@@ -43,9 +51,14 @@ use yii\widgets\ActiveForm;
             <div class="col-md-4">
                 <?php echo $form->field($model, 'is_myfatoorah_enable')->checkbox([]) ?>
             </div>
+            <!--
             <div class="col-md-4">
                 <?php echo $form->field($model, 'has_deployed')->checkbox([]) ?>
             </div>
+            <div class="col-md-4">
+                <?php echo $form->field($model, 'has_not_deployed')->checkbox([]) ?>
+            </div>-->
+
             <div class="col-md-4">
                 <?php echo $form->field($model, 'is_sandbox')->checkbox([]) ?>
             </div>

@@ -15,6 +15,7 @@ class RestaurantSearch extends Restaurant
     public $country_name;
     public $currency_title;
 
+    public $has_not_deployed;
     public $noOrder;
     public $noItem;
     public $notActive;
@@ -25,7 +26,7 @@ class RestaurantSearch extends Restaurant
      public function rules()
      {
          return [
-             [['restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id',
+             [['restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
                  'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'noItem', 'notActive'], 'safe'],
@@ -104,7 +105,10 @@ class RestaurantSearch extends Restaurant
         if($this->is_myfatoorah_enable)
             $query->andFilterWhere(['is_myfatoorah_enable' => $this->is_myfatoorah_enable]);
 
-        if($this->has_deployed)
+        if($this->has_not_deployed)
+            $query->andFilterWhere(['has_deployed' => false]);
+
+        if(isset($this->has_deployed))
             $query->andFilterWhere(['has_deployed' => $this->has_deployed]);
 
         if($this->is_sandbox)
