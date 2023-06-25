@@ -81,7 +81,7 @@ class AgentAssignmentSearch extends AgentAssignment
             'role' => $this->role,
         ]);
 
-        $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
+        $query->andFilterWhere(['like', 'agent_assignment.restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'restaurant.name', $this->store_name])
             ->andFilterWhere(['like', 'agent.agent_name', $this->agent_name])
             ->andFilterWhere(['like', 'assignment_agent_email', $this->assignment_agent_email]);

@@ -273,6 +273,11 @@ class RestaurantController extends Controller {
             'pagination' => false
         ]);
 
+        $domainRequests = new \yii\data\ActiveDataProvider([
+            'query' => $model->getRestaurantDomainRequests(),
+            'pagination' => false
+        ]);
+
         $payments = $model->getPayments()
             ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
                 SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
@@ -285,6 +290,7 @@ class RestaurantController extends Controller {
         return $this->render('view', [
             'model' => $this->findModel($id),
             'storeThemeColors' => $storeThemeColors,
+            'domainRequests' => $domainRequests,
             "payments" => $payments
         ]);
     }
@@ -427,6 +433,48 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * publish store
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionPublish($id)
+    {
+        $store = $this->findModel($id);
+
+        if($store->site_id) {
+            Yii::$app->session->setFlash('errorResponse', "Site already published!");
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+        $response = Yii::$app->netlifyComponent->createSite($store);
+
+        if ($response->isOk)
+        {
+            $store->version = Yii::$app->params['storeVersion'];
+
+            if(!$store->site_id)
+            {
+                $store->site_id = $response->data['site_id'];
+            }
+
+            //$store->sitemap_require_update = 1;
+            $store->save(false);
+
+            Yii::$app->session->setFlash('successResponse', "Success: Store will be updated in 2-5 min!");
+        }
+        else
+        {
+            Yii::error('[Error while upgrading site]' . json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            Yii::$app->session->setFlash('errorResponse', json_encode($response->data));
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
+
+    /**
      * upgrade store
      * @param $id
      * @return \yii\web\Response
@@ -436,17 +484,29 @@ class RestaurantController extends Controller {
     {
         $store = $this->findModel($id);
 
+        if(!$store->site_id) {
+            Yii::$app->session->setFlash('errorResponse', "Site not published yet, can't update unpublished site!");
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
         //$response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
 
         if($store->site_id)
             $response = Yii::$app->netlifyComponent->upgradeSite($store);
         else
-            $response = Yii::$app->netlifyComponent->createSite( str_replace("https://", "", $store->restaurant_domain));
+            $response = Yii::$app->netlifyComponent->createSite($store);
 
         if ($response->isOk)
         {
-            $store->sitemap_require_update = 1;
             $store->version = Yii::$app->params['storeVersion'];
+
+            if(!$store->site_id)
+            {
+                $store->site_id = $response->data['site_id'];
+            }
+
+            //$store->sitemap_require_update = 1;
             $store->save(false);
 
             Yii::$app->session->setFlash('successResponse', "Success: Store will be updated in 2-5 min!");
@@ -480,10 +540,8 @@ class RestaurantController extends Controller {
         }
 
       $sitemap =  fopen($dirName . "/" .   $store->store_branch_name . "/sitemap.xml", "w") or die("Unable to open file!");
-
       fwrite($sitemap, Yii::$app->fileGeneratorComponent->createSitemapXml($store->restaurant_uuid));
       fclose($sitemap);
-
 
       $fileToBeUploaded = file_get_contents($dirName .  "/" .   $store->store_branch_name  . "/sitemap.xml");
 

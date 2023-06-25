@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use common\models\RestaurantDomainRequest;
 use common\models\Restaurant;
 use yii\grid\GridView;
 
@@ -11,11 +12,15 @@ use yii\grid\GridView;
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Restaurants', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 
 $js = "
         $(function () {
-           $('#tabs li').click(function (e) {
+           $('#tabs li:not(.link)').click(function (e) {
+                
+                
+            
                $('#tabs li').removeClass('active');
                $(this).toggleClass('active'); 
                
@@ -49,53 +54,7 @@ $this->registerJs($js);
 
     <p>
 
-        <?=
-          Html::a($model->hide_request_driver_button == 1 ? 'Display request driver button' : 'Hide request driver button',
-          [
-            $model->hide_request_driver_button == 1 ?  'display-request-driver-button' : 'hide-request-driver-button'
-         , 'id' => $model->restaurant_uuid], ['class' => $model->hide_request_driver_button == 0 ? 'btn btn-success' : 'btn btn-danger'])
-         ?>
-
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
-
-        <?= Html::a('Toggle Debugger', ['toggle-debugger', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
-
-        <?=
-        Html::a('Remove tap account detail', ['reset-tap', 'id' => $model->restaurant_uuid], [
-            'class' => 'btn btn-danger btn-process-queue',
-            'data' => [
-                'confirm' => 'Are you sure you want to remove details for this store? This will not remove actual tap account.',
-                'method' => 'post',
-            ],
-        ])
-        ?>
-
-        <?php if($model->paymentGatewayQueue && $model->paymentGatewayQueue->queue_status != \common\models\PaymentGatewayQueue::QUEUE_STATUS_COMPLETE) { ?>
-
-        <?=
-        Html::a('Remove payment gateway request', ['remove-gateway-queue', 'id' => $model->restaurant_uuid], [
-            'class' => 'btn btn-danger btn-process-queue',
-            'data' => [
-                'confirm' => 'Are you sure you want to remove payment gateway queue for this store?',
-                'method' => 'post',
-            ],
-        ])
-        ?>
-
-        <?=
-        Html::a('Process payment gateway request', ['process-gateway-queue', 'id' => $model->restaurant_uuid], [
-            'class' => 'btn btn-danger btn-process-queue',
-            'data' => [
-                'confirm' => 'Are you sure you want to create payment gateway account for this store?',
-                'method' => 'post',
-            ],
-        ])
-        ?>
-        <?php } ?>
-
-        <?php if($model->is_tap_enable) { ?>
-            <?= Html::a('Test tap integration', ['restaurant/test-tap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-default']) ?>
-        <?php } ?>
 
         <?=
         Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
@@ -106,60 +65,12 @@ $this->registerJs($js);
             ],
         ])
         ?>
-        <?= Html::a('List Payment Method', ['restaurant-payment-method/index', 'uuid' => $model->restaurant_uuid], ['class' => 'btn btn-default']) ?>
         <br/>
         <br/>
 
-        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_BUSY || $model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSED ) { ?>
-          <?=
-          Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
-              'class' => 'btn btn-success',
-              'data' => [
-                  'confirm' => 'Are you sure you want to change store status to open?',
-                  'method' => 'post',
-              ],
-          ])
-          ?>
-        <?php } ?>
-
-        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
-          <?=
-          Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
-              'class' => 'btn btn-danger',
-              'data' => [
-                  'confirm' => 'Are you sure you want to change store status to busy?',
-                  'method' => 'post',
-              ],
-          ])
-          ?>
-
-            <?=
-            Html::a('Close', ['promote-to-close', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Are you sure you want to change store status to closed?',
-                    'method' => 'post',
-                ],
-            ])
-            ?>
-        <?php } ?>
-
-
-
-        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
-            <?=
-            Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Are you sure you want to upgrade store to latest codebase?',
-                    'method' => 'post',
-                ],
-            ])
-            ?>
-        <?php } ?>
-
-
+        <!--
         <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
+-->
 
     </p>
 
@@ -171,6 +82,9 @@ $this->registerJs($js);
         <li id="fees"><a href="#">Our Fees</a></li>
         <li id="theme"><a href="#">Theme color</a></li>
         <li id="seo"><a href="#">SEO</a></li>
+        <li id="netlify"><a href="#">Netlify</a></li>
+        <li id="domain" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['restaurant-payment-method/index', 'uuid' => $model->restaurant_uuid]) ?>">Payment Methods</a></li>
+        <li id="agents" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['agent-assignment/index', 'AgentAssignmentSearch[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Agents/ Vendors</a></li>
         <li id="settings"><a href="#">Settings</a></li>
     </ul>
 
@@ -181,9 +95,7 @@ $this->registerJs($js);
     DetailView::widget([
         'model' => $model,
         'attributes' => [
-
-          'retention_email_sent',
-            'version',
+           'retention_email_sent',
             'sitemap_require_update',
             'country.country_name',
             [
@@ -216,7 +128,6 @@ $this->registerJs($js);
                 },
                 'format' => 'raw'
             ],
-            'site_id',
             'company_name',
             'name',
             'name_ar',
@@ -225,7 +136,6 @@ $this->registerJs($js);
             'app_id',
             'status',
             'business_type',
-            'restaurant_domain',
             'thumbnail_image',
             'logo',
             [
@@ -277,16 +187,12 @@ $this->registerJs($js);
             ],
             'owner_number',
 
-            'store_branch_name',
             'custom_css:text',
 
             'currency_id',
             'country_id',
 
-
-
             'phone_number_country_code',
-
 
             'owner_phone_country_code',
 
@@ -303,7 +209,7 @@ $this->registerJs($js);
             'schedule_interval',
             'schedule_order',
 
-            'has_deployed',
+
 
             'snapchat_pixil_id',
             'default_language',
@@ -319,7 +225,104 @@ $this->registerJs($js);
     ?>
     </div>
 
+    <div id="tab-netlify" class="tab-content hidden">
+
+        <?php if ($model->site_id && $model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
+            <?=
+            Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to upgrade store to latest codebase?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+        <?php } ?>
+        <br/>
+        <br/>
+
+        <?=
+        DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'version',
+                'site_id',
+                'store_branch_name',
+                'has_deployed',
+                'restaurant_domain',
+            ]
+        ]); ?>
+
+        <?=
+        GridView::widget([
+            'dataProvider' => $domainRequests,
+            'columns' => [
+                'domain',
+                [
+                    'attribute' => 'status',
+                    'filter' => RestaurantDomainRequest::arrStatus(),
+                    'value' => function($data) {
+                        return RestaurantDomainRequest::arrStatus()[$data->status];
+                    }
+                ],
+                //'created_by',
+                'created_at',
+            ],
+            'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
+            'tableOptions' => ['class' => 'table table-bordered table-hover'],
+            'summaryOptions' => ['class' => "card-header"],
+        ]);
+        ?>
+
+    </div>
+
     <div id="tab-settings" class="tab-content hidden">
+
+        <?=
+        Html::a($model->hide_request_driver_button == 1 ? 'Display request driver button' : 'Hide request driver button',
+            [
+                $model->hide_request_driver_button == 1 ?  'display-request-driver-button' : 'hide-request-driver-button'
+                , 'id' => $model->restaurant_uuid], ['class' => $model->hide_request_driver_button == 0 ? 'btn btn-success' : 'btn btn-danger'])
+        ?>
+
+        <?= Html::a('Toggle Debugger', ['toggle-debugger', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
+
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_BUSY || $model->restaurant_status == Restaurant::RESTAURANT_STATUS_CLOSED ) { ?>
+            <?=
+            Html::a('Open', ['promote-to-open', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-success',
+                'data' => [
+                    'confirm' => 'Are you sure you want to change store status to open?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+        <?php } ?>
+
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
+            <?=
+            Html::a('Busy', ['promote-to-busy', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to change store status to busy?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+
+            <?=
+            Html::a('Close', ['promote-to-close', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to change store status to closed?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+        <?php } ?>
+        <br/>
+        <br/>
+
         <?=
         DetailView::widget([
             'model' => $model,
@@ -349,6 +352,46 @@ $this->registerJs($js);
     </div>
 
     <div id="tab-payment" class="tab-content hidden">
+
+        <?=
+        Html::a('Remove tap account detail', ['reset-tap', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to remove details for this store? This will not remove actual tap account.',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+
+        <?php if($model->paymentGatewayQueue && $model->paymentGatewayQueue->queue_status != \common\models\PaymentGatewayQueue::QUEUE_STATUS_COMPLETE) { ?>
+
+            <?=
+            Html::a('Remove payment gateway request', ['remove-gateway-queue', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger btn-process-queue',
+                'data' => [
+                    'confirm' => 'Are you sure you want to remove payment gateway queue for this store?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+
+            <?=
+            Html::a('Process payment gateway request', ['process-gateway-queue', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger btn-process-queue',
+                'data' => [
+                    'confirm' => 'Are you sure you want to create payment gateway account for this store?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+        <?php } ?>
+
+        <?php if($model->is_tap_enable) { ?>
+            <?= Html::a('Test tap integration', ['restaurant/test-tap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-default']) ?>
+        <?php } ?>
+        <br/>
+        <br/>
+
         <?=
         DetailView::widget([
             'model' => $model,
