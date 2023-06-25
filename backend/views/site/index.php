@@ -21,7 +21,13 @@ $this->title = 'Admin dashboard';
 
     <?php if($failedInQueue > 0) { ?>
         <div class="alert alert-danger" role="alert">
-            <?= $failedInQueue ?> Store building Failed, <?= Html::a('Check it now!', ['restaurant/index']) ?>
+            <?= $failedInQueue ?> Store building Failed, <?= Html::a('Check it now!', ['restaurant/index', 'RestaurantSearch[has_deployed]' => 0]) ?>
+        </div>
+    <?php } ?>
+
+    <?php if($notPublished > 0) { ?>
+        <div class="alert alert-danger" role="alert">
+            <?= $notPublished ?> Store not published, <?= Html::a('Check it now!', ['restaurant/index', 'RestaurantSearch[has_deployed]' => 0]) ?>
         </div>
     <?php } ?>
 

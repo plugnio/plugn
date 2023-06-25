@@ -35,6 +35,9 @@ $this->registerJs($js);
 <div class="restaurant-view">
     <h1>
         <?= Html::encode($this->title) ?>
+        <?php if($model->is_deleted) { ?>
+        <span class="badge badge-danger">Deleted</span>
+        <?php } ?>
     </h1>
 
     <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
@@ -85,6 +88,8 @@ $this->registerJs($js);
         <li id="netlify"><a href="#">Netlify</a></li>
         <li id="domain" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['restaurant-payment-method/index', 'uuid' => $model->restaurant_uuid]) ?>">Payment Methods</a></li>
         <li id="agents" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['agent-assignment/index', 'AgentAssignmentSearch[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Agents/ Vendors</a></li>
+        <li id="invoices" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['restaurant-invoice/index', 'RestaurantInvoice[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Invoices</a></li>
+        <li id="orders" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['order/index', 'OrderSearch[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Orders</a></li>
         <li id="settings"><a href="#">Settings</a></li>
     </ul>
 

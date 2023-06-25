@@ -48,6 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'name',
                 'format' => 'raw',
                 'value' => function ($data) {
+
                     if ($data->queue) {
 
                         $icon = "";
@@ -65,10 +66,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         }
 
-                        return $data->name . ' ' . $data->queue->queue_status . '&nbsp;&nbsp;' . $icon;
+                        $name = $data->name . ' ' . $data->queue->queue_status . '&nbsp;&nbsp;' . $icon;
                     } else {
-                        return $data->name;
+                        $name = $data->name;
                     }
+
+                    if($data->is_deleted)
+                        $name .= '&nbsp;&nbsp;<span class="badge badge-danger">Deleted</span>';
+
+                    return $name;
                 }
             ],
             'restaurant_domain',

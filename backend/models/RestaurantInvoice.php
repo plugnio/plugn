@@ -96,7 +96,7 @@ class RestaurantInvoice extends RestaurantInvoiceModel
 
         $query->andFilterWhere(['like', 'invoice_uuid', $this->invoice_uuid])
             ->andFilterWhere(['like', 'invoice_number', $this->invoice_number])
-            ->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
+            ->andFilterWhere(['like', 'restaurant_invoice.restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'payment_uuid', $this->payment_uuid])
             ->andFilterWhere(['like', 'currency_code', $this->currency_code]);
 
