@@ -204,36 +204,62 @@ class AuthController extends Controller {
     }
 
     /**
-     * signup
+     * signup agent
      * @return array|string[]
      */
     public function actionSignupStepOne()
     {
+        $accessToken = Yii::$app->request->getBodyParam('accessToken');
+
         $agent = new Agent();
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
         $agent->agent_name = Yii::$app->request->getBodyParam('name');
         $agent->agent_email = Yii::$app->request->getBodyParam('email');
+        $agent->agent_number = Yii::$app->request->getBodyParam ('owner_number');
+        $agent->agent_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
+
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
-        if (!$agent->validate()) {
+        if($accessToken) {
+
+            $response = Yii::$app->auth0->getUserInfo ($accessToken);
+
+            if ($response->isOk && $response->data['email']) {
+                $agent->agent_email = $response->data['email'];
+                $agent->agent_email_verification = Agent::EMAIL_VERIFIED;
+            }
+        }
+
+        if (!$agent->save()) {
             return [
                 "operation" => "error",
                 "message" => $agent->errors
             ];
-        } else {
+        }
 
-            if (YII_ENV == 'prod') {
-                $param = [
-                    'email' => Yii::$app->request->getBodyParam('email'),
-                    'password' => Yii::$app->request->getBodyParam('password')
-                ];
-                Yii::$app->auth0->createUser($param);
-            }
+        if (YII_ENV == 'prod') {
+
+            $param = [
+                'email' => Yii::$app->request->getBodyParam('email'),
+                'password' => Yii::$app->request->getBodyParam('password')
+            ];
+
+            Yii::$app->auth0->createUser($param);
+        }
+
+        if($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED)
+        {
+            $agent->sendVerificationEmail();
 
             return [
-                "operation" => "success"
+                "operation" => "success",
+                "agent_id" => $agent->agent_id,
+                "message" => Yii::t('agent', "Please click on the link sent to you by email to verify your account"),
+                "unVerifiedToken" => $this->_loginResponse($agent)
             ];
         }
+
+        return $this->_loginResponse ($agent);
     }
 
     /**
