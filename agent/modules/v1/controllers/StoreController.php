@@ -180,7 +180,7 @@ class StoreController extends BaseController
         $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
         $store->accept_order_247 = Yii::$app->request->getBodyParam('accept_order_247');
         $store->is_public = Yii::$app->request->getBodyParam('is_public');
-
+        $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
         $store->owner_first_name = Yii::$app->request->getBodyParam('owner_first_name');
         $store->owner_last_name = Yii::$app->request->getBodyParam('owner_last_name');
         $store->owner_email = Yii::$app->request->getBodyParam('owner_email');
