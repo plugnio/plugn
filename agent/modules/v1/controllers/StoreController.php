@@ -187,6 +187,14 @@ class StoreController extends BaseController
         $store->owner_number = Yii::$app->request->getBodyParam('owner_number');
         $store->owner_phone_country_code = Yii::$app->request->getBodyParam('owner_phone_country_code');
 
+        if(!$store->restaurant_email) {
+            $store->restaurant_email = Yii::$app->user->identity->agent_email;
+        }
+
+        if(!$store->name_ar) {
+            $store->name_ar = $store->name;
+        }
+
         $currencyCode = Yii::$app->request->getBodyParam('currency');
 
         $currency = Currency::findOne(['code' => $currencyCode]);

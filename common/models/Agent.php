@@ -78,7 +78,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             [['agent_status', 'email_notification', 'reminder_email', 'receive_weekly_stats'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],
             [['agent_phone_country_code', 'agent_number'], 'number'],
-            [['agent_number'], 'unique', 'comboNotUnique' => 'Phone no. already exist.',  'targetAttributes' => ['agent_phone_country_code', 'agent_number', 'deleted']],
+            [['agent_number'], 'unique', 'comboNotUnique' => 'Phone no. already exist.',  'targetAttribute' => ['agent_phone_country_code', 'agent_number', 'deleted']],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
             ['agent_language_pref', 'string', 'max' => 2],
             [['agent_auth_key'], 'string', 'max' => 32],
