@@ -19,7 +19,6 @@ use yii\helpers\Console;
  * @property string|null $created_at
  * @property string|null $updated_at
  *
- * @property Restaurant $restaurant
  * @property VendorEmailTemplate $template
  */
 class VendorCampaign extends \yii\db\ActiveRecord
@@ -46,7 +45,7 @@ class VendorCampaign extends \yii\db\ActiveRecord
             [['template_uuid'], 'required'],
             [['progress', 'status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['campaign_uuid', 'template_uuid', 'restaurant_uuid'], 'string', 'max' => 60],
+            [['campaign_uuid', 'template_uuid'], 'string', 'max' => 60],
             [['campaign_uuid'], 'unique'],
             [['template_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => VendorEmailTemplate::className(), 'targetAttribute' => ['template_uuid' => 'template_uuid']],
         ];
@@ -145,6 +144,7 @@ class VendorCampaign extends \yii\db\ActiveRecord
         }
 
         $this->status = self::STATUS_COMPLETED;
+
         if(!$this->save()) {
             throw new Exception(print_r($this->errors, true));
         }
