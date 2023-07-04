@@ -135,8 +135,8 @@ class OrderController extends Controller
 
                 $city = Yii::$app->request->getBodyParam("city");
 
-                if($city && isset($city->city_name)) {
-                    $order->city = Yii::$app->language == "ar" && $city->city_name_ar ? $city->city_name_ar:  $city->city_name;
+                if($city && isset($city['city_id'])) {
+                    $order->city = Yii::$app->language == "ar" && !empty($city['city_name_ar']) ? $city['city_name_ar']:  $city['city_name'];
                 } else {
                     $order->city = $city;
                 }
@@ -181,8 +181,6 @@ class OrderController extends Controller
 
         $order->order_instruction = Yii::$app->request->getBodyParam("order_instruction");
 
-        return $order->attributes();
-        
         if (!$order->save()) {
 
             $transaction->rollBack();
