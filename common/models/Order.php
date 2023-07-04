@@ -277,10 +277,10 @@ class Order extends \yii\db\ActiveRecord
                 return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
             }
             ],
-            [['postalcode', 'city', 'address_1', 'address_2'], 'required', 'when' => function ($model) {
+            /*[['postalcode', 'city', 'address_1', 'address_2'], 'required', 'when' => function ($model) {
                 return $model->shipping_country_id;
             }
-            ],
+            ],*/
             // [
             //     'subtotal', function ($attribute, $params, $validator) {
             //     if ($this->voucher && $this->voucher->minimum_order_amount !== 0 && $this->calculateOrderItemsTotalPrice() >= $this->voucher->minimum_order_amount)
