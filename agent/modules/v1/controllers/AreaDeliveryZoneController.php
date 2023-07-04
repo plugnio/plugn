@@ -2,6 +2,8 @@
 
 namespace agent\modules\v1\controllers;
 
+use common\models\City;
+use common\models\State;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
@@ -153,6 +155,104 @@ class AreaDeliveryZoneController extends BaseController
             Yii::$app->db->createCommand ()->batchInsert ('area_delivery_zone',
                 ['restaurant_uuid', 'delivery_zone_id', 'country_id', 'city_id', 'area_id'],
                 $arrDeliveryAreas
+            )->execute ();
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t ('agent', "Delivery areas updated successfully")
+        ];
+    }
+
+    /**
+     * save delivery zone cities
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionSaveCities()
+    {
+        $this->ownerCheck();
+
+        $states = Yii::$app->request->getBodyParam ("states", []);
+        $selectedCities = Yii::$app->request->getBodyParam ("selectedCities", []);
+
+        $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
+
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        $delivery_zone = $store->getDeliveryZones()
+            ->andWhere (['delivery_zone_id' => $delivery_zone_id])
+            ->one();
+
+        if (!$delivery_zone)
+            throw new NotFoundHttpException('The requested record does not exist.');
+
+        AreaDeliveryZone::deleteAll(['delivery_zone_id' => $delivery_zone_id]);
+
+        //list already added areas
+
+        $addedAreas = $store->getAreaDeliveryZones ()
+            ->andWhere (['delivery_zone_id' => $delivery_zone_id])
+            ->all ();
+
+        $addedCityIds = ArrayHelper::getColumn ($addedAreas, 'city_id');
+
+        //build city => state array
+
+        $arrStates = ArrayHelper::map(
+            City::findAll(['country_id' => $delivery_zone->country_id]),
+            'city_id',
+            'state_id'
+        );
+
+        //add new areas
+
+        $arrDeliveryAreas = [];
+
+            foreach ($selectedCities as $city) {
+
+                if((int) $city == 0) {
+                    continue;
+                }
+
+                //skip if already added
+                if (!in_array($city, $addedCityIds)) {
+                    $arrDeliveryAreas[] = [
+                        'restaurant_uuid' => $store->restaurant_uuid,
+                        'delivery_zone_id' => $delivery_zone_id,
+                        'country_id' => $delivery_zone->country_id,
+                        'state_id' => isset($arrStates[$city])? $arrStates[$city]: '',
+                        'city_id' => $city,
+                        // 'area_id' => $area['area_id']
+                    ];
+                }
+            }
+
+        if (sizeof ($arrDeliveryAreas) > 0) {
+            Yii::$app->db->createCommand ()->batchInsert ('area_delivery_zone',
+                ['restaurant_uuid', 'delivery_zone_id', 'country_id', 'state_id', 'city_id'],
+                $arrDeliveryAreas
+            )->execute ();
+        }
+
+        //state wise
+
+        $arrDeliveryStates = [];
+
+        foreach ($states as $state) {
+            $arrDeliveryStates[] = [
+                'restaurant_uuid' => $store->restaurant_uuid,
+                'delivery_zone_id' => $delivery_zone_id,
+                'country_id' => $delivery_zone->country_id,
+                'state_id' => $state,
+                // 'area_id' => $area['area_id']
+            ];
+        }
+
+        if (sizeof ($arrDeliveryStates) > 0) {
+            Yii::$app->db->createCommand ()->batchInsert ('area_delivery_zone',
+                ['restaurant_uuid', 'delivery_zone_id', 'country_id', 'state_id'],
+                $arrDeliveryStates
             )->execute ();
         }
 

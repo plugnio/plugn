@@ -60,6 +60,16 @@ class Country extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[States]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStates($modelClass = "\common\models\State")
+    {
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
+    }
+
+    /**
      * Gets query for [[Cities]].
      *
      * @return \yii\db\ActiveQuery
@@ -111,6 +121,17 @@ class Country extends \yii\db\ActiveRecord
             ->viaTable('country_payment_method', ['country_id' => 'country_id']);
     }
 
+    /**
+     * Gets query for [[Areas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
+    {
+        return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
+    }
+    
+    
     /**
      * Gets query for [[Restaurants]].
      *

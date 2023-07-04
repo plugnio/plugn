@@ -162,7 +162,15 @@ class StoreCest
         $I->sendPOST('v1/store/update-layout', [
             'default_language' => 'en',
             'store_layout' => Restaurant::STORE_LAYOUT_GRID_FULLWIDTH,
-            'phone_number_display' => 1
+            'phone_number_display' => 1,
+            'restaurantTheme' => [
+                'primary' => "#fff",
+                'secondary' => "#fff",
+                'tertiary' => "#fff",
+                'light' => "#fff",
+                'medium' => "#fff",
+                'dark' => "#fff",
+            ]
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
         $I->seeResponseContainsJson([

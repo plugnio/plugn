@@ -17,6 +17,7 @@ use Yii;
  * @property float|null $min_charge
  * @property float|null $delivery_zone_tax
  * @property string $time_unit
+ * @property boolean $deliver_whole_country
  * @property boolean $is_deleted
  *
  * @property AreaDeliveryZone[] $areaDeliveryZones
@@ -53,6 +54,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
             ['time_unit', 'string','min' => 3  , 'max' => 3],
             [['business_location_id', 'delivery_time', 'country_id', 'is_deleted'], 'integer'],
             [['delivery_zone_tax'], 'number', 'max' => 100],
+            [['deliver_whole_country'], 'boolean'],
             [['delivery_fee', 'min_charge'], 'number'],
             [['selectedAreas'], 'safe'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -75,6 +77,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
             'delivery_fee' => Yii::t('app', 'Delivery Fee'),
             'min_charge' => Yii::t('app', 'Min Charge'),
             'delivery_zone_tax' => Yii::t('app', 'Tax Override'),
+            'deliver_whole_country' => Yii::t('app', 'Deliver whole country'),
             'is_deleted' => Yii::t('app', 'Is Deleted?'),
         ];
     }
@@ -96,7 +99,6 @@ class DeliveryZone extends \yii\db\ActiveRecord
               break;
         }
     }
-
 
     /**
      * @inheritdoc
@@ -198,5 +200,4 @@ class DeliveryZone extends \yii\db\ActiveRecord
     public static function find() {
         return new query\DeliveryZoneQuery(get_called_class());
     }
-
 }

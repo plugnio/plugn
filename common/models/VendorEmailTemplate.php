@@ -38,7 +38,7 @@ class VendorEmailTemplate extends \yii\db\ActiveRecord
            // [['template_uuid'], 'required'],
             [['message'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['template_uuid', 'restaurant_uuid'], 'string', 'max' => 60],
+            [['template_uuid'], 'string', 'max' => 60],
             [['subject'], 'string', 'max' => 255],
             [['template_uuid'], 'unique'],
         ];
@@ -85,16 +85,6 @@ class VendorEmailTemplate extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
-    }
-
-    /**
-     * Gets query for [[CustomerCampaigns]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCustomerCampaigns($modelClass = "\common\models\CustomerCampaign")
-    {
-        return $this->hasMany($modelClass::className(), ['template_uuid' => 'template_uuid']);
     }
 
     /**

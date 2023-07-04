@@ -54,6 +54,32 @@ return [
             'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
+                [ // AuthController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/auth',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET login' => 'login',
+                        'GET locate' => 'locate',
+                        'POST signup' => 'signup',
+                        'PATCH update-password' => 'update-password',
+                        'POST request-reset-password' => 'request-reset-password',
+                        'POST is-email-verified' => 'is-email-verified',
+                        'POST update-email' => 'update-email',
+                        'POST resend-verification-email' => 'resend-verification-email',
+                        'POST verify-email' => 'verify-email',
+                        // OPTIONS VERBS
+                        'OPTIONS login' => 'options',
+                        'OPTIONS locate' => 'options',
+                        'OPTIONS update-password' => 'options',
+                        'OPTIONS request-reset-password' => 'options',
+                        'OPTIONS signup' => 'options',
+                        'OPTIONS is-email-verified' => 'options',
+                        'OPTIONS update-email' => 'options',
+                        'OPTIONS resend-verification-email' => 'options',
+                        'OPTIONS verify-email' => 'options',
+                    ]
+                ],
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
@@ -104,6 +130,8 @@ return [
                     'controller' => 'v2/delivery-zone',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET cities/<state_id>' => 'cities',
+                        'GET states/<country_id>' => 'states',
                         'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
                         'GET list-pickup-locations/<restaurant_uuid>' => 'list-pickup-locations',
                         'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
@@ -112,6 +140,8 @@ return [
                         // 'GET <restaurant_uuid>' => 'delivery-zone',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS cities' => 'options',
+                        'OPTIONS states' => 'options',
                         'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
                         'OPTIONS list-pickup-locations/<restaurant_uuid>' => 'options',
                         'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',

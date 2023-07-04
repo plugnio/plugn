@@ -90,6 +90,16 @@ class CustomerEmailTemplate extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[CustomerCampaigns]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomerCampaigns($modelClass = "\common\models\CustomerCampaign")
+    {
+        return $this->hasMany($modelClass::className(), ['template_uuid' => 'template_uuid']);
+    }
+
+    /**
      * Gets query for [[Restaurant]].
      *
      * @return \yii\db\ActiveQuery

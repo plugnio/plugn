@@ -48,6 +48,7 @@ class OrderItemCest
 
     }
 
+    /* should not let update single item
     public function tryToUpdate(FunctionalTester $I) {
         $model = $this->store->getOrderItems()->one();
 
@@ -72,5 +73,5 @@ class OrderItemCest
             'order_item_id' => $model->order_item_id
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
-    }
+    }*/
 }

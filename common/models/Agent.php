@@ -15,6 +15,8 @@ use common\models\AgentToken;
  * @property int $agent_id
  * @property string $agent_name
  * @property string $agent_email
+ * @property string $agent_number
+ * @property string $agent_phone_country_code
  * @property string $agent_auth_key
  * @property string $agent_password_hash
  * @property string|null $agent_password_reset_token
@@ -75,6 +77,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_AGENT]],
             [['agent_status', 'email_notification', 'reminder_email', 'receive_weekly_stats'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],
+            [['agent_phone_country_code', 'agent_number'], 'number'],
+            [['agent_number'], 'unique', 'comboNotUnique' => 'Phone no. already exist.',  'targetAttribute' => ['agent_phone_country_code', 'agent_number', 'deleted']],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
             ['agent_language_pref', 'string', 'max' => 2],
             [['agent_auth_key'], 'string', 'max' => 32],

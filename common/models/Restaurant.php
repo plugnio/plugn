@@ -3389,7 +3389,8 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getCustomers($modelClass = "\common\models\Customer")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany ($modelClass::className (), ['customer_id' => 'customer_id'])
+            ->via('orders');
     }
 
     /**

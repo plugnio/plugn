@@ -5,6 +5,8 @@ namespace common\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use yii\web\IdentityInterface;
+
 /**
  * This is the model class for table "customer".
  *
@@ -24,8 +26,22 @@ use yii\db\Expression;
  * @property CustomerVoucher[] $customerVouchers
  * @property Restaurant $restaurant
  */
-class Customer extends \yii\db\ActiveRecord {
+class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
 
+    const EMAIL_VERIFIED = 1;
+    const EMAIL_NOT_VERIFIED = 0;
+
+    const SCENARIO_CHANGE_PASSWORD = 'change-password';
+    const SCENARIO_CREATE_NEW_AGENT = 'create';
+    const SCENARIO_UPDATE_EMAIL = 'update-email';
+    const SCENARIO_VERIFY_EMAIL = 'verify-email';
+    const SCENARIO_DELETE = 'delete';
+
+    /**
+     * Field for temporary password. If set, it will overwrite the old password on save
+     * @var string
+     */
+    public $tempPassword;
     //for report
     public $totalSpent;
     public $totalOrder;
@@ -54,6 +70,24 @@ class Customer extends \yii\db\ActiveRecord {
             [['customer_name', 'customer_email'], 'string', 'max' => 255],
             [['civil_id', 'section','class'], 'string', 'max' => 255], //Temp fields
         ];
+    }
+
+    /**
+     * @return array|array[]
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios ();
+
+        $scenarios['updateLanguagePref'] = ['customer_language_pref'];
+
+        $scenarios['update-email'] = ['customer_email', 'customer_new_email'];
+
+        $scenarios['verify-email'] = ['customer_email', 'customer_new_email', 'customer_email_verification', 'customer_auth_key'];
+
+        $scenarios['SCENARIO_DELETE'] = ['deleted'];
+
+        return $scenarios;
     }
 
     /**
@@ -273,6 +307,333 @@ class Customer extends \yii\db\ActiveRecord {
     public function getCurrency($modelClass = "\common\models\Currency")
     {
         return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+    }
+
+
+    /**
+     * Finds user by username
+     *
+     * @param string $email
+     * @return static|null
+     */
+    public static function findByEmail($email)
+    {
+        return static::findOne (['customer_email' => $email, 'deleted' => 0]);
+    }
+
+    /**
+     * Finds user by password reset token
+     *
+     * @param string $token password reset token
+     * @return static|null
+     */
+    public static function findByPasswordResetToken($token)
+    {
+        if (!static::isPasswordResetTokenValid ($token)) {
+            return null;
+        }
+
+        return static::findOne ([
+            'customer_password_reset_token' => $token,
+            'deleted' => 0,
+        ]);
+    }
+
+    /**
+     * Finds out if password reset token is valid
+     *
+     * @param string $token password reset token
+     * @return bool
+     */
+    public static function isPasswordResetTokenValid($token)
+    {
+        if (empty($token)) {
+            return false;
+        }
+
+        $timestamp = (int)substr ($token, strrpos ($token, '_') + 1);
+        $expire = Yii::$app->params['user.passwordResetTokenExpire'];
+        return $timestamp + $expire >= time ();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId()
+    {
+        return $this->getPrimaryKey ();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthKey()
+    {
+        return $this->customer_auth_key;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateAuthKey($authKey)
+    {
+        return $this->getAuthKey () === $authKey;
+    }
+
+    /**
+     * Validates password
+     *
+     * @param string $password password to validate
+     * @return bool if password provided is valid for current user
+     */
+    public function validatePassword($password)
+    {
+        return Yii::$app->security->validatePassword ($password, $this->customer_password_hash);
+    }
+
+    /**
+     * Generates password hash from password and sets it to the model
+     *
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->customer_password_hash = Yii::$app->security->generatePasswordHash ($password);
+    }
+
+    /**
+     * Generates "remember me" authentication key
+     */
+    public function generateAuthKey()
+    {
+        $this->customer_auth_key = Yii::$app->security->generateRandomString ();
+    }
+
+    /**
+     * Generates new password reset token
+     */
+    public function generatePasswordResetToken()
+    {
+        $this->customer_password_reset_token = Yii::$app->security->generateRandomString () . '_' . time ();
+    }
+
+    /**
+     * Removes password reset token
+     */
+    public function removePasswordResetToken()
+    {
+        $this->customer_password_reset_token = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function findIdentity($id)
+    {
+        return static::findOne ([
+            'customer_id' => $id,
+            'customer_email_verification' => true,
+            'deleted' => 0
+        ]);
+    }
+
+    /**
+     * Create an Access Token Record for this customer
+     * if the customer already has one, it will return it instead
+     * @return \common\models\CustomerToken
+     */
+    public function getAccessToken()
+    {
+        // Return existing inactive token if found
+        $token = \api\models\CustomerToken::findOne ([
+            'customer_id' => $this->customer_id,
+            'token_status' => CustomerToken::STATUS_ACTIVE
+        ]);
+
+        if ($token) {
+            return $token;
+        }
+
+        // Create new inactive token
+
+        $token = new CustomerToken();
+        $token->customer_id = $this->customer_id;
+        $token->token_value = CustomerToken::generateUniqueTokenString ();
+        $token->token_status = CustomerToken::STATUS_ACTIVE;
+        $token->save ();
+
+        return $token;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function findIdentityByUnVerifiedTokenToken($token, $modelClass = "\api\models\CustomerToken") {
+        $token = $modelClass::find()
+            ->andWhere(['token_value' => $token])
+            ->with('customer')
+            ->one();
+
+        //update last used datetime
+
+        $token->token_last_used_datetime = new Expression('NOW()');
+        $token->save ();
+
+        if ($token && $token->customer) {//&& !$token->customer->deleted
+            return $token->customer;
+        }
+
+        //invalid token
+        $token->delete ();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function findIdentityByAccessToken($token, $type = null, $modelClass = "\api\models\CustomerToken")
+    {
+        $token = $modelClass::find ()->where ([
+            'token_value' => $token,
+            'token_status' => $modelClass::STATUS_ACTIVE
+        ])
+            ->with ('customer')
+            ->one ();
+
+        if (!$token)
+            return false;
+
+        //update last used datetime
+
+        $token->token_last_used_datetime = new Expression('NOW()');
+        $token->save ();
+
+        //should not able to login, if email not verified but have valid token
+
+        if ($token->customer) {
+            return $token->customer;
+        }
+
+        //invalid token
+        $token->delete ();
+    }
+
+    /**
+     * Whenever a user changes his password using any method (password reset email / profile page),
+     * we need to send out the following email to confirm that his password was set
+     */
+    public function sendPasswordUpdatedEmail()
+    {
+        \Yii::$app->mailer->htmlLayout = "layouts/text";
+
+        \Yii::$app->mailer->compose ([
+            'html' => 'customer/password-updated-html',
+            'text' => 'customer/password-updated-text',
+        ], [
+            'customer' => $this
+        ])
+            ->setFrom ([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setTo ($this->customer_email)
+            ->setSubject (Yii::t ('customer', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
+            ->send ();
+    }
+
+    /**
+     * Verifies the customer email
+     */
+    public static function verifyEmail($email, $code) {
+
+        $model = self::find()
+            ->andWhere([
+                'OR',
+                ['customer_new_email' => $email],
+                ['customer_email' => $email]
+            ])
+            ->one();
+
+        if(!$model) {
+            return [
+                'success' => false,
+                'message' =>Yii::t('api','This email verification link is no longer valid, please login to send a new one')
+            ];
+        }
+
+        if ($model->customer_auth_key && $code && $model->customer_auth_key == $code) { //to cope with sql case insensitivity
+
+            $model->setScenario(self::SCENARIO_VERIFY_EMAIL);
+
+            //If not verified
+            if ($model->customer_email_verification == Customer::EMAIL_NOT_VERIFIED) {
+                //Verify this candidates email
+                $model->customer_email_verification = Customer::EMAIL_VERIFIED;
+            }
+
+            // new email address
+
+            if (!empty($model->customer_new_email)) {
+                $model->customer_email = $model->customer_new_email;
+                $model->customer_new_email = null;
+            }
+
+            $model->customer_auth_key = ''; //remove auth key
+
+            if($model->save()) {
+                return [
+                    'success' => true,
+                    'data' => $model
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => Yii::t('api','This email already registered!')
+            ];
+
+        } else {
+            return [
+                'success' => false,
+                'message' => Yii::t('api','This email verification link is no longer valid, please login to send a new one')
+            ];
+        }
+    }
+
+    /**
+     * Sends an email requesting a user to verify his email address
+     * @return boolean whether the email was sent
+     */
+    public function sendVerificationEmail() {
+
+        $this->generateAuthKey();
+
+        //Update customer's last email limit timestamp
+        //$this->customer_limit_email = new Expression('NOW()');
+        //$this->save(false);
+
+        //to fix: password reset email on signup
+
+        self::updateAll([
+            'customer_auth_key' => $this->customer_auth_key,
+            'customer_limit_email' => new Expression('NOW()')
+        ], [
+            "customer_id" => $this->customer_id
+        ]);
+
+        if ($this->customer_new_email) {
+            $email = $this->customer_new_email;
+        } else {
+            $email = $this->customer_email;
+        }
+
+        return Yii::$app->mailer->compose([
+                'html' => 'customer/verify-email-html',
+                'text' => 'customer/verify-email-text',
+            ], [
+                'customer' => $this,
+                'email' => $email
+            ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setTo($email)
+            ->setSubject('Please confirm your email address')
+            ->send();
     }
 
     public static function find() {

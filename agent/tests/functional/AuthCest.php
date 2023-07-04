@@ -147,10 +147,12 @@ class AuthCest {
      * @param FunctionalTester $I
      */
     public function tryToCheckIfEmailVerified(FunctionalTester $I) {
+        
         $agent = Agent::findOne([
             'agent_email_verification'=>0,
             'agent_status' => Agent::STATUS_ACTIVE
         ]);
+
         $I->wantTo('Validate auth > is-email-verified api');
         $I->sendPOST('v1/auth/is-email-verified', [
             'email' => $agent->agent_email,
@@ -183,9 +185,15 @@ class AuthCest {
      */
     public function tryToGetVerificationEmail(FunctionalTester $I) {
 
+
+        $agent = Agent::findOne([
+            'agent_email_verification'=>0,
+            'agent_status' => Agent::STATUS_ACTIVE
+        ]);
+
         $I->wantTo('Validate auth > resend-verification-email api');
         $I->sendPOST('v1/auth/resend-verification-email', [
-            'email' => $this->agent->agent_email
+            'email' => $agent->agent_email
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
 
@@ -205,14 +213,20 @@ class AuthCest {
      * @param FunctionalTester $I
      */
     public function tryToVerifyEmail(FunctionalTester $I) {
+
+        $agent = Agent::findOne([
+            'agent_email_verification'=>0,
+            'agent_status' => Agent::STATUS_ACTIVE
+        ]);
+
         $I->wantTo('Validate auth > verify-email api');
         $I->sendPOST('v1/auth/verify-email', [
-            'email' => $this->agent->agent_email,
-            'code' => $this->agent->agent_auth_key
+            'email' => $agent->agent_email,
+            'code' => $agent->agent_auth_key
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
         $I->seeResponseContainsJson([
-            'agent_email' => $this->agent->agent_email
+            'agent_email' => $agent->agent_email
         ]);
     }
 }

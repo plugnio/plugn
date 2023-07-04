@@ -32,11 +32,11 @@ class StoreController extends BaseController
     {
         parent::beforeAction ($action);
 
-        if($action->id == 'options') {
+        if(in_array($action->id, ['options', 'create'])) {
             return true;
         }
 
-        if(!Yii::$app->accountManager->isOwner() && !in_array ($action->id, ['detail'])) {
+        if(!in_array($action->id, ['detail']) && !Yii::$app->accountManager->isOwner()) {
 
             throw new \yii\web\BadRequestHttpException(
                 Yii::t('agent', 'You are not allowed to manage store. Please contact with store owner')
@@ -180,12 +180,20 @@ class StoreController extends BaseController
         $store->enable_gift_message = Yii::$app->request->getBodyParam('enable_gift_message');
         $store->accept_order_247 = Yii::$app->request->getBodyParam('accept_order_247');
         $store->is_public = Yii::$app->request->getBodyParam('is_public');
-
+        $store->restaurant_domain = Yii::$app->request->getBodyParam ('restaurant_domain');
         $store->owner_first_name = Yii::$app->request->getBodyParam('owner_first_name');
         $store->owner_last_name = Yii::$app->request->getBodyParam('owner_last_name');
         $store->owner_email = Yii::$app->request->getBodyParam('owner_email');
         $store->owner_number = Yii::$app->request->getBodyParam('owner_number');
         $store->owner_phone_country_code = Yii::$app->request->getBodyParam('owner_phone_country_code');
+
+        if(!$store->restaurant_email) {
+            $store->restaurant_email = Yii::$app->user->identity->agent_email;
+        }
+
+        if(!$store->name_ar) {
+            $store->name_ar = $store->name;
+        }
 
         $currencyCode = Yii::$app->request->getBodyParam('currency');
 
