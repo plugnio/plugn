@@ -133,10 +133,17 @@ class OrderController extends Controller
         //if the order mode = 1 => Delivery
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
 
+                $city = Yii::$app->request->getBodyParam("city");
+
+                if($city && isset($city->city_name)) {
+                    $order->city = Yii::$app->language == "ar" && $city->city_name_ar ? $city->city_name_ar:  $city->city_name;
+                } else {
+                    $order->city = $city;
+                }
+
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
                 $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
-                $order->city = Yii::$app->request->getBodyParam("city");
 
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
                 $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
