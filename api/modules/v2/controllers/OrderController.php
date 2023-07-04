@@ -181,8 +181,12 @@ class OrderController extends Controller
 
         $order->order_instruction = Yii::$app->request->getBodyParam("order_instruction");
 
+        return $order->attributes();
+        
         if (!$order->save()) {
+
             $transaction->rollBack();
+
             return [
                 'operation' => 'error',
                 'message' => $order->getErrors(),
