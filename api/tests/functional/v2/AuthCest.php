@@ -10,6 +10,7 @@ use common\fixtures\CustomerFixture;
 use common\fixtures\CustomerTokenFixture;
 use common\fixtures\CountryFixture;
 use common\fixtures\CurrencyFixture;
+use common\fixtures\RestaurantFixture;
 
 class AuthCest
 {
@@ -21,6 +22,7 @@ class AuthCest
             'country' => CountryFixture::className(),
             'currencies' => CurrencyFixture::className(),
             'customers' => CustomerFixture::className(),
+            'restaurants' => RestaurantFixture::className(),
             'customerToken' => CustomerTokenFixture::className()
         ];
     }

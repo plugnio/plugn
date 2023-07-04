@@ -695,7 +695,7 @@ return [
         'agent_password_hash' => '$2y$13$VzpbqvPt/AnIi9yd9Sv2UOnpJQXOVwqXQSkrbSi5i9M8EERxY4VBm',
         'agent_password_reset_token' => null,
         'agent_status' => 10,
-        'email_notification' => 1, 'agent_email_verification' => 1,
+        'email_notification' => 1, 'agent_email_verification' => 0,
         'reminder_email' => 1,
         'agent_created_at' => '2017-12-12 15:01:35',
         'agent_updated_at' => '2006-03-05 10:29:28',

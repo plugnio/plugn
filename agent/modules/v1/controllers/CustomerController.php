@@ -226,11 +226,11 @@ class CustomerController extends BaseController
     {
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $model = Customer::findOne([
-            'customer_id' => $customer_id,
-            //todo: what if customer register from other store?
-            'restaurant_uuid' => $store->restaurant_uuid
-        ]);
+        $model = $store->getCustomers()
+            ->andWhere([
+                'customer_id' => $customer_id,
+            ])
+            ->one();
 
         if ($model !== null) {
             return $model;

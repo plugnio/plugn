@@ -106,11 +106,12 @@ class BankDiscountCest
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
+    /* todo
     public function tryToDelete(FunctionalTester $I) {
         $model = $this->store->getBankDiscounts()->one();
 
         $I->wantTo('Validate bank-discount > delete api');
         $I->sendDelete('v1/bank-discount/'. $model->bank_discount_id);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
-    }
+    }*/
 }

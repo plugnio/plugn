@@ -10,6 +10,7 @@ use common\fixtures\AgentTokenFixture;
 use common\fixtures\BankFixture;
 use common\fixtures\CustomerFixture;
 use common\fixtures\RestaurantFixture;
+use common\fixtures\OrderFixture;
 
 class CustomerCest
 {
@@ -23,7 +24,8 @@ class CustomerCest
             'agent_assignments' => AgentAssignmentFixture::className(),
             'banks' => BankFixture::className(),
             'customers' => CustomerFixture::className(),
-            //'restaurants' => RestaurantFixture::className(),
+            'restaurants' => RestaurantFixture::className(),
+            'orders' => OrderFixture::className(),
             'agentToken' => AgentTokenFixture::className()
         ];
     }
@@ -62,10 +64,12 @@ class CustomerCest
         $I->sendGET('v1/customer/detail', [
             'customer_id' => $customer->customer_id
         ]);
+
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
     public function tryToListOrders(FunctionalTester $I) {
+
         $customer = $this->store->getCustomers()->one();
 
         $I->wantTo('Validate customer > list orders api');
