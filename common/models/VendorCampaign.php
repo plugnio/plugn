@@ -116,11 +116,13 @@ class VendorCampaign extends \yii\db\ActiveRecord
     public function process() {
 
         $this->status = self::STATUS_IN_PROGRESS;
+
         if(!$this->save()) {
             throw new Exception(print_r($this->errors, true));
         }
 
-        $query = Restaurant::find();
+        $query = Restaurant::find()
+            ->andWhere(['=', 'restaurant.is_deleted', 0]);
 
         $total = $query->count();
 
@@ -129,12 +131,17 @@ class VendorCampaign extends \yii\db\ActiveRecord
         foreach ($query->batch(100) as $stores) {
 
             foreach ($stores as $store) {
-                $store->sendVendorEmailTemplate($this);
+                try {
+                    $store->sendVendorEmailTemplate($this);
+                } catch (\Exception $e) {
+                    Yii::error($e, 'campaign');
+                    continue;
+                }
             }
 
-            $processed += 100;
+            $processed += sizeof($stores);
 
-            $this->progress += ceil($processed * 100 / $total);
+            $this->progress = ceil($processed * 100 / $total);
 
             if(!$this->save()) {
                 throw new Exception(print_r($this->errors, true));

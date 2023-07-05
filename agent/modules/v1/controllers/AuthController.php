@@ -343,7 +343,7 @@ class AuthController extends Controller {
                 $rbc->utm_uuid = $utm_id;
 
                 if (!$rbc->save()) {
-                    $rbc->rollBack();
+                    $transaction->rollBack();
                     return [
                         "operation" => "error",
                         "message" => $rbc->errors
