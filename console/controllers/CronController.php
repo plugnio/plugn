@@ -156,7 +156,6 @@ class CronController extends \yii\console\Controller
         }
     }
 
-
     public function actionRetentionEmailsWhoPassedFiveDaysAndNoSales()
     {
         //todo: why processing all stores, when need only with no orders
@@ -193,7 +192,6 @@ class CronController extends \yii\console\Controller
             $store->save(false);
         }
     }
-
 
     public function actionDowngradedStoreSubscription()
     {
@@ -279,13 +277,6 @@ class CronController extends \yii\console\Controller
 
         $this->stdout("Email sent to all agents of employer that have applicants will expire soon \n", Console::FG_RED, Console::NORMAL);
         return self::EXIT_CODE_NORMAL;
-
-    }
-
-    public function actionTest() {
-        //$tap = PaymentGatewayQueue::find()->offset(1)->one();
-
-        //$tap->enableGateways();
 
     }
 
@@ -737,15 +728,7 @@ class CronController extends \yii\console\Controller
         return self::EXIT_CODE_NORMAL;
     }
 
-        /**
-     * Method called by cron once a day to update currency
-     */
-    public function actionDaily()
-    {
-        // GET UPDATED CURRENCY DATA FROM API
-        $response = Currency::getDataFromApi();
-
-        $this->stdout(print_r($response, true) . " \n", Console::FG_RED, Console::BOLD);
+    public function actionMinute() {
 
         $campaigns = VendorCampaign::find()
             ->andWhere(['status' => VendorCampaign::STATUS_READY])
@@ -756,6 +739,17 @@ class CronController extends \yii\console\Controller
         }
 
         $this->stdout( sizeof($campaigns) . " Campaign processed \n", Console::FG_RED, Console::BOLD);
+    }
+
+    /**
+     * Method called by cron once a day to update currency
+     */
+    public function actionDaily()
+    {
+        // GET UPDATED CURRENCY DATA FROM API
+        $response = Currency::getDataFromApi();
+
+        $this->stdout(print_r($response, true) . " \n", Console::FG_RED, Console::BOLD);
 
         //remind failed build
 
@@ -793,29 +787,6 @@ class CronController extends \yii\console\Controller
             foreach ($stores as $store) {
                 $store->deleteSite();
             }
-        }
-    }
-
-    /**
-     * https://docs.github.com/en/rest/branches/branches#merge-a-branch
-     */
-    public function actionUpgrade()
-    {
-        $commitMessage = "testing merge";
-
-        //foreach ()
-
-        $head = "master";
-
-        $base = "develop";
-
-        $response = Yii::$app->githubComponent->mergeABranch($commitMessage, $base, $head);
-
-        if($response->statusCode == 201) {
-            echo 'merged';
-        }
-        else if($response->statusCode == 409) {
-            echo 'conflict';
         }
     }
 }

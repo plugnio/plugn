@@ -116,6 +116,7 @@ class VendorCampaign extends \yii\db\ActiveRecord
     public function process() {
 
         $this->status = self::STATUS_IN_PROGRESS;
+
         if(!$this->save()) {
             throw new Exception(print_r($this->errors, true));
         }

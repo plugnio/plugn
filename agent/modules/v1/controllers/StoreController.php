@@ -188,7 +188,11 @@ class StoreController extends BaseController
         $store->owner_phone_country_code = Yii::$app->request->getBodyParam('owner_phone_country_code');
 
         if(strpos($store->restaurant_domain, ".plugn.store") == -1) {
-            $store->restaurant_domain .= ".plugn.store";
+            $store->restaurant_domain = $store->restaurant_domain . ".plugn.store";
+        }
+
+        if(strpos($store->restaurant_domain, "http") == -1) {
+            $store->restaurant_domain = "https://" . $store->restaurant_domain;
         }
 
         if(!$store->restaurant_email) {
