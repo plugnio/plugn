@@ -7,6 +7,7 @@ use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
 use common\components\TapPayments;
 use common\models\Queue;
+use common\models\RestaurantByCampaign;
 use common\models\RestaurantDomainRequest;
 use common\models\Setting;
 use Yii;
@@ -163,6 +164,8 @@ class StoreController extends BaseController
     {
         $store = new Restaurant();
 
+        $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
+
         $store->is_sandbox = Yii::$app->request->getBodyParam('is_sandbox');
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
@@ -213,6 +216,20 @@ class StoreController extends BaseController
 
         if (!$store->save()) {
             return self::message("error",$store->getErrors());
+        }
+
+        if($utm_id) {
+            $rbc = new RestaurantByCampaign();
+            $rbc->restaurant_uuid = $store->restaurant_uuid;
+            $rbc->utm_uuid = $utm_id;
+
+            if (!$rbc->save()) {
+
+                return [
+                    "operation" => "error",
+                    "message" => $rbc->errors
+                ];
+            }
         }
 
         //assign agent to store
