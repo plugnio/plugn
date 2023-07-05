@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use agent\models\AgentAssignment;
 use backend\models\Admin;
 use backend\models\AgentAssignmentSearch;
 use Yii;
@@ -144,6 +145,22 @@ class AgentController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Deletes an existing Agent model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDeleteAssignments($id)
+    {
+        $agent = $this->findModel($id);
+
+        AgentAssignment::deleteAll(['agent_id' => $agent->agent_id]);
+
+        return $this->redirect(['index']);
     }
 
     /**

@@ -26,6 +26,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+
+
+        <?= Html::a('Remove Store Assignments', ['delete-assignments', 'id' => $model->agent_id], [
+            'class' => 'btn btn-danger btn-delete',
+            'data' => [
+                'confirm' => 'Are you sure you want to remove agent from all stores?',
+                'method' => 'post',
+            ],
+        ]) ?>
+
+        
     </p>
 
     <?= DetailView::widget([
