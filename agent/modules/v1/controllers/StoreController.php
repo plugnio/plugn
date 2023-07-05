@@ -166,6 +166,9 @@ class StoreController extends BaseController
 
         $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
 
+        $store->version = Yii::$app->params['storeVersion'];
+        $store->setScenario(Restaurant::SCENARIO_CREATE_STORE_BY_AGENT);
+
         $store->is_sandbox = Yii::$app->request->getBodyParam('is_sandbox');
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');

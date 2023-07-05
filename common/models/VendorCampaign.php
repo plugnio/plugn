@@ -121,7 +121,8 @@ class VendorCampaign extends \yii\db\ActiveRecord
             throw new Exception(print_r($this->errors, true));
         }
 
-        $query = Restaurant::find();
+        $query = Restaurant::find()
+            ->andWhere(['=', 'restaurant.is_deleted', 0]);
 
         $total = $query->count();
 
