@@ -55,6 +55,14 @@ $this->registerJs($js);
     </div>
     <?php } ?>
 
+    <?php if (!$model->site_id) { ?>
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fa fa-ban"></i> Warning!</h5>
+        Not uploaded to server / website not published!
+    </div>
+    <?php } ?>
+
     <p>
 
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
@@ -68,6 +76,19 @@ $this->registerJs($js);
             ],
         ])
         ?>
+
+        <?php if (!$model->site_id) { ?>
+            <?=
+            Html::a('Publish', ['publish', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-primary',
+                'data' => [
+                    'confirm' => 'Are you sure you want to publish store?',
+                    'method' => 'post',
+                ],
+            ])
+            ?>
+        <?php } ?>
+
         <br/>
         <br/>
 
@@ -85,7 +106,7 @@ $this->registerJs($js);
         <li id="fees"><a href="#">Our Fees</a></li>
         <li id="theme"><a href="#">Theme color</a></li>
         <li id="seo"><a href="#">SEO</a></li>
-        <li id="netlify"><a href="#">Netlify</a></li>
+        <li id="netlify"><a href="#">Website Hosting/ Netlify</a></li>
         <li id="domain" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['restaurant-payment-method/index', 'uuid' => $model->restaurant_uuid]) ?>">Payment Methods</a></li>
         <li id="agents" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['agent-assignment/index', 'AgentAssignmentSearch[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Agents/ Vendors</a></li>
         <li id="invoices" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['restaurant-invoice/index', 'RestaurantInvoice[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Invoices</a></li>
@@ -243,6 +264,7 @@ $this->registerJs($js);
             ])
             ?>
         <?php } ?>
+
         <br/>
         <br/>
 
