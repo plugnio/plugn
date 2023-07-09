@@ -275,6 +275,9 @@ class Restaurant extends \yii\db\ActiveRecord
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
             [['restaurant_domain'], 'string', 'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+
+            ['restaurant_domain', 'validateDomain'],
+
             [['name', 'name_ar'], 'string', 'min' => 3],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
@@ -690,6 +693,26 @@ class Restaurant extends \yii\db\ActiveRecord
               $this->addError($attribute, $err->getMessage());
               return false;
             }
+    }
+
+    public function validateDomain($attribute, $params, $validator) {
+
+        $count = $this->getRestaurantDomainRequests()->count();
+
+        if($count > 3) {
+            Yii::error("Store #". $this->restaurant_uuid . " having more than 3 domain assigned to store");
+            //$this->addError($attribute, 'You can not assign more than 3 domain to site');
+        }
+
+        $restaurantDomain = $this->getRestaurantDomainRequests()
+            ->one();
+
+        if ($restaurantDomain && date("Y-m-d", strtotime($restaurantDomain->created_at)) == date("Y-m-d")) {
+            $this->addError($attribute, 'You can not update domain more than twice in single day');
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -1735,6 +1758,54 @@ class Restaurant extends \yii\db\ActiveRecord
             $currecy->restaurant_uuid = $this->restaurant_uuid;
             $currecy->currency_id = $this->currency_id;
             $currecy->save();
+        }
+
+        if(!$insert && isset($changedAttributes["restaurant_domain"])) {
+
+            $old_domain = $changedAttributes["restaurant_domain"];
+            //$this->getOldAttribute("restaurant_domain");
+
+            //save old/original domain detail
+
+            $isNotOriginalDomain = $this->getRestaurantDomainRequests()
+                ->exists();
+
+            if(!empty($old_domain) && !$isNotOriginalDomain)
+            {
+                $model = new RestaurantDomainRequest();
+                $model->restaurant_uuid = $this->restaurant_uuid;
+                $model->created_at = $this->restaurant_created_at;
+                $model->domain = $old_domain;
+                $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
+                $model->save(false);
+            }
+
+            //update in netlify
+
+            if($this->site_id) {
+
+                $domain = str_replace([
+                    'http://',
+                    'https://',
+                    'www.',
+                    'www2.',
+                ], ['', '', '', ''], $this->restaurant_domain);
+
+                //call api
+
+                Yii::$app->netlifyComponent->updateSite($this->site_id, [
+                    'domain_aliases' => $domain,
+                    'ssl' => true,
+                    'force_ssl' => true
+                ]);
+            }
+
+            /*$model = new RestaurantDomainRequest();
+            $model->restaurant_uuid = $this->restaurant_uuid;
+            $model->created_at = date("Y-m-d");
+            $model->domain = $this->restaurant_domain;
+            $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
+            $model->save(false);*/
         }
     }
 
