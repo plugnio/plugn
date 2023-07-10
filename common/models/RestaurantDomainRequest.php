@@ -99,9 +99,20 @@ class RestaurantDomainRequest extends \yii\db\ActiveRecord
             ],*/
             [
                 'class' => TimestampBehavior::className (),
-                'createdAtAttribute' => 'created_at',
+                'createdAtAttribute' => null,
                 'updatedAtAttribute' => 'updated_at',
                 'value' => new Expression('NOW()'),
+            ],
+            [
+                'class' => TimestampBehavior::className (),
+                'createdAtAttribute' => 'created_at',
+                'updatedAtAttribute' => null,
+                'value' => function() {
+                    if($this->created_at)
+                        return $this->created_at;
+
+                    return new Expression('NOW()');
+                },
             ],
         ];
     }

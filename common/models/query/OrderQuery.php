@@ -90,6 +90,26 @@ class OrderQuery extends \yii\db\ActiveQuery
     }
 
     /**
+     * @param $payment_method_id
+     * @return OrderQuery
+     */
+    public function filterByPaymentMethod($payment_method_id) {
+        return $this->andWhere (['payment_method_id' => $payment_method_id]);
+    }
+
+    /**
+     * filter by store
+     * @param $storeUuid
+     * @return $this
+     */
+    public function filterByStore($storeUuid) {
+        if($storeUuid)
+            $this->andWhere (['order.restaurant_uuid' => $storeUuid]);
+
+        return $this;
+    }
+
+    /**
      * Active records only
      */
     public function activeOrders($storeUuid = null)

@@ -278,39 +278,6 @@ class StoreController extends BaseController
             return self::message("error",$store->getErrors());
         }
 
-        //save old/original domain detail
-
-        $isNotOriginalDomain = $store->getRestaurantDomainRequests()->exists();
-
-        if(!$isNotOriginalDomain)
-        {
-            $model = new RestaurantDomainRequest();
-            $model->restaurant_uuid = $store->restaurant_uuid;
-            $model->created_at = $store->restaurant_created_at;
-            $model->domain = $old_domain;
-            $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
-            $model->save(false);
-        }
-
-        //update in netlify
-
-        //get domain from url
-
-        $domain = str_replace([
-            'http://',
-            'https://',
-            'www.',
-            'www2.',
-        ], ['', '', '', ''], $store->restaurant_domain);
-
-        //call api
-
-        Yii::$app->netlifyComponent->updateSite($store->site_id, [
-            'domain_aliases' => $domain,
-            'ssl' => true,
-            'force_ssl' => true
-        ]);
-
         //todo: response validation
 
         if($purchase) {//strpos($domain, '.plugn') > -1

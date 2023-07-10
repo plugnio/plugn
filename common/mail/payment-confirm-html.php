@@ -440,7 +440,8 @@ use common\models\BankDiscount;
                                                                             </table>
                                                                         <?php } ?>
                                                                     </div>
-                                                                    <!--[if mso | IE]></td><td class="" style="vertical-align:top;width:294px;" ><![endif]-->
+                                                                    <!--[if mso | IE]></td>
+                                                                    <td class="" style="vertical-align:top;width:294px;" ><![endif]-->
                                                                     <div class="mj-column-per-50 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
                                                                         <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                                                                             <tr>
@@ -455,9 +456,10 @@ use common\models\BankDiscount;
                                                                             </tr>
                                                                             <tr>
                                                                                 <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">
-                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">Paid by: <?= $order->payment_method_name ?></div>
+                                                                                    <div style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:15px;line-height:24px;text-align:left;color:#828585;">Payment mode: <?= $order->payment_method_name ?></div>
                                                                                 </td>
                                                                             </tr>
+
                                                                             <?php if ($order->payment && $order->payment_method_id != 3) { ?>
                                                                                 <tr>
                                                                                     <td align="left" style="font-size:0px;padding:10px 25px;padding-top:0;padding-bottom:0;word-break:break-word;">

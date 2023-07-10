@@ -468,7 +468,7 @@ class AuthController extends Controller {
 
         if ($agent) {
 
-            if ($agent->agent_email_verification == Agent::EMAIL_VERIFIED) {
+            if (empty($agent->agent_new_email) && $agent->agent_email_verification == Agent::EMAIL_VERIFIED) {
                 return [
                     'operation' => 'error',
                     'errorCode' => 1,
