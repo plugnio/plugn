@@ -2220,6 +2220,16 @@ failed: the order has failed to find a driver */
     }
 
     /**
+     * restaurant invoice item for order commission
+     * @param $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvoiceItem($modelClass = "\common\models\InvoiceItem")
+    {
+        return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
+    }
+
+    /**
      * Gets query for [[PaymentUu]].
      *
      * @return \yii\db\ActiveQuery

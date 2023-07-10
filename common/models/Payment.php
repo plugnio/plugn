@@ -535,6 +535,7 @@ class Payment extends \yii\db\ActiveRecord
             $payment->order->sendPaymentConfirmationEmail($payment);
 
             $invoicePaymentMethods = PaymentMethod::find()
+                //todo: check if not knet (as already taking commission from knet)
                 ->andWhere(['IN', 'payment_method_code', ["Moyasar", "Stripe"]])
                 ->all();
 
