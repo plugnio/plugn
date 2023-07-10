@@ -202,6 +202,7 @@ class ReportController extends Controller
             ->filterByCountry($country_id)
             ->filterByStore($restaurant_uuid)
             ->filterByPaymentMethod($payment_method->payment_method_id)
+            ->placedOrders()
             ->groupBy('order.currency_code')
             ->asArray()
             //->limit(1)
@@ -217,6 +218,7 @@ class ReportController extends Controller
                 //                SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"
                 ->filterByCountry($country_id)
                 ->filterByStore($restaurant_uuid)
+                ->placedOrders()
                 ->andWhere(['order.currency_code' => $currency['currency_code']])
                 //->asArray()
                 ->joinWith(['invoiceItem'])
