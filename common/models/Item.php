@@ -35,7 +35,11 @@ use yii\behaviors\TimestampBehavior;
  * @property float|null $compare_at_price
  * @property string|null $item_created_at
  * @property string|null $item_updated_at
- *
+ * @property number|null $length
+ * @property number|null $width
+ * @property number|null $height
+ * @property number|null $weight
+ * @property boolean $shipping
  * @property CategoryItem[] $categoryItems
  * @property Category[] $categories
  * @property Restaurant $restaurant
@@ -101,6 +105,8 @@ class Item extends \yii\db\ActiveRecord
             [['item_created_at', 'item_updated_at', 'items_category'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
+            [['shipping'], 'boolean'],
+            [['weight', 'length', 'height', 'width'], 'number', "max" => 8],
             [['item_name', 'item_name_ar', 'item_image', 'barcode', 'sku'], 'string', 'max' => 255],
             [['item_description', 'item_description_ar', 'item_meta_title', 'item_meta_title_ar', 'item_meta_description', 'item_meta_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
@@ -108,7 +114,6 @@ class Item extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
-
 
     public function scenarios()
     {
