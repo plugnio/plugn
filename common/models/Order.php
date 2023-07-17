@@ -769,7 +769,7 @@ class Order extends \yii\db\ActiveRecord
 
         if ($this->customer_email) {
 
-            \Yii::$app->mailer->compose([
+            $mailer = \Yii::$app->mailer->compose([
                 'html' => 'payment-confirm-html',
             ], [
                 'order' => $this,
@@ -777,40 +777,55 @@ class Order extends \yii\db\ActiveRecord
             ])
                 ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                 ->setTo($this->customer_email)
-                ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
+                ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                 //->setReplyTo($replyTo)
-                ->send();
+
+            try {
+                $mailer->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
 
         foreach ($this->restaurant->getAgentAssignments()->all() as $agentAssignment) {
 
             if ($agentAssignment->email_notification) {
 
-                \Yii::$app->mailer->compose([
+                $mailer = \Yii::$app->mailer->compose([
                     'html' => 'payment-confirm-html',
                 ], [
                     'order' => $this
                 ])
                     ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                     ->setTo($agentAssignment->agent->agent_email)
-                    ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
+                    ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                     //->setReplyTo($replyTo)
-                    ->send();
+
+                try {
+                    $mailer->send();
+                } catch (\Swift_TransportException $e) {
+                    Yii::error($e->getMessage(), "email");
+                }
             }
         }
 
         if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email) {
 
-            \Yii::$app->mailer->compose([
+            $mailer = \Yii::$app->mailer->compose([
                     'html' => 'payment-confirm-html',
                 ], [
                     'order' => $this
                 ])
                 ->setFrom($fromEmail)//[$this->restaurant->restaurant_email => $this->restaurant->name]
                 ->setTo($this->restaurant->restaurant_email)
-                ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name)
+                ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                // ->setReplyTo($replyTo)
-                ->send();
+
+            try {
+                $mailer->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
 
     }

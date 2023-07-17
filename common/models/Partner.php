@@ -300,7 +300,7 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
    */
   public static function passwordMail($model, $password)
   {
-      return \Yii::$app->mailer->compose([
+      $mailer = \Yii::$app->mailer->compose([
                    'html' => 'staff-password',
                        ], [
                          "model" => $model,
@@ -309,8 +309,13 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                ->setTo([$model->partner_email])
                ->setBcc(\Yii::$app->params['supportEmail'])
-               ->setSubject('Your account password has been reset')
-               ->send();
+               ->setSubject('Your account password has been reset');
+
+      try {
+          return $mailer->send();
+      } catch (\Swift_TransportException $e) {
+          Yii::error($e->getMessage(), "email");
+      }
   }
 
 

@@ -79,16 +79,20 @@ class TapQueue extends \yii\db\ActiveRecord
 
                     foreach ($this->restaurant->getOwnerAgent()->all() as $agent) {
 
-                        \Yii::$app->mailer->compose([
+                        $mailer = \Yii::$app->mailer->compose([
                             'html' => 'tap-created',
                         ], [
                             'store' => $this->restaurant,
                         ])
                             ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                             ->setTo([$agent->agent_email])
-                            ->setSubject('Your TAP Payments account has been approved')
-                            ->send();
+                            ->setSubject('Your TAP Payments account has been approved');
 
+                        try {
+                            $mailer->send();
+                        } catch (\Swift_TransportException $e) {
+                            Yii::error($e->getMessage(), "email");
+                        }
                     }
                 }
             }

@@ -304,7 +304,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
 
-            \Yii::$app->mailer->compose([
+            $mailer = \Yii::$app->mailer->compose([
                 'html' => 'premium-upgrade',
             ], [
                 'subscription' => $subscription,
@@ -313,8 +313,13 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                 ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                 ->setTo([$agent->agent_email])
                 ->setBcc(\Yii::$app->params['supportEmail'])
-                ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name)
-                ->send();
+                ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name);
+
+            try {
+                $mailer->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
     }
 
