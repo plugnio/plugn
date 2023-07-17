@@ -653,11 +653,20 @@ class ItemController extends BaseController
     {
         $restaurant = Yii::$app->accountManager->getManagedAccount();
 
-        $model = ItemVideo::findOne(['item_video_id'=>$id]);
+        $model = ItemVideo::find()->andWhere(['item_video_id'=> $id])->one();
+
+        if(!$model) {
+            return [
+                "operation" => "error",
+                "message" => "Video not found to delete"
+            ];
+        }
 
         //check ownership
 
-        $exists = $restaurant->getItems()->andWhere(['item_uuid' => $model->item_uuid])->exists();
+        $exists = $restaurant->getItems()
+            ->andWhere(['item_uuid' => $model->item_uuid])
+            ->exists();
 
         if(!$exists) {
             return [
