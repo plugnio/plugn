@@ -396,6 +396,7 @@ class AuthController extends Controller {
         $currentDatetime = new \DateTime('now');
 
         if ($customer->customer_limit_email && $currentDatetime < $emailLimitDatetime) {
+
             $difference = $currentDatetime->diff($emailLimitDatetime);
             $minuteDifference = (int) $difference->i;
             $secondDifference = (int) $difference->s;
@@ -404,6 +405,7 @@ class AuthController extends Controller {
                 'numMinutes' => $minuteDifference,
                 'numSeconds' => $secondDifference,
             ]);
+
         } else if (!$model->sendEmail()) {
             $errors = Yii::t('api', 'Sorry, we are unable to reset a password for email provided.');
         }
