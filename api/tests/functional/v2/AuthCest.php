@@ -38,7 +38,6 @@ class AuthCest
         $this->store = Restaurant::find()->one();
 
         $I->haveHttpHeader('Store-Id', $this->store->restaurant_uuid);
-
     }
 
     public function _after(FunctionalTester $I) {

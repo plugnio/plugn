@@ -68,7 +68,7 @@ class PasswordResetRequestForm extends Model {
                     ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard');
 
                 try {
-                    $mailer->send();
+                    return $mailer->send();
                 } catch (\Swift_TransportException $e) {
                     Yii::error($e->getMessage(), "email");
                 }
