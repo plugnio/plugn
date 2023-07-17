@@ -93,19 +93,24 @@ class CronController extends \yii\console\Controller
 
                 if ($getSiteResponse->isOk) {
                     if ($getSiteResponse->data['state'] == 'current') {
+
                         $restaurant->has_deployed = 1;
                         $restaurant->save(false);
 
-                        \Yii::$app->mailer->compose([
+                        $mailer = \Yii::$app->mailer->compose([
                             'html' => 'store-ready',
                         ], [
                             'store' => $restaurant,
                         ])
                             ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                             ->setTo([$restaurant->restaurant_email])
-                            ->setSubject('Your store ' . $restaurant->name . ' is now ready')
-                            ->send();
+                            ->setSubject('Your store ' . $restaurant->name . ' is now ready');
 
+                        try {
+                            $mailer->send();
+                        } catch (\Swift_TransportException $e) {
+                            Yii::error($e->getMessage(), "email");
+                        }
                     }
                 }
             }
@@ -140,15 +145,20 @@ class CronController extends \yii\console\Controller
 
             foreach ($store->ownerAgent as $agent) {
 
-                Yii::$app->mailer->compose([
+                $mailer = Yii::$app->mailer->compose([
                     'html' => 'offer-assistance',
                 ], [
                     'store' => $store
                 ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
-                    ->setSubject('Is there anything we can help with?')
-                    ->send();
+                    ->setSubject('Is there anything we can help with?');
+
+                try {
+                    $mailer->send();
+                } catch (\Swift_TransportException $e) {
+                    Yii::error($e->getMessage(), "email");
+                }
             }
 
             $store->retention_email_sent = 1;
@@ -177,15 +187,20 @@ class CronController extends \yii\console\Controller
 
             foreach ($store->ownerAgent as $agent) {
 
-                Yii::$app->mailer->compose([
+                $mailer = Yii::$app->mailer->compose([
                     'html' => 'offer-assistance',
                 ], [
                     'store' => $store
                 ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
-                    ->setSubject('Is there anything we can help with?')
-                    ->send();
+                    ->setSubject('Is there anything we can help with?');
+
+                try {
+                    $mailer->send();
+                } catch (\Swift_TransportException $e) {
+                    Yii::error($e->getMessage(), "email");
+                }
             }
 
             $store->retention_email_sent = 1;
@@ -212,7 +227,7 @@ class CronController extends \yii\console\Controller
 
                 foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
 
-                    $result = \Yii::$app->mailer->compose([
+                    $mailer = \Yii::$app->mailer->compose([
                         'html' => 'subscription-expired',
                     ], [
                         'subscription' => $subscription,
@@ -223,14 +238,19 @@ class CronController extends \yii\console\Controller
                         ->setFrom([\Yii::$app->params['supportEmail']])
                         ->setTo($agent->agent_email)
                         ->setBcc(\Yii::$app->params['supportEmail'])
-                        ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan')
-                        ->send();
+                        ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan');
 
-                    if (!$result)
-                        Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
+                    try {
 
+                        $result = $mailer->send();
+
+                        if(!$result)
+                            Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
+
+                    } catch (\Swift_TransportException $e) {
+                        Yii::error($e->getMessage(), "email");
+                    }
                 }
-
 
                 $subscription->subscription_status = Subscription::STATUS_INACTIVE;
                 $subscription->save();
@@ -254,7 +274,8 @@ class CronController extends \yii\console\Controller
         foreach ($subscriptions as $subscription) {
 
             foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
-                $result = \Yii::$app->mailer->compose([
+
+                $mailer = \Yii::$app->mailer->compose([
                     'html' => 'subscription-will-expire-soon-html',
                 ], [
                     'subscription' => $subscription,
@@ -265,13 +286,20 @@ class CronController extends \yii\console\Controller
                     ->setFrom([\Yii::$app->params['supportEmail']])
                     ->setTo($agent->agent_email)
                     ->setBcc(\Yii::$app->params['supportEmail'])
-                    ->setSubject('Your Subscription is Expiring')
-                    ->send();
+                    ->setSubject('Your Subscription is Expiring');
 
-                if ($result) {
-                    $subscription->notified_email = 1;
-                    $subscription->save(false);
+                try {
+                    $result = $mailer->send();
+
+                    if ($result) {
+                        $subscription->notified_email = 1;
+                        $subscription->save(false);
+                    }
+
+                } catch (\Swift_TransportException $e) {
+                    Yii::error($e->getMessage(), "email");
                 }
+
             }
         }
 
@@ -693,8 +721,11 @@ class CronController extends \yii\console\Controller
 
             foreach ($orders as $order) {
 
-                foreach ($order->restaurant->getAgentAssignments()->where(['reminder_email' => 1])->all() as $agentAssignment) {
+                $agentAssignments = $order->restaurant->getAgentAssignments()
+                    ->where(['reminder_email' => 1])
+                    ->all();
 
+                foreach ($agentAssignments as $agentAssignment) {
 
                     if ($agentAssignment && $agentAssignment->agent) {
 
@@ -706,7 +737,7 @@ class CronController extends \yii\console\Controller
                             }
                         }
 
-                        \Yii::$app->mailer->compose([
+                        $mailer = \Yii::$app->mailer->compose([
                             'html' => 'order-reminder-html',
                         ], [
                             'order' => $order,
@@ -714,8 +745,13 @@ class CronController extends \yii\console\Controller
                         ])
                             ->setFrom([\Yii::$app->params['supportEmail'] => $order->restaurant->name])
                             ->setTo($agentAssignment->agent->agent_email)
-                            ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name)
-                            ->send();
+                            ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name);
+
+                        try {
+                            $mailer->send();
+                        } catch (\Swift_TransportException $e) {
+                            Yii::error($e->getMessage(), "email");
+                        }
                     }
                 }
 

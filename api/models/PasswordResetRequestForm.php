@@ -53,7 +53,7 @@ class PasswordResetRequestForm extends Model {
                 //todo: replace with store link
                 $resetLink = Yii::$app->params['newDashboardAppUrl'] . '/update-password/' . $customer->customer_password_reset_token;
 
-                return Yii::$app->mailer
+                $mailer = Yii::$app->mailer
                     ->compose(
                         [
                             'html' => 'customer/passwordResetToken-html',
@@ -65,8 +65,13 @@ class PasswordResetRequestForm extends Model {
                     )
                     ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                     ->setTo($this->email)
-                    ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard')
-                    ->send();
+                    ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard');
+
+                try {
+                    $mailer->send();
+                } catch (\Swift_TransportException $e) {
+                    Yii::error($e->getMessage(), "email");
+                }
             }
         }
     }

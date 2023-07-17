@@ -204,7 +204,7 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
         if(sizeof($emails) ==  0)
             return true;
 
-        \Yii::$app->mailer->compose([
+        $mailer = \Yii::$app->mailer->compose([
             'html' => 'store/pending-invoice-html',
         ], [
             'invoice' => $this
@@ -213,8 +213,13 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
             ->setTo($emails[0])
             ->setCc(array_slice($emails, 1))
             ->setSubject('Invoice #' . $this->invoice_number . ' for Plugn commission | ' . $this->restaurant->name)
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
-            ->send();
+            ->setReplyTo(\Yii::$app->params['supportEmail']);
+
+        try {
+            $mailer->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
     }
 
     public function getRestaurantName() {

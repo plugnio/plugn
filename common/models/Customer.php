@@ -623,7 +623,7 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             $email = $this->customer_email;
         }
 
-        return Yii::$app->mailer->compose([
+        $mailer = Yii::$app->mailer->compose([
                 'html' => 'customer/verify-email-html',
                 'text' => 'customer/verify-email-text',
             ], [
@@ -632,8 +632,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             ])
             ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
             ->setTo($email)
-            ->setSubject('Please confirm your email address')
-            ->send();
+            ->setSubject('Please confirm your email address');
+
+        try {
+            return $mailer->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
     }
 
     public static function find() {

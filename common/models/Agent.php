@@ -287,7 +287,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             $email = $this->agent_email;
         }
 
-        return Yii::$app->mailer->compose([
+        $mailter = Yii::$app->mailer->compose([
             'html' => 'agent/verify-email-html',
             'text' => 'agent/verify-email-text',
         ], [
@@ -296,8 +296,13 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         ])
             ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
             ->setTo($email)
-            ->setSubject('Please confirm your email address')
-            ->send();
+            ->setSubject('Please confirm your email address');
+
+        try {
+            return $mailter->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
     }
 
     /**
