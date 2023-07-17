@@ -257,7 +257,12 @@ class Refund extends \yii\db\ActiveRecord
             $message->setCc([$this->order->customer_email]);
         }
         $message->setSubject('Refund was not processed successfully for Order #' . $this->order_uuid);
-        $message->send();
+
+        try {
+            return $message->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
     }
 
     /**

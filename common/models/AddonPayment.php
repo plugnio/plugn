@@ -233,7 +233,7 @@ class AddonPayment extends \yii\db\ActiveRecord
 
             foreach ($paymentRecord->restaurant->getOwnerAgent()->all() as $agent ) {
 
-                \Yii::$app->mailer->compose([
+                $mailter = \Yii::$app->mailer->compose([
                     'html' => 'addon-purchased',
                 ], [
                     'paymentRecord' => $paymentRecord,
@@ -243,8 +243,13 @@ class AddonPayment extends \yii\db\ActiveRecord
                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo([$agent->agent_email])
                     ->setBcc(\Yii::$app->params['supportEmail'])
-                    ->setSubject('Thank you for your purchase')
-                    ->send();
+                    ->setSubject('Thank you for your purchase');
+
+                try {
+                    $mailter->send();
+                } catch (\Swift_TransportException $e) {
+                    Yii::error($e->getMessage(), "email");
+                }
             }
         }
 

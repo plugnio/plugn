@@ -141,7 +141,7 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                 $paymentGateway = $this->payment_gateway == 'tap' ? 'Tap Payments' : 'MyFatoorah';
                 $subject = 'Your ' . $paymentGateway . ' account has been approved';
 
-                \Yii::$app->mailer->compose([
+            $mailer = \Yii::$app->mailer->compose([
                     'html' => 'payment-gateway-created',
                 ], [
                     'store' => $this->restaurant,
@@ -149,8 +149,13 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                 ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                     ->setTo([$this->restaurant->restaurant_email])
-                    ->setSubject($subject)
-                    ->send();
+                    ->setSubject($subject);
+
+            try {
+                $mailer->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
 
                 //enable all payment gateway by default
 

@@ -734,7 +734,7 @@ class Restaurant extends \yii\db\ActiveRecord
         \Yii::info("[Store Domain Update Request] " . $this->name . " want to change domain from " .
             $old_domain ." to " . $this->restaurant_domain, __METHOD__);
 
-        \Yii::$app->mailer->compose([
+        $mailer = \Yii::$app->mailer->compose([
             'html' => 'domain-update-request',
         ], [
             'store_name' => $this->name,
@@ -743,8 +743,13 @@ class Restaurant extends \yii\db\ActiveRecord
         ])
             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
             ->setTo(Yii::$app->params['adminEmail'])
-            ->setSubject('[Plugn] Agent updated DN')
-            ->send();
+            ->setSubject('[Plugn] Agent updated DN');
+
+        try {
+            $mailer->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
 
         return self::message("success","Our customer service agent will contact you soon!");
     }
@@ -777,17 +782,24 @@ class Restaurant extends \yii\db\ActiveRecord
             ->all();
 
         foreach ($agents as $agentAssignment) {
-            $mailer->setTo($agentAssignment->agent->agent_email)
-                ->send();
+            try {
+                $mailer->setTo($agentAssignment->agent->agent_email)
+                    ->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
 
         if ($this->restaurant_email_notification && $this->restaurant_email) {
-            $mailer->setTo($this->restaurant_email)
-                ->send();
+            try {
+                $mailer->setTo($this->restaurant_email)
+                    ->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
 
         return self::message("success", "Congratulations you have successfully changed your domain name");
-
     }
 
     public function alertInActive()
@@ -803,13 +815,21 @@ class Restaurant extends \yii\db\ActiveRecord
             ->all();
 
         foreach ($agents as $agentAssignment) {
-            $mailer->setTo($agentAssignment->agent->agent_email)
-                ->send();
+            try {
+                $mailer->setTo($agentAssignment->agent->agent_email)
+                    ->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
 
         if ($this->restaurant_email_notification && $this->restaurant_email) {
-            $mailer->setTo($this->restaurant_email)
-                ->send();
+            try {
+                $mailer->setTo($this->restaurant_email)
+                    ->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
 
         //mark store as notified
@@ -835,13 +855,21 @@ class Restaurant extends \yii\db\ActiveRecord
             ->all();
 
         foreach ($agents as $agentAssignment) {
-            $mailer->setTo($agentAssignment->agent->agent_email)
-                ->send();
+            try {
+                $mailer->setTo($agentAssignment->agent->agent_email)
+                    ->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
 
         if ($this->restaurant_email_notification && $this->restaurant_email) {
-            $mailer->setTo($this->restaurant_email)
-                ->send();
+            try {
+                $mailer->setTo($agentAssignment->agent->agent_email)
+                    ->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
     }
 
@@ -3022,8 +3050,11 @@ class Restaurant extends \yii\db\ActiveRecord
                     if ($key == 0)
                         $weeklyStoreSummaryEmail->setBcc(\Yii::$app->params['supportEmail']);
 
-                    $weeklyStoreSummaryEmail->send();
-
+                    try {
+                        $weeklyStoreSummaryEmail->send();
+                    } catch (\Swift_TransportException $e) {
+                        Yii::error($e->getMessage(), "email");
+                    }
                 }
             }
         }

@@ -157,27 +157,37 @@ class AgentAssignment extends \yii\db\ActiveRecord {
     }
 
     public function notificationMail($password) {
-        return Yii::$app->mailer->compose([
-            'html' => 'new-agent',
-        ], [
-            'model' => $this,
-            'password' => $password
-        ])
+        $mailter = Yii::$app->mailer->compose([
+                'html' => 'new-agent',
+            ], [
+                'model' => $this,
+                'password' => $password
+            ])
             ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setTo($this->agent->agent_email)
-            ->setSubject("You've been invited to manage " . $this->restaurant->name)
-            ->send();
+            ->setSubject("You've been invited to manage " . $this->restaurant->name);
+
+        try {
+            return $mailter->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
     }
 
     public function inviteAgent() {
-        return Yii::$app->mailer->compose([
+        $mailer = Yii::$app->mailer->compose([
             'html' => 'agent-invitation',
         ], [
             'model' => $this
         ])
             ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setTo($this->agent->agent_email)
-            ->setSubject( $this->restaurant->name  . " has added you as a team member on their Plugn store")
-            ->send();
+            ->setSubject( $this->restaurant->name  . " has added you as a team member on their Plugn store");
+
+        try {
+            return $mailer->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
     }
 }

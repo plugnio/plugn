@@ -22,6 +22,7 @@ use yii\web\NotFoundHttpException;
  * @property string $payment_mode which gateway they used
  * @property string $payment_current_status Where are we with this payment / result
  * @property double $payment_amount_charged amount charged to customer
+ * @property string $currency_code
  * @property double $payment_net_amount net amount deposited into our account
  * @property double $payment_gateway_fee gateway fee charged
  * @property double $payment_token
@@ -246,9 +247,19 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             self::onPaymentCaptured($paymentRecord);
 
         } else {
+
+            $currency = !empty($paymentRecord->currency) ? $paymentRecord->currency:
+                Currency::find()->andWhere(["code" => $paymentRecord->currency_code])->one();
+
+            $amount = Yii::$app->formatter->asCurrency(
+                $paymentRecord->payment_amount_charged,
+                $paymentRecord->currency_code, [
+                \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $currency->decimal_place
+            ]);
+
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
                     . $paymentRecord->restaurant->name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
+                    ' tried to pay ' . $amount .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .
@@ -304,7 +315,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
 
-            \Yii::$app->mailer->compose([
+            $mailer = \Yii::$app->mailer->compose([
                 'html' => 'premium-upgrade',
             ], [
                 'subscription' => $subscription,
@@ -313,8 +324,13 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                 ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                 ->setTo([$agent->agent_email])
                 ->setBcc(\Yii::$app->params['supportEmail'])
-                ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name)
-                ->send();
+                ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name);
+
+            try {
+                $mailer->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
         }
     }
 
@@ -367,12 +383,19 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                 $paymentRecord->payment_gateway_order_id = $reference->payment;
 
             // Net amount after deducting gateway fee
-            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee - $paymentRecord->plugn_fee;
+            $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;// - $paymentRecord->partner_fee;
 
         } else {
+
+            $currency = !empty($paymentRecord->currency) ? $paymentRecord->currency:
+                Currency::find()->andWhere(["code" => $paymentRecord->currency_code])->one();
+
+            $amount = Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency_code, [
+                \NumberFormatter::MAX_SIGNIFICANT_DIGITS => $currency->decimal_place]);
+
             Yii::info('[TAP Payment Issue > ' . $paymentRecord->restaurant->name . ']'
                     . $paymentRecord->restaurant->name .
-                    ' tried to pay ' . Yii::$app->formatter->asCurrency($paymentRecord->payment_amount_charged, $paymentRecord->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $paymentRecord->currency->decimal_place]) .
+                    ' tried to pay ' . $amount .
                     ' and has failed at gateway. Maybe card issue.', __METHOD__);
 
             Yii::info('[Response from TAP for Failed Payment] ' .

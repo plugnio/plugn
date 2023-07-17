@@ -321,7 +321,7 @@ class AddonController extends BaseController
 
                 foreach ($paymentRecord->restaurant->getOwnerAgent()->all() as $agent ) {
 
-                    \Yii::$app->mailer->compose([
+                    $mailer = \Yii::$app->mailer->compose([
                         'html' => 'addon-purchased',
                     ], [
                         'paymentRecord' => $paymentRecord,
@@ -331,8 +331,13 @@ class AddonController extends BaseController
                         ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
                         ->setTo([$agent->agent_email])
                         ->setBcc(\Yii::$app->params['supportEmail'])
-                        ->setSubject('Thank you for your purchase')
-                        ->send();
+                        ->setSubject('Thank you for your purchase');
+
+                    try {
+                        $mailer->send();
+                    } catch (\Swift_TransportException $e) {
+                        Yii::error($e->getMessage(), "email");
+                    }
                 }
             }
 
