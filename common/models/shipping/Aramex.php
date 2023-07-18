@@ -2,14 +2,14 @@
 
 namespace common\models\shipping;
 
+use common\models\Setting;
 use Yii;
 use common\models\Currency;
-use common\models\Customer;
 use common\models\shipping\util\ShippingHelper;
 
 class Aramex
 {
-    public static function getQuote($address) {
+    public static function getQuote($restaurant_uuid, $address) {
 
         $error = '';
 
@@ -17,8 +17,19 @@ class Aramex
 
         /*--------------- params start -----------------------*/
 
-        $sandbox = true;
+        $sandbox = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_sandbox');
 
+        $accountNumber = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_account_number');
+        $accountEntity = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_account_entity');
+        $accountPin = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_account_pin');
+        $username = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_username');
+        $password = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_password');
+
+        $fromCity = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_city');
+        $fromCountryCode = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_country_code');
+        $fromState = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_state');
+        $fromPostcode = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_post_code');
+         
         $products = [
             [
                "weight" => 1000,
@@ -35,26 +46,25 @@ class Aramex
 
         //account
 
-        $accountCountryCode = "GB";
+        /**$accountCountryCode = "GB";
         $accountEntity = "LON";
         $accountNumber = "102331";
         $accountPin = "321321";
-        $userName = "testingapi@aramex.com";//
+        $username = "testingapi@aramex.com";//
         $password = 'R123456789$r';
 
-        /**$accountCountryCode = "JO";
+        $accountCountryCode = "JO";
         $accountEntity = "AMM";
         $accountNumber = "NNNNN";
         $accountPin = "NNNNNN";
-        $userName = "AAAA@AAA.com";
-        $password = 'XXXXXXXXX';*/
-
-
+        $username = "AAAA@AAA.com";
+        $password = 'XXXXXXXXX';
+        
         //source
         $fromCity = "Bristol";
         $fromCountryCode= "GB";
         $fromState ="";
-        $fromPostcode = "BS7 8BA";
+        $fromPostcode = "BS7 8BA";*/
 
         //destination
         $county_code_to = "IN";//$address['country'][''];
@@ -154,7 +164,7 @@ class Aramex
                                 'AccountEntity'		 	=> $accountEntity,
                                 'AccountNumber'		 	=> $accountNumber,
                                 'AccountPin'		 	=> $accountPin,
-                                'UserName'			 	=> $userName,
+                                'UserName'			 	=> $username,
                                 'Password'			 	=> $password,
                                 'Version'			 	=> 'v1.0'
                             ),

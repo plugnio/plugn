@@ -3301,6 +3301,17 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[ShippingMethods]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShippingMethods($modelClass = "\common\models\ShippingMethod")
+    {
+        return $this->hasMany($modelClass::className(), ['shipping_method_id' => 'shipping_method_id'])
+            ->viaTable('restaurant_shipping_method', ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[Payments]].
      *
      * @return \yii\db\ActiveQuery

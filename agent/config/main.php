@@ -591,6 +591,17 @@ return [
                         'OPTIONS config/<code>' => 'options',
                     ]
                 ],
+                [// ShippingMethodController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/shipping-method',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST config/<code>' => 'config',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS config/<code>' => 'options',
+                    ]
+                ],
                 [// InvoiceController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/invoice',
@@ -616,6 +627,7 @@ return [
                         'GET settings/<code>' => 'settings',
                         'GET test-tap' => 'test-tap',
                         'GET view-payment-methods' => 'view-payment-methods',
+                        'GET view-shipping-methods' => 'view-shipping-methods',
                         'GET view-payment-methods/<id>' => 'view-payment-methods',
                         'POST' => 'update',
                         'POST upgrade' => 'upgrade',
@@ -688,6 +700,7 @@ return [
                         'OPTIONS disable-payment-method/<id>/<paymentMethodId>' => 'options',
                         'OPTIONS enable-payment-method/<id>/<paymentMethodId>' => 'options',
                         'OPTIONS view-payment-methods/<id>' => 'options',
+                        'OPTIONS view-shipping-methods' => 'options',
                         'OPTIONS create-tap-account/<id>' => 'options',
                         'OPTIONS enable-online-payment/<id>' => 'options',
                         'OPTIONS disable-online-payment/<id>' => 'options',
