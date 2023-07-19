@@ -597,8 +597,10 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'POST config/<code>' => 'config',
+                        'DELETE disable/<code>' => 'config',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS disable/<code>' => 'options',
                         'OPTIONS config/<code>' => 'options',
                     ]
                 ],

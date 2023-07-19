@@ -488,7 +488,8 @@ class Restaurant extends \yii\db\ActiveRecord
                 "enable_gift_message", "accept_order_247", "is_public", "currency_id"
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
-                'armada_api_key', 'mashkor_branch_id'
+                'armada_api_key',
+                'mashkor_branch_id'
             ],
             self::SCENARIO_CURRENCY => [
                 'currency_id'

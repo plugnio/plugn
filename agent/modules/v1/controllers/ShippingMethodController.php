@@ -11,6 +11,21 @@ use yii\web\NotFoundHttpException;
 
 class ShippingMethodController extends BaseController
 {
+    public function actionDisable($code)
+    {
+        $store = $this->findModel();
+
+        $shipping_method = $store->getRestaurantShippingMethods()
+            ->joinWith('shippingMethod')
+            ->andWhere(['shipping_method_code' => $code])
+            ->one();
+
+        if($shipping_method)
+            $shipping_method->delete();
+
+        return self::message('success', "Extension $code updated.");
+    }
+
     /**
      * edit shipping gateway settings
      * @param $code
@@ -22,19 +37,35 @@ class ShippingMethodController extends BaseController
 
         $name = "\agent\models\shipping\\" . $code;
 
-        $model = new $name;
-        $model->restaurant_uuid = $store->restaurant_uuid;
+        if ($code == "Aramex")
+        {
+            $model = new $name;
+            $model->restaurant_uuid = $store->restaurant_uuid;
 
-        if ($code == "Aramex") {
-            return $this->_configAramex($model, $store, $code);
-        } else if ($code == "Fedex") {
-            return $this->_configFedex($model, $store, $code);
-        } else if ($code == "FlatRate") {
-            return $this->_configFlatRate($model, $store, $code);
+            return $this->_configAramex($model, $store);
+        }
+        else if ($code == "Fedex")
+        {
+            $model = new $name;
+            $model->restaurant_uuid = $store->restaurant_uuid;
+
+            return $this->_configFedex($model, $store);
+        }
+        else if ($code == "Armada")
+        {
+            return $this->_configArmada($store);
+        }
+        else if ($code == "Mashkor")
+        {
+            return $this->_configMashkor($store);
+        }
+        else if ($code == "FlatRate")
+        {
+            return $this->_configFlatRate($store);
         }
     }
 
-    private function _configAramex($model, $store, $code)
+    private function _configAramex($model, $store)
     {
         $model->shipping_aramex_sandbox = Yii::$app->request->getBodyParam('sandbox');
         
@@ -49,40 +80,84 @@ class ShippingMethodController extends BaseController
         $model->shipping_aramex_state = Yii::$app->request->getBodyParam('state');
         $model->shipping_aramex_post_code = Yii::$app->request->getBodyParam('post_code');
 
-        if ($model->save())
+        if (!$model->save())
         {
-            $shipping_method = $store->getRestaurantShippingMethods()
-                ->joinWith('shippingMethod')
-                ->andWhere(['shipping_method_code' => ShippingMethod::CODE_ARAMEX])
-                ->exists();
-
-            if (!$shipping_method) {
-
-                $aramexShippingMethod = ShippingMethod::find()
-                    ->andWhere(['shipping_method_code' => ShippingMethod::CODE_STRIPE])
-                    ->one();
-
-                $shippings_method = new RestaurantShippingMethod();
-                $shippings_method->shipping_method_id = $aramexShippingMethod->shipping_method_id;
-                $shippings_method->restaurant_uuid = $store->restaurant_uuid;
-
-                if (!$shippings_method->save()) {
-                    return self::message("error", $shippings_method->getErrors());
-                }
-            }
-
-            return self::message('success', "Extension $code updated.");
+            return self::message('error', $model->errors);
         }
 
-        return self::message('error', $model->errors);
+        return $this->_enableMethod($store, ShippingMethod::CODE_ARAMEX);
     }
 
-    private function _configFedex($model, $store, $code)
+    private function _configFedex($model, $store)
     {
+        $model->shipping_fedex_key = Yii::$app->request->getBodyParam('key');
+        $model->shipping_fedex_password = Yii::$app->request->getBodyParam('password');
+        $model->shipping_fedex_account = Yii::$app->request->getBodyParam('account');
+        $model->shipping_fedex_meter = Yii::$app->request->getBodyParam('meter');
+        $model->shipping_fedex_dropoff_type = Yii::$app->request->getBodyParam('dropoff_type');
+        $model->shipping_fedex_fedpack_type = Yii::$app->request->getBodyParam('fedpack_type');
+        $model->shipping_fedex_country_code= Yii::$app->request->getBodyParam('country_code');
+        $model->shipping_fedex_postcode = Yii::$app->request->getBodyParam('postcode');
+
+        if (!$model->save())
+        {
+            return self::message('error', $model->errors);
+        }
+
+        return $this->_enableMethod($store, ShippingMethod::CODE_FEDEX);
+
+        /**"DROP_BOX";
+        REGULAR_PICKUP
+        REQUEST_COURIER
+        DROP_BOX
+        BUSINESS_SERVICE_CENTER
+        STATION
+
+
+        $fedex_fedpack_type = "FEDEX_BOX";
+        /*
+        YOUR_PACKAGING
+        FEDEX_BOX
+        FEDEX_PAK
+                FEDEX_TUBE
+                FEDEX_10KG_BOX
+                FEDEX_25KG_BOX
+                FEDEX_ENVELOPE
+                FEDEX_EXTRA_LARGE_BOX
+                FEDEX_LARGE_BOX
+                FEDEX_MEDIUM_BOX
+                FEDEX_SMALL_BOX*/
+
 
     }
 
-    private function _configFlatRate($model, $store, $code)
+    private function _configArmada($store)
+    {
+        $store->armada_api_key = Yii::$app->request->getBodyParam('api_key');
+
+        $store->setScenario(\common\models\Restaurant::SCENARIO_UPDATE_DELIVERY);
+
+        if (!$store->save()) {
+            return self::message("error", $store->getErrors());
+        }
+
+        return $this->_enableMethod($store, ShippingMethod::CODE_ARMADA);
+    }
+
+    private function _configMashkor($store)
+    {
+        $store->mashkor_branch_id = Yii::$app->request->getBodyParam('branch_id');
+
+        $store->setScenario(\common\models\Restaurant::SCENARIO_UPDATE_DELIVERY);
+
+        if (!$store->save()) {
+            return self::message("error", $store->getErrors());
+        }
+
+        return $this->_enableMethod($store, ShippingMethod::CODE_MASHKOR);
+    }
+
+    private function _configFlatRate($store)
     {
 
     }
@@ -103,6 +178,31 @@ class ShippingMethodController extends BaseController
         } else {
             throw new NotFoundHttpException('The requested record does not exist.');
         }
+    }
+
+    private function _enableMethod($store, $code) {
+
+        $shipping_method = $store->getRestaurantShippingMethods()
+            ->joinWith('shippingMethod')
+            ->andWhere(['shipping_method_code' => $code])
+            ->exists();
+
+        if (!$shipping_method) {
+
+            $aramexShippingMethod = ShippingMethod::find()
+                ->andWhere(['shipping_method_code' => $code])
+                ->one();
+
+            $shippings_method = new RestaurantShippingMethod();
+            $shippings_method->shipping_method_id = $aramexShippingMethod->shipping_method_id;
+            $shippings_method->restaurant_uuid = $store->restaurant_uuid;
+
+            if (!$shippings_method->save()) {
+                return self::message("error", $shippings_method->getErrors());
+            }
+        }
+
+        return self::message('success', "Extension $code updated.");
     }
 
     /**
