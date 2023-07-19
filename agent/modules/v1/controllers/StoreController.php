@@ -1091,6 +1091,11 @@ class StoreController extends BaseController
             ];
         }
 
+        //update site
+
+        if($model->site_id)
+            Yii::$app->netlifyComponent->upgradeSite($model);
+
         return self::message("success","Analytics integration updated successfully");
     }
 
