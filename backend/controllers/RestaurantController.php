@@ -501,7 +501,7 @@ class RestaurantController extends Controller {
         {
             $store->version = Yii::$app->params['storeVersion'];
 
-            if(!$store->site_id)
+            if(!$store->site_id && isset($response->data['site_id']))
             {
                 $store->site_id = $response->data['site_id'];
             }

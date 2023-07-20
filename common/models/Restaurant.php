@@ -390,7 +390,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $scenarios = parent::scenarios();
 
         return array_merge($scenarios, [
-            self::SCENARIO_DELETE => ['is_deleted'],
+            self::SCENARIO_DELETE => ['is_deleted', 'site_id'],
             self::SCENARIO_UPDATE_BANK => ['iban'],
             self::SCENARIO_TOGGLE_DEBUGGER => ['enable_debugger'],
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
@@ -1961,7 +1961,15 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function deleteSite() {
 
+        //remove from netlify
+
+        if($this->site_id)
+            Yii::$app->netlifyComponent->deleteSite($this->site_id);
+
+        //remove from local
+
         $this->setScenario(self::SCENARIO_DELETE);
+        $this->site_id = null;
         $this->is_deleted = true;
 
         if(!$this->save()) {
@@ -1970,11 +1978,6 @@ class Restaurant extends \yii\db\ActiveRecord
                 "message" => $this->errors
             ];
         }
-
-        //remove from netlify
-
-        if($this->site_id)
-            Yii::$app->netlifyComponent->deleteSite($this->site_id);
 
         //todo: remove github branch
 
