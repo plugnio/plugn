@@ -39,6 +39,9 @@ class StatsController extends BaseController
      */
     public function actionView()
     {
+        //todo: update queries and remove this 
+        ini_set('memory_limit', '512M');
+
         $interval = Yii::$app->request->get('interval');
         $type = Yii::$app->request->get('type');
 
