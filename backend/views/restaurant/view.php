@@ -106,6 +106,7 @@ $this->registerJs($js);
         <li id="fees"><a href="#">Our Fees</a></li>
         <li id="theme"><a href="#">Theme color</a></li>
         <li id="seo"><a href="#">SEO</a></li>
+        <li id="analytics"><a href="#">Analytics</a></li>
         <li id="netlify"><a href="#">Website Hosting/ Netlify</a></li>
         <li id="domain" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['restaurant-payment-method/index', 'uuid' => $model->restaurant_uuid]) ?>">Payment Methods</a></li>
         <li id="agents" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['agent-assignment/index', 'AgentAssignmentSearch[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Agents/ Vendors</a></li>
@@ -115,6 +116,20 @@ $this->registerJs($js);
     </ul>
 
     <br />
+
+    <div id="tab-analytics" class="tab-content">
+        <?=
+        DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'facebook_pixil_id',
+                'google_analytics_id',
+                'google_tag_id',
+                'tiktok_pixel_id',
+                'snapchat_pixil_id'
+            ]
+        ]) ?>
+    </div>
 
     <div id="tab-general" class="tab-content">
     <?=
@@ -202,8 +217,6 @@ $this->registerJs($js);
             'platform_fee:percent',
             'warehouse_fee',
             'warehouse_delivery_charges',
-            'facebook_pixil_id',
-            'google_analytics_id',
             [
               'attribute' => 'Owner name',
               'format' => 'html',
@@ -235,9 +248,6 @@ $this->registerJs($js);
             'schedule_interval',
             'schedule_order',
 
-
-
-            'snapchat_pixil_id',
             'default_language',
 
             'enable_gift_message',

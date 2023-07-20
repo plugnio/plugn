@@ -297,6 +297,10 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'snapchat_pixil_id')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'google_tag_id')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'tiktok_pixel_id')->textInput(['maxlength' => true]) ?>
+    
     <?= $form->field($model, 'custom_css')->textarea(['rows' => '12']) ?>
 
     <?= $form->field($model, 'identification_file_id_front_side')->textInput() ?>

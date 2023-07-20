@@ -83,6 +83,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property float|null $platform_fee
  * @property string|null $google_analytics_id
  * @property string|null $facebook_pixil_id
+ * @property string|null $google_tag_id
+ * @property string|null $tiktok_pixel_id
  * @property int|null $show_opening_hours
  * @property string|null $instagram_url
  * @property int|null $schedule_order
@@ -293,7 +295,7 @@ class Restaurant extends \yii\db\ActiveRecord
             [['is_public', 'is_deleted', 'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox'], 'boolean'],
             [['platform_fee', 'warehouse_fee','warehouse_delivery_charges'], 'number'],
             [['instagram_url'], 'url'],
-            [['export_orders_data_in_specific_date_range', 'export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
+            [['export_orders_data_in_specific_date_range', 'export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'google_tag_id', 'tiktok_pixel_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
 
             [['live_public_key', 'test_public_key'], 'default', 'value' => null],
@@ -397,6 +399,8 @@ class Restaurant extends \yii\db\ActiveRecord
                 'google_analytics_id',
                 'facebook_pixil_id',
                 'snapchat_pixil_id',
+                'google_tag_id',
+                'tiktok_pixel_id',
                 'sitemap_require_update'
             ],
             self::SCENARIO_CREATE_STORE_BY_AGENT => [
@@ -545,6 +549,8 @@ class Restaurant extends \yii\db\ActiveRecord
             'store_layout' => Yii::t('app','Store layout'),
             'google_analytics_id' => Yii::t('app','Google Analytics ID'),
             'facebook_pixil_id' => Yii::t('app','Facebook Pixil ID'),
+            'google_tag_id' => Yii::t('app','Google Tag ID'),
+            'tiktok_pixel_id' => Yii::t('app','TokTok Pixel ID'),
             'instagram_url' => Yii::t('app','Instagram url'),
             'schedule_order' => Yii::t('app','Schedule order'),
             'schedule_interval' => Yii::t('app','Schedule interval'),
