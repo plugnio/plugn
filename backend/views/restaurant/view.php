@@ -117,7 +117,7 @@ $this->registerJs($js);
 
     <br />
 
-    <div id="tab-analytics" class="tab-content">
+    <div id="tab-analytics" class="tab-content hidden">
         <?=
         DetailView::widget([
             'model' => $model,

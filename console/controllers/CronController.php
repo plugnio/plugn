@@ -5,6 +5,7 @@ namespace console\controllers;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
 use common\models\VendorCampaign;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
 use common\models\Restaurant;
 use common\models\OrderItem;
@@ -824,5 +825,51 @@ class CronController extends \yii\console\Controller
                 $store->deleteSite();
             }
         }
+    }
+
+    /**
+     * fix store missing netlify site_id (because of failed site upgrade attempt)
+     * @return void
+     */
+    public function actionNetlifyFix() {
+
+        $stores = Restaurant::find()
+            ->andWhere(new Expression("is_deleted=0 and site_id is null and has_deployed=1"))
+            ->all();
+
+        $i = 0;
+
+        foreach($stores as $store) {
+
+            $domain = str_replace(["https://", "http://", "www"], ["","",""], $store['restaurant_domain']);
+
+            $response = Yii::$app->netlifyComponent->listSiteData(1, $domain);
+
+            $site_id = null;
+
+            foreach ($response->data as $site) {
+                if (
+                    $domain == $site['custom_domain'] ||
+                    in_array($domain, $site['domain_aliases'])
+                ) {
+                    $site_id = $site['site_id'];
+                    continue;
+                }
+            }
+
+            if($site_id) {
+                $i++;
+                //$this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
+
+                $store->site_id = $site_id;
+                $store->save(false);
+
+                Yii::$app->netlifyComponent->upgradeSite($store);
+
+                $this->stdout($store->restaurant_domain . ' Updated' . PHP_EOL);
+            }
+        }
+
+        $this->stdout($i . ' Total' . PHP_EOL);
     }
 }
