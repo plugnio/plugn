@@ -91,6 +91,28 @@ class NetlifyComponent extends Component {
 
     /**
      *returns the specified site.
+     * @param integer $page
+     * @return type
+     */
+    public function listSiteData($page, $query = '') {
+
+        $deploySiteEndpoint = $this->apiEndpoint . "/sites?per_page=2&page" . $page . '&name=' . $query;
+
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('GET')
+            ->setUrl($deploySiteEndpoint)
+            ->addHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'User-Agent' => 'request',
+            ])
+            ->send();
+
+        return $response;
+    }
+
+    /**
+     *returns the specified site.
      * @param type $site_id
      * @return type
      */
