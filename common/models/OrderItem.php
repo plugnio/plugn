@@ -20,6 +20,11 @@ use yii\db\Expression;
  * @property float $item_price
  * @property float $item_unit_price
  * @property int|null $qty
+ * @property float $weight
+ * @property float $length
+ * @property float $height
+ * @property float $width
+ * @property float $shipping
  * @property string|null $customer_instruction
  * @property datetime $order_item_created_at
  * @property datetime $order_item_updated_at
@@ -47,7 +52,8 @@ class OrderItem extends \yii\db\ActiveRecord {
             [['qty'], 'integer', 'min' => 0],
             ['qty', 'validateQty'],
             [['order_uuid'], 'string', 'max' => 40],
-            [['item_price', 'item_unit_price'], 'number', 'min' => 0],
+            [['shipping'], 'boolean'],
+            [['item_price', 'item_unit_price', 'weight', 'length','height', 'width'], 'number', 'min' => 0],
             [['item_uuid'], 'checkIfItemBelongToRestaurant'],
             [['item_variant_uuid'], 'checkIfVariantBelongToRestaurant'],
             [['item_uuid'], 'string', 'max' => 300],
@@ -88,6 +94,11 @@ class OrderItem extends \yii\db\ActiveRecord {
             'item_price' => Yii::t('app','Item Price'),
             'item_unit_price' => Yii::t('app','Item Unit Price'),
             'qty' => Yii::t('app','Quantity'),
+            'weight' => Yii::t('app','Weight'),
+            'length' => Yii::t('app','Length'),
+            'height' => Yii::t('app','Height'),
+            'width'  => Yii::t('app','Width'),
+            'shipping'=> Yii::t('app','Shipping'),
             'customer_instruction' => Yii::t('app','Instructions'),
         ];
     }
@@ -225,10 +236,10 @@ class OrderItem extends \yii\db\ActiveRecord {
      * @return false|void
      */
     public function afterDelete() {
-        $order_model = Order::findOne($this->order_uuid);
+        $order = Order::findOne($this->order_uuid);
 
-        if ($order_model) {
-            return $order_model->updateOrderTotalPrice();
+        if ($order) {
+            return $order->updateOrderTotalPrice();
         }
 
         return false;
@@ -242,12 +253,12 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         parent::beforeSave($insert);
 
-        $item_model = Item::findOne($this->item_uuid);
-        $order_model = Order::findOne($this->order_uuid);
+        $item = Item::findOne($this->item_uuid);
+        $order = Order::findOne($this->order_uuid);
 
         //Update order total price
 
-        $order_model->updateOrderTotalPrice();
+        $order->updateOrderTotalPrice();
 
         if(!$this->restaurant_uuid && $this->order) {
             $this->restaurant_uuid = $this->order->restaurant_uuid;
@@ -261,17 +272,23 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         //Update product inventory
 
-        if ($insert && $item_model) {
+        if ($insert && $item) {
 
-            $this->item_name = $item_model->item_name;
-            $this->item_name_ar = $item_model->item_name_ar;
+            $this->item_name = $item->item_name;
+            $this->item_name_ar = $item->item_name_ar;
+
+            $this->shipping = $item->shipping;
+            $this->width  = $item->width;
+            $this->length = $item->length;
+            $this->height = $item->height;
+            $this->weight = $item->weight;            
         }
 
         $this->item_price = $this->calculateOrderItemPrice();
 
         //if custom item
 
-        if(!$item_model && $this->item_price) {
+        if(!$item && $this->item_price) {
             return true;
         }
 
@@ -296,9 +313,9 @@ class OrderItem extends \yii\db\ActiveRecord {
         //Update product inventory
         
         if ($insert) {
-          if ($item_model) {
-              $this->item_name = $item_model->item_name;
-              $this->item_name_ar = $item_model->item_name_ar;
+          if ($item) {
+              $this->item_name = $item->item_name;
+              $this->item_name_ar = $item->item_name_ar;
           } else {
               return false; //if custom item
           }
@@ -320,12 +337,12 @@ class OrderItem extends \yii\db\ActiveRecord {
 
       if($this->item_uuid != null) {
 
-        $item_model = Item::findOne($this->item_uuid);
+        $item = Item::findOne($this->item_uuid);
 
-        if (!$insert && isset($changedAttributes['qty']) && $item_model && $item_model->track_quantity) {
+        if (!$insert && isset($changedAttributes['qty']) && $item && $item->track_quantity) {
 
-            $item_model->increaseStockQty($changedAttributes['qty']);
-            $item_model->decreaseStockQty($this->qty);
+            $item->increaseStockQty($changedAttributes['qty']);
+            $item->decreaseStockQty($this->qty);
 
             if ($this->variant) {
                 $this->variant->increaseStockQty($changedAttributes['qty']);
@@ -345,10 +362,10 @@ class OrderItem extends \yii\db\ActiveRecord {
         }
       }
 
-        $order_model = Order::findOne($this->order_uuid);
+        $order = Order::findOne($this->order_uuid);
 
-        if ($order_model)
-            $order_model->updateOrderTotalPrice();
+        if ($order)
+            $order->updateOrderTotalPrice();
 
         return parent::afterSave($insert, $changedAttributes);
     }

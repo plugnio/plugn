@@ -2,8 +2,8 @@
 
 namespace agent\modules\v1\controllers;
 
-use agent\models\ShippingMethod;
-use agent\models\RestaurantShippingMethod;
+use common\models\ShippingMethod;
+use common\models\RestaurantShippingMethod;
 use Yii;
 use agent\models\Restaurant;
 use yii\web\NotFoundHttpException;
@@ -17,7 +17,7 @@ class ShippingMethodController extends BaseController
 
         $shipping_method = $store->getRestaurantShippingMethods()
             ->joinWith('shippingMethod')
-            ->andWhere(['shipping_method_code' => $code])
+            ->andWhere(['code' => $code])
             ->one();
 
         if($shipping_method)
@@ -35,10 +35,9 @@ class ShippingMethodController extends BaseController
     {
         $store = $this->findModel();
 
-        $name = "\agent\models\shipping\\" . $code;
-
         if ($code == "Aramex")
         {
+            $name = "\agent\models\shipping\\" . $code;
             $model = new $name;
             $model->restaurant_uuid = $store->restaurant_uuid;
 
@@ -46,6 +45,7 @@ class ShippingMethodController extends BaseController
         }
         else if ($code == "Fedex")
         {
+            $name = "\agent\models\shipping\\" . $code;
             $model = new $name;
             $model->restaurant_uuid = $store->restaurant_uuid;
 
@@ -184,13 +184,13 @@ class ShippingMethodController extends BaseController
 
         $shipping_method = $store->getRestaurantShippingMethods()
             ->joinWith('shippingMethod')
-            ->andWhere(['shipping_method_code' => $code])
+            ->andWhere(['code' => $code])
             ->exists();
 
         if (!$shipping_method) {
 
             $aramexShippingMethod = ShippingMethod::find()
-                ->andWhere(['shipping_method_code' => $code])
+                ->andWhere(['code' => $code])
                 ->one();
 
             $shippings_method = new RestaurantShippingMethod();

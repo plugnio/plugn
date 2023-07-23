@@ -2076,6 +2076,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'noOfItems',
             'categories',
             'paymentGatewayQueue',
+            'restaurantShippingMethods',
             'restaurantDomainRequests',
             'openingHours' => function ($restaurant) {
                 //if($this->accept_order_247)
@@ -3265,6 +3266,15 @@ class Restaurant extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getRestaurantBranches($modelClass = "\common\models\RestaurantBranch")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * @param $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantShippingMethods($modelClass = "\common\models\RestaurantShippingMethod")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }

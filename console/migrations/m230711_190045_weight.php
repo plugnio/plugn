@@ -18,7 +18,6 @@ class m230711_190045_weight extends Migration
         $this->addColumn( "item_variant","width", $this->float(8));
 
         $this->addColumn( "item","weight", $this->float(8));
-
         $this->addColumn( "item","length", $this->float(8));
         $this->addColumn( "item","height", $this->float(8));
         $this->addColumn( "item","width", $this->float(8));
@@ -59,6 +58,17 @@ class m230711_190045_weight extends Migration
             'fk-restaurant_shipping_method-restaurant_uuid', 'restaurant_shipping_method',
             'restaurant_uuid', 'restaurant', 'restaurant_uuid', "CASCADE"
         );
+
+        $this->addColumn( "order_item","weight", $this->float(8)->after('qty'));
+        $this->addColumn( "order_item","length", $this->float(8)->after('weight'));
+        $this->addColumn( "order_item","height", $this->float(8)->after('length'));
+        $this->addColumn( "order_item","width", $this->float(8)->after('height'));
+        $this->addColumn( "order_item","shipping", $this->boolean()->defaultValue(true)->after('width'));
+
+        //Armada
+        //Aramex
+        //FedEx
+
     }
 
     /**

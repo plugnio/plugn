@@ -34,8 +34,15 @@ class RestaurantShippingMethod extends \yii\db\ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['restaurant_uuid', 'shipping_method_id'], 'unique', 'targetAttribute' => ['restaurant_uuid', 'shipping_method_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
-            [['shipping_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShippingMethod::className(), 'targetAttribute' => ['shipping_method_id' => 'sm_id']],
+            [['shipping_method_id'], 'exist', 'skipOnError' => true, 'targetClass' => ShippingMethod::className(), 'targetAttribute' => ['shipping_method_id' => 'shipping_method_id']],
         ];
+    }
+
+    public function extraFields()
+    {
+        return array_merge(parent::extraFields(), [
+            'shippingMethod'
+        ]);
     }
 
     /**

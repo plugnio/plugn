@@ -9,6 +9,14 @@ use common\models\Order;
 class OrderItemQuery extends \yii\db\ActiveQuery
 {
     /**
+     * filter items with shipping
+     * @return void
+     */
+    public function filterShipping() {
+        $this->andWhere (['order_item.shipping' => true]);
+    }
+
+    /**
      * Active records only
      */
     public function activeOrders($storeUuid = null)

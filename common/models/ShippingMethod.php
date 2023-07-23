@@ -21,6 +21,13 @@ use yii\db\Expression;
  */
 class ShippingMethod extends \yii\db\ActiveRecord
 {
+    const CODE_MASHKOR = 'Mashkor';
+    const CODE_ARMADA = 'Armada';
+    const CODE_ARAMEX = 'Aramex';
+    const CODE_FEDEX = 'Fedex';
+    const CODE_UPS = 'Ups';
+    const CODE_CANADA_POST = 'CanadaPost';
+
     /**
      * {@inheritdoc}
      */

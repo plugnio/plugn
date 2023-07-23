@@ -31,7 +31,7 @@ class Aramex extends Model
 
         if($this->restaurant_uuid) {
 
-            $this->shipping_aramex_sandbox = Setting::getConfig($this->restaurant_uuid, "Aramex", 'shipping_aramex_sandbox');
+            $this->shipping_aramex_sandbox = (int) Setting::getConfig($this->restaurant_uuid, "Aramex", 'shipping_aramex_sandbox');
 
             $this->shipping_aramex_account_number = Setting::getConfig($this->restaurant_uuid, "Aramex", 'shipping_aramex_account_number');
             $this->shipping_aramex_account_entity = Setting::getConfig($this->restaurant_uuid, "Aramex", 'shipping_aramex_account_entity');
@@ -52,7 +52,8 @@ class Aramex extends Model
     public function rules()
     {
         return [
-            [['shipping_aramex_sandbox', 'shipping_aramex_account_number', 'shipping_aramex_account_entity',
+            [['shipping_aramex_sandbox', 'boolean']],
+            [['shipping_aramex_account_number', 'shipping_aramex_account_entity',
                 'shipping_aramex_account_pin', 'shipping_aramex_username', 'shipping_aramex_password',
                 'shipping_aramex_city', 'shipping_aramex_country_code', 'shipping_aramex_state', 'shipping_aramex_post_code'], 'required']
         ];
@@ -60,7 +61,7 @@ class Aramex extends Model
 
     public function save() {
 
-        Setting::setConfig($this->restaurant_uuid, "Aramex", 'shipping_aramex_sandbox', $this->shipping_aramex_sandbox);
+        Setting::setConfig($this->restaurant_uuid, "Aramex", 'shipping_aramex_sandbox', $this->shipping_aramex_sandbox? "1": "0");
 
         Setting::setConfig($this->restaurant_uuid, "Aramex", 'shipping_aramex_account_number', $this->shipping_aramex_account_number);
         Setting::setConfig($this->restaurant_uuid, "Aramex", 'shipping_aramex_account_entity', $this->shipping_aramex_account_entity);

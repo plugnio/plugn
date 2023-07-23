@@ -41,7 +41,7 @@ class Aramex
         $report_id = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_report_id');
 
         if (!$report_id)
-            $report_id = '9729';
+            $report_id = 9201;//todo: '9729';
 
         $shipper_street = '';
 
@@ -134,7 +134,12 @@ class Aramex
         $totalWeight = 0;
         $totalItems = 0;
         $product_arr = [];
-        foreach ($model->orderItems as $orderItem) {
+
+        $orderItems = $model->getOrderItems()
+            ->filterShipping()
+            ->all();
+
+        foreach ($orderItems as $orderItem) {
 
             $product_arr[] = $orderItem['item_name'];
             $weight = number_format($orderItem['weight'], 2);
@@ -166,7 +171,6 @@ class Aramex
         //SOAP object
         $soapClient = new SoapClient($baseUrl . '/shipping.wsdl');
         $aramex_errors = false;
-
 
         $flag = true;
         $error = "";
