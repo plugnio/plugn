@@ -537,8 +537,6 @@ class OrderController extends BaseController
                 ];
             }
 
-            if ($area_id) {
-
                 $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
 
                 $order->area_id = $area_id;
@@ -557,16 +555,11 @@ class OrderController extends BaseController
                 if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
                     $order->office = Yii::$app->request->getBodyParam("office");
 
-            } //Delivery other countries
-            else if ($country_id && !$area_id)
-            {
-                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
                 $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
                 $order->city = Yii::$app->request->getBodyParam("city");
-            }
 
             $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
 
@@ -616,6 +609,13 @@ class OrderController extends BaseController
             $orderItem->item_uuid = $item["item_uuid"];
             $orderItem->item_variant_uuid = isset($item["item_variant_uuid"])? $item["item_variant_uuid"]: null;
             $orderItem->qty = (int)$item["qty"];
+
+            $orderItem->shipping = isset($item["shipping"])? $item["shipping"]: true;
+            $orderItem->weight = isset($item["weight"])? $item["weight"]: 0;
+
+            $orderItem->width = isset($item["width"])? $item["width"]: 0;
+            $orderItem->height = isset($item["height"])? $item["height"]: 0;
+            $orderItem->length = isset($item["length"])? $item["length"]: 0;
 
             //optional field
             if (array_key_exists("customer_instruction", $item) && $item["customer_instruction"] != null)
@@ -814,8 +814,6 @@ class OrderController extends BaseController
                 ];
             }
 
-            if ($area_id)
-            {
                 //if delivery zone not specified
 
                 $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
@@ -829,16 +827,12 @@ class OrderController extends BaseController
                 if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
                     $order->office = Yii::$app->request->getBodyParam("office");
 
-            } //Delivery other countries
-            else if ($country_id && !$area_id)
-            {
-                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
                 $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
                 $order->city = Yii::$app->request->getBodyParam("city");
-            }
+
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
             $order->pickup_location_id = Yii::$app->request->getBodyParam("pickup_location_id");
         }
@@ -1217,6 +1211,9 @@ class OrderController extends BaseController
         if($model->businessLocation)
             $armadaApiKey = $model->businessLocation->armada_api_key;
 
+        if(!$armadaApiKey)
+            $armadaApiKey = $model->restaurant->armada_api_key;
+
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery ($model, $armadaApiKey);
 
         if ($createDeliveryApiResponse->isOk)
@@ -1265,7 +1262,7 @@ class OrderController extends BaseController
      * @return array
      * @throws NotFoundHttpException
      */
-    public function actionRequestDriverFromAramex($order_uuid, $store_uuid = null)
+    public function actionCreateShipmentAramex($order_uuid, $store_uuid = null)
     {
         $model = $this->findModel($order_uuid, $store_uuid);
 
@@ -1325,6 +1322,10 @@ class OrderController extends BaseController
 
         if($model->businessLocation)
             $mashkorBranchId = $model->businessLocation->mashkor_branch_id;
+
+        if(!$mashkorBranchId) {
+            $mashkorBranchId = $model->restaurant->mashkor_branch_id;
+        }
 
         $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder ($model, $mashkorBranchId);
 
@@ -1747,6 +1748,14 @@ class OrderController extends BaseController
             $orderItem->item_name = $item["item_name"];
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
+
+            $orderItem->shipping = isset($item["shipping"])? $item["shipping"]: true;
+            $orderItem->weight = isset($item["weight"])? $item["weight"]: 0;
+
+            $orderItem->width = isset($item["width"])? $item["width"]: 0;
+            $orderItem->height = isset($item["height"])? $item["height"]: 0;
+            $orderItem->length = isset($item["length"])? $item["length"]: 0;
+
             $orderItem->item_price = $item["item_price"];
             $orderItem->restaurant_uuid = $restaurant->restaurant_uuid;
             $orderItem->item_unit_price = isset($item["item_unit_price"])? $item["item_unit_price"]:

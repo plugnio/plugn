@@ -10,6 +10,7 @@ use Yii;
 use common\models\Currency;
 use common\models\shipping\util\ShippingHelper;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
  * todo: new params
@@ -41,7 +42,7 @@ class Aramex
         $report_id = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_report_id');
 
         if (!$report_id)
-            $report_id = 9201;//todo: '9729';
+            $report_id = 9201;//todo: '9729'; 9201
 
         $shipper_street = '';
 
@@ -53,24 +54,44 @@ class Aramex
         ##################### customer shipment details ################
 
         $shipment_receiver_name = $model->customer_name;
+
         $shipment_receiver_street = '';
 
-        if (!empty($model->address_1)) {
-            $shipment_receiver_street .= $model->address_1;
+        if($model->unit_type == "House") {
+            $shipment_receiver_street .= "House number: " . $model->house_number;
         }
 
-        if (!empty($model->address_2)) {
-            $shipment_receiver_street .= $model->address_2;
-        }
+        if($model->apartment)
+            $shipment_receiver_street .= "Apartment: " . $model->apartment;
+
+        if($model->floor)
+            $shipment_receiver_street .= "Floor: " . $model->floor;
+
+        if($model->block)
+            $shipment_receiver_street .= "Block: " . $model->block;
+
+        if($model->street)
+            $shipment_receiver_street .= "Street: " . $model->street;
+
+        if($model->avenue)
+            $shipment_receiver_street .= "Avenue: " . $model->avenue;
+
+        if($model->building)
+            $shipment_receiver_street .= "Building: " . $model->building;
+
+        if($model->office)
+            $shipment_receiver_street .= "Office: " . $model->office;
+
         $receiver_name = $shipment_receiver_name;
         $receiver_email = $model->customer_email;
         $receiver_company = '';
         $receiver_street = $shipment_receiver_street;
-        $receiver_country = $model->country->iso;
-        $receiver_city =  $model->city;
+        $receiver_country = $model->country?$model->country->iso: "KW";
+        $receiver_city =  $model->city ;
         $receiver_postal = $model->postalcode;
         $receiver_state = '';//todo: state
-        $receiver_phone = $model->customer_phone_number;//customer_phone_country_code
+        $receiver_phone =  '+' .$model->customer_phone_country_code . $model->customer_phone_number;//
+//6666666 todo: phone number not working
 
         #################
 
@@ -78,10 +99,12 @@ class Aramex
 
         $shipper_account = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_account_number');
 
-        $domestic_methods = ArrayHelper::getColumn(self::domesticmethods(), 'value');
-        $domestic_additional_services =  ArrayHelper::getColumn(self::domesticadditionalservices(), 'value');
-        $international_methods = ArrayHelper::getColumn(self::internationalmethods(), 'value');
-        $international_additional_services = ArrayHelper::getColumn(self::internationaladditionalservices(), 'value');
+        //todo: configurable from order form page 
+
+        $domestic_methods = "CDA";// "LGS";// ArrayHelper::getColumn(self::domesticmethods(), 'value')[0];
+        $domestic_additional_services = null;//'CHST';//  ArrayHelper::getColumn(self::domesticadditionalservices(), 'value')[0];
+        $international_methods = "DPX";// ArrayHelper::getColumn(self::internationalmethods(), 'value')[0];
+        $international_additional_services = null;// ArrayHelper::getColumn(self::internationaladditionalservices(), 'value')[0];
 
         $weight_unit = 'KG';//todo: configurable
         $aramex_shipment_info_billing_account = 1;
@@ -99,7 +122,10 @@ class Aramex
         /// COD
         $services = array();
         $additional_service_type_array = array();
-        $additional_service_type_array[] = $additional_service_type;
+
+        if($additional_service_type)
+            $additional_service_type_array[] = $additional_service_type;
+
         if($product_type == "CDA"){
             if( $additional_service_type == null ){
                 array_push($services, "CODS");
@@ -115,16 +141,22 @@ class Aramex
             }
             $services = array_merge($services, $additional_service_type_array);
         }
+
         $services = implode(',', $services);
 /// COD
         $payment_type = 'P';
         $cod_amount = 0;
+        $payment_option = 'ACCT';//ASCC/ARCC/CASH/ACCT/PPST/CRDT
+
         if ($model->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH) {
             $payment_option = 'CASH';
-            $cod_amount = number_format($model->total_price, 2);
+            $payment_type = 'C';//collect
         }
+        $cod_amount = number_format($model->total_price * $model->currency_rate, 2);
         $currency_code = $model->currency_code;
-        $custom_amount = '';
+
+        $custom_amount = $model->total_price * $model->currency_rate;
+
         $info_comment = '';
         $foreignhawb = '';
 
@@ -158,7 +190,7 @@ class Aramex
             $totalItems += $orderItem['qty'];
         }
         //echo $totalWeight;
-        $total = number_format($model->total_price, 2);
+        $total = number_format($model->total_price * $model->currency_rate, 2);
 
         if (count($product_arr)) {
             $aramex_shipment_description = implode(", ", $product_arr);
@@ -169,11 +201,18 @@ class Aramex
         $baseUrl = self::getWsdlPath($sandbox);
 
         //SOAP object
-        $soapClient = new SoapClient($baseUrl . '/shipping.wsdl');
+        $soapClient = new \SoapClient($baseUrl . '/shipping.wsdl', array(
+            'exceptions'=>true,
+            'cache_wsdl'=>WSDL_CACHE_NONE,
+            'encoding'=>'utf-8',
+            "trace" => 1
+        ));
+
         $aramex_errors = false;
 
         $flag = true;
         $error = "";
+
         try {
 
             $aramex_atachments = array();
@@ -220,8 +259,8 @@ class Aramex
                 //Party Address
                 'PartyAddress' => array(
                     'Line1' => $receiver_street, //'15 ABC St',
-                    'Line2' => '',
-                    'Line3' => '',
+                    'Line2' => $model->address_1 . ' ' . $model->address_2 ,
+                    'Line3' => $model->special_directions,
                     'City' => $receiver_city, //'Amman',
                     'StateOrProvinceCode' => '',
                     'PostCode' => $receiver_postal,
@@ -233,12 +272,12 @@ class Aramex
                     'PersonName' => $receiver_name, //'Mazen',
                     'Title' => '',
                     'CompanyName' => $receiver_email, //'Aramex',
-                    'PhoneNumber1' => $receiver_phone, //'6666666',
-                    'PhoneNumber1Ext' => '',
+                    'PhoneNumber1' => $model->customer_phone_number,//'6666666',
+                    'PhoneNumber1Ext' => '',//+962 '+'.$model->customer_phone_country_code,
                     'PhoneNumber2' => '',
                     'PhoneNumber2Ext' => '',
                     'FaxNumber' => '',
-                    'CellPhone' => $receiver_phone,
+                    'CellPhone' => $model->customer_phone_number,// '',//$receiver_phone
                     'EmailAddress' => $receiver_email, //'mazen@aramex.com',
                     'Type' => ''
                 )
@@ -315,17 +354,26 @@ class Aramex
                 'Items' => $aramex_items,
             );
 
-            if (count($aramex_atachments)) {
-                $params['Attachments'] = $aramex_atachments;
-            }
-
-            $params['Details']['CashOnDeliveryAmount'] = array(
-                'Value' => $cod_amount,
-                'CurrencyCode' => $currency_code
+            /*$aramex_atachments[] = array(
+                "FileName" => "invoice-" . $model->order_uuid,
+                "FileExtension" => "pdf",
+                "FileContents" => base64_encode("test")
             );
 
+            //if (count($aramex_atachments)) {
+                $params['Attachments'] = $aramex_atachments;
+            //}
+            */
+
+            if($cod_amount > 0) {
+                $params['Details']['CashOnDeliveryAmount'] = array(
+                    'Value' => $cod_amount,
+                    'CurrencyCode' => $currency_code
+                );
+            }
+
             $params['Details']['CustomsValueAmount'] = array(
-                'Value' => $custom_amount,
+                'Value' => $custom_amount,//todo: $custom_amount,
                 'CurrencyCode' => $currency_code
             );
 
@@ -335,27 +383,38 @@ class Aramex
 
             $major_par['LabelInfo'] = array(
                 'ReportID' => $report_id, //'9201',
-                'ReportType' => 'URL'
+                'ReportType' => 'RPT'//URL
             );
 
             try {
                 //create shipment call
+                //$auth_call = $soapClient->CreateShipments($major_par, array('trace' => 1));
+//echo  '<pre />';
+//print_r($major_par);die();
                 $auth_call = $soapClient->CreateShipments($major_par);
-                //print_r($auth_call);
+
+                //$auth_call = $soapClient->__soapCall('CreateShipments', $major_par);
+
                 if ($auth_call->HasErrors) {
+
                     if (empty($auth_call->Shipments)) {
                         if (count($auth_call->Notifications->Notification) > 1) {
-                            foreach ($auth_call->Notifications->Notification as $notify_error) {
+                            $message = '';
 
-                                $message = 'Aramex: ' . $notify_error->Code . ' - ' . $notify_error->Message;
-                                return self::createShipmentFail($model->order_uuid, $message);
+                            foreach ($auth_call->Notifications->Notification as $notify_error) {
+                                $message .=  'Aramex: ' . $notify_error->Code . ' - ' .$notify_error->Message .' ';
                             }
+
+                            return self::createShipmentFail($model->order_uuid, $message);
                         } else {
                             $message = 'Aramex: ' . $auth_call->Notifications->Notification->Code . ' - ' . $auth_call->Notifications->Notification->Message;
                             return self::createShipmentFail($model->order_uuid, $message);
                         }
                     } else {
-                        if (count($auth_call->Shipments->ProcessedShipment->Notifications->Notification) > 1) {
+
+                        if (is_array($auth_call->Shipments->ProcessedShipment->Notifications->Notification) &&
+                            isset($auth_call->Shipments->ProcessedShipment->Notifications->Notification[0])
+                        ) {
                             $notification_string = '';
                             foreach ($auth_call->Shipments->ProcessedShipment->Notifications->Notification as $notification_error) {
                                 $notification_string .= $notification_error->Code . ' - ' . $notification_error->Message . ' <br />';
@@ -367,15 +426,13 @@ class Aramex
                             return self::createShipmentFail($model->order_uuid, $message);
                         }
                     }
+
                 } else {
+
                     $shipmenthistory = "AWB No. " . $auth_call->Shipments->ProcessedShipment->ID .
                         " - Order No. " . $auth_call->Shipments->ProcessedShipment->Reference1;
 
-                    Yii::info($auth_call);
-
-                    Yii::info($auth_call->Shipments);
-
-                    Yii::info($shipmenthistory);
+                    //todo: save this response for future reference
 
                     return [
                         "operation" => "success",
@@ -398,8 +455,14 @@ class Aramex
                 $aramex_errors = true;
                 $message = $e->getMessage();
                 return self::createShipmentFail($model->order_uuid, $message);
+            } catch (\yii\base\ErrorException $e) {
+                $message = $e->getMessage();
+                return self::createShipmentFail($model->order_uuid, $message);
             }
         } catch (Exception $e) {
+            $message = $e->getMessage();
+            return self::createShipmentFail($model->order_uuid, $message);
+        } catch (\yii\base\ErrorException $e) {
             $message = $e->getMessage();
             return self::createShipmentFail($model->order_uuid, $message);
         }
@@ -415,13 +478,18 @@ class Aramex
         ];
     }
 
-    public function getWsdlPath($sandbox) {
+    public static function getWsdlPath($sandbox) {
 
-        $wsdlBasePath = Yii::getAlias("@common/models/shipping/util/aramex/wsdl");
+        //$wsdlBasePath = Yii::getAlias("@common/models/shipping/util/aramex/wsdl");
+
+        //$wsdlBasePath = Url::to()
+
+        $wsdlBasePath = "http://localhost:8888/plugn/agent/web/wsdl";
 
         if ($sandbox) {
             $wsdlBasePath .='/TestMode';
         }
+
         return $wsdlBasePath;
     }
 
@@ -706,7 +774,7 @@ print_r($total_res);
         );
     }
 
-    public function domesticmethods() {
+    public static function domesticmethods() {
 
         $arr[] = array('value'=>'BLK', 'label'=>'Special: Bulk Mail Delivery');
         $arr[] = array('value'=>'BLT', 'label'=>'Domestic - Bullet Delivery');
@@ -738,7 +806,7 @@ print_r($total_res);
         return $arr;
     }
 
-    public function domesticAdditionalServices()
+    public static function domesticAdditionalServices()
     {
 
         $arr[] = array('value'=>'AM10', 'label'=>'Morning delivery');
@@ -758,7 +826,7 @@ print_r($total_res);
         return $arr;
     }
 
-    public function internationalmethods()
+    public static function internationalmethods()
     {
         $arr[] = array('value'=>'DPX', 'label'=>'Value Express Parcels');
         $arr[] = array('value'=>'EDX', 'label'=>'Economy Document Express');
@@ -774,7 +842,7 @@ print_r($total_res);
         return $arr;
     }
 
-    public function internationalAdditionalServices()
+    public static function internationalAdditionalServices()
     {
         $arr[] = array('value'=>'AM10', 'label'=>'Morning delivery');
         $arr[] = array('value'=>'CODS', 'label'=>'Cash On Delivery');

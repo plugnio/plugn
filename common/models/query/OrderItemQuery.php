@@ -13,7 +13,7 @@ class OrderItemQuery extends \yii\db\ActiveQuery
      * @return void
      */
     public function filterShipping() {
-        $this->andWhere (['order_item.shipping' => true]);
+        return $this->andWhere (['order_item.shipping' => true]);
     }
 
     /**

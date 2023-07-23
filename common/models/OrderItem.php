@@ -24,7 +24,7 @@ use yii\db\Expression;
  * @property float $length
  * @property float $height
  * @property float $width
- * @property float $shipping
+ * @property boolean $shipping
  * @property string|null $customer_instruction
  * @property datetime $order_item_created_at
  * @property datetime $order_item_updated_at
