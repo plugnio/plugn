@@ -8,6 +8,7 @@ use agent\models\Refund;
 use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
 use common\models\Payment;
+use common\models\shipping\Aramex;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -1256,6 +1257,19 @@ class OrderController extends BaseController
             "armada_delivery_code" => $model->armada_delivery_code,
             "message" => Yii::t('agent', "Your request has been successfully submitted")
         ];
+    }
+
+    /**
+     * @param $order_uuid
+     * @param $store_uuid
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionRequestDriverFromAramex($order_uuid, $store_uuid = null)
+    {
+        $model = $this->findModel($order_uuid, $store_uuid);
+
+        return Aramex::createDelivery ($model);
     }
 
     /**
