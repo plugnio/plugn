@@ -7,6 +7,7 @@ use api\models\City;
 use api\models\Item;
 use api\models\Restaurant;
 use api\models\State;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
 use yii\db\Expression;
 use yii\filters\auth\HttpBearerAuth;
@@ -378,6 +379,53 @@ class DeliveryZoneController extends BaseController
         return new ActiveDataProvider([
             'query' => $query
         ]);
+    }
+
+    /**
+     * delivery zone by city, state and country
+     * @return void
+     */
+    public function actionDetailByLocation()
+    {
+        $store_id = Yii::$app->request->getHeaders()
+            ->get('Store-Id');
+
+        $city_id = Yii::$app->request->get("city_id");
+        $state_id = Yii::$app->request->get("state_id");
+        $country_id = Yii::$app->request->get("country_id");
+
+        $store = $this->findStore($store_id);
+
+        $areaDeliveryZone = $store->getAreaDeliveryZones()
+            ->andWhere([
+                'city_id' => $city_id,
+                'state_id' => $state_id,
+                'country_id' => $country_id
+            ])
+            ->one();
+
+        //state wide
+        if(!$areaDeliveryZone) {
+            $areaDeliveryZone = $store->getAreaDeliveryZones()
+                ->andWhere([
+                    'state_id' => $state_id,
+                    'country_id' => $country_id
+                ])
+                ->andWhere(new Expression("city_id IS NULL"))
+                ->one();
+        }
+
+        //country wide
+        if(!$areaDeliveryZone) {
+            $areaDeliveryZone = $store->getAreaDeliveryZones()
+                ->andWhere([
+                    'country_id' => $country_id
+                ])
+                ->andWhere(new Expression("city_id IS NULL AND state_id IS NULL"))
+                ->one();
+        }
+
+        return $areaDeliveryZone? $areaDeliveryZone->deliveryZone: null;
     }
 
     /**

@@ -458,7 +458,7 @@ return [
                         'GET areas/<city_id>' => 'areas',
                         'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
                         'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
-
+                        'GET detail-by-location' => 'detail-by-location',
                         'POST create' => 'create',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
                         'PATCH <delivery_zone_id>' => 'update',
@@ -471,6 +471,7 @@ return [
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
 
+                        'OPTIONS detail-by-location' => 'options',
                         'OPTIONS cities/<state_id>' => 'options',
                         'OPTIONS states/<country_id>' => 'options',
                         'OPTIONS areas/<city_id>' => 'options',
