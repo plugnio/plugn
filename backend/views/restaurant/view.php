@@ -125,6 +125,7 @@ $this->registerJs($js);
                 'facebook_pixil_id',
                 'google_analytics_id',
                 'google_tag_id',
+                'google_tag_manager_id',
                 'tiktok_pixel_id',
                 'snapchat_pixil_id'
             ]
