@@ -2,7 +2,13 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\Country;
+use api\models\City;
+use api\models\Item;
+use api\models\Restaurant;
+use api\models\State;
 use Yii;
+use yii\db\Expression;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\Cors;
 use yii\rest\Controller;
@@ -269,6 +275,208 @@ class DeliveryZoneController extends BaseController
             "operation" => "success",
             "message" => Yii::t('agent',"Delivery Zone VAT Charged cancelled successfully")
         ];
+    }
+
+    /**
+     * Return list of states available for delivery
+     */
+    public function actionStates($country_id) {
+
+        //$store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $country = Country::findOne($country_id);
+
+        if(!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getStates("\api\models\State");
+
+        /*if($store_id) {
+            $query->joinWith('areaDeliveryZones', true, 'inner join')
+                ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
+        }*/
+
+        if($keyword) {
+            $query->andWhere(['like', 'name', $keyword]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * Return list of cities available for delivery
+     */
+    public function actionCities($state_id) {
+
+        //$store_id = Yii::$app->request->getHeaders()
+        //    ->get('Store-Id');
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $state = State::findOne($state_id);
+
+        if(!$state) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $state->getCities("\api\models\City");
+
+        /*if($store_id) {
+            $query->joinWith('areaDeliveryZones', true, 'inner join')
+                ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
+        }*/
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'city_name', $keyword],
+                ['like', 'city_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * Return list of cities available for delivery
+     */
+    public function actionAreas($city_id) {
+
+        //$store_id = Yii::$app->request->getHeaders()
+        //    ->get('Store-Id');
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $city = City::findOne($city_id);
+
+        if(!$city) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $city->getAreas("\common\models\Area");
+
+        /*if($store_id) {
+            $query->joinWith('areaDeliveryZones', true, 'inner join')
+                ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
+        }*/
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * Return list of areas available for delivery
+     */
+    public function actionListOfAreas($restaurant_uuid, $country_id) {
+
+        $store_model = Restaurant::findOne($restaurant_uuid);
+
+            $countryCities = City::find()
+                ->andWhere(['country_id' => $country_id])
+                ->asArray()
+                ->all();
+
+            if($countryCities) {
+
+                $areaDeliveryZones = $store_model->getAreaDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
+
+                foreach ($countryCities as $cityKey => $city) {
+                    foreach ($areaDeliveryZones as $areaDeliveryZoneKey => $areaDeliveryZone) {
+
+                        if(isset($areaDeliveryZone['area'])){
+                            if($areaDeliveryZone['area']['city_id'] == $city['city_id']){
+                                $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
+                            }
+                        }
+                        else {
+                            $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
+                        }
+                    }
+                }
+            }
+
+            $citiesData = [];
+            foreach ($countryCities as $key => $city) {
+                if(isset($city['areas']))
+                    $citiesData []= $city;
+            }
+
+            if(!empty($citiesData))
+                return $citiesData ;
+    }
+
+    /**
+     * Return List of countries available for delivery
+     */
+    public function actionListOfCountries($restaurant_uuid) {
+
+        $store_model = $this->findStore($restaurant_uuid);
+
+        $subQuery = $store_model->getDeliveryZones()
+            ->select('delivery_zone.country_id')
+            ->distinct();
+
+        $countries = Country::find()
+            ->andWhere(['IN', 'country.country_id', $subQuery])
+            ->all();
+
+        $data = [];
+
+        foreach ($countries as $country) {
+
+            $areas = $store_model->getAreaDeliveryZones()
+                ->andWhere(new Expression('state_id IS NOT NULL OR city_id IS NOT NULL OR area_id IS NOT NULL'))
+                ->andWhere(['area_delivery_zone.country_id' => $country->country_id])
+                ->count();
+
+            $deliveryZone = null;
+
+            $deliveryZone = $store_model->getDeliveryZones()
+                ->andWhere(['delivery_zone.country_id' => $country->country_id])
+                ->one();
+
+            $data[] = array_merge($country->attributes, [
+                'areas' => $areas,
+                'deliveryZone' => $deliveryZone,
+                'delivery_zone_id' => $deliveryZone? $deliveryZone->delivery_zone_id : null
+            ]);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Finds the Item model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Item the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findStore($id)
+    {
+        $model = Restaurant::findOne($id);
+
+        if ($model !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
     /**

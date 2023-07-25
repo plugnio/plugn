@@ -453,6 +453,12 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'GET cities/<state_id>' => 'cities',
+                        'GET states/<country_id>' => 'states',
+                        'GET areas/<city_id>' => 'areas',
+                        'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
+                        'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
+
                         'POST create' => 'create',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
                         'PATCH <delivery_zone_id>' => 'update',
@@ -464,6 +470,13 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
+
+                        'OPTIONS cities/<state_id>' => 'options',
+                        'OPTIONS states/<country_id>' => 'options',
+                        'OPTIONS areas/<city_id>' => 'options',
+                        'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
+                        'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',
+
                         'OPTIONS <delivery_zone_id>/<store_uuid>' => 'options',
                         'OPTIONS cancel-override/<delivery_zone_id>/<store_uuid>' => 'options',
                         'OPTIONS <delivery_zone_id>' => 'options',

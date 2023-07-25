@@ -1586,6 +1586,9 @@ failed: the order has failed to find a driver */
             $area_model = Area::findOne($this->area_id);
             $this->area_name = $area_model->area_name;
             $this->area_name_ar = $area_model->area_name_ar;
+
+
+
             //$this->save(false);
         }
 
@@ -1606,16 +1609,19 @@ failed: the order has failed to find a driver */
                       'restaurant_uuid' =>$this->restaurant_uuid,
                     ])->one();
 
-                    if ($deliveryZone) {
-
+                    if ($deliveryZone)
+                    {
                         $this->country_name = $deliveryZone->country->country_name;
                         $this->country_name_ar = $deliveryZone->country->country_name_ar;
+                        $this->shipping_country_id = $deliveryZone->country->country_id;
 
                         if ($deliveryZone->business_location_id)
                             $this->business_location_name = $deliveryZone->businessLocation->business_location_name;
 
                         //$this->save(false);
-                    }else {
+                    }
+                    else
+                    {
                       return $this->addError(
                           'delivery_zone_id',
                           Yii::t('yii', "{attribute} is invalid.", [
