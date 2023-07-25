@@ -137,6 +137,12 @@ to publish in production
 `circleci local execute -e SLACK_ACCESS_TOKEN=xoxb-47737144055-4606269551878-bOLPfBq1x0ZvfC4OHbj7WgRP`
 
 
+To check amount mismatched orders 
+
+------------------
+
+select `order`.order_uuid, `order`.total_price, payment.payment_amount_charged, `order`.store_currency_code, `order`.currency_code,  `order`.currency_rate from payment inner join `order` on `order`.payment_uuid = payment.payment_uuid where payment.payment_amount_charged = `order`.total_price and `order`.store_currency_code != `order`.currency_code and payment_current_status="CAPTURED"
+
 Todo
 ------------------
 update cron > crontab
