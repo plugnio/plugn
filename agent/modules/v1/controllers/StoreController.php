@@ -1081,7 +1081,8 @@ class StoreController extends BaseController
         $model->google_analytics_id = Yii::$app->request->getBodyParam ('google_analytics_id');
         $model->facebook_pixil_id = Yii::$app->request->getBodyParam ('facebook_pixil_id');
         $model->snapchat_pixil_id = Yii::$app->request->getBodyParam ('snapchat_pixil_id');
-        $model->google_tag_id= Yii::$app->request->getBodyParam ('google_tag_id');
+        $model->google_tag_id = Yii::$app->request->getBodyParam ('google_tag_id');
+        $model->google_tag_manager_id = Yii::$app->request->getBodyParam ('google_tag_manager_id');
         $model->tiktok_pixel_id= Yii::$app->request->getBodyParam ('tiktok_pixel_id');
 
         $model->sitemap_require_update = 1;
