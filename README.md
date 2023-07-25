@@ -140,8 +140,16 @@ to publish in production
 
 SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
+To check amount mismatched orders 
+
+------------------
+
+select `order`.order_uuid, `order`.total_price, payment.payment_amount_charged, `order`.store_currency_code, `order`.currency_code,  `order`.currency_rate from payment inner join `order` on `order`.payment_uuid = payment.payment_uuid where payment.payment_amount_charged = `order`.total_price and `order`.store_currency_code != `order`.currency_code and payment_current_status="CAPTURED"
+
 Todo
 ------------------
 update cron > crontab
 
 https://blog.logrocket.com/how-to-run-laravel-docker-compose-ubuntu-v22-04/
+
+https://stackoverflow.com/questions/37741512/how-can-i-use-the-aramex-api-with-wsdl-and-python

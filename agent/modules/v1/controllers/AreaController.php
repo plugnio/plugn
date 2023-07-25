@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
+use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
@@ -63,7 +64,8 @@ class AreaController extends BaseController {
 
         $store = Yii::$app->accountManager->getManagedAccount($store_id);
 
-        $query = $store->getAreaDeliveryZones();
+        $query = $store->getAreaDeliveryZones()
+            ->andWhere(new Expression('area_id IS NOT NULL'));
 
         if ($city_id) {
             $query->andWhere(['city_id' => $city_id]);

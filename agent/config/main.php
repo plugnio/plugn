@@ -242,6 +242,7 @@ return [
                         'GET' => 'list',
                         'POST' => 'place-an-order',
                         'POST cancel-delivery/<id>' => 'cancel-delivery',
+                        'POST create-shipment-aramex/<order_uuid>' => 'create-shipment-aramex',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
                         'POST request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'request-driver-from-mashkor',
                         'POST request-payment-status-from-tap/<order_uuid>/<store_uuid>' => 'request-payment-status-from-tap',
@@ -269,6 +270,8 @@ return [
                         'OPTIONS download-invoice/<id>' => 'options',
                         'OPTIONS refund/<order_uuid>' => 'options',
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS create-shipment-aramex/<order_uuid>' => 'options',
+
                         'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS update-order-status/<order_uuid>' => 'options',
@@ -450,6 +453,12 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'GET cities/<state_id>' => 'cities',
+                        'GET states/<country_id>' => 'states',
+                        'GET areas/<city_id>' => 'areas',
+                        'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
+                        'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
+                        'GET detail-by-location' => 'detail-by-location',
                         'POST create' => 'create',
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
                         'PATCH <delivery_zone_id>' => 'update',
@@ -461,6 +470,14 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS create' => 'options',
+
+                        'OPTIONS detail-by-location' => 'options',
+                        'OPTIONS cities/<state_id>' => 'options',
+                        'OPTIONS states/<country_id>' => 'options',
+                        'OPTIONS areas/<city_id>' => 'options',
+                        'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
+                        'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',
+
                         'OPTIONS <delivery_zone_id>/<store_uuid>' => 'options',
                         'OPTIONS cancel-override/<delivery_zone_id>/<store_uuid>' => 'options',
                         'OPTIONS <delivery_zone_id>' => 'options',
@@ -591,6 +608,19 @@ return [
                         'OPTIONS config/<code>' => 'options',
                     ]
                 ],
+                [// ShippingMethodController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/shipping-method',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST config/<code>' => 'config',
+                        'DELETE disable/<code>' => 'config',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS disable/<code>' => 'options',
+                        'OPTIONS config/<code>' => 'options',
+                    ]
+                ],
                 [// InvoiceController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/invoice',
@@ -616,6 +646,7 @@ return [
                         'GET settings/<code>' => 'settings',
                         'GET test-tap' => 'test-tap',
                         'GET view-payment-methods' => 'view-payment-methods',
+                        'GET view-shipping-methods' => 'view-shipping-methods',
                         'GET view-payment-methods/<id>' => 'view-payment-methods',
                         'POST' => 'update',
                         'POST upgrade' => 'upgrade',
@@ -688,6 +719,7 @@ return [
                         'OPTIONS disable-payment-method/<id>/<paymentMethodId>' => 'options',
                         'OPTIONS enable-payment-method/<id>/<paymentMethodId>' => 'options',
                         'OPTIONS view-payment-methods/<id>' => 'options',
+                        'OPTIONS view-shipping-methods' => 'options',
                         'OPTIONS create-tap-account/<id>' => 'options',
                         'OPTIONS enable-online-payment/<id>' => 'options',
                         'OPTIONS disable-online-payment/<id>' => 'options',

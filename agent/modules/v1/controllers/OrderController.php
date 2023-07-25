@@ -8,6 +8,7 @@ use agent\models\Refund;
 use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
 use common\models\Payment;
+use common\models\shipping\Aramex;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -536,8 +537,6 @@ class OrderController extends BaseController
                 ];
             }
 
-            if ($area_id) {
-
                 $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
 
                 $order->area_id = $area_id;
@@ -546,26 +545,15 @@ class OrderController extends BaseController
                 $order->street = Yii::$app->request->getBodyParam("street");
                 $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam("house_number");
-
-                if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
-                    $order->floor = Yii::$app->request->getBodyParam("floor");
-
-                if (Yii::$app->request->getBodyParam("apartment") != null && $order->unit_type == 'Apartment')
-                    $order->apartment = Yii::$app->request->getBodyParam("apartment");
-
-                if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
-                    $order->office = Yii::$app->request->getBodyParam("office");
-
-            } //Delivery other countries
-            else if ($country_id && !$area_id)
-            {
-                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
+                $order->building = Yii::$app->request->getBodyParam("building");
+                $order->floor = Yii::$app->request->getBodyParam("floor");
+                $order->apartment = Yii::$app->request->getBodyParam("apartment");
+                $order->office = Yii::$app->request->getBodyParam("office");
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
                 $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
                 $order->city = Yii::$app->request->getBodyParam("city");
-            }
 
             $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
 
@@ -615,6 +603,13 @@ class OrderController extends BaseController
             $orderItem->item_uuid = $item["item_uuid"];
             $orderItem->item_variant_uuid = isset($item["item_variant_uuid"])? $item["item_variant_uuid"]: null;
             $orderItem->qty = (int)$item["qty"];
+
+            $orderItem->shipping = isset($item["shipping"])? $item["shipping"]: true;
+            $orderItem->weight = isset($item["weight"])? $item["weight"]: 0;
+
+            $orderItem->width = isset($item["width"])? $item["width"]: 0;
+            $orderItem->height = isset($item["height"])? $item["height"]: 0;
+            $orderItem->length = isset($item["length"])? $item["length"]: 0;
 
             //optional field
             if (array_key_exists("customer_instruction", $item) && $item["customer_instruction"] != null)
@@ -752,7 +747,8 @@ class OrderController extends BaseController
         $order->block = Yii::$app->request->getBodyParam("block");
         $order->street = Yii::$app->request->getBodyParam("street");
         $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
-        $order->house_number = Yii::$app->request->getBodyParam("building");
+        $order->house_number = Yii::$app->request->getBodyParam("house_number");
+        $order->building = Yii::$app->request->getBodyParam("building");
 
         $order->payment_method_id = Yii::$app->request->getBodyParam('payment_method_id');
         if ($order->paymentMethod && $order->paymentMethod->payment_method_name) {
@@ -813,31 +809,19 @@ class OrderController extends BaseController
                 ];
             }
 
-            if ($area_id)
-            {
                 //if delivery zone not specified
 
                 $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
+                $order->floor = Yii::$app->request->getBodyParam("floor");
+                $order->apartment = Yii::$app->request->getBodyParam("apartment");
+                $order->office = Yii::$app->request->getBodyParam("office");
 
-                if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
-                    $order->floor = Yii::$app->request->getBodyParam("floor");
-
-                if (Yii::$app->request->getBodyParam("apartment") != null && $order->unit_type == 'Apartment')
-                    $order->apartment = Yii::$app->request->getBodyParam("apartment");
-
-                if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
-                    $order->office = Yii::$app->request->getBodyParam("office");
-
-            } //Delivery other countries
-            else if ($country_id && !$area_id)
-            {
-                $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
                 $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
                 $order->city = Yii::$app->request->getBodyParam("city");
-            }
+
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
             $order->pickup_location_id = Yii::$app->request->getBodyParam("pickup_location_id");
         }
@@ -1216,6 +1200,9 @@ class OrderController extends BaseController
         if($model->businessLocation)
             $armadaApiKey = $model->businessLocation->armada_api_key;
 
+        if(!$armadaApiKey)
+            $armadaApiKey = $model->restaurant->armada_api_key;
+
         $createDeliveryApiResponse = Yii::$app->armadaDelivery->createDelivery ($model, $armadaApiKey);
 
         if ($createDeliveryApiResponse->isOk)
@@ -1256,6 +1243,19 @@ class OrderController extends BaseController
             "armada_delivery_code" => $model->armada_delivery_code,
             "message" => Yii::t('agent', "Your request has been successfully submitted")
         ];
+    }
+
+    /**
+     * @param $order_uuid
+     * @param $store_uuid
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionCreateShipmentAramex($order_uuid, $store_uuid = null)
+    {
+        $model = $this->findModel($order_uuid, $store_uuid);
+
+        return Aramex::createDelivery ($model);
     }
 
     /**
@@ -1311,6 +1311,10 @@ class OrderController extends BaseController
 
         if($model->businessLocation)
             $mashkorBranchId = $model->businessLocation->mashkor_branch_id;
+
+        if(!$mashkorBranchId) {
+            $mashkorBranchId = $model->restaurant->mashkor_branch_id;
+        }
 
         $createDeliveryApiResponse = Yii::$app->mashkorDelivery->createOrder ($model, $mashkorBranchId);
 
@@ -1613,6 +1617,7 @@ class OrderController extends BaseController
         $street = Yii::$app->request->getBodyParam('street');
         $avenue = Yii::$app->request->getBodyParam('avenue');
         $building = Yii::$app->request->getBodyParam('building');
+        $house_number = Yii::$app->request->getBodyParam('house_number');
         $block = Yii::$app->request->getBodyParam('block');
         $customer_email = Yii::$app->request->getBodyParam('customer_email');
         $customer_phone_country_code = Yii::$app->request->getBodyParam('customer_phone_country_code');
@@ -1666,7 +1671,8 @@ class OrderController extends BaseController
         $model->unit_type = $unit_type;
         $model->street = $street;
         $model->avenue = $avenue;
-        $model->house_number = $building;
+        $model->house_number = $house_number;
+        $model->building = $building;
         $model->block = $block;
         $model->customer_email = $customer_email;
         $model->customer_phone_country_code = $customer_phone_country_code;
@@ -1733,6 +1739,14 @@ class OrderController extends BaseController
             $orderItem->item_name = $item["item_name"];
             $orderItem->item_name_ar = $item["item_name_ar"];
             $orderItem->qty = (int)$item["qty"];
+
+            $orderItem->shipping = isset($item["shipping"])? $item["shipping"]: true;
+            $orderItem->weight = isset($item["weight"])? $item["weight"]: 0;
+
+            $orderItem->width = isset($item["width"])? $item["width"]: 0;
+            $orderItem->height = isset($item["height"])? $item["height"]: 0;
+            $orderItem->length = isset($item["length"])? $item["length"]: 0;
+
             $orderItem->item_price = $item["item_price"];
             $orderItem->restaurant_uuid = $restaurant->restaurant_uuid;
             $orderItem->item_unit_price = isset($item["item_unit_price"])? $item["item_unit_price"]:
