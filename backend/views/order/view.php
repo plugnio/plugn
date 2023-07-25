@@ -277,6 +277,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                             },
                             'visible' => $model->armada_order_status != null,
                         ],
+                        'aramex_shipment_id',
                         [
                             'attribute' => 'mashkor_order_number',
                             'format' => 'raw',

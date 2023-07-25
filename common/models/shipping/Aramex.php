@@ -19,7 +19,6 @@ aramex_allowed_domestic_additional_services
 aramex_allowed_international_methods
 aramex_allowed_international_additional_services
 
-
 aramex_report_id
 
  *
@@ -50,6 +49,15 @@ class Aramex
         $shipper_email = $model->restaurant->restaurant_email ? $model->restaurant->restaurant_email: $model->restaurant->owner_email;
         $shipper_company = $model->restaurant->name;
         $shipper_phone = $model->restaurant->phone_number ? $model->restaurant->phone_number : $model->restaurant->owner_number;//'+'. $model->restaurant->phone_number_country_code . ' ' .
+
+        //todo: configurable from order form page
+
+        $domestic_methods = "CDA";// "LGS";// ArrayHelper::getColumn(self::domesticmethods(), 'value')[0];
+        $domestic_additional_services = null;//'CHST';//  ArrayHelper::getColumn(self::domesticadditionalservices(), 'value')[0];
+        $international_methods = "DPX";// ArrayHelper::getColumn(self::internationalmethods(), 'value')[0];
+        $international_additional_services = null;// ArrayHelper::getColumn(self::internationaladditionalservices(), 'value')[0];
+
+        $weight_unit = 'KG';//todo: configurable
 
         ##################### customer shipment details ################
 
@@ -99,14 +107,6 @@ class Aramex
 
         $shipper_account = Setting::getConfig($restaurant_uuid, "Aramex", 'shipping_aramex_account_number');
 
-        //todo: configurable from order form page 
-
-        $domestic_methods = "CDA";// "LGS";// ArrayHelper::getColumn(self::domesticmethods(), 'value')[0];
-        $domestic_additional_services = null;//'CHST';//  ArrayHelper::getColumn(self::domesticadditionalservices(), 'value')[0];
-        $international_methods = "DPX";// ArrayHelper::getColumn(self::internationalmethods(), 'value')[0];
-        $international_additional_services = null;// ArrayHelper::getColumn(self::internationaladditionalservices(), 'value')[0];
-
-        $weight_unit = 'KG';//todo: configurable
         $aramex_shipment_info_billing_account = 1;
 
         if (strtolower($receiver_country) == strtolower($shipper_country)) {
@@ -277,7 +277,7 @@ class Aramex
                     'PhoneNumber2' => '',
                     'PhoneNumber2Ext' => '',
                     'FaxNumber' => '',
-                    'CellPhone' => $model->customer_phone_number,// '',//$receiver_phone
+                    'CellPhone' => $receiver_phone,
                     'EmailAddress' => $receiver_email, //'mazen@aramex.com',
                     'Type' => ''
                 )
@@ -373,7 +373,7 @@ class Aramex
             }
 
             $params['Details']['CustomsValueAmount'] = array(
-                'Value' => $custom_amount,//todo: $custom_amount,
+                'Value' => $custom_amount,
                 'CurrencyCode' => $currency_code
             );
 
@@ -388,9 +388,7 @@ class Aramex
 
             try {
                 //create shipment call
-                //$auth_call = $soapClient->CreateShipments($major_par, array('trace' => 1));
-//echo  '<pre />';
-//print_r($major_par);die();
+
                 $auth_call = $soapClient->CreateShipments($major_par);
 
                 //$auth_call = $soapClient->__soapCall('CreateShipments', $major_par);
@@ -429,14 +427,21 @@ class Aramex
 
                 } else {
 
-                    $shipmenthistory = "AWB No. " . $auth_call->Shipments->ProcessedShipment->ID .
+                    $message = "AWB No. " . $auth_call->Shipments->ProcessedShipment->ID .
                         " - Order No. " . $auth_call->Shipments->ProcessedShipment->Reference1;
 
-                    //todo: save this response for future reference
+                    //$model->aramex_shipment_id = $auth_call->Shipments->ProcessedShipment->ID;
+                    //$model->save(false);
+
+                    Order::updateAll([
+                        'aramex_shipment_id' => $auth_call->Shipments->ProcessedShipment->ID
+                    ], [
+                        'order_uuid' => $model->order_uuid
+                    ]);
 
                     return [
                         "operation" => "success",
-                        "message" => $shipmenthistory
+                        "message" => $message
                     ];
 
                     /*

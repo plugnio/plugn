@@ -65,6 +65,8 @@ class m230711_190045_weight extends Migration
         $this->addColumn( "order_item","width", $this->float(8)->after('height'));
         $this->addColumn( "order_item","shipping", $this->boolean()->defaultValue(true)->after('width'));
 
+        $this->addColumn( "order","aramex_shipment_id", $this->string()->after('armada_tracking_link'));
+
         //Armada
         //Aramex
         //FedEx
