@@ -545,16 +545,10 @@ class OrderController extends BaseController
                 $order->street = Yii::$app->request->getBodyParam("street");
                 $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam("house_number");
-
-                if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
-                    $order->floor = Yii::$app->request->getBodyParam("floor");
-
-                if (Yii::$app->request->getBodyParam("apartment") != null && $order->unit_type == 'Apartment')
-                    $order->apartment = Yii::$app->request->getBodyParam("apartment");
-
-                if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
-                    $order->office = Yii::$app->request->getBodyParam("office");
-
+                $order->building = Yii::$app->request->getBodyParam("building");
+                $order->floor = Yii::$app->request->getBodyParam("floor");
+                $order->apartment = Yii::$app->request->getBodyParam("apartment");
+                $order->office = Yii::$app->request->getBodyParam("office");
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
@@ -753,7 +747,8 @@ class OrderController extends BaseController
         $order->block = Yii::$app->request->getBodyParam("block");
         $order->street = Yii::$app->request->getBodyParam("street");
         $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
-        $order->house_number = Yii::$app->request->getBodyParam("building");
+        $order->house_number = Yii::$app->request->getBodyParam("house_number");
+        $order->building = Yii::$app->request->getBodyParam("building");
 
         $order->payment_method_id = Yii::$app->request->getBodyParam('payment_method_id');
         if ($order->paymentMethod && $order->paymentMethod->payment_method_name) {
@@ -817,15 +812,9 @@ class OrderController extends BaseController
                 //if delivery zone not specified
 
                 $order->delivery_zone_id = $delivery_zone_id? $delivery_zone_id: $area_delivery_zone->delivery_zone_id;
-
-                if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
-                    $order->floor = Yii::$app->request->getBodyParam("floor");
-
-                if (Yii::$app->request->getBodyParam("apartment") != null && $order->unit_type == 'Apartment')
-                    $order->apartment = Yii::$app->request->getBodyParam("apartment");
-
-                if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
-                    $order->office = Yii::$app->request->getBodyParam("office");
+                $order->floor = Yii::$app->request->getBodyParam("floor");
+                $order->apartment = Yii::$app->request->getBodyParam("apartment");
+                $order->office = Yii::$app->request->getBodyParam("office");
 
                 $order->shipping_country_id = $country_id;
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
@@ -1628,6 +1617,7 @@ class OrderController extends BaseController
         $street = Yii::$app->request->getBodyParam('street');
         $avenue = Yii::$app->request->getBodyParam('avenue');
         $building = Yii::$app->request->getBodyParam('building');
+        $house_number = Yii::$app->request->getBodyParam('house_number');
         $block = Yii::$app->request->getBodyParam('block');
         $customer_email = Yii::$app->request->getBodyParam('customer_email');
         $customer_phone_country_code = Yii::$app->request->getBodyParam('customer_phone_country_code');
@@ -1681,7 +1671,8 @@ class OrderController extends BaseController
         $model->unit_type = $unit_type;
         $model->street = $street;
         $model->avenue = $avenue;
-        $model->house_number = $building;
+        $model->house_number = $house_number;
+        $model->building = $building;
         $model->block = $block;
         $model->customer_email = $customer_email;
         $model->customer_phone_country_code = $customer_phone_country_code;
