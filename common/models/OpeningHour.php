@@ -146,13 +146,9 @@ class OpeningHour extends \yii\db\ActiveRecord
 
     public static function getReopeningAt($store)
     {
-
-
         for ($i = 0; $i <= 7; $i++) {
 
-
             $data = date('c', strtotime($i . " day", strtotime('now')));
-
 
             $getWorkingHours = OpeningHour::find()
                 ->where(['restaurant_uuid' => $store->restaurant_uuid])
@@ -160,15 +156,11 @@ class OpeningHour extends \yii\db\ActiveRecord
                 ->orderBy(['open_at' => SORT_ASC])
                 ->all();
 
-
             foreach ($getWorkingHours as $key => $workingHours) {
-
 
                 $startAt = date('c', strtotime($workingHours->open_at, strtotime($data)));
 
-
                 if (date('c', strtotime($startAt)) > date('c', strtotime('now'))) {
-
 
                     $tmwDate = date('Y-m-d', strtotime("1 day"));
 
@@ -215,7 +207,6 @@ class OpeningHour extends \yii\db\ActiveRecord
 
 
             $minDate = date('c', strtotime("+" . intval(($prep_time + $delivery_time)) . " min", strtotime('now')));
-
 
             $currentWeekDay = date('w', strtotime($i . " day", strtotime($minDate)));
             $currentDate = date('c', strtotime($i . " day", strtotime($minDate)));
@@ -328,7 +319,6 @@ class OpeningHour extends \yii\db\ActiveRecord
                 ->all();
 
             $timeSlots = [];
-
 
             foreach ($getWorkingHours as $key => $workingHours) {
 

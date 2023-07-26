@@ -241,6 +241,7 @@ return [
                         'GET <type>' => 'list',
                         'GET' => 'list',
                         'POST' => 'place-an-order',
+                        'POST schedule-pickup-aramex/<order_uuid>' => 'schedule-pickup-aramex',
                         'POST cancel-delivery/<id>' => 'cancel-delivery',
                         'POST create-shipment-aramex/<order_uuid>' => 'create-shipment-aramex',
                         'POST request-driver-from-armada/<order_uuid>/<store_uuid>' => 'request-driver-from-armada',
@@ -271,7 +272,7 @@ return [
                         'OPTIONS refund/<order_uuid>' => 'options',
                         'OPTIONS update-order-status/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS create-shipment-aramex/<order_uuid>' => 'options',
-
+                        'OPTIONS schedule-pickup-aramex' => 'options',
                         'OPTIONS request-driver-from-armada/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS request-driver-from-mashkor/<order_uuid>/<store_uuid>' => 'options',
                         'OPTIONS update-order-status/<order_uuid>' => 'options',

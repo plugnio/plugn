@@ -189,6 +189,7 @@ class Aramex
             $totalWeight += ($weight * $orderItem['qty']);
             $totalItems += $orderItem['qty'];
         }
+
         //echo $totalWeight;
         $total = number_format($model->total_price * $model->currency_rate, 2);
 
@@ -471,6 +472,187 @@ class Aramex
             $message = $e->getMessage();
             return self::createShipmentFail($model->order_uuid, $message);
         }
+    }
+
+    /**
+     * schedule store pickup by aramex
+     * @param $model
+     * @return array
+     * @throws \SoapFault
+     */
+    public static function schedulePickup($model) {
+
+        $store = $model->restaurant;
+
+        $shipper_name = Yii::$app->request->getBodyParam('shipper_name', $store->name);
+        $shipper_company = Yii::$app->request->getBodyParam('shipper_company', $store->name);
+        $shipper_phone = Yii::$app->request->getBodyParam('shipper_phone', $store->owner_number);
+        $shipper_phone_prefix = Yii::$app->request->getBodyParam('shipper_phone', '+' . $store->owner_phone_country_code);
+        $shipper_email = Yii::$app->request->getBodyParam('shipper_email', $store->owner_email);
+        $shipper_address = Yii::$app->request->getBodyParam('shipper_address');
+        $shipper_location  = Yii::$app->request->getBodyParam('shipper_location');
+
+        $product_group  = Yii::$app->request->getBodyParam('product_group');
+        $product_type  = Yii::$app->request->getBodyParam('product_type');
+        $no_shipments  = Yii::$app->request->getBodyParam('no_shipments');
+        $total_counts  = Yii::$app->request->getBodyParam('total_count');
+
+        $status = Yii::$app->request->getBodyParam('status');
+        $ready_time = Yii::$app->request->getBodyParam('ready_time');
+        $closing_time = Yii::$app->request->getBodyParam('closing_time');
+
+        $date = Yii::$app->request->getBodyParam('date', date('Y-m-d'));
+
+        $comment = Yii::$app->request->getBodyParam('comment', date('Y-m-d'));
+
+        $shipper_city = Setting::getConfig($store->restaurant_uuid, "Aramex", 'shipping_aramex_city');
+        $shipper_country = Setting::getConfig($store->restaurant_uuid, "Aramex", 'shipping_aramex_country_code');
+        $shipper_state = Setting::getConfig($store->restaurant_uuid, "Aramex", 'shipping_aramex_state');
+        $shipper_postal = Setting::getConfig($store->restaurant_uuid, "Aramex", 'shipping_aramex_post_code');
+
+                ##################### customer shipment details ################
+
+                $shipment_receiver_name ='';
+                $shipment_receiver_street ='';
+
+                $destination_country = $model->country?$model->country->iso: "KW";
+                $destination_city    = $model->city ;
+                $destination_zipcode  = $model->postalcode;
+                //$destination_state   = ($order_info['shipping_zone'])?$order_info['shipping_zone']:'';
+
+                ################## create shipment ###########
+
+        $orderItems = $model->getOrderItems()
+            ->filterShipping()
+            ->all();
+
+        $totalWeight = $totalItems = 0;
+
+        foreach ($orderItems as $orderItem) {
+
+            $weight = number_format($orderItem['weight'], 2);
+            $totalWeight += ($weight * $orderItem['qty']);
+            $totalItems += $orderItem['qty'];
+        }
+
+                    $clientInfo = self::getClientInfo($model->restaurant_uuid);
+
+                    try {
+
+                        $pickupDate = strtotime($date);
+
+                        $readyTime =strtotime($ready_time);
+
+                        $closingTime =strtotime($closing_time);
+
+                        $weight_unit ='KG' ;
+
+                        $params = array(
+                            'ClientInfo'  	=> $clientInfo,
+
+                            'Transaction' 	=> array(
+                                'Reference1'			=> $model->order_uuid
+                            ),
+
+                            'Pickup'		=>array(
+                                'PickupContact'				=>array(
+                                    'PersonName'			=> $shipper_name,
+                                    'CompanyName'			=> $shipper_company,
+                                    'PhoneNumber1'			=> $shipper_phone,
+                                    'PhoneNumber1Ext'		=> $shipper_phone_prefix,
+                                    'CellPhone'				=> $shipper_phone,
+                                    'EmailAddress'			=> $shipper_email
+                                ),
+                                'PickupAddress'				=>array(
+                                    'Line1'					=> $shipper_address,
+                                    'City'					=> $shipper_city,
+                                    'StateOrProvinceCode'	=> $shipper_state,
+                                    'PostCode'				=> $shipper_postal,
+                                    'CountryCode'			=> $shipper_country
+                                ),
+
+                                'PickupLocation'		=> $shipper_location,
+                                'PickupDate'			=> $pickupDate,
+                                'ReadyTime'				=> $readyTime,
+                                'LastPickupTime'		=> $closingTime,
+                                'ClosingTime'			=> $closingTime,
+                                'Comments'				=> $comment,
+                                'Reference1'			=> $model->order_uuid,
+                                'Reference2'			=>'',
+                                'Vehicle'				=> '',
+                                'Shipments'				=>array(
+                                    'Shipment'					=>array()
+                                ),
+                                'PickupItems'			=>array(
+                                    'PickupItemDetail'=>array(
+                                        'ProductGroup'	=> $product_group,
+                                        'ProductType'	=> $product_type,
+                                        'Payment'		=> $product_type,
+                                        'NumberOfShipments'=> $no_shipments,
+                                        'NumberOfPieces'=> $total_counts,
+                                        'ShipmentWeight' => array('Value'=> $totalWeight, 'Unit'=> $weight_unit),
+                                    ),
+                                ),
+                                'Status' => $status
+                            )
+                        );
+
+                        $baseUrl = self::getWsdlPath();
+                        $soapClient = new \SoapClient($baseUrl.'/shipping.wsdl', array('trace' => 1));
+
+                        try{
+                            $results = $soapClient->CreatePickup($params);
+
+                            if($results->HasErrors) {
+
+                                $errors = [];
+
+                                if(count($results->Notifications->Notification) > 1){
+
+                                    foreach($results->Notifications->Notification as $notify_error){
+                                        $errors[] = $notify_error->Code .' - '. $notify_error->Message;
+                                    }
+                                }else{
+                                    $errors[] = $results->Notifications->Notification->Code . ' - '. $results->Notifications->Notification->Message;
+                                }
+
+                                return [
+                                    "operation" => "error",
+                                    "message" => $errors
+                                ];
+
+                            } else {
+
+                                /*$comment = "Pickup reference number ( <strong>".$results->ProcessedPickup->ID."</strong> ).";
+
+                                $message = array(
+                                    'notify' => 0,
+                                    'comment' => $comment
+                                );*/
+                                //todo: create order history
+
+                                return [
+                                    "operation" => "success",
+                                    'ID' => $results->ProcessedPickup->ID,
+                                    "message" => "Pickup reference number #" . $results->ProcessedPickup->ID
+                                ];
+                            }
+
+                        } catch (Exception $e) {
+
+                            return [
+                                "operation" => "error",
+                                "message" =>$e->getMessage()
+                            ];
+                        }
+                    }
+                    catch (Exception $e) {
+                        return [
+                            "operation" => "error",
+                            "message" =>$e->getMessage()
+                        ];
+                    }
+
     }
 
     public static function createShipmentFail($order_uuid, $message) {
