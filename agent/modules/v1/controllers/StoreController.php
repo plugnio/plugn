@@ -429,9 +429,9 @@ class StoreController extends BaseController
      * View shipping settings page
      * @return mixed
      */
-    public function actionViewShippingMethods($id = null)
+    public function actionViewShippingMethods()
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel();
 
         $query = $model->getShippingMethods();
 

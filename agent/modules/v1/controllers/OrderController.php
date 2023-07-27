@@ -1260,14 +1260,13 @@ class OrderController extends BaseController
 
     /**
      * @param $order_uuid
-     * @param $store_uuid
      * @return array
      * @throws NotFoundHttpException
      * @throws \SoapFault
      */
-    public function actionSchedulePickupAramex($order_uuid, $store_uuid = null)
+    public function actionSchedulePickupAramex($order_uuid)
     {
-        $model = $this->findModel($order_uuid, $store_uuid);
+        $model = $this->findModel($order_uuid);
 
         return Aramex::schedulePickup($model);
     }

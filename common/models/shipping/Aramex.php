@@ -484,16 +484,20 @@ class Aramex
 
         $store = $model->restaurant;
 
+        $vehicle = Yii::$app->request->getBodyParam('pickup_vehicle');
+
+
         $shipper_name = Yii::$app->request->getBodyParam('shipper_name', $store->name);
         $shipper_company = Yii::$app->request->getBodyParam('shipper_company', $store->name);
         $shipper_phone = Yii::$app->request->getBodyParam('shipper_phone', $store->owner_number);
-        $shipper_phone_prefix = Yii::$app->request->getBodyParam('shipper_phone', '+' . $store->owner_phone_country_code);
+        $shipper_phone_prefix = Yii::$app->request->getBodyParam('shipper_phone_prefix', '+' . $store->owner_phone_country_code);
         $shipper_email = Yii::$app->request->getBodyParam('shipper_email', $store->owner_email);
         $shipper_address = Yii::$app->request->getBodyParam('shipper_address');
         $shipper_location  = Yii::$app->request->getBodyParam('shipper_location');
 
         $product_group  = Yii::$app->request->getBodyParam('product_group');
         $product_type  = Yii::$app->request->getBodyParam('product_type');
+        $payment_type = Yii::$app->request->getBodyParam('payment_type');
         $no_shipments  = Yii::$app->request->getBodyParam('no_shipments');
         $total_counts  = Yii::$app->request->getBodyParam('total_count');
 
@@ -505,6 +509,7 @@ class Aramex
 
         $comment = Yii::$app->request->getBodyParam('comment', date('Y-m-d'));
 
+        $sandbox = Setting::getConfig($store->restaurant_uuid, "Aramex", 'shipping_aramex_sandbox');
         $shipper_city = Setting::getConfig($store->restaurant_uuid, "Aramex", 'shipping_aramex_city');
         $shipper_country = Setting::getConfig($store->restaurant_uuid, "Aramex", 'shipping_aramex_country_code');
         $shipper_state = Setting::getConfig($store->restaurant_uuid, "Aramex", 'shipping_aramex_state');
@@ -541,9 +546,9 @@ class Aramex
 
                         $pickupDate = strtotime($date);
 
-                        $readyTime =strtotime($ready_time);
+                        $readyTime = strtotime($ready_time);
 
-                        $closingTime =strtotime($closing_time);
+                        $closingTime = strtotime($closing_time);
 
                         $weight_unit ='KG' ;
 
@@ -579,7 +584,7 @@ class Aramex
                                 'Comments'				=> $comment,
                                 'Reference1'			=> $model->order_uuid,
                                 'Reference2'			=>'',
-                                'Vehicle'				=> '',
+                                'Vehicle'				=> $vehicle,
                                 'Shipments'				=>array(
                                     'Shipment'					=>array()
                                 ),
@@ -587,7 +592,7 @@ class Aramex
                                     'PickupItemDetail'=>array(
                                         'ProductGroup'	=> $product_group,
                                         'ProductType'	=> $product_type,
-                                        'Payment'		=> $product_type,
+                                        'Payment'		=> $payment_type,
                                         'NumberOfShipments'=> $no_shipments,
                                         'NumberOfPieces'=> $total_counts,
                                         'ShipmentWeight' => array('Value'=> $totalWeight, 'Unit'=> $weight_unit),
@@ -597,7 +602,7 @@ class Aramex
                             )
                         );
 
-                        $baseUrl = self::getWsdlPath();
+                        $baseUrl = self::getWsdlPath($sandbox);
                         $soapClient = new \SoapClient($baseUrl.'/shipping.wsdl', array('trace' => 1));
 
                         try{
@@ -607,8 +612,7 @@ class Aramex
 
                                 $errors = [];
 
-                                if(count($results->Notifications->Notification) > 1){
-
+                                if(is_array($results->Notifications->Notification)){
                                     foreach($results->Notifications->Notification as $notify_error){
                                         $errors[] = $notify_error->Code .' - '. $notify_error->Message;
                                     }
@@ -629,7 +633,12 @@ class Aramex
                                     'notify' => 0,
                                     'comment' => $comment
                                 );*/
-                                //todo: create order history
+
+                                Order::updateAll([
+                                    'aramex_pickup_id' => $results->ProcessedPickup->ID
+                                ], [
+                                    'order_uuid' => $model->order_uuid
+                                ]);
 
                                 return [
                                     "operation" => "success",

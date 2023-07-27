@@ -62,6 +62,7 @@ use yii\web\BadRequestHttpException;
  * @property datetime $scheduled_time_to
  * @property string $armada_tracking_link
  * @property string $aramex_shipment_id
+ * @property string $aramex_pickup_id
  * @property string $armada_qr_code_link
  * @property int|null $voucher_id
  * @property int $subtotal_before_refund
@@ -304,6 +305,7 @@ class Order extends \yii\db\ActiveRecord
                     'payment_method_name', 'payment_method_name_ar',
                     'armada_tracking_link',
                     'aramex_shipment_id',
+                    'aramex_pickup_id',
                     'armada_qr_code_link', 'armada_delivery_code',
                     'country_name', 'country_name_ar', 'business_location_name',
                     'building', 'apartment', 'city', 'address_1', 'address_2', 'postalcode', 'floor', 'office',
@@ -318,7 +320,7 @@ class Order extends \yii\db\ActiveRecord
 
             [['civil_id', 'section', 'class'], 'string', 'max' => 255], //Temp var
 
-            [['mashkor_order_number', 'mashkor_tracking_link', 'mashkor_driver_name', 'mashkor_driver_phone', 'aramex_shipment_id'], 'string', 'max' => 255],
+            [['mashkor_order_number', 'mashkor_tracking_link', 'mashkor_driver_name', 'mashkor_driver_phone', 'aramex_shipment_id', 'aramex_pickup_id'], 'string', 'max' => 255],
 
             [['delivery_zone_id'], 'exist', 'skipOnError' => false, 'targetClass' => DeliveryZone::className(),
                 'targetAttribute' => ['delivery_zone_id' => 'delivery_zone_id', 'restaurant_uuid']],
@@ -697,6 +699,7 @@ class Order extends \yii\db\ActiveRecord
             'order_updated_at' => Yii::t('app','Updated at'),
             'armada_tracking_link' => Yii::t('app','Tracking link'),
             'aramex_shipment_id' => Yii::t('app','Aramex Shipment ID'),
+            'aramex_pickup_id' => Yii::t('app','Aramex Pickup ID'),
             'armada_delivery_code' => Yii::t('app','Armada delivery code'),
             'armada_qr_code_link' => Yii::t('app','QR code link'),
             'latitude' => Yii::t('app','Latitude'),
