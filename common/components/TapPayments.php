@@ -276,6 +276,9 @@ class TapPayments extends Component
                     ]
                 ]
             ],
+            "metadata" =>  [
+              "mtd" => "Plugn Platform"
+            ]
         ];
 
         if (
