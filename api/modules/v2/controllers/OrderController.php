@@ -1279,6 +1279,22 @@ class OrderController extends Controller
     }
 
     /**
+     * update order instruction
+     */
+    public function actionInstruction($order_uuid = null)
+    {
+        $order_instruction = Yii::$app->request->getBodyParam('order_instruction');
+
+        Order::updateAll(['order_instruction' => $order_instruction], [
+            'order_uuid' => $order_uuid
+        ]);
+
+        return [
+            'operation' => 'success',
+        ];
+    }
+
+    /**
      * CheckPendingOrders of type boolean and we want to return
      * True if there are pending  orders , false if these isn't any
      * @param type $restaurantUuid
