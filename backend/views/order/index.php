@@ -170,8 +170,7 @@ white-space: nowrap !important;
                         'label' => 'Payment',
                         "format" => "raw",
                         "value" => function($data) {
-                            if($data->paymentMethod)
-                                return $data->paymentMethod->payment_method_name;
+                            return $data->getPaymentMethodName();
                         },
                         "visible" => function($data) {
                             return $data->payment->payment_current_status;
