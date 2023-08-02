@@ -527,6 +527,7 @@ class OrderController extends Controller
                 $order->restaurant->test_api_key,
                 $order->restaurant->is_sandbox
             );
+
             $response = Yii::$app->tapPayments->createCharge(
                 $order->currency->code,
                 "Order placed from: " . $order->customer_name, // Description

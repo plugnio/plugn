@@ -425,7 +425,10 @@ class Order extends \yii\db\ActiveRecord
             'orderStatusInArabic',
             'restaurant',
             'orderItems' => function ($order) {
-                return $order->getOrderItems()->with('orderItemExtraOptions')->asArray()->all();
+                return $order->getOrderItems()
+                    ->with('orderItemExtraOptions')
+                    ->asArray()
+                    ->all();
             },
             'restaurantBranch',
             'deliveryZone',
@@ -434,7 +437,8 @@ class Order extends \yii\db\ActiveRecord
             'payment',
             'currency',
             'refundedTotal',
-            'voucher'
+            'voucher',
+            'paymentMethod'
         ];
     }
 
@@ -2317,6 +2321,16 @@ failed: the order has failed to find a driver */
     public function getPickupLocation($modelClass = "\common\models\BusinessLocation")
     {
         return $this->hasOne($modelClass::className(), ['business_location_id' => 'pickup_location_id']);
+    }
+
+    public function getPaymentMethodName()
+    {
+        if ($this->paymentMethod)
+            return $this->paymentMethod->payment_method_name;
+        else if (!empty($this->payment_method_name))
+            return $this->payment_method_name;
+        else if (!empty($this->payment_method_name_ar))
+            return $this->payment_method_name_ar;
     }
 
     /**
