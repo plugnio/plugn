@@ -78,7 +78,7 @@ class StoreController extends Controller
      * @param $id
      * @return Category
      */
-    public function actionView($id)
+    public function actionView($id = null)
     {
         $store =  $this->findModel($id);
 
@@ -297,11 +297,15 @@ class StoreController extends Controller
      * @return Category the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id = null)
     {
-        $model = Restaurant::find()
-            ->where(['restaurant_uuid' => $id])
-            ->one();
+        if($id) {
+            $model = Restaurant::find()
+                ->where(['restaurant_uuid' => $id])
+                ->one();
+        } else {
+            $model = Restaurant::findOne(['restaurant_domain' => 'https://'. $_SERVER['HTTP_HOST']]);
+        }
 
         if ($model !== null) {
             return $model;
