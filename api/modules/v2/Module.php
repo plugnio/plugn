@@ -23,16 +23,18 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+        /*$store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
-        $store = Restaurant::findOne($store_id);
+        if($store_id) {
 
-        if($store_id && !$store)
-        {
-            \Yii::$app->getResponse()->setStatusCode(404);
+            $store = Restaurant::findOne($store_id);
+
+            if (!$store) {
+                \Yii::$app->getResponse()->setStatusCode(404);
+            }
         }
 
-        /*if($store && $store->enable_debugger)
+        if($store && $store->enable_debugger)
         {
             $component = \Yii::$app->getModule('debug');
 

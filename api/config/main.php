@@ -173,6 +173,7 @@ return [
                         'GET get-opening-hours' => 'get-opening-hours',
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
+                        'GET by-domain' => 'view',
                         'GET <id>' => 'view',
                         'POST get-delivery-time' => 'get-delivery-time',
                         // OPTIONS VERBS
