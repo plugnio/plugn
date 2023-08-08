@@ -610,7 +610,9 @@ class OrderController extends Controller {
         $phone_number = Yii::$app->request->get("phone_number");
         $code = Yii::$app->request->get("code");
 
-        $voucher = Voucher::find()->where(['restaurant_uuid' => $restaurant_uuid, 'code' => $code, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])->one();
+        $voucher = Voucher::find()
+            ->where(['restaurant_uuid' => $restaurant_uuid, 'code' => $code, 'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE])
+            ->one();
 
         if ($voucher && $voucher->isValid($phone_number)) {
             return [
