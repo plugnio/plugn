@@ -426,6 +426,21 @@ class StoreController extends BaseController
     }
 
     /**
+     * View shipping settings page
+     * @return mixed
+     */
+    public function actionViewShippingMethods()
+    {
+        $model = $this->findModel();
+
+        $query = $model->getShippingMethods();
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
      * Update bank account in tap account
      * @return array
      */

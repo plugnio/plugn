@@ -494,7 +494,8 @@ class Restaurant extends \yii\db\ActiveRecord
                 "enable_gift_message", "accept_order_247", "is_public", "currency_id"
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
-                'armada_api_key', 'mashkor_branch_id'
+                'armada_api_key',
+                'mashkor_branch_id'
             ],
             self::SCENARIO_CURRENCY => [
                 'currency_id'
@@ -2115,6 +2116,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'noOfItems',
             'categories',
             'paymentGatewayQueue',
+            'restaurantShippingMethods',
             'restaurantDomainRequests',
             'openingHours' => function ($restaurant) {
                 //if($this->accept_order_247)
@@ -3312,6 +3314,15 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * @param $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantShippingMethods($modelClass = "\common\models\RestaurantShippingMethod")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[RestaurantPaymentMethods]].
      *
      * @return \yii\db\ActiveQuery
@@ -3341,6 +3352,17 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return $this->hasOne ($modelClass::className (), ['utm_uuid' => 'utm_uuid'])
             ->via('restaurantByCampaign');
+    }
+
+    /**
+     * Gets query for [[ShippingMethods]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getShippingMethods($modelClass = "\common\models\ShippingMethod")
+    {
+        return $this->hasMany($modelClass::className(), ['shipping_method_id' => 'shipping_method_id'])
+            ->viaTable('restaurant_shipping_method', ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

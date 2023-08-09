@@ -18,6 +18,9 @@ use yii\db\Expression;
  * @property float|null $price
  * @property float|null $compare_at_price
  * @property int|null $weight
+ * @property number|null $length
+ * @property number|null $width
+ * @property number|null $height
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -42,12 +45,13 @@ class ItemVariant extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['stock_qty', 'weight'], 'integer'],
+            [['stock_qty'], 'integer'],
             [['price', 'compare_at_price'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
             [['item_variant_uuid'], 'string', 'max' => 60],
             [['item_uuid'], 'string', 'max' => 100],
             [['sku', 'barcode'], 'string', 'max' => 255],
+            [['weight', 'length', 'height', 'width'], 'number', "max" => 8],
             [['item_variant_uuid'], 'unique'],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
         ];

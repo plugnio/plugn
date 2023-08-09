@@ -282,6 +282,15 @@ return [
                         'OPTIONS order-details/<id>/<restaurant_uuid>' => 'options',
                     ]
                 ],
+                [// VoucherController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/voucher',
+                    'patterns' => [
+                        'GET' => 'list',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
                 [// OrderController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/order',
