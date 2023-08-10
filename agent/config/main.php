@@ -637,6 +637,20 @@ return [
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
+                [// PageController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/page',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <page_uuid>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <page_uuid>' => 'update',
+                        'DELETE <page_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <page_uuid>' => 'options',
+                    ]
+                ],
                 [// StoreController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/store',
