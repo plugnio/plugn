@@ -3610,6 +3610,16 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[StorePages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStorePages($modelClass = "\common\models\RestaurantPage")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[StoreWebLinks]].
      *
      * @return \yii\db\ActiveQuery

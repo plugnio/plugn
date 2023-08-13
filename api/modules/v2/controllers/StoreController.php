@@ -99,6 +99,11 @@ class StoreController extends Controller
         return $store;
     }
 
+    public function actionByDomain($domain)
+    {
+        return $this->findByDomain($domain);
+    }
+
     /**
      * Return Restaurant's branches
      */
@@ -287,6 +292,25 @@ class StoreController extends Controller
                 'operation' => 'error',
                 'message' => 'Branch name is invalid'
             ];
+        }
+    }
+
+
+    /**
+     * Finds the Restaurant model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $domain
+     * @return \common\models\Restaurant the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findByDomain($domain)
+    {
+        $model = Restaurant::findOne(['restaurant_domain' => 'https://'. $domain]);
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
         }
     }
 

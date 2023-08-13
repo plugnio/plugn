@@ -12,6 +12,8 @@ class m230727_051714_aramex_pickup extends Migration
      */
     public function safeUp()
     {
+        //$this->addColumn( "order","aramex_shipment_id", $this->string()->after('armada_tracking_link'));
+
         $this->addColumn( "order","aramex_pickup_id", $this->string()->after('aramex_shipment_id'));
     }
 
