@@ -2115,6 +2115,7 @@ class Restaurant extends \yii\db\ActiveRecord
         return [
             'noOfItems',
             'categories',
+            'restaurantPages',
             'paymentGatewayQueue',
             'restaurantShippingMethods',
             'restaurantDomainRequests',
@@ -3318,6 +3319,16 @@ class Restaurant extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getRestaurantShippingMethods($modelClass = "\common\models\RestaurantShippingMethod")
+    {
+        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[restaurantPages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantPages($modelClass = "\common\models\RestaurantPage")
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
