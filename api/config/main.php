@@ -87,10 +87,12 @@ return [
                     'patterns' => [
                         'GET detail' => 'item-data',
                         'GET' => 'restaurant-menu',
+                        'GET category-items' => 'category-items',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS detail' => 'options',
+                        'OPTIONS category-items' => 'options',
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
@@ -113,12 +115,14 @@ return [
                         'GET view/<slug>' => 'view',
                         'GET detail' => 'item-data',
                         'GET items' => 'items',
+                        'GET category-items' => 'category-items',
                         'GET' => 'restaurant-menu',
                         'GET category/<slug>' => 'category-products',
                         'GET <category_id>' => 'category-products',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS items' => 'options',
+                        'OPTIONS category-items' => 'options',
                         'OPTIONS detail' => 'options',
                         'OPTIONS view/<slug>' => 'options',
                         'OPTIONS category/<slug>' => 'options',
