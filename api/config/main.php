@@ -25,7 +25,7 @@ return [
     ],
     'components' => [
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'api\models\Customer',
             'enableAutoLogin' => false,
             'enableSession' => false,
             'loginUrl' => null
@@ -56,12 +56,25 @@ return [
             'rules' => [
                 [ // AuthController
                     'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/account',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'detail',
+                        'PATCH' => 'update',
+                        'DELETE' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
+                [ // AuthController
+                    'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/auth',
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
                         'GET locate' => 'locate',
                         'POST signup' => 'signup',
+                        'POST register' => 'signup',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
                         'POST is-email-verified' => 'is-email-verified',
@@ -73,6 +86,7 @@ return [
                         'OPTIONS locate' => 'options',
                         'OPTIONS update-password' => 'options',
                         'OPTIONS request-reset-password' => 'options',
+                        'OPTIONS register' => 'options',
                         'OPTIONS signup' => 'options',
                         'OPTIONS is-email-verified' => 'options',
                         'OPTIONS update-email' => 'options',

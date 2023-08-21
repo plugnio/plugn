@@ -9,7 +9,7 @@ use common\models\Restaurant;
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       <head>
         <title>
-          Your Plugn password has been changed
+          Your <?= $restaurant->name ?> password has been changed
         </title>
         <!--[if !mso]><!-- -->
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -186,7 +186,7 @@ use common\models\Restaurant;
               <table
                  border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;margin:0px;"
               >
-
+<!--
                     <tr>
                       <td
                          align="left" style="font-size:0px;padding:0;padding-top:30px;padding-left:30px;word-break:break-word;"
@@ -199,7 +199,7 @@ use common\models\Restaurant;
           <tr>
             <td  style="width:93px;">
 
-      <img
+        <img
          height="auto" src="https://res.cloudinary.com/plugn/image/upload/v1618264194/plugn-white_egzahs.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;" width="93"
       />
 
@@ -210,7 +210,7 @@ use common\models\Restaurant;
 
                       </td>
                     </tr>
-
+-->
                     <tr>
                       <td
                          align="left" style="font-size:0px;padding:20px;padding-top:40px;padding-bottom:0;padding-left:30px;word-break:break-word;"
