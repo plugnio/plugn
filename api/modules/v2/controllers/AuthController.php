@@ -5,6 +5,7 @@ namespace api\modules\v2\controllers;
 use api\models\Customer;
 use api\models\CustomerToken;
 use api\models\PasswordResetRequestForm;
+use api\models\Restaurant;
 use common\models\CustomerEmailVerifyAttempt;
 use Yii;
 use yii\rest\Controller;
@@ -136,7 +137,35 @@ class AuthController extends Controller {
      * @return mixed
      */
     public function actionSignup() {
+        
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
+        $model = new Customer();
+
+        $model->customer_name = Yii::$app->request->getBodyParam("first_name") . ' '
+                . Yii::$app->request->getBodyParam("last_name");
+
+        $model->customer_email = Yii::$app->request->getBodyParam("email");
+        $model->setPassword(Yii::$app->request->getBodyParam("password"));
+        $model->customer_phone_number = Yii::$app->request->getBodyParam("phone_number");
+        $model->customer_language_pref = Yii::$app->language == "ar" ? "ar": "en";
+        $model->restaurant_uuid = $store_id;
+
+        if(!$model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        $model->sendVerificationEmail();
+
+        return [
+            "operation" => "success",
+            "customer_id" => $model->customer_id,
+            "message" => Yii::t('agent', "Please click on the link sent to you by email to verify your account"),
+            "unVerifiedToken" => $this->_loginResponse($model)
+        ];
     }
 
     /**
@@ -144,6 +173,8 @@ class AuthController extends Controller {
      * @return type
      */
     public function actionUpdateEmail() {
+
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
         $unVerifiedToken = Yii::$app->request->getBodyParam("unVerifiedToken");
         $new_email = Yii::$app->request->getBodyParam("newEmail");
@@ -196,7 +227,7 @@ class AuthController extends Controller {
 
             //to verify new email address 
 
-            $customer->sendVerificationEmail();
+            $customer->sendVerificationEmail($store_id);
 
             return [
                 "operation" => "success",
@@ -217,6 +248,8 @@ class AuthController extends Controller {
      */
     public function actionResendVerificationEmail()
     {
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
         $emailInput = Yii::$app->request->getBodyParam("email");
 
         $customer = Customer::find()->andWhere([
@@ -256,7 +289,7 @@ class AuthController extends Controller {
                     'numSeconds' => $secondDifference,
                 ]);
             } else if ($customer->customer_email_verification == Customer::EMAIL_NOT_VERIFIED) {
-                $customer->sendVerificationEmail();
+                $customer->sendVerificationEmail($store_id);
             }
         } else {
             $errorCode = 3;
@@ -374,6 +407,10 @@ class AuthController extends Controller {
      */
     public function actionRequestResetPassword() {
 
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+        $store = Restaurant::find()->andWhere(['restaurant_uuid' => $store_id])->one();
+
         $emailInput = Yii::$app->request->getBodyParam("email");
         $errors = false;
         $model = new PasswordResetRequestForm();
@@ -406,7 +443,7 @@ class AuthController extends Controller {
                 'numSeconds' => $secondDifference,
             ]);
 
-        } else if (!$model->sendEmail()) {
+        } else if (!$model->sendEmail($customer, $store)) {
             $errors = Yii::t('api', 'Sorry, we are unable to reset a password for email provided.');
         }
 
@@ -504,5 +541,23 @@ class AuthController extends Controller {
      */
     public function actionLocate() {
         return Yii::$app->ipstack->locate();
+    }
+
+    /**
+     * Finds the Restaurant model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $domain
+     * @return \common\models\Restaurant the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findByDomain($domain)
+    {
+        $model = Restaurant::findOne(['restaurant_domain' => 'https://'. $domain]);
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
     }
 }

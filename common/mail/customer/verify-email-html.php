@@ -7,8 +7,6 @@ use yii\helpers\Html;
 
 //$verifyLink = Yii::$app->urlManager->createAbsoluteUrl(['site/verify-email', 'token' => $customer->customer_auth_key]);
 
-$verifyLink = Yii::$app->params['newDashboardAppUrl'] . '/verify-email/' . urlencode($email) . '/' . $customer->customer_auth_key;
-
 $mobileUrl = 'plugn-dashboard://verify-email/' . urlencode($email) . '/' . $customer->customer_auth_key;
 
 ?>
