@@ -14,6 +14,7 @@ use yii\helpers\ArrayHelper;
  *
  */
 class Item extends \common\models\Item {
+  
   /**
    * @inheritdoc
    */

@@ -20,11 +20,11 @@ class Category extends \common\models\Category {
    *
    * @return \yii\db\ActiveQuery
    */
-  public function getItems($modelClass = "\common\models\Item")
+  public function getItems($modelClass = "\api\models\Item")
   {
       return $this->hasMany ($modelClass::className (), ['item_uuid' => 'item_uuid'])
          ->andWhere (['item_status' => Item::ITEM_STATUS_PUBLISH])
-          ->viaTable ('category_item', ['category_id' => 'category_id'])
-          ->orderBy ([new \yii\db\Expression('item.sort_number IS NULL, item.sort_number ASC, item.sku IS NULL, item.sku ASC')]);
+         ->viaTable ('category_item', ['category_id' => 'category_id'])
+         ->orderBy ([new \yii\db\Expression('item.sort_number IS NULL, item.sort_number ASC, item.sku IS NULL, item.sku ASC')]);
   }
 }

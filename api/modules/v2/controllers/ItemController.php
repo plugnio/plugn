@@ -191,6 +191,42 @@ class ItemController extends Controller {
     }
 
     /**
+     * Return restaurant menu
+     */
+    public function actionCategoryItems() {
+
+        $restaurant_uuid = Yii::$app->request->get("restaurant_uuid");
+        $category_id = Yii::$app->request->get("category_id");
+        $keyword = Yii::$app->request->get("keyword");
+
+        $restaurant = Restaurant::find()
+            ->where(['restaurant_uuid' => $restaurant_uuid])->one();
+
+        if (!$restaurant) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+ 
+        $query = Category::find()
+                ->andWhere(['restaurant_uuid' => $restaurant_uuid])
+                ->with('items', 'items.options', 'items.itemImage')
+                ->orderBy([new \yii\db\Expression('sort_number IS NULL, sort_number ASC')]);
+
+        if($keyword) {
+            $query->filterKeyword($keyword);
+        }
+
+        if($category_id) {
+            $query->joinWith('categoryItems')
+                ->andWhere(['category_id' => $category_id]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false
+        ]);        
+    }
+
+    /**
      * Return item's data
      */
     public function actionItemData()

@@ -240,6 +240,20 @@ class Item extends \yii\db\ActiveRecord
     // }
 
 
+  /**
+   * @inheritdoc
+   */
+  public function fields()
+  {
+      $fields = parent::fields ();
+ 
+      $fields['track_quantity'] = function($data) {
+        return (boolean) $data->track_quantity;
+      };
+
+      return $fields;
+  }
+
     /**
      * @inheritdoc
      */
@@ -251,6 +265,7 @@ class Item extends \yii\db\ActiveRecord
             'currency',
             'options',
             'itemImages',
+            'itemImage',
             'itemVideos',
             'extraOptions',
             'itemVariants',
@@ -540,12 +555,14 @@ class Item extends \yii\db\ActiveRecord
     public function getItemImages($model = 'common\models\ItemImage')
     {
         return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
+          //  ->orderBy('sort_order DESC');
     }
 
 
     public function getItemImage($model = 'common\models\ItemImage')
     {
         return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid']);
+          //  ->orderBy('sort_order DESC');
     }
 
     /**
