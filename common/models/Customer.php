@@ -260,6 +260,10 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
         return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
+    public function getCustomerAddresses($modelClass = "\common\models\CustomerAddress") {
+        return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id']);
+    }
+
     /**
      * Gets query for [[Orders]].
      *

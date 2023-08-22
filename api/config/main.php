@@ -54,7 +54,7 @@ return [
             'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
-                [ // AuthController
+                [ // AccountController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/account',
                     'pluralize' => false,
@@ -64,6 +64,19 @@ return [
                         'DELETE' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                    ]
+                ],
+                [ // AddressController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/address',
+                    'patterns' => [
+                        'GET <id>' => 'detail',
+                        'POST' => 'add',
+                        'PATCH <id>' => 'update',
+                        'DELETE <id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
                     ]
                 ],
                 [ // AuthController
