@@ -305,6 +305,81 @@ class DeliveryZoneController extends Controller {
         ]);
     }
 
+    public function actionCountryAreas($country_id) {
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $country = Country::findOne($country_id);
+
+        if(!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getAreas("\common\models\Area");
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    public function actionCountryStates($country_id) {
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $country = Country::findOne($country_id);
+
+        if(!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getStates("\api\models\State");
+
+        if($keyword) {
+            $query->andWhere(['like', 'name', $keyword]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false
+        ]);
+    }
+
+    /**
+     * Return list of cities available for state
+     */
+    public function actionStateCities($state_id) {
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $state = State::findOne($state_id);
+
+        if(!$state) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $state->getCities("\api\models\City");
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'city_name', $keyword],
+                ['like', 'city_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
     /**
      * Return list of cities available for delivery
      */
@@ -331,12 +406,35 @@ class DeliveryZoneController extends Controller {
             $query->andWhere([
                 'OR',
                 ['like', 'city_name', $keyword],
-                ['like', 'city_name_ar', $keyword]   
+                ['like', 'city_name_ar', $keyword]
             ]);
         }
 
         return new ActiveDataProvider([
             'query' => $query
+        ]);
+    }
+
+    /**
+     * Return list of Countries available for delivery
+     */
+    public function actionCountries() {
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $query = Country::find();
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'country_name', $keyword],
+                ['like', 'country_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false
         ]);
     }
 

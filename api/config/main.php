@@ -70,6 +70,7 @@ return [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/address',
                     'patterns' => [
+                        'GET' => 'list',
                         'GET <id>' => 'detail',
                         'POST' => 'add',
                         'PATCH <id>' => 'update',
@@ -161,8 +162,12 @@ return [
                     'controller' => 'v2/delivery-zone',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET country-states/<country_id>' => 'country-states',
+                        'GET state-cities/<state_id>' => 'state-cities',
+                        'GET areas/<country_id>' => 'country-areas',
                         'GET cities/<state_id>' => 'cities',
                         'GET states/<country_id>' => 'states',
+                        'GET countries' => 'countries',
                         'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
                         'GET list-pickup-locations/<restaurant_uuid>' => 'list-pickup-locations',
                         'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
@@ -171,8 +176,11 @@ return [
                         // 'GET <restaurant_uuid>' => 'delivery-zone',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS country-states/<country_id>' => 'options',
+                        'OPTIONS state-cities/<state_id>' => 'options',
                         'OPTIONS cities' => 'options',
                         'OPTIONS states' => 'options',
+                        'OPTIONS countries' => 'options',
                         'OPTIONS list-of-countries/<restaurant_uuid>' => 'options',
                         'OPTIONS list-pickup-locations/<restaurant_uuid>' => 'options',
                         'OPTIONS list-of-areas/<restaurant_uuid>/<country_id>' => 'options',

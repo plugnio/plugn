@@ -19,7 +19,7 @@ class m230822_135940_address extends Migration
         }
 
         $this->createTable('{{%customer_address}}', [
-            'address_id' => $this->bigInteger(20), // used as reference id
+            'address_id' => $this->bigPrimaryKey(), // used as reference id
             'customer_id' => $this->bigInteger(20)->notNull(), // used as reference id
             'area_id' => $this->integer(11),
             'city_id' => $this->integer(11),

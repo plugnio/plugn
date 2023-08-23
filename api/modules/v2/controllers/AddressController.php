@@ -2,6 +2,7 @@
 
 namespace api\modules\v2\controllers;
 
+use Yii;
 use common\models\CustomerAddress;
 use yii\data\ActiveDataProvider;
 use yii\rest\Controller;

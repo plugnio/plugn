@@ -50,7 +50,7 @@ class CustomerAddress extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['address_id', 'customer_id', 'city_id', 'country_id', 'postalcode', 'unit_type'], 'required'],
+            [['customer_id', 'city_id', 'country_id', 'postalcode', 'unit_type'], 'required'],
             [['address_id', 'customer_id', 'area_id', 'city_id', 'country_id', 'house_number', 'floor'], 'integer'],
             [['special_directions', 'delivery_instructions'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
@@ -63,6 +63,18 @@ class CustomerAddress extends \yii\db\ActiveRecord
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
         ];
+    }
+
+    public function extraFields()
+    {
+        $fields = parent::extraFields();
+
+        return array_merge($fields, [
+            'country',
+           // 'state',
+            'city',
+            'area'
+        ]);
     }
 
     /**
