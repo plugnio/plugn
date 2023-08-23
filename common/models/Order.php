@@ -433,12 +433,13 @@ class Order extends \yii\db\ActiveRecord
             'orderStatusInEnglish',
             'orderStatusInArabic',
             'restaurant',
-            'orderItems' => function ($order) {
+            'orderItems',
+            /*'orderItems' => function ($order) {
                 return $order->getOrderItems()
                     ->with('orderItemExtraOptions')
                     ->asArray()
                     ->all();
-            },
+            },*/
             'restaurantBranch',
             'deliveryZone',
             'pickupLocation',

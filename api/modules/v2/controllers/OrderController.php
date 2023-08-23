@@ -1083,6 +1083,11 @@ class OrderController extends Controller
      */
     public function actionList()
     {
+        $authHeader = Yii::$app->request->getHeaders()->get('Authorization');
+        if ($authHeader !== null && preg_match('/^Bearer\s+(.*?)$/', $authHeader, $matches)) {
+            Yii::$app->user->loginByAccessToken($matches[1]);
+        }
+
         $store_uuid = Yii::$app->request->get('restaurant_uuid');
         $phone_number = Yii::$app->request->get('phone_number');
         $email = Yii::$app->request->get('email');
@@ -1101,11 +1106,18 @@ class OrderController extends Controller
             ->andWhere(['order.is_deleted' => 0])
             ->orderBy(['order_created_at' => SORT_DESC]);
 
-        $query->andWhere([
-            'OR',
-            ['customer_email' => $email],
-            ['customer_phone_number' => $phone_number]
-        ]);
+        if(!Yii::$app->user->isGuest) 
+        {
+            $query->andWhere(['customer_id' => Yii::$app->user->getId()]);
+        } 
+        else if($email || $phone_number) 
+        {
+                $query->andWhere([
+                    'OR',
+                    ['customer_email' => $email],
+                    ['customer_phone_number' => $phone_number]
+                ]);
+        }
 
         return new ActiveDataProvider([
             'query' => $query
