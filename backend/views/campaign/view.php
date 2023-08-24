@@ -12,6 +12,10 @@ $this->title = $model->utm_uuid;
 $this->params['breadcrumbs'][] = ['label' => 'Campaigns', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+$urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_medium . '&utm_campaign='.
+        $model->utm_campaign . '&utm_id=' . $model->utm_uuid . '&utm_term=' . $model->utm_term .'&utm_content='.$model->utm_content;
+
 ?>
 <div class="campaign-view">
 
@@ -29,11 +33,23 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
     <h3>Campaign URL</h3>
-    <a target="_blank" href="<?= Yii::$app->params['dashboardAppUrl'] ?>?utm_source=<?= $model->utm_source . '&utm_medium=' .$model->utm_medium . '&utm_campaign='.
-        $model->utm_campaign . '&utm_id=' . $model->utm_uuid . '&utm_term=' . $model->utm_term .'&utm_content='.$model->utm_content ?>">
-        <?= Yii::$app->params['dashboardAppUrl'] ?>?utm_source=<?= $model->utm_source . '&utm_medium=' .$model->utm_medium . '&utm_campaign='.
-        $model->utm_campaign . '&utm_id=' . $model->utm_uuid . '&utm_term=' . $model->utm_term .'&utm_content='.$model->utm_content ?>
+
+    <a target="_blank" href="<?= Yii::$app->params['dashboardAppUrl'] . $urlParams ?>">
+        <?= Yii::$app->params['dashboardAppUrl'] . $urlParams ?>
     </a>
+
+    <br />
+    <br />
+
+    <a target="_blank" href="<?= Yii::$app->params['dashboardAppUrl'] . '/register' . $urlParams ?>">
+        <?= Yii::$app->params['dashboardAppUrl'] . '/register' . $urlParams ?>
+    </a>
+ 
+
+    <br />
+    <br />
+    
+    <p>or any url with `<i><?= $urlParams ?></i>` </p>
 
     <h3>Campaign detail</h3>
 
