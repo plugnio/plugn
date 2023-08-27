@@ -11,6 +11,16 @@ use yii\web\NotFoundHttpException;
 
 class CampaignController extends BaseController
 {
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options', 'click'];
+
+        return $behaviors;
+    }
+
     /**
      * Get all store's categories
      * @param type $id
@@ -141,6 +151,30 @@ class CampaignController extends BaseController
     public function actionDetail($id)
     {
         return $this->findModel($id);
+    }
+
+    /**
+     * @param $id
+     * @return array|string[]
+     */
+    public function actionClick($id)
+    {
+        $model = Campaign::find()->where([
+            'utm_uuid' => $id
+        ])->one();
+
+        $model->no_of_clicks = $model->no_of_clicks + 1;
+
+        if(!$model->save()) {
+            return [
+                'operation' => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return [
+            "operation" => "success"
+        ];
     }
 
     /**

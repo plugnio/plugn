@@ -11,6 +11,7 @@ use yii\widgets\DetailView;
 $this->title = $model->utm_uuid;
 $this->params['breadcrumbs'][] = ['label' => 'Campaigns', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
 
 $urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_medium . '&utm_campaign='.
@@ -30,6 +31,13 @@ $urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_me
                 'method' => 'post',
             ],
         ]) ?>
+
+        <?php if($model->no_of_signups > 0) {
+            echo Html::a('Agents by this campaign', [
+                'agent/index', 'id' => $model->utm_uuid,
+                'AgentSearch[utm_uuid]' => $model->utm_uuid,
+            ], ['class' => 'btn btn-primary']);
+        } ?>
     </p>
 
     <h3>Campaign URL</h3>
@@ -63,6 +71,8 @@ $urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_me
             'utm_content',
             'utm_term',
             'investment',
+            'no_of_clicks',
+            'no_of_signups',
             'no_of_stores',
             'no_of_orders',
             'total_commission',

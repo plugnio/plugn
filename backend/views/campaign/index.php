@@ -31,6 +31,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'utm_medium',
             'utm_campaign',
             'investment',
+            'no_of_clicks',
+            'no_of_signups',
             'no_of_stores',
             'no_of_orders',
             'total_commission',
