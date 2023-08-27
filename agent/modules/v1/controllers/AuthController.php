@@ -213,6 +213,7 @@ class AuthController extends Controller {
 
         $agent = new Agent();
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
+        $agent->utm_uuid = Yii::$app->request->getBodyParam('utm_uuid');
         $agent->agent_name = Yii::$app->request->getBodyParam('name');
         $agent->agent_email = Yii::$app->request->getBodyParam('email');
         $agent->agent_number = Yii::$app->request->getBodyParam ('owner_number');
@@ -276,6 +277,7 @@ class AuthController extends Controller {
 
         $agent = new Agent();
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
+        $agent->utm_uuid = Yii::$app->request->getBodyParam('utm_uuid');
         $agent->agent_name = Yii::$app->request->getBodyParam ('name');
         $agent->agent_email = Yii::$app->request->getBodyParam ('email');
         //$agent->setPassword(Yii::$app->request->getBodyParam ('password'));
@@ -335,6 +337,10 @@ class AuthController extends Controller {
                 $transaction->rollBack();
 
                 return $response;
+            }
+
+            if(!$utm_id) {
+                $utm_id = Yii::$app->user->indentity->utm_uuid;
             }
 
             if($utm_id) {

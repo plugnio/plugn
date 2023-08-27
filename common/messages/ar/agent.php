@@ -1,5 +1,6 @@
 <?php
 return [
+    "Store created successfully" => "تم إنشاء المتجر بنجاح",
     "Please delete store(s) first to delete profile!" => "يرجى حذف المتجر (المتاجر) أولاً لحذف الملف الشخصي!",
     "Store deleted successfully" => "تم حذف المتجر بنجاح",
     "Mail settings updated successfully" => "تم تحديث إعدادات البريد بنجاح",

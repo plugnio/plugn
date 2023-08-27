@@ -221,6 +221,10 @@ class StoreController extends BaseController
             return self::message("error",$store->getErrors());
         }
 
+        if(!$utm_id) {
+            $utm_id = Yii::$app->user->indentity->utm_uuid;
+        }
+
         if($utm_id) {
             $rbc = new RestaurantByCampaign();
             $rbc->restaurant_uuid = $store->restaurant_uuid;
@@ -246,7 +250,7 @@ class StoreController extends BaseController
         return [
             "operation" => "success",
             "restaurant_uuid" => $store->restaurant_uuid,
-            "message" => 'Store created successfully'
+            "message" => Yii::t("agent",  'Store created successfully')
         ];
     }
 
