@@ -17,6 +17,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Agent', ['create'], ['class' => 'btn btn-success btn-create']) ?>
     </p>
 
+    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
+
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,

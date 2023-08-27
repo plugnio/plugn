@@ -11,7 +11,12 @@ use yii\widgets\DetailView;
 $this->title = $model->utm_uuid;
 $this->params['breadcrumbs'][] = ['label' => 'Campaigns', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
 \yii\web\YiiAsset::register($this);
+
+$urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_medium . '&utm_campaign='.
+        $model->utm_campaign . '&utm_id=' . $model->utm_uuid . '&utm_term=' . $model->utm_term .'&utm_content='.$model->utm_content;
+
 ?>
 <div class="campaign-view">
 
@@ -26,14 +31,33 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+
+        <?php if($model->no_of_signups > 0) {
+            echo Html::a('Agents by this campaign', [
+                'agent/index', 'id' => $model->utm_uuid,
+                'AgentSearch[utm_uuid]' => $model->utm_uuid,
+            ], ['class' => 'btn btn-primary']);
+        } ?>
     </p>
 
     <h3>Campaign URL</h3>
-    <a target="_blank" href="<?= Yii::$app->params['dashboardAppUrl'] ?>?utm_source=<?= $model->utm_source . '&utm_medium=' .$model->utm_medium . '&utm_campaign='.
-        $model->utm_campaign . '&utm_id=' . $model->utm_uuid . '&utm_term=' . $model->utm_term .'&utm_content='.$model->utm_content ?>">
-        <?= Yii::$app->params['dashboardAppUrl'] ?>?utm_source=<?= $model->utm_source . '&utm_medium=' .$model->utm_medium . '&utm_campaign='.
-        $model->utm_campaign . '&utm_id=' . $model->utm_uuid . '&utm_term=' . $model->utm_term .'&utm_content='.$model->utm_content ?>
+
+    <a target="_blank" href="<?= Yii::$app->params['dashboardAppUrl'] . $urlParams ?>">
+        <?= Yii::$app->params['dashboardAppUrl'] . $urlParams ?>
     </a>
+
+    <br />
+    <br />
+
+    <a target="_blank" href="<?= Yii::$app->params['dashboardAppUrl'] . '/register' . $urlParams ?>">
+        <?= Yii::$app->params['dashboardAppUrl'] . '/register' . $urlParams ?>
+    </a>
+ 
+
+    <br />
+    <br />
+    
+    <p>or any url with `<i><?= $urlParams ?></i>` </p>
 
     <h3>Campaign detail</h3>
 
@@ -47,6 +71,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'utm_content',
             'utm_term',
             'investment',
+            'no_of_clicks',
+            'no_of_signups',
             'no_of_stores',
             'no_of_orders',
             'total_commission',

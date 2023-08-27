@@ -13,6 +13,7 @@ use common\models\AgentToken;
  * This is the model class for table "agent".
  *
  * @property int $agent_id
+ * @property string utm_uuid
  * @property string $agent_name
  * @property string $agent_email
  * @property string $agent_number
@@ -32,6 +33,7 @@ use common\models\AgentToken;
  * @property Restaurant[] $restaurantsManaged
  * @property Restaurant[] $restaurants
  * @property AgentAssignment[] $agentAssignments
+ * @property Campaign $campaign
  */
 class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -74,7 +76,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return [
             [['agent_name', 'agent_email'], 'required'],//'agent_password_hash'
-            ['tempPassword', 'required', 'on' => [self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_AGENT]],
+            ['tempPassword', 'required', 'on' => [
+                self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_AGENT]],
             [['agent_status', 'email_notification', 'reminder_email', 'receive_weekly_stats'], 'integer'],
             [['agent_created_at', 'agent_updated_at'], 'safe'],
             [['agent_phone_country_code', 'agent_number'], 'number'],
@@ -115,6 +118,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return [
             'agent_id' => Yii::t('app','Agent ID'),
+            'utm_uuid' => Yii::t('app','Campaign / Utm ID'),
             'agent_name' => Yii::t('app','Agent Name'),
             'tempPassword' => Yii::t('app','Password'),
             'agent_email' => Yii::t('app','Agent Email'),
@@ -179,6 +183,11 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         ) {
             $this->sendPasswordUpdatedEmail ();
         }
+
+        if($insert && $this->campaign) {
+            $this->campaign->no_of_signups++;
+            $this->campaign->save(false);
+        }
     }
 
     /**
@@ -217,7 +226,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         if(!$model) {
             return [
                 'success' => false,
-                'message' =>Yii::t('agent','This email verification link is no longer valid, please login to send a new one')
+                'message' => Yii::t('agent','This email verification link is no longer valid, please login to send a new one')
             ];
         }
 
@@ -241,6 +250,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             $model->agent_auth_key = ''; //remove auth key
 
             if($model->save()) {
+
                 return [
                     'success' => true,
                     'data' => $model
@@ -669,5 +679,14 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id'])
             ->joinWith(['restaurant'])
             ->andWhere(['restaurant.is_deleted' => false]);
+    }
+
+    /**
+     * @param $modelClass
+     * @return ActiveQuery
+     */
+    public function getCampaign($modelClass = "\common\models\Campaign")
+    {
+        return $this->hasOne ($modelClass::className (), ['utm_uuid' => 'utm_uuid']);
     }
 }

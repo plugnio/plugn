@@ -344,9 +344,11 @@ return [
                         'GET <id>' => 'detail',
                         'POST' => 'create',
                         'PATCH <id>' => 'update',
+                        'PATCH click/<id>' => 'click',
                         'DELETE delete/<id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS click/<id>' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS delete/<id>' => 'options',
                     ]

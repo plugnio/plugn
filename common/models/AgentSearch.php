@@ -17,6 +17,7 @@ class AgentSearch extends Agent {
     public function rules() {
         return [
             [['agent_id', 'agent_status'], 'integer'],
+            [['utm_uuid'], 'string'],
             [['agent_name', 'agent_email', 'last_active_at', 'agent_auth_key', 'agent_password_hash', 'agent_password_reset_token', 'agent_created_at', 'agent_updated_at'], 'safe'],
         ];
     }
@@ -59,6 +60,7 @@ class AgentSearch extends Agent {
             'agent_status' => $this->agent_status,
             'agent_created_at' => $this->agent_created_at,
             'agent_updated_at' => $this->agent_updated_at,
+            'utm_uuid' => $this->utm_uuid
             //'last_active_at' => $this->last_active_at,
         ]);
 

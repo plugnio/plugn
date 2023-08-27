@@ -15,17 +15,16 @@ use yii\widgets\ActiveForm;
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'agent_id') ?>
-
-    <?= $form->field($model, 'agent_name') ?>
-
-    <?= $form->field($model, 'agent_email') ?>
-
-    <?= $form->field($model, 'agent_auth_key') ?>
-
-    <?php // echo $form->field($model, 'agent_password_hash') ?>
-
-    <?php // echo $form->field($model, 'agent_password_reset_token') ?>
+    <div class="grid">
+        <div class="row">
+            <div class="col-md-3">
+                <?= $form->field($model, 'agent_id') ?>
+            </div>
+            <div class="col-md-3">
+                <?= $form->field($model, 'utm_uuid') ?>
+            </div>
+        </div>
+    </div>
 
     <?php // echo $form->field($model, 'agent_status') ?>
 
