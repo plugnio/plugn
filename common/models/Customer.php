@@ -58,7 +58,7 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function rules() {
         return [
-            [['customer_name'], 'required'],// 'customer_phone_number','country_code'
+            [['customer_name', 'customer_phone_number'], 'required'],// 'customer_phone_number','country_code'
             //'customer_email', 
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'unique'],
