@@ -348,7 +348,7 @@ return [
                         'DELETE delete/<id>' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS click/<id>' => 'options',
+                        'OPTIONS click/s<id>' => 'options',
                         'OPTIONS <id>' => 'options',
                         'OPTIONS delete/<id>' => 'options',
                     ]

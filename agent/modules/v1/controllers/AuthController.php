@@ -125,6 +125,7 @@ class AuthController extends Controller {
      * @return array
      */
     public function actionLogin() {
+
         $agent = Yii::$app->user->identity;
 
         // Email and password are correct, check if his email has been verified
@@ -337,10 +338,6 @@ class AuthController extends Controller {
                 $transaction->rollBack();
 
                 return $response;
-            }
-
-            if(!$utm_id) {
-                $utm_id = Yii::$app->user->indentity->utm_uuid;
             }
 
             if($utm_id) {
