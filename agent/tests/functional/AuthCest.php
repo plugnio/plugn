@@ -2,12 +2,12 @@
 
 namespace agent\tests;
 
+use agent\tests\FunctionalTester;
 use common\fixtures\AgentAssignmentFixture;
 use common\fixtures\CountryFixture;
 use common\fixtures\CurrencyFixture;
 use yii;
 use agent\models\Agent;
-use agent\tests\FunctionalTester;
 use common\fixtures\AgentTokenFixture;
 use common\fixtures\AgentFixture;
 use Codeception\Util\HttpCode;
@@ -118,6 +118,22 @@ class AuthCest {
             'restaurant_domain' => 'demo-store',
             'country_id' => 1,
             'annual_revenue' => '10,000 KWD'
+        ]);
+        $I->seeResponseCodeIs(HttpCode::OK); // 200
+        $I->seeResponseContainsJson([
+            'operation' => 'success'
+        ]);
+    }
+
+    public function tryToSignupStep1(FunctionalTester $I) {
+        $I->wantTo('Validate auth > register api');
+        $I->sendPOST('v1/auth/signup-step-one', [
+            'currency' => 1,
+            'name' => 'demo com',
+            'email' => 'demo@demo.com',
+            'password' => 'demo1admin',
+            'owner_number' => 12345678,
+            'owner_phone_country_code' => 91
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
         $I->seeResponseContainsJson([
