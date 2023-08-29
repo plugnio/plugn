@@ -6,6 +6,7 @@ use agent\models\RestaurantPaymentMethod;
 use backend\components\ChartWidget;
 use common\models\Payment;
 use common\models\Restaurant;
+use common\models\RestaurantDomainRequest;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -133,6 +134,11 @@ class StatsController extends Controller
 
         $activeStores = $totalStores - $inActiveStores;
 
+        $totalTapStores = Restaurant::find()
+            ->filterByDateRange($date_start, $date_end)
+            ->andWhere(['is_tap_enable' => 1])
+            ->count();
+
         $totalStoresWithPaymentGateway = Restaurant::find()
             ->filterByCountry($country_id)
             ->filterByDateRange($date_start, $date_end)
@@ -149,6 +155,15 @@ class StatsController extends Controller
             ->filterByCountry($country_id)
             ->filterByDateRange($date_start, $date_end)
             ->filterCustomDomain()
+            ->count();
+
+        $totalDomainRequests = RestaurantDomainRequest::find()
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $pendingDomainRequests = RestaurantDomainRequest::find()
+            ->filterByDateRange($date_start, $date_end)
+            ->andWhere(['status' => RestaurantDomainRequest::STATUS_PENDING])
             ->count();
 
         $payments = Payment::find()
@@ -204,6 +219,9 @@ class StatsController extends Controller
                 "totalStoresWithPaymentGateway" => $totalStoresWithPaymentGateway,
                 "totalPlugnDomain" => $totalPlugnDomain,
                 "totalCustomDomain" => $totalCustomDomain,
+                'totalDomainRequests' => $totalDomainRequests,
+                'pendingDomainRequests' => $pendingDomainRequests,
+                'totalTapStores' => $totalTapStores,
                 //"most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => "KWD",
         ]);

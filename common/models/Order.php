@@ -86,6 +86,7 @@ use yii\web\BadRequestHttpException;
  * @property string $diggipack_awb_no
  * @property boolean $is_sandbox
  * @property decimal $total
+ * @property number $total_orders
  * @property Area
  * @property BankDiscount $bankDiscount
  * @property Country $country
@@ -171,7 +172,7 @@ class Order extends \yii\db\ActiveRecord
             ]],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted'], 'integer', 'min' => 0],
+            [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted', 'total_orders'], 'integer', 'min' => 0],
             [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'pickup_location_id'], 'integer'],
 
             ['mashkor_order_status', 'in', 'range' => [

@@ -29,9 +29,9 @@ class RestaurantSearch extends Restaurant
              [['restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
-                 'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'noItem', 'notActive'], 'safe'],
+                 'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders', 'noItem', 'notActive'], 'safe'],
              [['restaurant_status'], 'integer'],
-             [['platform_fee','version'], 'number'],
+             [['platform_fee','version', 'total_orders'], 'number'],
          ];
      }
 
@@ -53,8 +53,7 @@ class RestaurantSearch extends Restaurant
      */
     public function search($params, $source_utm_uuid = null)
     {
-        $query = Restaurant::find()->joinWith(['country', 'currency'])
-            ->orderBy(['restaurant_created_at' => SORT_DESC]);
+        $query = Restaurant::find()->joinWith(['country', 'currency']);
 
         if($source_utm_uuid) {
             $query->joinWith(['restaurantByCampaign'])
@@ -65,7 +64,10 @@ class RestaurantSearch extends Restaurant
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> ['defaultOrder' => ['restaurant_created_at' => SORT_DESC]],
         ]);
+
+      //  $dataProvider->defa
 
         $dataProvider->sort->attributes['country_name'] = [
             'asc' => ['country.country_name' => SORT_ASC],
@@ -155,6 +157,7 @@ class RestaurantSearch extends Restaurant
             ->andFilterWhere(['like', 'version', $this->version])
             ->andFilterWhere(['like', 'currency.title', $this->currency_title])
             ->andFilterWhere(['like', 'country.country_name', $this->country_name])
+            ->andFilterWhere(['like', 'total_orders', $this->total_orders])
             ->andFilterWhere(['like', 'name_ar', $this->name_ar]);
 
         return $dataProvider;
