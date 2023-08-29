@@ -42,7 +42,7 @@ class m230822_135940_address extends Migration
             'updated_at' => $this->dateTime(),
         ], $tableOptions);
 
-        $this->addPrimaryKey('PK', 'customer_address', 'address_id');
+        //$this->addPrimaryKey('PK', 'customer_address', 'address_id');
 
         $this->addForeignKey(
             'fk-customer_address-customer_id', 'customer_address',
