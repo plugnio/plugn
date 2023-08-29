@@ -64,6 +64,29 @@ class StoreCest
         $I->seeResponseCodeIs(HttpCode::OK); // 200
     }
 
+    public function tryToCreate(FunctionalTester $I) {
+        $I->wantTo('Validate store > create api');
+        $I->sendPOST('v1/store/create', [
+            'currency' => 1,
+            'owner_first_name' => 'demo',
+            'owner_last_name' => 'demo',
+            'owner_email' => 'demo@demo.com',
+            'restaurant_email'=> 'demo@demo.com',
+            'owner_number' => 12345678,
+            'owner_phone_country_code' => 91,
+            'name' => 'demo',
+            'name_ar' => 'demo',
+            'account_type' => 'individual',
+            'restaurant_domain' => 'demo-store',
+            'country_id' => 1,
+            'accept_order_247' => true,
+            'is_public' => true,
+            'enable_gift_message' => true,
+            'schedule_order' => true,
+        ]);
+        $I->seeResponseCodeIs(HttpCode::OK); // 200
+    }
+
     public function tryToUpdate(FunctionalTester $I) {
         $I->wantTo('Validate store > update api');
         $I->sendPOST('v1/store', [
