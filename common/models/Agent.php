@@ -341,7 +341,11 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public static function findByEmail($email)
     {
-        return static::findOne (['agent_email' => $email, 'agent_status' => self::STATUS_ACTIVE]);
+        return static::findOne ([
+            'agent_email' => $email,
+            'agent_status' => self::STATUS_ACTIVE,
+            'deleted' => 0
+        ]);
     }
 
     /**
