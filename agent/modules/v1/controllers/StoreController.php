@@ -222,7 +222,7 @@ class StoreController extends BaseController
         }
 
         if(!$utm_id) {
-            $utm_id = Yii::$app->user->indentity->utm_uuid;
+            $utm_id = Yii::$app->user->identity->utm_uuid;
         }
 
         if($utm_id) {
