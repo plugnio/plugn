@@ -35,6 +35,12 @@ class RestaurantQuery extends \yii\db\ActiveQuery
             DATE(restaurant.last_order_at) < DATE(NOW() - INTERVAL 30 DAY)"));
     }
 
+    public function filterByNoOrderInDays($days)
+    {
+        return $this->andWhere (new Expression("restaurant.last_order_at IS NULL OR 
+            DATE(restaurant.last_order_at) < DATE(NOW() - INTERVAL ".$days." DAY)"));
+    }
+
     /**
      * no order & no item
      * @param null $db

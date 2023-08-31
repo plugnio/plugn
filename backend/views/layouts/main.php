@@ -49,6 +49,8 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Numbers', 'url' => ['/stats/index']],
                     ['label' => 'Graphs', 'url' => ['/stats/graph']],
+                    ['label' => 'Store Closer & Retention', 'url' => ['/stats/store-retention']],
+                    ['label' => 'Customer Funnel', 'url' => ['/stats/customer-funnel']],
                 ]
             ],
             [

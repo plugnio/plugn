@@ -36,7 +36,8 @@ class StatsController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'graph', 'graph-fees', 'graph-stores', 'graph-orders', 'graph-customers'],
+                        'actions' => ['index', 'graph', 'store-retention', 'graph-fees', 'graph-stores', 'graph-orders',
+                            'customer-funnel', 'graph-customers'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -206,6 +207,67 @@ class StatsController extends Controller
                 "totalCustomDomain" => $totalCustomDomain,
                 //"most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => "KWD",
+        ]);
+    }
+
+    public function actionStoreRetention()
+    {
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+        $country_id = Yii::$app->request->get('country_id');
+
+        $totalStores = Restaurant::find()
+            ->filterByCountry($country_id)
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $inActiveStores = Restaurant::find()
+            ->filterByCountry($country_id)
+            ->filterByNoOrderInDays(15)
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
+        $countries = ["0" => "All"] + $countries;
+
+        return $this->render('store-retention', [
+            "totalStores" => $totalStores,
+            "inActiveStores" => $inActiveStores,
+            "date_start" => $date_start,
+            "date_end" => $date_end,
+            "country_id" => $country_id,
+            "countries" => $countries
+        ]);
+    }
+
+    public function actionCustomerFunnel()
+    {
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+        $country_id = Yii::$app->request->get('country_id');
+
+        $totalOrders = Order::find()
+            ->filterByCountry($country_id)
+            ->checkoutCompleted()
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $completedOrders = Order::find()
+            ->filterByCountry($country_id)
+            ->filterCompleted()
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
+        $countries = ["0" => "All"] + $countries;
+
+        return $this->render('customer-funnel', [
+            "totalOrders" => $totalOrders,
+            "completedOrders" => $completedOrders,
+            "date_start" => $date_start,
+            "date_end" => $date_end,
+            "country_id" => $country_id,
+            "countries" => $countries
         ]);
     }
 
