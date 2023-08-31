@@ -35,7 +35,7 @@ class PasswordResetRequestForm extends Model {
      *
      * @return bool whether the email was send
      */
-    public function sendEmail($customer = null) {
+    public function sendEmail($customer = null, $restaurant = null) {
 
         if (!$customer) {
             $customer = Customer::findOne([
@@ -44,14 +44,18 @@ class PasswordResetRequestForm extends Model {
         }
 
         if ($customer) {
+
             if (!Customer::isPasswordResetTokenValid($customer->customer_password_reset_token)) {
                 $customer->generatePasswordResetToken();
             }
 
             if ($customer->save(false)) {
 
-                //todo: replace with store link
-                $resetLink = Yii::$app->params['newDashboardAppUrl'] . '/update-password/' . $customer->customer_password_reset_token;
+                if($restaurant) {
+                    $resetLink = $restaurant->restaurant_domain . '/update-password/' . $customer->customer_password_reset_token;
+                } else {
+                    $resetLink = Yii::$app->params['newDashboardAppUrl'] . '/update-password/' . $customer->customer_password_reset_token;
+                }
 
                 $mailer = Yii::$app->mailer
                     ->compose(
@@ -60,7 +64,8 @@ class PasswordResetRequestForm extends Model {
                             'text' => 'customer/passwordResetToken-text'
                         ], [
                             'resetLink' => $resetLink,
-                            'customer' => $customer
+                            'customer' => $customer,
+                            'restaurant' => $restaurant
                         ]
                     )
                     ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])

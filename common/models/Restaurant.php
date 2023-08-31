@@ -241,7 +241,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
-            [['not_for_profit'], 'number'],
+            [['not_for_profit', 'total_orders'], 'number'],
             
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             ['owner_email', 'email'],
@@ -1670,7 +1670,7 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function beforeSave($insert) {
 
-        if($insert && $this->referral_code != null){
+        if($insert && $this->referral_code != null) {
             if(!Partner::find()->where(['referral_code' => $this->referral_code])->exists())
               $this->referral_code = null;
         }
@@ -3202,12 +3202,14 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM payment WHERE restaurant_uuid='.$this->restaurant_uuid,
+            'sql' => 'SELECT COUNT(*) FROM payment WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
         ]);
 
-        return Restaurant::getDb()->cache(function($db) {
+        $model = $this;
 
-            return $this->getPayments()
+        return Restaurant::getDb()->cache(function($db) use ($model) {
+
+            return $model->getPayments()
                 ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
                             SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
                 ->joinWith(['order'])

@@ -59,6 +59,14 @@ class OrderQuery extends \yii\db\ActiveQuery
     }
 
     /**
+     * Orders with complete/ delivered status
+     */
+    public function filterCompleted()
+    {
+        return $this->andWhere (['order_status' => Order::STATUS_COMPLETE]);
+    }
+
+    /**
      * Orders successfully placed
      */
     public function checkoutCompleted()

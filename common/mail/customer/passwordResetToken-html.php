@@ -4,9 +4,6 @@ use yii\helpers\Html;
 use common\models\Restaurant;
 
 
-
-
-
 ?>
 
 
@@ -14,7 +11,7 @@ use common\models\Restaurant;
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
     <title>
-        Reset your Plugn password
+        Reset your password
     </title>
     <!--[if !mso]><!-- -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -192,6 +189,7 @@ use common\models\Restaurant;
                                                         border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;margin:0px;"
                                                     >
 
+<!--
                                                         <tr>
                                                             <td
                                                                 align="left" style="font-size:0px;padding:0;padding-top:30px;padding-left:30px;word-break:break-word;"
@@ -215,7 +213,7 @@ use common\models\Restaurant;
 
                                                             </td>
                                                         </tr>
-
+-->
                                                         <tr>
                                                             <td
                                                                 align="left" style="font-size:0px;padding:20px;padding-top:40px;padding-bottom:0;padding-left:30px;word-break:break-word;"
@@ -224,7 +222,7 @@ use common\models\Restaurant;
                                                                 <div
                                                                     style="font-family:Helvetica;font-size:21px;font-weight:900;line-height:24px;text-align:left;color:#ffffff;"
                                                                 >
-                                                                    Reset your Plugn password
+                                                                    Reset your password
                                                                 </div>
 
                                                             </td>
@@ -326,7 +324,7 @@ use common\models\Restaurant;
                                                     <div
                                                         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
                                                     >
-                                                        Somebody (hopefully you) requested a new password for the Plugn account for <?= $customer->customer_email ?>. No changes have been made to your account yet.
+                                                        Somebody (hopefully you) requested a new password for the <?= $restaurant->name ?> account for <?= $customer->customer_email ?>. No changes have been made to your account yet.
                                                     </div>
 
                                                 </td>

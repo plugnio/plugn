@@ -37,15 +37,16 @@ $this->params['breadcrumbs'][] = $this->title;
         },
         'columns' => [
             // ['class' => 'yii\grid\SerialColumn'],
-            [
+            /*[
                 'attribute' => 'logo',
                 'format' => 'html',
                 'value' => function ($data) {
                     return Html::img($data->getRestaurantLogoUrl());
                 },
-            ],
+            ],*/
             [
                 'attribute' => 'name',
+                'label' => "Name",
                 'format' => 'raw',
                 'value' => function ($data) {
 
@@ -77,7 +78,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $name;
                 }
             ],
-            'restaurant_domain',
+             [
+                'attribute' => 'restaurant_domain',
+                'label' => "URL",
+                'format' => 'raw',
+                'value' => function ($data) {
+                    return '<a target="_blank" href="'. $data->restaurant_domain .'">'. $data->restaurant_domain .'</a>';
+                }
+            ],
+            'total_orders',
             /*[
               'attribute' => 'country_name',
               'value' =>     'country.country_name'
@@ -87,14 +96,14 @@ $this->params['breadcrumbs'][] = $this->title;
               'attribute' => 'currency_title',
               'value' =>     'currency.title'
             ],*/
-            'platform_fee:percent',
+           // 'platform_fee:percent',
             //'warehouse_fee',
             //'warehouse_delivery_charges',
            // 'version',
            // 'restaurant_created_at:datetime',
             //'referral_code',
-            'last_active_at',
-            'last_order_at',
+           // 'last_active_at',
+            //'last_order_at',
             [
                  'attribute' => 'restaurant_status',
                 'filter' => \common\models\Restaurant::arrStatus(),

@@ -58,7 +58,7 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function rules() {
         return [
-            [['customer_name', 'customer_phone_number','restaurant_uuid', 'country_code'], 'required'],
+            [['customer_name', 'customer_phone_number'], 'required'],// 'customer_phone_number','country_code'
             //'customer_email', 
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['customer_phone_number'], 'unique'],
@@ -257,6 +257,10 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      * @return \yii\db\ActiveQuery
      */
     public function getOrders($modelClass = "\common\models\Order") {
+        return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id']);
+    }
+
+    public function getCustomerAddresses($modelClass = "\common\models\CustomerAddress") {
         return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
@@ -521,20 +525,27 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      * Whenever a user changes his password using any method (password reset email / profile page),
      * we need to send out the following email to confirm that his password was set
      */
-    public function sendPasswordUpdatedEmail()
+    public function sendPasswordUpdatedEmail($restaurant_uuid = null)
     {
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
+        if(!$restaurant_uuid) {
+            $restaurant_uuid = $this->restaurant_uuid;
+        }
+
+        $restaurant = Restaurant::find()->andWhere(['restaurant_uuid' => $restaurant_uuid])->one();
+ 
         \Yii::$app->mailer->compose ([
             'html' => 'customer/password-updated-html',
             'text' => 'customer/password-updated-text',
         ], [
-            'customer' => $this
+            'customer' => $this,
+            'restaurant' => $restaurant
         ])
             ->setFrom ([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
             ->setTo ($this->customer_email)
-            ->setSubject (Yii::t ('customer', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
-            ->send ();
+            ->setSubject (Yii::t ('customer', 'Your '. $restaurant->restaurant.' password has been changed'))
+            ->send();
     }
 
     /**
@@ -600,10 +611,10 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      * Sends an email requesting a user to verify his email address
      * @return boolean whether the email was sent
      */
-    public function sendVerificationEmail() {
+    public function sendVerificationEmail($restaurant_uuid = null) {
 
         $this->generateAuthKey();
-
+ 
         //Update customer's last email limit timestamp
         //$this->customer_limit_email = new Expression('NOW()');
         //$this->save(false);
@@ -623,12 +634,28 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             $email = $this->customer_email;
         }
 
+        if(!$restaurant_uuid) {
+            $restaurant_uuid = $this->restaurant_uuid;
+        }
+
+        $restaurant = Restaurant::find()->andWhere(['restaurant_uuid' => $restaurant_uuid])->one();
+
+        if($restaurant) {
+            $verifyLink = $restaurant->restaurant_domain . '/verify-email/' . urlencode($email) . '/' 
+                . $this->customer_auth_key;
+        } else {
+            $verifyLink = $verifyLink = Yii::$app->params['newDashboardAppUrl'] . '/verify-email/' . urlencode($email) . '/' 
+                . $this->customer_auth_key;
+        }
+            
         $mailer = Yii::$app->mailer->compose([
                 'html' => 'customer/verify-email-html',
                 'text' => 'customer/verify-email-text',
             ], [
                 'customer' => $this,
-                'email' => $email
+                'email' => $email,
+                'restaurant' => $restaurant,
+                'verifyLink' => $verifyLink
             ])
             ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
             ->setTo($email)

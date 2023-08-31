@@ -494,7 +494,8 @@ class OrderController extends Controller {
         //for https://pogi.sentry.io/issues/3889482226/?project=5220572&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
 
         \common\models\Restaurant::updateAll([
-            'last_order_at' => new Expression('NOW()')
+            'last_order_at' => new Expression('NOW()'),
+            'total_orders' => $restaurant->total_orders + 1
         ], [
             'restaurant_uuid' => $restaurant->restaurant_uuid
         ]);

@@ -204,6 +204,4 @@ class AgentController extends BaseController
             "message" => Yii::t('agent', "Account Password Updated Successfully")
         ];
     }
-
-
 }

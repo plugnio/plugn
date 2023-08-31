@@ -86,6 +86,7 @@ use yii\web\BadRequestHttpException;
  * @property string $diggipack_awb_no
  * @property boolean $is_sandbox
  * @property decimal $total
+ * @property number $total_orders
  * @property Area
  * @property BankDiscount $bankDiscount
  * @property Country $country
@@ -171,7 +172,7 @@ class Order extends \yii\db\ActiveRecord
             ]],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted'], 'integer', 'min' => 0],
+            [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted', 'total_orders'], 'integer', 'min' => 0],
             [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'pickup_location_id'], 'integer'],
 
             ['mashkor_order_status', 'in', 'range' => [
@@ -238,35 +239,28 @@ class Order extends \yii\db\ActiveRecord
                     $this->addError($attribute, Yii::t('app','Unit type cannot be blank.'));
                 }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
+
             ['block', function ($attribute, $params, $validator) {
                 if ($this->area_id && $this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                 {
                     $this->addError($attribute, Yii::t('app','Block cannot be blank.'));
                 }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
+
             ['street', function ($attribute, $params, $validator) {
                 if ($this->area_id && $this->street == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                 {
                     $this->addError($attribute, Yii::t('app','Street cannot be blank.'));
                 }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
+
             ['house_number', function ($attribute, $params, $validator) {
-                if ($this->area_id && $this->house_number == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                if ($this->area_id && $this->unit_type != 'Office' && $this->house_number == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                 {
                     $this->addError($attribute, Yii::t('app','House number cannot be blank.'));
                 }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
-            ['order_mode', 'validateOrderMode', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
-            [['restaurant_uuid'], 'string', 'max' => 60],
-            [['customer_phone_number'], 'string', 'min' => 6, 'max' => 20],
-            [['customer_phone_number'], 'number'],
-            [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund', 'tax'], 'number', 'min' => 0],
-            ['subtotal', 'validateMinCharge', 
-                'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 
-                'when' => function ($model) {
-                    return $model->order_mode == static::ORDER_MODE_DELIVERY && $model->subtotal > 0;
-                }
-            ],
+
             [['floor'], 'required', 'when' => function ($model) {
                 return ($model->unit_type == 'Office' || $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
             }
@@ -277,7 +271,18 @@ class Order extends \yii\db\ActiveRecord
             ],
             [['apartment'], 'required', 'when' => function ($model) {
                 return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
-            }
+            }],
+
+            ['order_mode', 'validateOrderMode', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
+            [['restaurant_uuid'], 'string', 'max' => 60],
+            [['customer_phone_number'], 'string', 'min' => 6, 'max' => 20],
+            [['customer_phone_number'], 'number'],
+            [['total_price', 'total_price_before_refund', 'delivery_fee', 'subtotal', 'subtotal_before_refund', 'tax'], 'number', 'min' => 0],
+            ['subtotal', 'validateMinCharge', 
+                'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN, 
+                'when' => function ($model) {
+                    return $model->order_mode == static::ORDER_MODE_DELIVERY && $model->subtotal > 0;
+                }
             ],
             /*[['postalcode', 'city', 'address_1', 'address_2'], 'required', 'when' => function ($model) {
                 return $model->shipping_country_id;
@@ -429,12 +434,13 @@ class Order extends \yii\db\ActiveRecord
             'orderStatusInEnglish',
             'orderStatusInArabic',
             'restaurant',
-            'orderItems' => function ($order) {
+            'orderItems',
+            /*'orderItems' => function ($order) {
                 return $order->getOrderItems()
                     ->with('orderItemExtraOptions')
                     ->asArray()
                     ->all();
-            },
+            },*/
             'restaurantBranch',
             'deliveryZone',
             'pickupLocation',

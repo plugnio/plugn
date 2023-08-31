@@ -2,6 +2,8 @@
 
 namespace agent\tests;
 
+use common\fixtures\CountryFixture;
+use common\fixtures\CurrencyFixture;
 use common\fixtures\RestaurantPaymentMethodFixture;
 use Yii;
 use agent\models\Agent;
@@ -27,7 +29,9 @@ class StoreCest
             'agent_assignments' => AgentAssignmentFixture::className(),
             'restaurants' => RestaurantFixture::className(),
             'restaurants' => RestaurantPaymentMethodFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agentToken' => AgentTokenFixture::className(),
+            'currency' => CurrencyFixture::className(),
+            'country' => CountryFixture::className()
         ];
     }
 
@@ -79,12 +83,16 @@ class StoreCest
             'account_type' => 'individual',
             'restaurant_domain' => 'demo-store',
             'country_id' => 1,
+            'currency' => 'KWD',
             'accept_order_247' => true,
             'is_public' => true,
             'enable_gift_message' => true,
             'schedule_order' => true,
         ]);
         $I->seeResponseCodeIs(HttpCode::OK); // 200
+        $I->seeResponseContainsJson([
+            "operation" => "success"
+        ]);
     }
 
     public function tryToUpdate(FunctionalTester $I) {

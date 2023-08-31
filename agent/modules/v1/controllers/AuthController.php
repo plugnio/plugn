@@ -275,7 +275,7 @@ class AuthController extends Controller {
         $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
 
         $currency = Currency::findOne(['code' => $currencyCode]);
-
+ 
         $agent = new Agent();
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
         $agent->utm_uuid = Yii::$app->request->getBodyParam('utm_uuid');

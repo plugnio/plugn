@@ -6,6 +6,7 @@ use agent\models\RestaurantPaymentMethod;
 use backend\components\ChartWidget;
 use common\models\Payment;
 use common\models\Restaurant;
+use common\models\RestaurantDomainRequest;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -36,7 +37,8 @@ class StatsController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'graph', 'graph-fees', 'graph-stores', 'graph-orders', 'graph-customers'],
+                        'actions' => ['index', 'graph', 'store-retention', 'graph-fees', 'graph-stores', 'graph-orders',
+                            'customer-funnel', 'sales', 'payment-gateways', 'graph-customers'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -151,16 +153,14 @@ class StatsController extends Controller
             ->filterCustomDomain()
             ->count();
 
-        $payments = Payment::find()
+        $totalDomainRequests = RestaurantDomainRequest::find()
             ->filterByDateRange($date_start, $date_end)
-            ->select(new Expression("currency_code, SUM(payment_gateway_fee) as payment_gateway_fees, 
-                SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
-            ->joinWith(['order'])
-            ->filterByCountry($country_id)
-            ->filterPaid()
-            ->groupBy('order.currency_code')
-            ->asArray()
-            ->all();
+            ->count();
+
+        $pendingDomainRequests = RestaurantDomainRequest::find()
+            ->filterByDateRange($date_start, $date_end)
+            ->andWhere(['status' => RestaurantDomainRequest::STATUS_PENDING])
+            ->count();
 
         $revenues = Order::find()
             ->filterByDateRange($date_start, $date_end)
@@ -168,15 +168,6 @@ class StatsController extends Controller
             ->filterByCountry($country_id)
             ->activeOrders()
             ->groupBy('order.currency_code')
-            ->asArray()
-            ->all();
-
-        $storesByPaymentMethods = RestaurantPaymentMethod::find()
-            ->joinWith(['paymentMethod'])
-            ->select(new Expression('payment_method.payment_method_name, COUNT(*) as total'))
-            ->filterByCountry($country_id)
-            ->filterActive()
-            ->groupBy('restaurant_payment_method.payment_method_id')
             ->asArray()
             ->all();
 
@@ -192,10 +183,8 @@ class StatsController extends Controller
             "date_end" => $date_end,
                  "inActiveStores" => $inActiveStores,
                  "activeStores" => $activeStores,
-                 "storesByPaymentMethods" => $storesByPaymentMethods,
                  "country_id" => $country_id,
                  "countries" => $countries,
-                 "payments" => $payments,
                 "totalOrders" => $totalOrders,
                 "revenues" => $revenues,
                 "totalStores" => $totalStores,
@@ -204,8 +193,135 @@ class StatsController extends Controller
                 "totalStoresWithPaymentGateway" => $totalStoresWithPaymentGateway,
                 "totalPlugnDomain" => $totalPlugnDomain,
                 "totalCustomDomain" => $totalCustomDomain,
+                'totalDomainRequests' => $totalDomainRequests,
+                'pendingDomainRequests' => $pendingDomainRequests,
                 //"most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => "KWD",
+        ]);
+    }
+
+    public function actionPaymentGateways()
+    {
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+        $country_id = Yii::$app->request->get('country_id');
+
+        $storesByPaymentMethods = RestaurantPaymentMethod::find()
+            ->joinWith(['paymentMethod'])
+            ->select(new Expression('payment_method.payment_method_name, COUNT(*) as total'))
+            ->filterByCountry($country_id)
+            ->filterActive()
+            ->groupBy('restaurant_payment_method.payment_method_id')
+            ->asArray()
+            ->all();
+
+        $totalTapStores = Restaurant::find()
+            ->filterByDateRange($date_start, $date_end)
+            ->filterByCountry($country_id)
+            ->andWhere(['is_tap_enable' => 1])
+            ->count();
+
+        $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
+        $countries = ["0" => "All"] + $countries;
+
+        return $this->render('payment-gateways', [
+            "totalTapStores" => $totalTapStores,
+            "storesByPaymentMethods" => $storesByPaymentMethods,
+            "date_start" => $date_start,
+            "date_end" => $date_end,
+            "country_id" => $country_id,
+            "countries" => $countries
+        ]);
+    }
+
+    public function actionSales()
+    {
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+        $country_id = Yii::$app->request->get('country_id');
+
+        $payments = Payment::find()
+            ->filterByDateRange($date_start, $date_end)
+            ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, 
+                SUM(payment_gateway_fee) as payment_gateway_fees, 
+                SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
+            ->joinWith(['order'])
+            ->filterByCountry($country_id)
+            ->filterPaid()
+            ->groupBy('order.currency_code')
+            ->asArray()
+            ->all();
+
+        $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
+        $countries = ["0" => "All"] + $countries;
+
+        return $this->render('sales', [
+            "payments" => $payments,
+            "date_start" => $date_start,
+            "date_end" => $date_end,
+            "country_id" => $country_id,
+            "countries" => $countries
+        ]);
+    }
+
+    public function actionStoreRetention()
+    {
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+        $country_id = Yii::$app->request->get('country_id');
+
+        $totalStores = Restaurant::find()
+            ->filterByCountry($country_id)
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $inActiveStores = Restaurant::find()
+            ->filterByCountry($country_id)
+            ->filterByNoOrderInDays(15)
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
+        $countries = ["0" => "All"] + $countries;
+
+        return $this->render('store-retention', [
+            "totalStores" => $totalStores,
+            "inActiveStores" => $inActiveStores,
+            "date_start" => $date_start,
+            "date_end" => $date_end,
+            "country_id" => $country_id,
+            "countries" => $countries
+        ]);
+    }
+
+    public function actionCustomerFunnel()
+    {
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+        $country_id = Yii::$app->request->get('country_id');
+
+        $totalOrders = Order::find()
+            ->filterByCountry($country_id)
+            ->checkoutCompleted()
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $completedOrders = Order::find()
+            ->filterByCountry($country_id)
+            ->filterCompleted()
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
+        $countries = ["0" => "All"] + $countries;
+
+        return $this->render('customer-funnel', [
+            "totalOrders" => $totalOrders,
+            "completedOrders" => $completedOrders,
+            "date_start" => $date_start,
+            "date_end" => $date_end,
+            "country_id" => $country_id,
+            "countries" => $countries
         ]);
     }
 
