@@ -1,6 +1,9 @@
 <?php
 
+use yii\db\Expression;
+use yii\grid\GridView;
 use yii\helpers\Html;
+use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
@@ -12,10 +15,10 @@ $this->title = $model->utm_uuid;
 $this->params['breadcrumbs'][] = ['label' => 'Campaigns', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-\yii\web\YiiAsset::register($this);
+YiiAsset::register($this);
 
-$urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_medium . '&utm_campaign='.
-        $model->utm_campaign . '&utm_id=' . $model->utm_uuid . '&utm_term=' . $model->utm_term .'&utm_content='.$model->utm_content;
+$urlParams = '?utm_source=' . $model->utm_source . '&utm_medium=' . $model->utm_medium . '&utm_campaign=' .
+    $model->utm_campaign . '&utm_id=' . $model->utm_uuid . '&utm_term=' . $model->utm_term . '&utm_content=' . $model->utm_content;
 
 ?>
 <div class="campaign-view">
@@ -32,7 +35,7 @@ $urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_me
             ],
         ]) ?>
 
-        <?php if($model->no_of_signups > 0) {
+        <?php if ($model->no_of_signups > 0) {
             echo Html::a('Agents by this campaign', [
                 'agent/index', 'id' => $model->utm_uuid,
                 'AgentSearch[utm_uuid]' => $model->utm_uuid,
@@ -46,17 +49,17 @@ $urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_me
         <?= Yii::$app->params['dashboardAppUrl'] . $urlParams ?>
     </a>
 
-    <br />
-    <br />
+    <br/>
+    <br/>
 
     <a target="_blank" href="<?= Yii::$app->params['dashboardAppUrl'] . '/register' . $urlParams ?>">
         <?= Yii::$app->params['dashboardAppUrl'] . '/register' . $urlParams ?>
     </a>
- 
 
-    <br />
-    <br />
-    
+
+    <br/>
+    <br/>
+
     <p>or any url with `<i><?= $urlParams ?></i>` </p>
 
     <h3>Campaign detail</h3>
@@ -84,7 +87,7 @@ $urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_me
 
     <h3>Stores</h3>
 
-    <?= \yii\grid\GridView::widget([
+    <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         /*'rowOptions' => function($model){
@@ -102,6 +105,83 @@ $urlParams = '?utm_source='. $model->utm_source . '&utm_medium=' .$model->utm_me
             'name',
             'restaurant_domain',
             'restaurant_created_at:date',
+
+            [
+                'label' => "Store revenue",
+                'format' => "html",
+                'value' => function ($model) {
+
+                    $payments = $model->getCSV();
+
+                    if(empty($payments)) {
+                        return "No order(s)!";
+                    }
+
+                    $values = [];
+
+                    foreach ($payments as $payment) {
+
+                        $values[] = Yii::$app->formatter->asCurrency($payment['payment_net_amount'], $payment['currency_code']);
+                    }
+
+                    return implode(", ", $values);
+                }
+            ],
+
+            [
+                'label' => "Plugn fees",
+                'format' => "html",
+                'value' => function ($model) {
+
+                    $payments = $model->getCSV();
+
+                    $values = [];
+
+                    foreach ($payments as $payment) {
+
+                        $values[] = Yii::$app->formatter->asCurrency($payment['plugn_fees'], $payment['currency_code']);
+                    }
+
+                    return implode(", ", $values);
+                }
+            ],
+
+            [
+                'label' => "Payment gateway fees",
+                'format' => "html",
+                'value' => function ($model) {
+
+                    $payments = $model->getCSV();
+
+                    $values = [];
+
+                    foreach ($payments as $payment) {
+
+                        $values[] = Yii::$app->formatter->asCurrency($payment['payment_gateway_fees'], $payment['currency_code']);
+                    }
+
+                    return implode(", ", $values);
+                }
+            ],
+
+            [
+                'label' => "Partner fees",
+                'format' => "html",
+                'value' => function ($model) {
+
+                    $payments = $model->getCSV();
+
+                    $values = [];
+
+                    foreach ($payments as $payment) {
+
+                        $values[] = Yii::$app->formatter->asCurrency($payment['partner_fees'], $payment['currency_code']);
+                    }
+
+                    return implode(", ", $values);
+                }
+            ],
+
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{view}',

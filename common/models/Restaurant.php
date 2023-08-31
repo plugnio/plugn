@@ -3195,6 +3195,30 @@ class Restaurant extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getCSV() {
+
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM payment WHERE restaurant_uuid='.$this->restaurant_uuid,
+        ]);
+
+        return Restaurant::getDb()->cache(function($db) {
+
+            return $this->getPayments()
+                ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
+                            SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
+                ->joinWith(['order'])
+                ->filterPaid()
+                ->groupBy('order.currency_code')
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
+    }
+
     /**
      * Gets query for [[Items]].
      *

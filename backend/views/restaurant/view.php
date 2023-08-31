@@ -584,6 +584,7 @@ $this->registerJs($js);
 
         </div>
     <?php } ?>
+
     </div>
 
 </div>
