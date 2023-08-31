@@ -39,7 +39,7 @@ class StatsController extends BaseController
      */
     public function actionView()
     {
-        //todo: update queries and remove this 
+        //todo: update queries and remove this + use yii2 query-cache feature 
         ini_set('memory_limit', '512M');
 
         $interval = Yii::$app->request->get('interval');
