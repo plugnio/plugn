@@ -285,41 +285,6 @@ $this->title = 'Statistics';
 
         </div>
 
-        <h3>Stores by Payment Methods</h3>
-
-        <div class="row">
-
-            <?php foreach ($storesByPaymentMethods as $storesByPaymentMethod) { ?>
-                <div class="col-xl-3 col-lg-4">
-                    <div class="card card-stats mb-4 mb-xl-0">
-                        <div class="card-body">
-                            <h5 class="card-title text-uppercase text-muted mb-0"><?= $storesByPaymentMethod['payment_method_name'] ?></h5>
-                            <span class="h2 font-weight-bold mb-0">
-                                            <?= $storesByPaymentMethod['total'] ?></span>
-                            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                                <i class="fa fa-chart-pie"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php } ?>
-
-            <div class="col-xl-3 col-lg-4">
-                <div class="card card-stats mb-4 mb-xl-0">
-                    <div class="card-body">
-                        <h5 class="card-title text-uppercase text-muted mb-0">
-                            Stores with Tap account
-                        </h5>
-                        <span class="h2 font-weight-bold mb-0"><?= $totalTapStores?></span>
-                        <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                            <i class="fa fa-chart-pie"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
         <h3>Vendors' Revenues</h3>
 
         <div class="row">
@@ -339,53 +304,6 @@ $this->title = 'Statistics';
                 </div>
             <?php } ?>
         </div>
-
-        <h3>Our fees</h3>
-
-        <?php foreach($payments as $payment) { ?>
-
-            <h5><?= $payment['currency_code'] ?></h5>
-
-            <div class="row">
-
-                <div class="col-xl-3 col-lg-4">
-                    <div class="card card-stats mb-4 mb-xl-0">
-                        <div class="card-body">
-                            <h5 class="card-title text-uppercase text-muted mb-0">Payment gateway fees</h5>
-                            <span class="h2 font-weight-bold mb-0">
-                                        <?= Yii::$app->formatter->asCurrency($payment['payment_gateway_fees'], $payment['currency_code']) ?> </span>
-                            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                                <i class="fa fa-chart-pie"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-4">
-                    <div class="card card-stats mb-4 mb-xl-0">
-                        <div class="card-body">
-                            <h5 class="card-title text-uppercase text-muted mb-0">Plugn fees</h5>
-                            <span class="h2 font-weight-bold mb-0">
-                                        <?= Yii::$app->formatter->asCurrency($payment['plugn_fees'], $payment['currency_code']) ?></span>
-                            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                                <i class="fa fa-chart-pie"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-4">
-                    <div class="card card-stats mb-4 mb-xl-0">
-                        <div class="card-body">
-                            <h5 class="card-title text-uppercase text-muted mb-0">Partner fees</h5>
-                            <span class="h2 font-weight-bold mb-0">
-                                        <?= Yii::$app->formatter->asCurrency($payment['partner_fees'], $payment['currency_code']) ?></span>
-                            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                                <i class="fa fa-chart-pie"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php } ?>
 
     </div>
     </div>

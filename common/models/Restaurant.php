@@ -3202,12 +3202,14 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM payment WHERE restaurant_uuid='.$this->restaurant_uuid,
+            'sql' => 'SELECT COUNT(*) FROM payment WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
         ]);
 
-        return Restaurant::getDb()->cache(function($db) {
+        $model = $this;
 
-            return $this->getPayments()
+        return Restaurant::getDb()->cache(function($db) use ($model) {
+
+            return $model->getPayments()
                 ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
                             SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
                 ->joinWith(['order'])
