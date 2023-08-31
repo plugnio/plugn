@@ -203,4 +203,11 @@ class RestaurantDomainRequest extends \yii\db\ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['agent_id' => 'created_by']);
     }
+
+    /**
+     * @return query\RestaurantDomainRequestQuery
+     */
+    public static function find() {
+        return new query\RestaurantDomainRequestQuery(get_called_class());
+    }
 }
