@@ -123,7 +123,8 @@ use borales\extensions\phoneInput\PhoneInputValidator;
  * @property boolean $is_under_maintenance
  * @property string|null $last_active_at
  * @property string|null $last_order_at
- *
+ * @property number $total_orders
+ * 
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
