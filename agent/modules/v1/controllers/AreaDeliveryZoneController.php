@@ -272,6 +272,7 @@ class AreaDeliveryZoneController extends BaseController
 
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
+
         $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");
@@ -317,6 +318,7 @@ class AreaDeliveryZoneController extends BaseController
         
         $store_uuid = Yii::$app->request->getBodyParam ("store_uuid");
         $area_id = Yii::$app->request->getBodyParam ("area_id");
+
         $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
         $delivery_zone_id = Yii::$app->request->getBodyParam ("delivery_zone_id");

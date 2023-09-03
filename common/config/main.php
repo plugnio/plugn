@@ -8,9 +8,9 @@ return [
     'name' => 'Plugn',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
-        /*'cache' => [
+        'cache' => [
             'class' => 'yii\caching\FileCache',
-        ],*/
+        ],
         'formatter' => [
         'thousandSeparator' => ',',
         'decimalSeparator' => '.',

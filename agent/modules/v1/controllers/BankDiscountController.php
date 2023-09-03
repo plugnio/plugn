@@ -85,11 +85,9 @@ class BankDiscountController extends BaseController {
         if(Yii::$app->request->getBodyParam("valid_until"))
           $model->valid_until = Yii::$app->request->getBodyParam("valid_until");
 
-
         $model->max_redemption = Yii::$app->request->getBodyParam("max_redemption") ? Yii::$app->request->getBodyParam("max_redemption") : 0;
         $model->limit_per_customer = Yii::$app->request->getBodyParam("limit_per_customer") ? Yii::$app->request->getBodyParam("limit_per_customer") : 0;
         $model->minimum_order_amount = Yii::$app->request->getBodyParam("minimum_order_amount") ? Yii::$app->request->getBodyParam("minimum_order_amount") : 0;
-
 
         if (!$model->save()) {
             return [
