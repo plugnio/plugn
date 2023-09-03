@@ -699,6 +699,19 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
+    public function actionUndoDelete($id)
+    {
+        $model = $this->findModel($id);
+
+        $model->is_deleted = false;
+
+        if(!$model->save(false)) {
+            Yii::$app->session->setFlash('error', print_r($model->errors, true));
+        }
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
     /**
      * Deletes an existing Restaurant model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
