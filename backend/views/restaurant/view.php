@@ -67,27 +67,37 @@ $this->registerJs($js);
 
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
 
-        <?=
-        Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
-            'class' => 'btn btn-danger btn-delete',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this store?',
-                'method' => 'post',
-            ],
-        ])
-        ?>
+        <?php if($model->is_deleted) {
+            echo Html::a('Undo Delete', ['undo-delete', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-warning btn-undodelete',
+                /*'data' => [
+                    'confirm' => 'You will need to publish site, after undo',
+                    'method' => 'post',
+                ],*/
+            ]);
 
-        <?php if (!$model->site_id) { ?>
-            <?=
-            Html::a('Publish', ['publish', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-primary',
+        } else {
+
+            if (!$model->site_id) {
+                echo Html::a('Publish', ['publish', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-success',
+                    'data' => [
+                        'confirm' => 'Are you sure you want to publish store?',
+                        'method' => 'post',
+                    ],
+                ]);
+            }
+
+            echo '&nbsp;'. Html::a('Delete', ['delete', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger btn-delete',
                 'data' => [
-                    'confirm' => 'Are you sure you want to publish store?',
+                    'confirm' => 'Are you sure you want to delete this store?',
                     'method' => 'post',
                 ],
-            ])
-            ?>
-        <?php } ?>
+            ]);
+
+        }
+        ?>
 
         <br/>
         <br/>
