@@ -53,9 +53,10 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'business_location_id',
                 'value' => function ($data) {
-                    return $data->businessLocation->business_location_name;
+                    if($data->businessLocation)
+                        return $data->businessLocation->business_location_name;
                 },
-                'visible' => $model->business_location_id != null
+                'visible' => $model->businessLocation != null
             ],
             [
                 'attribute' => 'email_notification',
