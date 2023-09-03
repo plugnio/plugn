@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "country".
@@ -57,6 +58,69 @@ class Country extends \yii\db\ActiveRecord
             'emoji' => Yii::t('app','Emoji'),
             'country_code' => Yii::t('app','Country Code'),
         ];
+    }
+
+    public function getCashOrderTotal() {
+
+        $paymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_CASH])
+            ->one();
+
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where payment_method_id="'.$paymentMethod->payment_method_id.'"',
+        ]);
+
+        return Restaurant::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->andWhere(['shipping_country_id' => $this->country_id])
+                ->select(new Expression("currency_code, SUM(total_price) as total"))
+                ->checkoutCompleted()
+                ->groupBy('order.currency_code')
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
+    }
+
+    public function getCSV() {
+
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM payment',
+        ]);
+
+        return Payment::getDb()->cache(function($db) {
+
+            return Payment::find()
+                ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
+                            SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
+                ->joinWith(['order'])
+                ->filterPaid()
+                ->groupBy('order.currency_code')
+                ->andWhere(['order.shipping_country_id' => $this->country_id])
+                ->asArray()
+                //->cache($cacheDuration)
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
+    }
+
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrders($modelClass = "\common\models\Order")
+    {
+        return $this->hasMany($modelClass::className(), ['shipping_country_id' => 'country_id']);
     }
 
     /**
@@ -130,8 +194,7 @@ class Country extends \yii\db\ActiveRecord
     {
         return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
     }
-    
-    
+
     /**
      * Gets query for [[Restaurants]].
      *
@@ -141,4 +204,16 @@ class Country extends \yii\db\ActiveRecord
     {
         return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
     }
+
+    /**
+     * Gets query for [[Payments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayments($modelClass = "\common\models\Payment")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via('restaurants');
+    }
 }
+

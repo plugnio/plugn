@@ -407,7 +407,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
     public static function initPayment($plan_id, $payment_method_id, $currency = null) {
 
-        $store = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount (null, false);
 
         $selectedPlan = Plan::findOne ($plan_id);
 

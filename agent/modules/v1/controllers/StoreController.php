@@ -1201,7 +1201,7 @@ class StoreController extends BaseController
      */
     protected function findModel($store_uuid =  null)
     {
-        $model = Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $model = Yii::$app->accountManager->getManagedAccount($store_uuid, false);
 
         if ($model !== null) {
             return $model;

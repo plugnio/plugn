@@ -67,7 +67,7 @@ class AddonController extends BaseController
 
         $addon = $this->findModel($addon_uuid);
 
-        $store = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount (null, false);
 
         $payment = new AddonPayment;
         $payment->restaurant_uuid = $store->restaurant_uuid;
