@@ -177,35 +177,6 @@ class StatsController extends Controller
 
         }, $cacheDuration, $storeCacheDependency);
 
-        $totalPlugnDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
-
-            return Restaurant::find()
-                ->filterByCountry($country_id)
-                ->filterByDateRange($date_start, $date_end)
-                ->filterPlugnDomain()
-                ->count();
-
-        }, $cacheDuration, $storeCacheDependency);
-
-        $totalCustomDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
-
-            return Restaurant::find()
-                ->filterByCountry($country_id)
-                ->filterByDateRange($date_start, $date_end)
-                ->filterCustomDomain()
-                ->count();
-
-        }, $cacheDuration, $storeCacheDependency);
-
-        $totalDomainRequests = RestaurantDomainRequest::find()
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
-
-        $pendingDomainRequests = RestaurantDomainRequest::find()
-            ->filterByDateRange($date_start, $date_end)
-            ->andWhere(['status' => RestaurantDomainRequest::STATUS_PENDING])
-            ->count();
-
         $revenues = Order::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
             return Order::find()
@@ -250,17 +221,25 @@ class StatsController extends Controller
         $date_end = Yii::$app->request->get('date_end');
         $country_id = Yii::$app->request->get('country_id');
 
-        $totalPlugnDomain = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByDateRange($date_start, $date_end)
-            ->filterPlugnDomain()
-            ->count();
+        $totalPlugnDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
-        $totalCustomDomain = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByDateRange($date_start, $date_end)
-            ->filterCustomDomain()
-            ->count();
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterPlugnDomain()
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
+
+        $totalCustomDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterCustomDomain()
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
 
         $totalDomainRequests = RestaurantDomainRequest::find()
             //->filterByCountry($country_id)

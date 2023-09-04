@@ -122,6 +122,14 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
 
     public static function getTotalCustomersByWeek()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `customer`',
+        ]);
+        
         $customer_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -135,12 +143,16 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             );
         }
 
-        $rows = Customer::find()
-            ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere(new Expression("DATE(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy(new Expression('DAYNAME(customer_created_at)'))
-            ->asArray()
-            ->all();
+        $rows = Customer::getDb()->cache(function($db) {
+
+            return Customer::find()
+                ->select(new Expression('customer_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy(new Expression('DAYNAME(customer_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('w', strtotime ($result['customer_created_at']))] = array(
@@ -149,9 +161,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             );
         }
 
-        $number_of_all_customer_gained = Customer::find()
-            ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->count();
+        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) {
+
+            return Customer::find()
+                ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'customer_chart_data' => array_values($customer_data),
@@ -161,6 +177,14 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
 
     public static function getTotalCustomersByMonth()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `customer`',
+        ]);
+        
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
@@ -172,12 +196,16 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             );
         }
 
-        $rows = Customer::find()
-            ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
-            ->groupBy(new Expression('DAY(customer_created_at)'))
-            ->asArray()
-            ->all();
+        $rows = Customer::getDb()->cache(function($db) {
+
+            return Customer::find()
+                ->select(new Expression('customer_created_at, COUNT(*) as total'))
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->groupBy(new Expression('DAY(customer_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('j', strtotime ($result['customer_created_at']))] = array(
@@ -186,9 +214,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             );
         }
 
-        $number_of_all_customer_gained = Customer::find()
-            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
-            ->count();
+        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) {
+
+            return Customer::find()
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'customer_chart_data' => array_values($customer_data),
@@ -198,6 +230,14 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
 
     public static function getTotalCustomersByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `customer`',
+        ]);
+        
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -214,13 +254,17 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             );
         }
 
-        $rows = Customer::find()
-            ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+        $rows = Customer::getDb()->cache(function($db) use($months) {
+
+            return Customer::find()
+                ->select(new Expression('customer_created_at, COUNT(*) as total'))
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-            ->groupBy(new Expression('MONTH(customer_created_at)'))
-            ->asArray()
-            ->all();
+                ->groupBy(new Expression('MONTH(customer_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
@@ -229,10 +273,14 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             );
         }
 
-        $number_of_all_customer_gained = Customer::find()
-            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) use($months) {
+
+            return Customer::find()
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-            ->count();
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'customer_chart_data' => array_values($customer_data),
@@ -310,7 +358,8 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])->via('restaurant');
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id'])
+            ->via('restaurant');
     }
 
 
