@@ -1833,6 +1833,14 @@ failed: the order has failed to find a driver */
 
     public static function getTotalRevenueByWeek()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order`',
+        ]);
+
         $revenue_generated_chart_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -1846,13 +1854,17 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $rows = Order::find()
-            ->activeOrders ()
-            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy (new Expression('DAY(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->activeOrders ()
+                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+                ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy (new Expression('DAY(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
@@ -1861,10 +1873,14 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $number_of_all_revenue_generated = Order::find()
-            ->activeOrders()
-            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->sum('total_price');
+        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->activeOrders()
+                ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->sum('total_price');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
@@ -1874,6 +1890,14 @@ failed: the order has failed to find a driver */
 
     public static function getTotalOrdersByWeek()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order`',
+        ]);
+
         $orders_received_chart_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -1887,13 +1911,17 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $rows = Order::find()
-            ->activeOrders ()
-            ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy (new Expression('DAY(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->activeOrders ()
+                ->select (new Expression('order_created_at, COUNT(*) as total'))
+                ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy (new Expression('DAY(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
@@ -1902,10 +1930,14 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $number_of_all_orders_received = Order::find()
-            ->activeOrders()
-            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->count();
+        $number_of_all_orders_received = Order::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->activeOrders()
+                ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'orders_received_chart_data' => array_values ($orders_received_chart_data),
@@ -1915,6 +1947,14 @@ failed: the order has failed to find a driver */
 
     public static function getTotalOrdersByMonth()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order`',
+        ]);
+
         $orders_received_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
@@ -1926,13 +1966,17 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $rows = Order::find()
-            ->activeOrders ()
-            ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->groupBy (new Expression('DAY(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->activeOrders ()
+                ->select (new Expression('order_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->groupBy (new Expression('DAY(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
@@ -1941,10 +1985,14 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $number_of_all_orders_received = Order::find()
-            ->activeOrders()
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->count();
+        $number_of_all_orders_received = Order::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->activeOrders()
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'orders_received_chart_data' => array_values ($orders_received_chart_data),
@@ -1954,6 +2002,14 @@ failed: the order has failed to find a driver */
 
     public static function getTotalOrdersByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order`',
+        ]);
+
         $orders_received_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -1970,13 +2026,17 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $rows = Order::find()
-            ->activeOrders ()
-            ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->groupBy (new Expression('MONTH(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) use($months) {
+
+            return Order::find()
+                ->activeOrders ()
+                ->select (new Expression('order_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->groupBy (new Expression('MONTH(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
@@ -1985,10 +2045,14 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $number_of_all_orders_received = Order::find()
-            ->activeOrders()
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->count();
+        $number_of_all_orders_received = Order::getDb()->cache(function($db) use($months) {
+
+            return Order::find()
+                ->activeOrders()
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'orders_received_chart_data' => array_values ($orders_received_chart_data),
@@ -2009,6 +2073,14 @@ failed: the order has failed to find a driver */
 
     public static function getTotalRevenueByMonth()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order`',
+        ]);
+
         $revenue_generated_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
@@ -2020,13 +2092,17 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $rows = Order::find()
-            ->activeOrders ()
-            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->groupBy (new Expression('DAY(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->activeOrders ()
+                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->groupBy (new Expression('DAY(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
@@ -2035,10 +2111,14 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $number_of_all_revenue_generated = Order::find()
-            ->activeOrders()
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->sum('total_price');
+        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) {
+
+            return Order::find()
+                ->activeOrders()
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->sum('total_price');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
@@ -2048,6 +2128,14 @@ failed: the order has failed to find a driver */
 
     public static function getTotalRevenueByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order`',
+        ]);
+
         $revenue_generated_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -2064,13 +2152,17 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $rows = Order::find()
-            ->activeOrders ()
-            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->groupBy (new Expression('MONTH(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) use($months) {
+
+            return Order::find()
+                ->activeOrders ()
+                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->groupBy (new Expression('MONTH(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
@@ -2079,10 +2171,14 @@ failed: the order has failed to find a driver */
             );
         }
 
-        $number_of_all_revenue_generated = Order::find()
-            ->activeOrders()
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->sum('total_price');
+        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) use($months) {
+
+            return Order::find()
+                ->activeOrders()
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->sum('total_price');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
