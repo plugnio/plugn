@@ -601,7 +601,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
     /**
      *
-     * @return type
+     * @return array
      */
     public function behaviors()
     {
@@ -2158,6 +2158,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'supportPickup' => function ($restaurant) {
                 return $restaurant->getPickupBusinessLocations ()->count () > 0 ? 1 : 0;
             },
+            //not using anymore
             'customerGained' => function ($store) {
 
                 return [
@@ -2433,6 +2434,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalCustomersByWeek()
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $customer_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -2446,12 +2455,16 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getCustomers()
-            ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere(new Expression("DATE(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy(new Expression('DAYNAME(customer_created_at)'))
-            ->asArray()
-            ->all();
+        $rows = Customer::getDb()->cache(function($db) {
+
+            return $this->getCustomers()
+                ->select(new Expression('customer_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy(new Expression('DAYNAME(customer_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('w', strtotime ($result['customer_created_at']))] = array(
@@ -2460,9 +2473,13 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_customer_gained = $this->getCustomers()
-            ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->count();
+        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) {
+
+            return $this->getCustomers()
+                ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'customer_chart_data' => array_values($customer_data),
@@ -2472,6 +2489,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalRevenueByWeek()
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $revenue_generated_chart_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -2485,13 +2510,17 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getOrders ()
-            ->activeOrders ($this->restaurant_uuid)
-            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy (new Expression('DAY(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return $this->getOrders ()
+                ->activeOrders ($this->restaurant_uuid)
+                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+                ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy (new Expression('DAY(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
@@ -2500,10 +2529,14 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_revenue_generated = $this->getOrders()
-            ->activeOrders($this->restaurant_uuid)
-            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->sum('total_price');
+        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) {
+
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->sum('total_price');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
@@ -2513,6 +2546,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalOrdersByWeek()
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $orders_received_chart_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -2526,13 +2567,17 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getOrders ()
-            ->activeOrders ($this->restaurant_uuid)
-            ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy (new Expression('DAY(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return $this->getOrders ()
+                ->activeOrders ($this->restaurant_uuid)
+                ->select (new Expression('order_created_at, COUNT(*) as total'))
+                ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy (new Expression('DAY(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
@@ -2541,10 +2586,14 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_orders_received = $this->getOrders()
+        $number_of_all_orders_received = Order::getDb()->cache(function($db) {
+
+         return $this->getOrders()
             ->activeOrders($this->restaurant_uuid)
             ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
             ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'orders_received_chart_data' => array_values ($orders_received_chart_data),
@@ -2554,6 +2603,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalSoldItemsByWeek()
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $sold_item_chart_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -2567,12 +2624,16 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getSoldOrderItems ()
-            ->select ('order_item_created_at, SUM(order_item.qty) as total')
-            ->andWhere (new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy (new Expression('DAY(order_item_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return $this->getSoldOrderItems ()
+                ->select ('order_item_created_at, SUM(order_item.qty) as total')
+                ->andWhere (new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy (new Expression('DAY(order_item_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('w', strtotime ($result['order_item_created_at']))] = array(
@@ -2581,9 +2642,13 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_sold_item = $this->getSoldOrderItems()
-            ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->sum('order_item.qty');
+        $number_of_all_sold_item = Order::getDb()->cache(function($db) {
+
+            return $this->getSoldOrderItems()
+                ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->sum('order_item.qty');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'sold_item_chart_data' => array_values($sold_item_chart_data),
@@ -2593,6 +2658,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalCustomersByMonth()
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
@@ -2604,12 +2677,16 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getCustomers()
-            ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
-            ->groupBy(new Expression('DAY(customer_created_at)'))
-            ->asArray()
-            ->all();
+        $rows = Customer::getDb()->cache(function($db) {
+
+            return $this->getCustomers()
+                ->select(new Expression('customer_created_at, COUNT(*) as total'))
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->groupBy(new Expression('DAY(customer_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('j', strtotime ($result['customer_created_at']))] = array(
@@ -2618,9 +2695,13 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_customer_gained = $this->getCustomers()
-            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
-            ->count();
+        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) {
+
+            return $this->getCustomers()
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'customer_chart_data' => array_values($customer_data),
@@ -2630,6 +2711,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalRevenueByMonth()
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $revenue_generated_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
@@ -2641,13 +2730,17 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getOrders ()
-            ->activeOrders ($this->restaurant_uuid)
-            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->groupBy (new Expression('DAY(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return $this->getOrders ()
+                ->activeOrders ($this->restaurant_uuid)
+                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->groupBy (new Expression('DAY(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
@@ -2656,10 +2749,14 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_revenue_generated = $this->getOrders()
-            ->activeOrders($this->restaurant_uuid)
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->sum('total_price');
+        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) {
+
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->sum('total_price');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
@@ -2669,6 +2766,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalOrdersByMonth()
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $orders_received_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
@@ -2680,13 +2785,17 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getOrders ()
-            ->activeOrders ($this->restaurant_uuid)
-            ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->groupBy (new Expression('DAY(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return $this->getOrders ()
+                ->activeOrders ($this->restaurant_uuid)
+                ->select (new Expression('order_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->groupBy (new Expression('DAY(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
@@ -2695,10 +2804,14 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_orders_received = $this->getOrders()
-            ->activeOrders($this->restaurant_uuid)
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->count();
+        $number_of_all_orders_received = Order::getDb()->cache(function($db) {
+
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'orders_received_chart_data' => array_values ($orders_received_chart_data),
@@ -2708,6 +2821,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalSoldItemsByMonth()
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $sold_item_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
@@ -2719,12 +2840,16 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getSoldOrderItems ()
-            ->select ('order_item_created_at, SUM(order_item.qty) as total')
-            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->groupBy (new Expression('DATE(order_item_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) {
+
+            return $this->getSoldOrderItems ()
+                ->select ('order_item_created_at, SUM(order_item.qty) as total')
+                ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->groupBy (new Expression('DATE(order_item_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('j', strtotime ($result['order_item_created_at']))] = array(
@@ -2733,9 +2858,13 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_sold_item = $this->getSoldOrderItems()
-            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-            ->sum('order_item.qty');
+        $number_of_all_sold_item = Order::getDb()->cache(function($db) {
+
+            return $this->getSoldOrderItems()
+                ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
+                ->sum('order_item.qty');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'sold_item_chart_data' => array_values($sold_item_chart_data),
@@ -2745,6 +2874,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalCustomersByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -2761,13 +2898,17 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getCustomers()
-            ->select(new Expression('customer_created_at, COUNT(*) as total'))
-            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+        $rows = Customer::getDb()->cache(function($db) use ($months) {
+
+            return $this->getCustomers()
+                ->select(new Expression('customer_created_at, COUNT(*) as total'))
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-            ->groupBy(new Expression('MONTH(customer_created_at)'))
-            ->asArray()
-            ->all();
+                ->groupBy(new Expression('MONTH(customer_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
@@ -2776,10 +2917,14 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_customer_gained = $this->getCustomers()
-            ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) use ($months) {
+
+            return $this->getCustomers()
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-            ->count();
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'customer_chart_data' => array_values($customer_data),
@@ -2789,6 +2934,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalRevenueByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $revenue_generated_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -2805,13 +2958,17 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getOrders ()
-            ->activeOrders ($this->restaurant_uuid)
-            ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->groupBy (new Expression('MONTH(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) use ($months) {
+
+            return $this->getOrders ()
+                ->activeOrders ($this->restaurant_uuid)
+                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->groupBy (new Expression('MONTH(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
@@ -2820,10 +2977,14 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_revenue_generated = $this->getOrders()
-            ->activeOrders($this->restaurant_uuid)
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->sum('total_price');
+        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) use ($months)  {
+
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->sum('total_price');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
@@ -2833,6 +2994,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalOrdersByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $orders_received_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -2849,13 +3018,17 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getOrders ()
-            ->activeOrders ($this->restaurant_uuid)
-            ->select (new Expression('order_created_at, COUNT(*) as total'))
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->groupBy (new Expression('MONTH(order.order_created_at)'))
-            ->asArray ()
-            ->all ();
+        $rows = Order::getDb()->cache(function($db) use($months) {
+
+            return $this->getOrders ()
+                ->activeOrders ($this->restaurant_uuid)
+                ->select (new Expression('order_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->groupBy (new Expression('MONTH(order.order_created_at)'))
+                ->asArray ()
+                ->all ();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
@@ -2864,10 +3037,14 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_orders_received = $this->getOrders()
-            ->activeOrders($this->restaurant_uuid)
-            ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->count();
+        $number_of_all_orders_received = Order::getDb()->cache(function($db) use($months) {
+
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'orders_received_chart_data' => array_values ($orders_received_chart_data),
@@ -2877,6 +3054,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public function getTotalSoldItemsByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+        ]);
+
         $sold_item_chart_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -2893,12 +3078,16 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = $this->getSoldOrderItems ()
-            ->select ('order_item_created_at, SUM(order_item.qty) as total')
-            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->groupBy (new Expression('MONTH(order_item_created_at)'))
-            ->asArray()
-            ->all();
+        $rows = OrderItem::getDb()->cache(function($db) use($months) {
+
+            return $this->getSoldOrderItems ()
+                ->select ('order_item_created_at, SUM(order_item.qty) as total')
+                ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->groupBy (new Expression('MONTH(order_item_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
@@ -2907,9 +3096,13 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_sold_item = $this->getSoldOrderItems()
-            ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-            ->sum('order_item.qty');
+        $number_of_all_sold_item = OrderItem::getDb()->cache(function($db) use($months) {
+
+            return $this->getSoldOrderItems()
+                ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->sum('order_item.qty');
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'sold_item_chart_data' => array_values($sold_item_chart_data),
@@ -2961,7 +3154,10 @@ class Restaurant extends \yii\db\ActiveRecord
 
         //Revenue generated
         $lastWeekRevenue = $this
-            ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8)));
+            ->getStoreRevenue(
+                date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 14)),
+                date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 8))
+            );
 
         $thisWeekRevenue = $this
             ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 7)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d"))));
@@ -3078,6 +3274,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public static function getTotalStoresByWeek()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
         $customer_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -3091,12 +3295,16 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = self::find()
-            ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
-            ->andWhere(new Expression("DATE(restaurant_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy(new Expression('DAYNAME(restaurant_created_at)'))
-            ->asArray()
-            ->all();
+        $rows = Restaurant::getDb()->cache(function($db)  {
+
+            return Restaurant::find()
+                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(restaurant_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy(new Expression('DAYNAME(restaurant_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('w', strtotime ($result['restaurant_created_at']))] = array(
@@ -3105,9 +3313,13 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_customer_gained = self::find()
-            ->andWhere(new Expression("date(restaurant_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->count();
+        $number_of_all_customer_gained = Restaurant::getDb()->cache(function($db) {
+
+            return Restaurant::find()
+                ->andWhere(new Expression("date(restaurant_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'store_created_chart_data' => array_values($customer_data),
@@ -3117,6 +3329,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public static function getTotalStoresByMonth()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
@@ -3128,12 +3348,16 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = self::find()
-            ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
-            ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL 1 MONTH)')
-            ->groupBy(new Expression('DAY(restaurant_created_at)'))
-            ->asArray()
-            ->all();
+        $rows = Restaurant::getDb()->cache(function($db) {
+
+            return Restaurant::find()
+                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
+                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->groupBy(new Expression('DAY(restaurant_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('j', strtotime ($result['restaurant_created_at']))] = array(
@@ -3142,9 +3366,13 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_customer_gained = self::find()
-            ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL 1 MONTH)')
-            ->count();
+        $number_of_all_customer_gained = Restaurant::getDb()->cache(function($db) {
+
+            return Restaurant::find()
+                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'store_created_chart_data' => array_values($customer_data),
@@ -3154,6 +3382,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
     public static function getTotalStoresByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -3170,13 +3406,17 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = self::find()
-            ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
-            ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+        $rows = Restaurant::getDb()->cache(function($db) use ($months) {
+
+            return Restaurant::find()
+                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
+                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-            ->groupBy(new Expression('MONTH(restaurant_created_at)'))
-            ->asArray()
-            ->all();
+                ->groupBy(new Expression('MONTH(restaurant_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['restaurant_created_at']))] = array(
@@ -3185,10 +3425,14 @@ class Restaurant extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_all_customer_gained = self::find()
-            ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+        $number_of_all_customer_gained = Restaurant::getDb()->cache(function($db) use ($months) {
+
+            return Restaurant::find()
+                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-            ->count();
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'store_created_chart_data' => array_values($customer_data),
@@ -3208,7 +3452,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         $model = $this;
 
-        return Restaurant::getDb()->cache(function($db) use ($model) {
+        return Payment::getDb()->cache(function($db) use ($model) {
 
             return $model->getPayments()
                 ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
@@ -3219,6 +3463,27 @@ class Restaurant extends \yii\db\ActiveRecord
                 ->asArray()
                 ->all();
 
+        }, $cacheDuration, $cacheDependency);
+    }
+
+    /**
+     * Gets query for [[Customers]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomerGained($start_date, $end_date, $modelClass = "\common\models\Customer")
+    {
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM customer WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
+        ]);
+
+        return Customer::getDb()->cache(function($db) use ($modelClass, $start_date, $end_date) {
+            return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+                ->customerGained ($this->restaurant_uuid, $start_date, $end_date);
         }, $cacheDuration, $cacheDependency);
     }
 
@@ -3521,10 +3786,22 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getStoreRevenue($start_date, $end_date, $modelClass = "\common\models\Order")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->activeOrders ($this->restaurant_uuid)
-            ->andWhere (['between', 'order.order_created_at', $start_date, $end_date])
-            ->sum ('total_price');
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
+        ]);
+
+        return Order::getDb()->cache(function($db) use ($modelClass, $start_date, $end_date) {
+
+            return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+                ->activeOrders ($this->restaurant_uuid)
+                ->andWhere (['between', 'order.order_created_at', $start_date, $end_date])
+                ->sum ('total_price');
+
+        }, $cacheDuration, $cacheDependency);
     }
 
     /**
@@ -3534,8 +3811,20 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getOrdersReceived($start_date, $end_date, $modelClass = "\common\models\Order")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->ordersReceived ($this->restaurant_uuid, $start_date, $end_date);
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order` WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
+        ]);
+
+        return Order::getDb()->cache(function($db) use ($modelClass, $start_date, $end_date) {
+
+            return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+                ->ordersReceived ($this->restaurant_uuid, $start_date, $end_date);
+
+        }, $cacheDuration, $cacheDependency);
     }
 
     /**
@@ -3567,17 +3856,6 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return $this->hasMany ($modelClass::className (), ['customer_id' => 'customer_id'])
             ->via('orders');
-    }
-
-    /**
-     * Gets query for [[Customers]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCustomerGained($start_date, $end_date, $modelClass = "\common\models\Customer")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->customerGained ($this->restaurant_uuid, $start_date, $end_date);
     }
 
     /**

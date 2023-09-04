@@ -40,7 +40,7 @@ class StatsController extends Controller
                 'rules' => [
                     [
                         'actions' => ['index', 'graph', 'store-retention', 'graph-fees', 'graph-stores', 'graph-orders',
-                            'customer-funnel', 'sales', 'payment-gateways', 'graph-customers', 'countries', 'domain'],
+                            'customer-funnel', 'sales', 'payment-gateways', 'graph-customers', 'countries', 'domain', 'clear-cache'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -78,6 +78,20 @@ class StatsController extends Controller
         $date_end = Yii::$app->request->get('date_end');
         $country_id = Yii::$app->request->get('country_id');
 
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $orderCacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order`',
+        ]);
+
+        $storeCacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
         /*$numberOfOrders = Order::find()
             ->activeOrders()
             ->count();
@@ -110,50 +124,78 @@ class StatsController extends Controller
 
         //Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
 
-        $totalOrders = Order::find()
-            ->filterByCountry($country_id)
-            ->activeOrders()
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
+        $totalOrders = Order::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
-        $totalPremium = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByDateRange($date_start, $date_end)
-            ->filterPremium()
-            ->count();
+            return Order::find()
+                ->filterByCountry($country_id)
+                ->activeOrders()
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
 
-        $totalStores = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
+        }, $cacheDuration, $orderCacheDependency);
+
+        $totalPremium = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterPremium()
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
+
+        $totalStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
 
         $totalFreeStores = $totalStores - $totalPremium;
 
-        $inActiveStores = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByNoOrderIn30Days()
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
+        $inActiveStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByNoOrderIn30Days()
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
 
         $activeStores = $totalStores - $inActiveStores;
 
-        $totalStoresWithPaymentGateway = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByDateRange($date_start, $date_end)
-            ->filterStoresWithPaymentGateway()
-            ->count();
+        $totalStoresWithPaymentGateway = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
-        $totalPlugnDomain = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByDateRange($date_start, $date_end)
-            ->filterPlugnDomain()
-            ->count();
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterStoresWithPaymentGateway()
+                ->count();
 
-        $totalCustomDomain = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByDateRange($date_start, $date_end)
-            ->filterCustomDomain()
-            ->count();
+        }, $cacheDuration, $storeCacheDependency);
+
+        $totalPlugnDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterPlugnDomain()
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
+
+        $totalCustomDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterCustomDomain()
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
 
         $totalDomainRequests = RestaurantDomainRequest::find()
             ->filterByDateRange($date_start, $date_end)
@@ -164,14 +206,18 @@ class StatsController extends Controller
             ->andWhere(['status' => RestaurantDomainRequest::STATUS_PENDING])
             ->count();
 
-        $revenues = Order::find()
-            ->filterByDateRange($date_start, $date_end)
-            ->select(new Expression("currency_code, SUM(total_price) as total_price"))
-            ->filterByCountry($country_id)
-            ->activeOrders()
-            ->groupBy('order.currency_code')
-            ->asArray()
-            ->all();
+        $revenues = Order::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Order::find()
+                ->filterByDateRange($date_start, $date_end)
+                ->select(new Expression("currency_code, SUM(total_price) as total_price"))
+                ->filterByCountry($country_id)
+                ->activeOrders()
+                ->groupBy('order.currency_code')
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $orderCacheDependency);
 
         //Our profit margin and payment gateway margin separated from that revenue
 
@@ -253,20 +299,36 @@ class StatsController extends Controller
         $date_end = Yii::$app->request->get('date_end');
         $country_id = Yii::$app->request->get('country_id');
 
-        $storesByPaymentMethods = RestaurantPaymentMethod::find()
-            ->joinWith(['paymentMethod'])
-            ->select(new Expression('payment_method.payment_method_name, COUNT(*) as total'))
-            ->filterByCountry($country_id)
-            ->filterActive()
-            ->groupBy('restaurant_payment_method.payment_method_id')
-            ->asArray()
-            ->all();
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
 
-        $totalTapStores = Restaurant::find()
-            ->filterByDateRange($date_start, $date_end)
-            ->filterByCountry($country_id)
-            ->andWhere(['is_tap_enable' => 1])
-            ->count();
+        $storeCacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
+        $storesByPaymentMethods = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return  RestaurantPaymentMethod::find()
+                ->joinWith(['paymentMethod'])
+                ->select(new Expression('payment_method.payment_method_name, COUNT(*) as total'))
+                ->filterByCountry($country_id)
+                ->filterActive()
+                ->groupBy('restaurant_payment_method.payment_method_id')
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $storeCacheDependency);
+
+        $totalTapStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByDateRange($date_start, $date_end)
+                ->filterByCountry($country_id)
+                ->andWhere(['is_tap_enable' => 1])
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
 
         $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
         $countries = ["0" => "All"] + $countries;
@@ -303,17 +365,29 @@ class StatsController extends Controller
         $date_end = Yii::$app->request->get('date_end');
         $country_id = Yii::$app->request->get('country_id');
 
-        $payments = Payment::find()
-            ->filterByDateRange($date_start, $date_end)
-            ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, 
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM payment',
+        ]);
+
+        $payments = Payment::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Payment::find()
+                ->filterByDateRange($date_start, $date_end)
+                ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, 
                 SUM(payment_gateway_fee) as payment_gateway_fees, 
                 SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
-            ->joinWith(['order'])
-            ->filterByCountry($country_id)
-            ->filterPaid()
-            ->groupBy('order.currency_code')
-            ->asArray()
-            ->all();
+                ->joinWith(['order'])
+                ->filterByCountry($country_id)
+                ->filterPaid()
+                ->groupBy('order.currency_code')
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
         $countries = ["0" => "All"] + $countries;
@@ -333,16 +407,32 @@ class StatsController extends Controller
         $date_end = Yii::$app->request->get('date_end');
         $country_id = Yii::$app->request->get('country_id');
 
-        $totalStores = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
 
-        $inActiveStores = Restaurant::find()
-            ->filterByCountry($country_id)
-            ->filterByNoOrderInDays(15)
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
+        $totalStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
+
+        $inActiveStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByNoOrderInDays(15)
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
         $countries = ["0" => "All"] + $countries;
@@ -363,17 +453,33 @@ class StatsController extends Controller
         $date_end = Yii::$app->request->get('date_end');
         $country_id = Yii::$app->request->get('country_id');
 
-        $totalOrders = Order::find()
-            ->filterByCountry($country_id)
-            ->checkoutCompleted()
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
 
-        $completedOrders = Order::find()
-            ->filterByCountry($country_id)
-            ->filterCompleted()
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `order`',
+        ]);
+
+        $totalOrders = Order::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Order::find()
+                ->filterByCountry($country_id)
+                ->checkoutCompleted()
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
+
+        $completedOrders = Order::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Order::find()
+                ->filterByCountry($country_id)
+                ->filterCompleted()
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
         $countries = ["0" => "All"] + $countries;
@@ -613,5 +719,15 @@ class StatsController extends Controller
             "categories" => $categories,
             "seriesData" => $seriesData
         ];
+    }
+
+    public function actionClearCache() {
+
+        if(Yii::$app->cache)
+            Yii::$app->cache->flush();
+
+        Yii::$app->session->addFlash("success", "All cache cleared!");
+
+        $this->goBack(['site/index']);
     }
 }
