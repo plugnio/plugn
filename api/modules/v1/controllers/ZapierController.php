@@ -103,6 +103,7 @@ class ZapierController extends Controller {
    * @return boolean
    */
     public function actionGetLatestOrder($restaurant_uuid) {
+
         if (Yii::$app->accountManager->getManagedAccount($restaurant_uuid)) {
 
             $orders = Order::find()

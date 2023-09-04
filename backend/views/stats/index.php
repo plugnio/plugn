@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use backend\components\ChartWidget;
 use yii\helpers\Url;
 
-$this->title = 'Statistics';
+$this->title = 'Summary';
 
 ?>
 <style type="text/css">
@@ -181,35 +181,6 @@ $this->title = 'Statistics';
             </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
-                <a href="<?= Url::to(['restaurant-domain-request/index']) ?>">
-                    <div class="card card-stats mb-4 mb-xl-0">
-                        <div class="card-body">
-                            <h5 class="card-title text-uppercase text-muted mb-0">Domain Requests</h5>
-                            <span class="h2 font-weight-bold mb-0"><?= $totalDomainRequests ?></span>
-
-                            <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div><!-- END .col-xl-3 -->
-
-            <div class="col-xl-3 col-lg-4">
-                <a href="<?= Url::to(['restaurant-domain-request/index', 'RestaurantDomainRequestSearch[status]' => '2']) ?>">
-                <div class="card card-stats mb-4 mb-xl-0">
-                    <div class="card-body">
-                        <h5 class="card-title text-uppercase text-muted mb-0">Pending Domain Requests</h5>
-                        <span class="h2 font-weight-bold mb-0"><?= $pendingDomainRequests ?></span>
-
-                        <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                            <i class="fas fa-globe"></i>
-                        </div>
-                    </div>
-                </div></a>
-            </div><!-- END .col-xl-3 -->
-
-            <div class="col-xl-3 col-lg-4">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-muted mb-0">Number of stores created</h5>
@@ -252,30 +223,6 @@ $this->title = 'Statistics';
                         <h5 class="card-title text-uppercase text-muted mb-0">Stores with payment method usage</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $totalStoresWithPaymentGateway ?></span>
 
-                        <div class="icon icon-shape bg-info text-white rounded-circle shadow">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- END .col-xl-3 -->
-
-            <div class="col-xl-3 col-lg-4">
-                <div class="card card-stats mb-4 mb-xl-0">
-                    <div class="card-body">
-                        <h5 class="card-title text-uppercase text-muted mb-0">Free plugn domain</h5>
-                        <span class="h2 font-weight-bold mb-0"><?= $totalPlugnDomain ?></span>
-                        <div class="icon icon-shape bg-info text-white rounded-circle shadow">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- END .col-xl-3 -->
-
-            <div class="col-xl-3 col-lg-4">
-                <div class="card card-stats mb-4 mb-xl-0">
-                    <div class="card-body">
-                        <h5 class="card-title text-uppercase text-muted mb-0">Custom domain</h5>
-                        <span class="h2 font-weight-bold mb-0"><?= $totalCustomDomain ?></span>
                         <div class="icon icon-shape bg-info text-white rounded-circle shadow">
                             <i class="fas fa-chart-bar"></i>
                         </div>

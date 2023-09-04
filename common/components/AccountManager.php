@@ -40,33 +40,30 @@ class AccountManager  extends BaseObject
             throw new \yii\web\BadRequestHttpException('ILLEGAL USAGE OF ACCOUNT OWNERSHIP MANAGER');
         }
 
-          // Getting a list of Restaurants this agent manages
-        /*$cacheDependency = Yii::createObject([
+        // Getting a list of Restaurants this agent manages
+        $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT '.Yii::$app->user->identity->agent_id.', COUNT(*) FROM agent_assignment WHERE agent_id='.Yii::$app->user->identity->agent_id,
-
+            'sql' => 'SELECT '.Yii::$app->user->getId().', COUNT(*) FROM agent_assignment WHERE agent_id='.Yii::$app->user->getId(),
 
             // we SELECT agent_id as well to make sure every cached sql statement is unique to this agent
             // don't want agents viewing the cached content of another agent
             // SUM of agent_status is to bust the cache when status changes
         ]);
-//
-        //todo: increase on production?
-        $cacheDuration = 0; //60 * 60 * 24 1 day then delete from cache
+
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 days then delete from cache
 
         $this->_managedAccounts = Restaurant::getDb()->cache(function($db) {
             return Yii::$app->user->identity->getAgentAssignments()
                 //->limit(10)
                 ->all();
-        }, $cacheDuration, $cacheDependency);*/
-
+        }, $cacheDuration, $cacheDependency);
 
          // Getting a list of Restaurants this agent manages
         // No cache
-        $this->_managedAccounts = Yii::$app->user->identity
+        /*$this->_managedAccounts = Yii::$app->user->identity
             ->getAgentAssignments()
-            ->all();
+            ->all();*/
 
         parent::__construct($config);
     }
@@ -88,15 +85,22 @@ class AccountManager  extends BaseObject
      * @throws \yii\web\NotFoundHttpException if the account isnt one this agent owns
      */
 
-    public function getManagedAccount($restaurantUuid = null) {
+    public function getManagedAccount($restaurantUuid = null, $fromCache = true) {
 
         if(!$restaurantUuid) {
             $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
         }
 
         foreach($this->_managedAccounts as $managedAccount) {
+
             if($managedAccount->restaurant_uuid == $restaurantUuid) {
-                return $managedAccount->restaurant;
+
+                if($fromCache)
+                    return $managedAccount->restaurant;
+
+                return Restaurant::find()
+                    ->andWhere(['restaurant_uuid' => $restaurantUuid])
+                    ->one();
             }
         }
 

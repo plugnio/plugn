@@ -102,6 +102,7 @@ class ZapierController extends Controller {
    * @return boolean
    */
     public function actionGetLatestOrder($restaurant_uuid) {
+
         if (Yii::$app->accountManager->getManagedAccount($restaurant_uuid)) {
 
             $orders = Order::find()
@@ -136,8 +137,6 @@ class ZapierController extends Controller {
 
                 $orders[$key]['scheduled_time_to'] =  date('c', strtotime($order['scheduled_time_to']));
                 $orders[$key]['scheduled_time_start_from'] =  date('c', strtotime($order['scheduled_time_start_from']));
-
-
 
                 $orders[$key]['customer_phone_number'] =   $customer_phone_number ;
 

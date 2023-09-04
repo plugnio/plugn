@@ -4,11 +4,13 @@ namespace backend\controllers;
 use agent\models\Country;
 use agent\models\RestaurantPaymentMethod;
 use backend\components\ChartWidget;
+use backend\models\Admin;
 use common\models\Payment;
 use common\models\Restaurant;
 use common\models\RestaurantDomainRequest;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -38,7 +40,7 @@ class StatsController extends Controller
                 'rules' => [
                     [
                         'actions' => ['index', 'graph', 'store-retention', 'graph-fees', 'graph-stores', 'graph-orders',
-                            'customer-funnel', 'sales', 'payment-gateways', 'graph-customers', 'clear-cache'],
+                            'customer-funnel', 'sales', 'payment-gateways', 'graph-customers', 'countries', 'domain', 'clear-cache'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -175,35 +177,6 @@ class StatsController extends Controller
 
         }, $cacheDuration, $storeCacheDependency);
 
-        $totalPlugnDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
-
-            return Restaurant::find()
-                ->filterByCountry($country_id)
-                ->filterByDateRange($date_start, $date_end)
-                ->filterPlugnDomain()
-                ->count();
-
-        }, $cacheDuration, $storeCacheDependency);
-
-        $totalCustomDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
-
-            return Restaurant::find()
-                ->filterByCountry($country_id)
-                ->filterByDateRange($date_start, $date_end)
-                ->filterCustomDomain()
-                ->count();
-
-        }, $cacheDuration, $storeCacheDependency);
-
-        $totalDomainRequests = RestaurantDomainRequest::find()
-            ->filterByDateRange($date_start, $date_end)
-            ->count();
-
-        $pendingDomainRequests = RestaurantDomainRequest::find()
-            ->filterByDateRange($date_start, $date_end)
-            ->andWhere(['status' => RestaurantDomainRequest::STATUS_PENDING])
-            ->count();
-
         $revenues = Order::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
             return Order::find()
@@ -237,12 +210,65 @@ class StatsController extends Controller
                 "totalPremium" => $totalPremium,
                 "totalFreeStores" => $totalFreeStores,
                 "totalStoresWithPaymentGateway" => $totalStoresWithPaymentGateway,
-                "totalPlugnDomain" => $totalPlugnDomain,
-                "totalCustomDomain" => $totalCustomDomain,
-                'totalDomainRequests' => $totalDomainRequests,
-                'pendingDomainRequests' => $pendingDomainRequests,
                 //"most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => "KWD",
+        ]);
+    }
+
+    public function actionDomain() {
+
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+        $country_id = Yii::$app->request->get('country_id');
+
+        $totalPlugnDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterPlugnDomain()
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
+
+        $totalCustomDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterCustomDomain()
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
+
+        $totalDomainRequests = RestaurantDomainRequest::find()
+            //->filterByCountry($country_id)
+            ->filterByDateRange($date_start, $date_end)
+            ->count();
+
+        $pendingDomainRequests = RestaurantDomainRequest::find()
+            //->filterByCountry($country_id)
+            ->filterByDateRange($date_start, $date_end)
+            ->andWhere(['status' => RestaurantDomainRequest::STATUS_PENDING])
+            ->count();
+
+        //Our profit margin and payment gateway margin separated from that revenue
+
+        $countries = ArrayHelper::map(Country::find()->all(), 'country_id', 'country_name');
+        $countries = ["0" => "All"] + $countries;
+
+        // array_unshift($countries, "All");//
+
+        return $this->render('domain', [
+            "date_start" => $date_start,
+            "date_end" => $date_end,
+            "country_id" => $country_id,
+            "countries" => $countries,
+            "totalPlugnDomain" => $totalPlugnDomain,
+            "totalCustomDomain" => $totalCustomDomain,
+            'totalDomainRequests' => $totalDomainRequests,
+            'pendingDomainRequests' => $pendingDomainRequests,
+            "currency_code" => "KWD",
         ]);
     }
 
@@ -293,6 +319,22 @@ class StatsController extends Controller
             "date_end" => $date_end,
             "country_id" => $country_id,
             "countries" => $countries
+        ]);
+    }
+
+    public function actionCountries()
+    {
+        $date_start = Yii::$app->request->get('date_start');
+        $date_end = Yii::$app->request->get('date_end');
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => Country::find(),
+        ]);
+
+        return $this->render('countries', [
+            "date_start" => $date_start,
+            "date_end" => $date_end,
+            'dataProvider' => $dataProvider,
         ]);
     }
 

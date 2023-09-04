@@ -57,7 +57,7 @@ class InvoiceController extends BaseController
      */
     public function actionPayByTap() {
 
-        $store = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount (null, false);
 
         $invoice_uuid = Yii::$app->request->getBodyParam ('invoice_uuid');
         $payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
@@ -302,7 +302,9 @@ class InvoiceController extends BaseController
     {
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $model = $store->getInvoices()->andWhere(['invoice_uuid' => $invoice_uuid])->one();
+        $model = $store->getInvoices()
+            ->andWhere(['invoice_uuid' => $invoice_uuid])
+            ->one();
 
         if ($model !== null) {
             return $model;

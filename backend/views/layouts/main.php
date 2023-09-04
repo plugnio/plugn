@@ -47,8 +47,10 @@ AppAsset::register($this);
             [
                 'label' => 'Statistics',
                 'items' => [
-                    ['label' => 'Numbers', 'url' => ['/stats/index']],
+                    ['label' => 'Summary', 'url' => ['/stats/index']],
                     ['label' => 'Graphs', 'url' => ['/stats/graph']],
+                    ['label' => 'Domain', 'url' => ['/stats/domain']],
+                    ['label' => 'Countries', 'url' => ['/stats/countries']],
                     ['label' => 'Payment Gateways', 'url' => ['/stats/payment-gateways']],
                     ['label' => 'Sales & Revenue', 'url' => ['/stats/sales']],
                     ['label' => 'Store Closer & Retention', 'url' => ['/stats/store-retention']],

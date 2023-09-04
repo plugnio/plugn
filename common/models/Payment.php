@@ -644,6 +644,14 @@ class Payment extends \yii\db\ActiveRecord
 
     public static function getTotalFeesByWeek()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `payment`',
+        ]);
+
         $customer_data = [];
 
         $date_start = strtotime ('-6 days');//date('w')
@@ -657,13 +665,17 @@ class Payment extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = self::find()
-            ->filterPaid()
-            ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
-            ->andWhere(new Expression("DATE(payment_updated_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->groupBy(new Expression('DAYNAME(payment_updated_at)'))
-            ->asArray()
-            ->all();
+        $rows = Payment::getDb()->cache(function($db) {
+
+            return Payment::find()
+                ->filterPaid()
+                ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
+                ->andWhere(new Expression("DATE(payment_updated_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy(new Expression('DAYNAME(payment_updated_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('w', strtotime ($result['payment_updated_at']))] = array(
@@ -672,10 +684,14 @@ class Payment extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_payments = self::find()
-            ->filterPaid()
-            ->andWhere(new Expression("date(payment_updated_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->count();
+        $number_of_payments = Payment::getDb()->cache(function($db) {
+
+            return Payment::find()
+                ->filterPaid()
+                ->andWhere(new Expression("date(payment_updated_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'plugn_fee_chart_data' => array_values($customer_data),
@@ -685,6 +701,14 @@ class Payment extends \yii\db\ActiveRecord
 
     public static function getTotalFeesByMonth()
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `payment`',
+        ]);
+
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
@@ -696,13 +720,17 @@ class Payment extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = self::find()
-            ->filterPaid()
-            ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
-            ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL 1 MONTH)')
-            ->groupBy(new Expression('DAY(payment_updated_at)'))
-            ->asArray()
-            ->all();
+        $rows = Payment::getDb()->cache(function($db) {
+
+            return Payment::find()
+                ->filterPaid()
+                ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
+                ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->groupBy(new Expression('DAY(payment_updated_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('j', strtotime ($result['payment_updated_at']))] = array(
@@ -711,10 +739,14 @@ class Payment extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_payments = self::find()
-            ->filterPaid()
-            ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL 1 MONTH)')
-            ->count();
+        $number_of_payments = Payment::getDb()->cache(function($db) {
+
+            return Payment::find()
+                ->filterPaid()
+                ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'plugn_fee_chart_data' => array_values($customer_data),
@@ -724,6 +756,14 @@ class Payment extends \yii\db\ActiveRecord
 
     public static function getTotalFeesByMonths($months)
     {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM `payment`',
+        ]);
+
         $customer_data = [];
 
         $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
@@ -740,14 +780,18 @@ class Payment extends \yii\db\ActiveRecord
             );
         }
 
-        $rows = self::find()
-            ->filterPaid()
-            ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
-            ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+        $rows = Payment::getDb()->cache(function($db) use($months) {
+
+            return Payment::find()
+                ->filterPaid()
+                ->select(new Expression('payment_updated_at, SUM(plugn_fee) as total'))
+                ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-            ->groupBy(new Expression('MONTH(payment_updated_at)'))
-            ->asArray()
-            ->all();
+                ->groupBy(new Expression('MONTH(payment_updated_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
             $customer_data[date ('m', strtotime ($result['payment_updated_at']))] = array(
@@ -756,11 +800,15 @@ class Payment extends \yii\db\ActiveRecord
             );
         }
 
-        $number_of_payments = self::find()
-            ->filterPaid()
-            ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+        $number_of_payments = Payment::getDb()->cache(function($db) use($months) {
+
+            return Payment::find()
+                ->filterPaid()
+                ->andWhere('`payment_updated_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-            ->count();
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
 
         return [
             'plugn_fee_chart_data' => array_values($customer_data),
