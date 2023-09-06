@@ -221,6 +221,14 @@ class StatsController extends Controller
         $date_end = Yii::$app->request->get('date_end');
         $country_id = Yii::$app->request->get('country_id');
 
+        $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
+
+        $storeCacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
         $totalPlugnDomain = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
             return Restaurant::find()
