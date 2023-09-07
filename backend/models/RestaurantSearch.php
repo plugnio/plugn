@@ -26,7 +26,10 @@ class RestaurantSearch extends Restaurant
      public function rules()
      {
          return [
-             [['restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
+             [['country_id', 'currency_id', 'license_number', 'vendor_sector', 'store_layout', 'enable_gift_message',
+                 'retention_email_sent', 'referral_code', 'is_public', 'accept_order_247', 'iban', 'business_id',
+                 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
+                'restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
                  'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders', 'noItem', 'notActive'], 'safe'],
@@ -151,14 +154,39 @@ class RestaurantSearch extends Restaurant
                date('Y-m-d', strtotime($this->last_order_at))."')");
         }
 
+        if($this->is_public)
+            $query->andFilterWhere(['is_public' => $this->is_public]);
+        if($this->accept_order_247)
+            $query->andFilterWhere(['accept_order_247' => $this->accept_order_247]);
+        if($this->enable_gift_message)
+            $query->andFilterWhere(['enable_gift_message' => $this->enable_gift_message]);
+
+        $query->andFilterWhere(['like', 'country_id', $this->country_id])
+            ->andFilterWhere(['like', 'currency_id', $this->currency_id])
+            ->andFilterWhere(['like', 'license_number', $this->license_number])
+            ->andFilterWhere(['like', 'vendor_sector', $this->vendor_sector])
+            ->andFilterWhere(['like', 'store_layout', $this->store_layout])
+            ->andFilterWhere(['like', 'retention_email_sent', $this->retention_email_sent])
+            ->andFilterWhere(['like', 'referral_code', $this->referral_code])
+            ->andFilterWhere(['like', 'iban', $this->iban])
+            ->andFilterWhere(['business_entity_id', 'business_entity_id', $this->business_entity_id])
+            ->andFilterWhere(['like', 'wallet_id', $this->wallet_id])
+            ->andFilterWhere(['like', 'merchant_id', $this->merchant_id])
+            ->andFilterWhere(['like', 'operator_id', $this->operator_id])
+            ->andFilterWhere(['like', 'business_id', $this->business_id]);
+
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'restaurant_domain', $this->restaurant_domain])
             ->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'version', $this->version])
             ->andFilterWhere(['like', 'currency.title', $this->currency_title])
-            ->andFilterWhere(['like', 'country.country_name', $this->country_name])
             ->andFilterWhere(['like', 'total_orders', $this->total_orders])
             ->andFilterWhere(['like', 'name_ar', $this->name_ar]);
+
+        if($this->country_name)
+            $query->andFilterWhere(['like', 'country.country_name',
+                new Expression("'%". $this->country_name . "%'")]);
+
 
         return $dataProvider;
     }
