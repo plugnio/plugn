@@ -4066,6 +4066,14 @@ class Restaurant extends \yii\db\ActiveRecord
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    public function getCountryName($modelClass = "\common\models\Country") {
+
+        $country = $this->getCountry($modelClass)->one();
+
+        if($country)
+            return $country->country_name;
+    }
+
     /**
      * Gets query for [[Country]].
      *

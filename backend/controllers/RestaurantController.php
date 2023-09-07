@@ -62,9 +62,31 @@ class RestaurantController extends Controller {
         $searchModel = new RestaurantSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $totalFilter = 0;
+
+        if(isset(Yii::$app->request->queryParams['RestaurantSearch'])) {
+            foreach (Yii::$app->request->queryParams['RestaurantSearch'] as $filter) {
+                if (!empty($filter)) {
+                    $totalFilter++;
+                }
+            }
+        }
+
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+            'totalFilter' => $totalFilter
+        ]);
+    }
+
+    public function actionFilter() {
+
+        $searchModel = new RestaurantSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('filter', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
