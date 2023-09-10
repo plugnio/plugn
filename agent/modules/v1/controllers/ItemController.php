@@ -756,6 +756,13 @@ class ItemController extends BaseController
 
         $model = ItemImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
 
+        if(!$model) {
+            return [
+                "operation" => "error",
+                "message" => "We've faced a problem deleting the item"
+            ];
+        }
+
         //check ownership
 
         $exists = $restaurant->getItems()->andWhere(['item_uuid' => $model->item_uuid])->exists();
@@ -767,7 +774,7 @@ class ItemController extends BaseController
             ];
         }
 
-        if ($model && !$model->delete()) {
+        if (!$model->delete()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
