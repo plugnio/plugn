@@ -5,6 +5,7 @@ use agent\models\Country;
 use agent\models\RestaurantPaymentMethod;
 use backend\components\ChartWidget;
 use backend\models\Admin;
+use backend\models\CountrySearch;
 use common\models\Payment;
 use common\models\Restaurant;
 use common\models\RestaurantDomainRequest;
@@ -335,14 +336,14 @@ class StatsController extends Controller
         $date_start = Yii::$app->request->get('date_start');
         $date_end = Yii::$app->request->get('date_end');
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => Country::find(),
-        ]);
+        $searchModel = new CountrySearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('countries', [
             "date_start" => $date_start,
             "date_end" => $date_end,
             'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel
         ]);
     }
 
