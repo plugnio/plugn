@@ -246,9 +246,9 @@ class Item extends \yii\db\ActiveRecord
   public function fields()
   {
       $fields = parent::fields ();
- 
+
       $fields['track_quantity'] = function($data) {
-        return (boolean) $data->track_quantity;
+          return (boolean) $data->track_quantity;
       };
 
       return $fields;
@@ -316,7 +316,7 @@ class Item extends \yii\db\ActiveRecord
             "offers" => [
                 "@type" => "Offer",
                 "url" => $url,
-                "priceCurrency" => $this->restaurant->currency->code,
+                "priceCurrency" => $this->restaurant->currency? $this->restaurant->currency->code: "KWD",
                 "price" => $this->item_price,
                 "itemCondition" => "https://schema.org/NewCondition",
                 "availability" => "https://schema.org/InStock"
