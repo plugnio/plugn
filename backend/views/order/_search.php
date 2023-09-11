@@ -43,8 +43,45 @@ $this->registerJs($js);
                         </div>
 
                         <div class="col-md-2">
+                            <?= $form->field($model, 'payment_uuid') ?>
+                        </div>
+                        <div class="col-md-2">
+                            <?=
+                            $form->field($model, 'payment_method_id')
+                                ->label("Payment method")
+                                ->dropDownList(
+                                ArrayHelper::map(
+                                    \agent\models\PaymentMethod::find()->all(),
+                                    'payment_method_id',
+                                'payment_method_name'
+                                ), ['class' => 'form-control', 'prompt' => 'Select payment method']);
+                            ?>
+                        </div>
+                        <div class="col-md-2">
+                            <?= $form->field($model, 'currency_code') ?>
+                        </div>
+                        <div class="col-md-2">
+                            <?=
+                            $form->field($model, 'order_mode')->dropDownList([
+
+                                Order::ORDER_MODE_DELIVERY => 'Delivery',
+                                Order::ORDER_MODE_PICK_UP => 'Store Pickup'
+                            ], ['class' => 'form-control', 'prompt' => 'Select order mode']);
+                            ?>
+                        </div>
+
+                        <div class="col-md-2">
+                            <?= $form->field($model, 'country_name') ?>
+                        </div>
+
+                        <div class="col-md-2">
                             <?= $form->field($model, 'customer_phone_number') ?>
                         </div>
+
+                        <div class="col-md-2">
+                            <?= $form->field($model, 'customer_email') ?>
+                        </div>
+
 
                         <div class="col-md-2">
                             <?=
