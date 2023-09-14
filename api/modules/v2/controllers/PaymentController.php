@@ -118,7 +118,7 @@ class PaymentController extends Controller
     /**
      * return a list of payments method that restaurant's owner added on agent dashboard
      */
-    public function actionListAllRestaurantsPaymentMethod($id)
+    public function actionListAllRestaurantsPaymentMethod($id = null)
     {
         $model = $this->findModel($id);
 
@@ -177,8 +177,12 @@ class PaymentController extends Controller
      * @return Category the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id = null)
     {
+        if(!$id) {
+            $id = Yii::$app->request->getHeaders()->get('Store-Id');
+        }
+
         $model = Restaurant::find()
             ->where(['restaurant_uuid' => $id])
             ->one();

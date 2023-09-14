@@ -196,6 +196,38 @@ class DeliveryZoneController extends Controller {
     }
 
     /**
+     * return delivery zone for tax + delivery fee details by location provided
+     * @return string[]
+     * @throws NotFoundHttpException
+     */
+    public function actionByLocation()
+    {
+        $area_id = Yii::$app->request->get('area_id');
+        $city_id = Yii::$app->request->get('city_id');
+
+        if(!$area_id && !$city_id) {
+            return [
+                "operation" => "error",
+                "message" => "Location details missing"
+            ];
+        }
+
+        $query = $this->findStore()
+            ->getAreaDeliveryZones();
+
+        if($area_id) //for kuwait
+        {
+            $query->andWhere(['area_delivery_zone.area_id' => $area_id]);
+        }
+        else if($city_id)
+        {
+            $query->andWhere(['area_delivery_zone.city_id' => $city_id]);
+        }
+
+        return $query->one();
+    }
+
+    /**
      * Return pickup location
      */
     public function actionGetPickupLocation($restaurant_uuid, $pickup_location_id) {
@@ -305,6 +337,31 @@ class DeliveryZoneController extends Controller {
         ]);
     }
 
+    public function actionCityAreas($city_id) {
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $city = City::findOne($city_id);
+
+        if(!$city) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $city->getAreas("\common\models\Area");
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
     public function actionCountryAreas($country_id) {
 
         $keyword = Yii::$app->request->get("keyword");
@@ -349,6 +406,34 @@ class DeliveryZoneController extends Controller {
         return new ActiveDataProvider([
             'query' => $query,
             'pagination' => false
+        ]);
+    }
+
+    /**
+     * Return list of cities available for state
+     */
+    public function actionCountryCities($country_id) {
+
+        $keyword = Yii::$app->request->get("keyword");
+
+        $country = Country::findOne($country_id);
+
+        if(!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getCities("\api\models\City");
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'city_name', $keyword],
+                ['like', 'city_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
         ]);
     }
 
@@ -445,8 +530,11 @@ class DeliveryZoneController extends Controller {
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findStore($id)
+    protected function findStore($id = null)
     {
+        if(!$id)
+            $id = Yii::$app->request->getHeaders()->get('Store-Id');
+
         $model = Restaurant::findOne($id);
 
         if ($model !== null) {
