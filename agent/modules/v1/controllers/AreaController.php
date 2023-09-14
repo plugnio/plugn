@@ -65,7 +65,7 @@ class AreaController extends BaseController {
         $store = Yii::$app->accountManager->getManagedAccount($store_id);
 
         $query = $store->getAreaDeliveryZones()
-            ->andWhere(new Expression('area_id IS NOT NULL'));
+            ->andWhere(new Expression('area_delivery_zone.area_id IS NOT NULL'));
 
         if ($city_id) {
             $query->andWhere(['city_id' => $city_id]);

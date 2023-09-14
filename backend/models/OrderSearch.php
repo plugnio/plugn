@@ -18,7 +18,7 @@ class OrderSearch extends Order
     {
         return [
             [['area_id', 'payment_method_id', 'order_status','customer_id'], 'integer'],
-            [['order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name','payment_method_name_ar','restaurant_uuid'], 'safe'],
+            [['payment_uuid', 'order_mode', 'currency_code', 'payment_method_id ', 'country_name', 'order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name','payment_method_name_ar','restaurant_uuid'], 'safe'],
         ];
     }
 

@@ -246,9 +246,9 @@ class Item extends \yii\db\ActiveRecord
   public function fields()
   {
       $fields = parent::fields ();
- 
+
       $fields['track_quantity'] = function($data) {
-        return (boolean) $data->track_quantity;
+          return (boolean) $data->track_quantity;
       };
 
       return $fields;
@@ -316,7 +316,7 @@ class Item extends \yii\db\ActiveRecord
             "offers" => [
                 "@type" => "Offer",
                 "url" => $url,
-                "priceCurrency" => $this->restaurant->currency->code,
+                "priceCurrency" => $this->restaurant->currency? $this->restaurant->currency->code: "KWD",
                 "price" => $this->item_price,
                 "itemCondition" => "https://schema.org/NewCondition",
                 "availability" => "https://schema.org/InStock"
@@ -449,10 +449,27 @@ class Item extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function beforeDelete()
     {
-        foreach ($this->getItemImages()->all() as $itemImage) {
-            $itemImage->delete();
+        ItemImage::deleteAll(['item_uuid' => $this->item_uuid]);
+
+        ItemVideo::deleteAll(['item_uuid' => $this->item_uuid]);
+
+        CategoryItem::deleteAll(['item_uuid' => $this->item_uuid]);
+
+        $variants = $this->getItemVariants()->all();
+
+        foreach ($variants as $variant) {
+
+            ItemVariantOption::deleteAll(['item_variant_uuid' => $variant->item_variant_uuid]);
+            ItemVariantImage::deleteAll(['item_variant_uuid' => $variant->item_variant_uuid]);
+
+            $variant->delete();
         }
 
         return parent::beforeDelete();
