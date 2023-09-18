@@ -308,6 +308,21 @@ class StoreController extends BaseController
     }
 
     /**
+     * Update front store settings
+     * @return mixed
+     */
+    public function actionUpdateStoreSettings()
+    {
+        $model = $this->findModel();
+
+        $item_discount_label = Yii::$app->request->getBodyParam('item_discount_label');
+
+        Setting::setConfig($model->restaurant_uuid, 'Store', 'item_discount_label', $item_discount_label);
+
+        return self::message("success",'Mail settings updated successfully');
+    }
+
+    /**
      * Update mail settings
      * @return mixed
      */
