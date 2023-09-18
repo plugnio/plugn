@@ -10,6 +10,7 @@ use yii\db\Exception;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
+use yii\helpers\ArrayHelper;
 
 
 /**
@@ -2125,6 +2126,14 @@ class Restaurant extends \yii\db\ActiveRecord
                 //    return null;
 
                 return $restaurant->openingHours;
+            },
+            'storeSettings' => function ($restaurant) {
+
+                $rows = $restaurant->getSettings()
+                    ->andWhere(['code' => "Store"])
+                    ->all();
+
+                return ArrayHelper::map($rows, 'key', 'value');
             },
             'restaurantUploads',
             'isOpen' => function ($restaurant) {
