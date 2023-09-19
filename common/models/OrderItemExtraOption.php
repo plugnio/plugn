@@ -164,7 +164,7 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
                 $this->option_id = $this->option->option_id;
                 $this->option_name = $this->option->option_name;
                 $this->option_name_ar = $this->option->option_name_ar;
-                $this->extra_option_price = 0;
+                $this->extra_option_price = $this->option->option_price;
             }
 
             if ($extra_option_model) {
@@ -196,13 +196,14 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
 
                 $this->extra_option_name = $extra_option_model->extra_option_name;
                 $this->extra_option_name_ar = $extra_option_model->extra_option_name_ar;
+
+                //todo: option price + extra option price
                 $this->extra_option_price = $extra_option_model->extra_option_price;
             }
 
             if(!$this->option_id && !$this->extra_option_id) {
                 return false;
             }
-
         }
         else
         {
