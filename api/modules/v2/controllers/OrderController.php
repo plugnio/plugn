@@ -124,7 +124,8 @@ class OrderController extends Controller
         $order->currency_code = Yii::$app->currency->getCode();
 
         //Preorder
-        $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ? Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
+        $order->is_order_scheduled = Yii::$app->request->getBodyParam("is_order_scheduled") ?
+            Yii::$app->request->getBodyParam("is_order_scheduled") : 0;
 
         //Apply promo code
 
@@ -396,6 +397,7 @@ class OrderController extends Controller
 
             $order = $response['order'];
         }
+
         //Apply promo code
 
         $order->voucher_id = Yii::$app->request->getBodyParam("voucher_id");
@@ -1458,7 +1460,6 @@ class OrderController extends Controller
             ];
         }
     }
-
 
     /**
      * Finds the Order model based on its primary key value.

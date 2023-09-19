@@ -162,8 +162,11 @@ return [
                     'controller' => 'v2/delivery-zone',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET by-location' => 'by-location',
                         'GET country-states/<country_id>' => 'country-states',
+                        'GET country-cities/<country_id>' => 'country-cities',
                         'GET state-cities/<state_id>' => 'state-cities',
+                        'GET city-areas/<city_id>' => 'city-areas',
                         'GET areas/<country_id>' => 'country-areas',
                         'GET cities/<state_id>' => 'cities',
                         'GET states/<country_id>' => 'states',
@@ -176,6 +179,9 @@ return [
                         // 'GET <restaurant_uuid>' => 'delivery-zone',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS city-areas/<city_id>' => 'options',
+                        'OPTIONS by-location' => 'options',
+                        'OPTIONS country-cities/<country_id>' => 'options',
                         'OPTIONS country-states/<country_id>' => 'options',
                         'OPTIONS state-cities/<state_id>' => 'options',
                         'OPTIONS cities' => 'options',
@@ -189,7 +195,7 @@ return [
                         // 'OPTIONS <restaurant_uuid>' => 'options'
                     ]
                 ],
-                [// RestaurantCest
+                [// RestaurantController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',
                     'pluralize' => false,
@@ -243,6 +249,7 @@ return [
                     'controller' => 'v1/payment',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list-all-restaurants-payment-method',
                         'GET <id>' => 'list-all-restaurants-payment-method',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
@@ -282,6 +289,7 @@ return [
                     'controller' => 'v2/payment',
                     'pluralize' => false,
                     'patterns' => [
+                        'GET' => 'list-all-restaurants-payment-method',
                         'GET <id>' => 'list-all-restaurants-payment-method',
                         'POST status-update-webhook' => 'my-fatoorah-webhook',
                         // OPTIONS VERBS

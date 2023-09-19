@@ -13,6 +13,7 @@ use Yii;
  * @property int|null $max_qty
  * @property string|null $option_name
  * @property string|null $option_name_ar
+ * @property number|null $option_price
  *
  * @property ExtraOption[] $extraOptions
  * @property Item $item
@@ -75,6 +76,10 @@ class Option extends \yii\db\ActiveRecord {
 //                    return $model->min_qty != null;
 //                }
 //            ],
+
+            [['option_price'], 'number', 'min' => 0],
+            [['option_price'], 'default', 'value' => 0],
+
             [['sort_number'], 'integer'],
             [['min_qty'], 'integer', 'min' => 0],
             //[['max_qty'], 'integer', 'min' => 1],
@@ -101,6 +106,7 @@ class Option extends \yii\db\ActiveRecord {
             'max_qty' => Yii::t('app','Max Selections'),
             'is_required' => Yii::t('app','Is Required?'),
             'option_name' => Yii::t('app','Option Name'),
+            'option_price' =>Yii::t('app','Option Price'),
             'option_name_ar' => Yii::t('app','Option Name in Arabic'),
             'option_type' => Yii::t('app','Option Type')
         ];

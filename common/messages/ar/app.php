@@ -44,6 +44,7 @@ return [
     'Page Title' => "عنوان الصفحة",
     'Page Title in Arabic' => "عنوان الصفحة باللغة العربية",
     'Option Type' => "نوع الخيار",
+    "Option Price" => "سعر الخيار",
     "Is Required?" => "مطلوب؟",
     'Incorrect email or password.' => 'بريد أو كلمة مرورغير صحيحة.',
     'Another store is already using this domain' => 'متجر آخر يستخدم هذا المجال بالفعل',

@@ -148,6 +148,7 @@ class ItemController extends BaseController
                 $optionModel->max_qty = $max_qty;
                 $optionModel->min_qty = $min_qty;
                 $optionModel->is_required = $option['is_required'];
+                $optionModel->option_price = isset($option['option_price'])? $option['option_price']: 0;
                 $optionModel->sort_number = isset($option['sort_number'])? $option['sort_number']: 1;
                 $optionModel->option_type = isset($option['option_type'])? $option['option_type']: 1;
 
@@ -168,6 +169,7 @@ class ItemController extends BaseController
                         $extraOptionModel->extra_option_name_ar = $extraOption['extra_option_name_ar'];
                         $extraOptionModel->extra_option_price = (isset($extraOption['extra_option_price'])) ? $extraOption['extra_option_price'] : 0;
                         $extraOptionModel->stock_qty = (isset($extraOption['stock_qty']))?$extraOption['stock_qty'] : null;
+
                         if (!$extraOptionModel->save()) {
                             $transaction->rollBack();
                             return [
@@ -383,6 +385,7 @@ class ItemController extends BaseController
                     $optionModel->option_name = $option['option_name'];
                     $optionModel->option_name_ar = $option['option_name_ar'];
                     $optionModel->is_required = $option['is_required'];
+                    $optionModel->option_price = isset($option['option_price'])? $option['option_price']: 0;
                     $optionModel->sort_number = isset($option['sort_number'])? $option['sort_number']: 1;
                     $optionModel->option_type = isset($option['option_type'])? $option['option_type']: 1;
                     $optionModel->max_qty = $max_qty;

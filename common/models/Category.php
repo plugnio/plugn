@@ -151,6 +151,18 @@ class Category extends \yii\db\ActiveRecord
 
 
     /**
+     * @inheritdoc
+     */
+    public function extraFields()
+    {
+        return [
+            'noOfItems' => function($data) {
+                return $data->getCategoryItems()->count();
+            }
+        ];
+    }    
+
+    /**
      * Return Category Image url
      */
     public function getCategoryImage()
