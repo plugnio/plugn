@@ -319,12 +319,23 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
       <div
          style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
       >
-        Your <?= $paymentGateway ?> account for your store <b><?= $store->name ?></b> has been approved.
+          <?php if( $paymentGateway == 'tap' ) { ?>
+
+            Your <?= $paymentGateway ?> account for your store <b><?= $store->name ?></b> has been created.
+            It will be approved in 1-2 business days by Tap document verification team if all documents will be valid.
+
+          <?php } else { ?>
+
+              Your <?= $paymentGateway ?> account for your store <b><?= $store->name ?></b> has been approved.
+
+          <?php } ?>
       </div>
+
 
               </td>
             </tr>
 
+          <?php if( $paymentGateway == 'tap' ) { ?>
             <tr>
               <td
                  align="left" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:10px;word-break:break-word;"
@@ -344,7 +355,7 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
                  align="left" vertical-align="middle" style="font-size:0px;padding:10px 25px;padding-top:10px;word-break:break-word;"
               >
 
-      <table
+                <table
          border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;line-height:100%;"
       >
         <tr>
@@ -360,6 +371,8 @@ $paymentSettingsUrl = Yii::$app->params['frontendUrl'] . '/store/view-payment-me
 
               </td>
             </tr>
+
+          <?php } ?>
 
       </table>
 

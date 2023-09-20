@@ -4,7 +4,6 @@ namespace common\models;
 
 use Yii;
 use yii\db\Expression;
-use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "payment_gateway_queue".
@@ -137,31 +136,6 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
                 ], [
                     'payment_gateway_queue_id' => $this->payment_gateway_queue_id
                 ]);
-
-                $paymentGateway = $this->payment_gateway == 'tap' ? 'Tap Payments' : 'MyFatoorah';
-                $subject = 'Your ' . $paymentGateway . ' account has been approved';
-
-            $mailer = \Yii::$app->mailer->compose([
-                    'html' => 'payment-gateway-created',
-                ], [
-                    'store' => $this->restaurant,
-                    'paymentGateway' => $this->payment_gateway == 'tap' ? 'Tap' : 'MyFatoorah',
-                ])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-                    ->setTo([$this->restaurant->restaurant_email])
-                    ->setSubject($subject);
-
-            try {
-                $mailer->send();
-            } catch (\Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
-            }
-
-                //enable all payment gateway by default
-
-                if($this->payment_gateway == 'tap')
-                    $this->enableTapGateways();
-
         }
         else
         {
@@ -174,30 +148,6 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
         }
 
         return $response;
-    }
-
-    /**
-     * enable tap payment gateways from tap
-     * @return void
-     */
-    public function enableTapGateways() {
-
-        $subQuery = $this->restaurant->getRestaurantPaymentMethods()
-            ->select('payment_method_id');
-
-        $paymentGateways = PaymentMethod::find()
-            ->andWhere(['LIKE', 'source_id', "src_"])
-            ->andWhere(new Expression("source_id IS NOT NULL"))
-            ->andWhere(['NOT IN', 'payment_method_id', $subQuery])
-            ->all();
-
-        foreach ($paymentGateways as $paymentGateway) {
-            $model = new RestaurantPaymentMethod();
-            $model->payment_method_id = $paymentGateway->payment_method_id;
-            $model->restaurant_uuid = $this->restaurant_uuid;
-            $model->status = RestaurantPaymentMethod::STATUS_ACTIVE;
-            $model->save();
-        }
     }
 
     /**

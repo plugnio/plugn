@@ -185,15 +185,15 @@ class TapPayments extends Component
      * @param type $title
      * @return type
      */
-    public function uploadFileToTap($file_path, $purpose, $title)
+    public function uploadFileToTap($file_path, $purpose, $title, $params = [])
     {
         $fileEndpoint = $this->apiEndpoint . "/files";
 
-        $fileParams = [
+        $fileParams = array_merge($params, [
             "purpose" => $purpose,
             "title" => $title,
             "file_link_create" => '0'
-        ];
+        ]);
 
         $client = new Client();
 
@@ -222,8 +222,8 @@ class TapPayments extends Component
 
         $bussinessParams = [
             "name" => [
-                "en" => $restaurant->company_name. '- Plugn',
-                "ar" => $restaurant->name_ar. '- Plugn'
+                "en" => $restaurant->company_name. ' - Plugn',
+                "ar" => $restaurant->name_ar. ' - Plugn'
             ],
             "type" => $restaurant->business_type,
             "entity" => [
@@ -282,6 +282,23 @@ class TapPayments extends Component
         ];
 
         if (
+            $restaurant->iban_certificate_file_id
+        ) {
+            $ibanDocument = [
+                "type" => "IBAN Certificate",
+                "number" => "",
+                "issuing_country" => $restaurant->country->iso,
+                "issuing_date" => "",
+                "expiry_date" => "",
+                "images" => [
+                    $restaurant->iban_certificate_file_id
+                ]
+            ];
+
+            array_push($bussinessParams['entity']['documents'], $ibanDocument);
+        }
+
+        if (
             $restaurant->authorized_signature_file_id &&
             $restaurant->commercial_license_file_id
         ) {
@@ -329,6 +346,29 @@ class TapPayments extends Component
                 ->send();
 
         return $response;
+    }
+
+    /**
+     * get business status update
+     * @param $restaurant
+     * @return \yii\httpclient\Response
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function getBussiness($restaurant)
+    {
+        $bussinessEndpoint = $this->apiEndpoint . "/business/" . $restaurant->business_id;
+
+        $client = new Client();
+
+        return $client->createRequest()
+            ->setMethod('GET')
+            ->setUrl($bussinessEndpoint)
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
     }
 
     /**

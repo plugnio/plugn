@@ -56,6 +56,8 @@ use yii\helpers\ArrayHelper;
  * @property string|null $authorized_signature_file
  * @property string|null $authorized_signature_file_id
  * @property string|null $authorized_signature_file_purpose
+ * @property string|null $iban_certificate_file
+ * @property string|null $iban_certificate_file_id
  * @property string|null $iban
  * @property string|null $owner_first_name
  * @property string|null $owner_last_name
@@ -97,6 +99,8 @@ use yii\helpers\ArrayHelper;
  * @property string|null $site_id
  * @property string|null $company_name
  * @property int|null $is_tap_enable
+ * @property int|null $is_tap_created
+ * @property int|null $is_tap_business_active
  * @property int|null $is_myfatoorah_enable
  * @property int|null $supplierCode
  * @property int|null $has_deployed
@@ -230,19 +234,22 @@ class Restaurant extends \yii\db\ActiveRecord
             ],
             [
                 [
-                   'identification_file_front_side', 'identification_file_back_side'
+                   'identification_file_front_side', 'identification_file_back_side', 'commercial_license_file',
                 ],
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
 
             [['meta_title', 'meta_title_ar', 'meta_description', 'meta_description_ar'], 'string'],
 
-            [['commercial_license_file', 'authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
+            [['authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
                 return $model->business_type == 'corp';
             }],
 
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
-            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
+            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file', 'iban_certificate_file_id'], 'safe', 'on' => [
+                self::SCENARIO_CREATE_TAP_ACCOUNT,
+                self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT
+            ]],
             [['not_for_profit', 'total_orders'], 'number'],
             
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
@@ -370,7 +377,18 @@ class Restaurant extends \yii\db\ActiveRecord
                   return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
-            [['restaurant_email_notification', 'demand_delivery', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_myfatoorah_enable', 'supplierCode'], 'integer'],
+            [
+                ['iban_certificate_file'],
+                '\common\components\S3FileExistValidator',
+                'filePath' => '',
+                'message' => Yii::t('app',"Please upload IBAN certificate file"),
+                'resourceManager' => Yii::$app->temporaryBucketResourceManager,
+                'when' => function($model, $attribute) {
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute) &&
+                        $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
+                }
+            ],
+            [['restaurant_email_notification', 'demand_delivery', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_tap_created', 'is_tap_business_active', 'is_myfatoorah_enable', 'supplierCode'], 'integer'],
             [['schedule_interval'], 'required','when' => function($model) {
                     return $model->schedule_order;
                 }
@@ -466,9 +484,13 @@ class Restaurant extends \yii\db\ActiveRecord
                 'commercial_license_file',
                 'commercial_license_file_id',
                 'commercial_license_file_purpose',
+                'iban_certificate_file',
+                'iban_certificate_file_id',
                 'live_public_key',
                 'test_public_key',
                 'is_tap_enable',
+                'is_tap_created',
+                'is_tap_business_active',
                 'identification_file_back_side',
                 'identification_file_id_back_side',
                 'payment_gateway_queue_id',
@@ -481,7 +503,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'authorized_signature_file_id', 'commercial_license_file_id',
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
-                'identification_expiry_date'],
+                'identification_expiry_date', 'iban_certificate_file','iban_certificate_file_id', 'is_tap_business_active'],
 
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
@@ -588,6 +610,7 @@ class Restaurant extends \yii\db\ActiveRecord
             'identification_file_back_side' => Yii::t('app',' National ID File back side'),
             'identification_title' => Yii::t('app','Identification Title'),
             'identification_file_purpose' => Yii::t('app','Identification File Purpose'),
+            'iban_certificate_file' => Yii::t('app','IBAN Certificate'),
             'live_api_key' => Yii::t('app','Live secret key'),
             'test_api_key' => Yii::t('app','Test secret key'),
             'default_language' => Yii::t('app','Default Language'),
@@ -694,7 +717,6 @@ class Restaurant extends \yii\db\ActiveRecord
                 ]);
 
                 if ($result || count ($result) > 0) {
-                    //delete the file from temp folder
                     $this[$attribute] = basename ($result['url']);
                     $this->$attribute = basename ($result['url']);
                     return true;
@@ -919,8 +941,65 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function uploadDocumentsToTap()
     {
+        //IBAN Certificate
+
+        if (
+            $this->iban_certificate_file
+        )
+        {
+            $tmpFile = sys_get_temp_dir () . '/' . $this->iban_certificate_file;
+
+            if (!file_put_contents ($tmpFile, file_get_contents ($this->getIBANCertificatePhoto ())))
+            {
+                //Yii::error ('Error reading authorized signature document: ');
+
+                $this->addError('iban_certificate_file', 'Error reading IBAN certificate document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading IBAN certificate document'
+                ];
+            }
+
+            $response = Yii::$app->tapPayments->uploadFileToTap (
+                $tmpFile,
+                "identity_document",
+                "IBAN Certificate",
+                [
+                    "issuing_country" => $this->country->iso
+                ]
+            );
+
+            @unlink ($tmpFile);
+
+            if ($response->isOk) {
+                $this->iban_certificate_file_id = $response->data['id'];
+            }
+            else
+            {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                //Yii::error ('Error when uploading IBAN document: ' . $error);
+
+                $this->addError('iban_certificate_file', 'Error reading IBAN document' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading IBAN document' . $error
+                ];
+            }
+        }
+
         //Upload Authorized Signature file
-        if ($this->authorized_signature_file && $this->authorized_signature_file_purpose && $this->authorized_signature_title)
+        if (
+            $this->authorized_signature_file &&
+            $this->authorized_signature_file_purpose &&
+            $this->authorized_signature_title
+        )
         {
             $tmpFile = sys_get_temp_dir () . '/' . $this->authorized_signature_file;
 
@@ -966,7 +1045,9 @@ class Restaurant extends \yii\db\ActiveRecord
             }
         }
 
+
         //Upload commercial_license file
+
         if ($this->commercial_license_file && $this->commercial_license_file_purpose && $this->commercial_license_title) {
 
             $commercialLicenseTmpFile = sys_get_temp_dir () . '/' . $this->commercial_license_file;
@@ -1103,6 +1184,16 @@ class Restaurant extends \yii\db\ActiveRecord
             }
         }
 
+        self::updateAll([
+            'iban_certificate_file_id' => $this->iban_certificate_file_id,
+            'authorized_signature_file_id' => $this->authorized_signature_file_id,
+            'commercial_license_file_id' => $this->commercial_license_file_id,
+            'identification_file_id_front_side' => $this->identification_file_id_front_side,
+            'identification_file_id_back_side' => $this->identification_file_id_back_side
+        ], [
+            'restaurant_uuid' => $this->restaurant_uuid
+        ]);
+
         return [
             "operation" => 'success',
         ];
@@ -1172,7 +1263,6 @@ class Restaurant extends \yii\db\ActiveRecord
             $responseContent = json_decode($response->content);
 
             @unlink($civilIdFrontSideTmpFile);
-
 
             if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
                 $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
@@ -1265,6 +1355,21 @@ class Restaurant extends \yii\db\ActiveRecord
      * Return authorized_signature_file url
      * @return string
      */
+    public function getIBANCertificatePhoto()
+    {
+        if (!$this->iban_certificate_file) {
+            return false;
+        }
+
+        return 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+            . $this->restaurant_uuid . '/private_documents/'
+            . $this->iban_certificate_file;
+    }
+
+    /**
+     * Return authorized_signature_file url
+     * @return string
+     */
     public function getAuthorizedSignaturePhoto()
     {
         if (!$this->authorized_signature_file) {
@@ -1309,6 +1414,8 @@ class Restaurant extends \yii\db\ActiveRecord
                 // //Upload documents file on our server before we create an account on MyFatoorah we gonaa delete them
                 $this->uploadDocumentsToMyFatoorah();
             }
+
+            $this->onMyFatoorahCreated();
 
             return [
                 "operation" => 'success',
@@ -1377,10 +1484,13 @@ class Restaurant extends \yii\db\ActiveRecord
                 $this->business_entity_id = $businessApiResponse->data['entity']['id'];
                 $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
 
+                $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
+
                 self::updateAll([
                     'business_id' => $this->business_id,
                     'business_entity_id' => $this->business_entity_id,
-                    'developer_id' => $this->developer_id
+                    'developer_id' => $this->developer_id,
+                    'is_tap_business_active' => $this->is_tap_business_active
                 ], [
                     'restaurant_uuid' => $this->restaurant_uuid
                 ]);
@@ -1463,14 +1573,22 @@ class Restaurant extends \yii\db\ActiveRecord
               $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
             }
 
-            if ($this->live_api_key && $this->test_api_key)
+            //sandbox mode will give only test api keys
+
+            if ($this->live_api_key || $this->test_api_key)
             {
-              $this->is_tap_enable = 1;
+              //$this->is_tap_enable = 1;
+              $this->is_tap_created = 1;
               $this->is_myfatoorah_enable = 0;
             }
             else
             {
-                $this->is_tap_enable = 0;
+                $this->is_tap_created = 0;
+                //$this->is_tap_enable = 0;
+            }
+
+            if($this->is_tap_created && $this->is_tap_business_active) {
+                $this->is_tap_enable = 1;
             }
 
             \Yii::info($this->name . " has just created TAP account", __METHOD__);
@@ -1487,10 +1605,20 @@ class Restaurant extends \yii\db\ActiveRecord
                 'live_api_key' => $this->live_api_key,
                 'live_public_key' => $this->live_public_key,
                 'is_tap_enable' => $this->is_tap_enable,
+                'is_tap_created' => $this->is_tap_created,
                 'is_myfatoorah_enable' => $this->is_myfatoorah_enable
             ], [
               'restaurant_uuid' => $this->restaurant_uuid
             ]);
+
+            if($this->is_tap_created) {
+
+                if ($this->is_tap_enable) {
+                    $this->onTapApproved();
+                } else {
+                    $this->onTapCreated();
+                }
+            }
 
             return [
                 "operation" => 'success',
@@ -1528,11 +1656,126 @@ class Restaurant extends \yii\db\ActiveRecord
                 "message" => $operatorApiResponse->data
             ];
         }
- 
+
         return [
             "operation" => 'success',
             "message" => "Account created successfully!"
         ];
+    }
+
+    public function pollTapStatus()
+    {
+        $businessApiResponse = Yii::$app->tapPayments->getBussiness($this);
+
+        if ($businessApiResponse->isOk && $businessApiResponse->data['status'] === 'Active')
+        {
+            self::updateAll([
+                'is_tap_enable' => true,
+                'is_tap_business_active' => true
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            $this->onTapApproved();
+        }
+    }
+
+    public function onMyFatoorahCreated() {
+
+        $paymentGateway = 'MyFatoorah';
+
+        $subject = 'Your ' . $paymentGateway . ' account data has been created';
+
+        $mailer = \Yii::$app->mailer->compose([
+            'html' => 'payment-gateway-created',
+        ], [
+            'store' => $this,
+            'paymentGateway' => 'MyFatoorah',
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo([$this->restaurant_email])
+            ->setSubject($subject);
+
+        try {
+            $mailer->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
+    }
+
+    public function onTapCreated() {
+
+        $subject = 'Your Tap account has been created';
+
+        $mailer = \Yii::$app->mailer->compose([
+            'html' => 'payment-gateway-created',
+        ], [
+            'store' => $this,
+            'paymentGateway' => 'Tap',
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo([$this->restaurant_email])
+            ->setSubject($subject);
+
+        try {
+            $mailer->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
+    }
+
+    public function onTapApproved() {
+
+        $this->notifyTapApproved();
+
+        $this->enableTapGateways();
+    }
+
+    public function notifyTapApproved() {
+
+        $paymentGateway = 'Tap Payments';
+
+        $subject = 'Your ' . $paymentGateway . ' account data has been approved';
+
+        $mailer = \Yii::$app->mailer->compose([
+            'html' => 'agent/tap-approved',
+        ], [
+            'store' => $this,
+            'paymentGateway' => $paymentGateway,
+        ])
+            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo([$this->restaurant_email])
+            ->setSubject($subject);
+
+        try {
+            $mailer->send();
+        } catch (\Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
+    }
+
+    /**
+     * enable tap payment gateways from tap
+     * @return void
+     */
+    public function enableTapGateways() {
+
+        $subQuery = $this->getRestaurantPaymentMethods()
+            ->select('payment_method_id');
+
+        $paymentGateways = \common\models\PaymentMethod::find()
+            ->andWhere(['LIKE', 'source_id', "src_"])
+            ->andWhere(new Expression("source_id IS NOT NULL"))
+            ->andWhere(['NOT IN', 'payment_method_id', $subQuery])
+            ->all();
+
+        foreach ($paymentGateways as $paymentGateway) {
+            $model = new RestaurantPaymentMethod();
+            $model->payment_method_id = $paymentGateway->payment_method_id;
+            $model->restaurant_uuid = $this->restaurant_uuid;
+            $model->status = RestaurantPaymentMethod::STATUS_ACTIVE;
+            $model->save();
+        }
     }
 
     /**
