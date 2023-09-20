@@ -100,6 +100,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $company_name
  * @property int|null $is_tap_enable
  * @property int|null $is_tap_created
+ * @property int|null $is_tap_business_active
  * @property int|null $is_myfatoorah_enable
  * @property int|null $supplierCode
  * @property int|null $has_deployed
@@ -387,7 +388,7 @@ class Restaurant extends \yii\db\ActiveRecord
                         $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
-            [['restaurant_email_notification', 'demand_delivery', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_tap_created', 'is_myfatoorah_enable', 'supplierCode'], 'integer'],
+            [['restaurant_email_notification', 'demand_delivery', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_tap_created', 'is_tap_business_active', 'is_myfatoorah_enable', 'supplierCode'], 'integer'],
             [['schedule_interval'], 'required','when' => function($model) {
                     return $model->schedule_order;
                 }
@@ -489,6 +490,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'test_public_key',
                 'is_tap_enable',
                 'is_tap_created',
+                'is_tap_business_active',
                 'identification_file_back_side',
                 'identification_file_id_back_side',
                 'payment_gateway_queue_id',
@@ -501,7 +503,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'authorized_signature_file_id', 'commercial_license_file_id',
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
-                'identification_expiry_date', 'iban_certificate_file','iban_certificate_file_id'],
+                'identification_expiry_date', 'iban_certificate_file','iban_certificate_file_id', 'is_tap_business_active'],
 
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
@@ -961,7 +963,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
             $response = Yii::$app->tapPayments->uploadFileToTap (
                 $tmpFile,
-                "iban_certificate",
+                "identity_document",
                 "IBAN Certificate",
                 [
                     "issuing_country" => $this->country->iso
@@ -1182,6 +1184,16 @@ class Restaurant extends \yii\db\ActiveRecord
             }
         }
 
+        self::updateAll([
+            'iban_certificate_file_id' => $this->iban_certificate_file_id,
+            'authorized_signature_file_id' => $this->authorized_signature_file_id,
+            'commercial_license_file_id' => $this->commercial_license_file_id,
+            'identification_file_id_front_side' => $this->identification_file_id_front_side,
+            'identification_file_id_back_side' => $this->identification_file_id_back_side
+        ], [
+            'restaurant_uuid' => $this->restaurant_uuid
+        ]);
+
         return [
             "operation" => 'success',
         ];
@@ -1251,7 +1263,6 @@ class Restaurant extends \yii\db\ActiveRecord
             $responseContent = json_decode($response->content);
 
             @unlink($civilIdFrontSideTmpFile);
-
 
             if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
                 $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
@@ -1473,13 +1484,13 @@ class Restaurant extends \yii\db\ActiveRecord
                 $this->business_entity_id = $businessApiResponse->data['entity']['id'];
                 $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
 
-                $is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
+                $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
 
                 self::updateAll([
                     'business_id' => $this->business_id,
                     'business_entity_id' => $this->business_entity_id,
                     'developer_id' => $this->developer_id,
-                    'is_tap_business_active' => $is_tap_business_active
+                    'is_tap_business_active' => $this->is_tap_business_active
                 ], [
                     'restaurant_uuid' => $this->restaurant_uuid
                 ]);
@@ -1562,7 +1573,9 @@ class Restaurant extends \yii\db\ActiveRecord
               $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
             }
 
-            if ($this->live_api_key && $this->test_api_key)
+            //sandbox mode will give only test api keys
+
+            if ($this->live_api_key || $this->test_api_key)
             {
               //$this->is_tap_enable = 1;
               $this->is_tap_created = 1;
@@ -1597,6 +1610,15 @@ class Restaurant extends \yii\db\ActiveRecord
             ], [
               'restaurant_uuid' => $this->restaurant_uuid
             ]);
+
+            if($this->is_tap_created) {
+
+                if ($this->is_tap_enable) {
+                    $this->onTapApproved();
+                } else {
+                    $this->onTapCreated();
+                }
+            }
 
             return [
                 "operation" => 'success',
@@ -1633,15 +1655,6 @@ class Restaurant extends \yii\db\ActiveRecord
                 "operation" => 'error',
                 "message" => $operatorApiResponse->data
             ];
-        }
-
-        if($this->is_tap_created) {
-
-            if ($this->is_tap_enable) {
-                $this->onTapApproved();
-            } else {
-                $this->onTapCreated();
-            }
         }
 
         return [

@@ -4,7 +4,6 @@ namespace common\models;
 
 use Yii;
 use yii\db\Expression;
-use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "payment_gateway_queue".

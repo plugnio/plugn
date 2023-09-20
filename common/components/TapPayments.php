@@ -222,8 +222,8 @@ class TapPayments extends Component
 
         $bussinessParams = [
             "name" => [
-                "en" => $restaurant->company_name. '- Plugn',
-                "ar" => $restaurant->name_ar. '- Plugn'
+                "en" => $restaurant->company_name. ' - Plugn',
+                "ar" => $restaurant->name_ar. ' - Plugn'
             ],
             "type" => $restaurant->business_type,
             "entity" => [

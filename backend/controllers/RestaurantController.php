@@ -189,6 +189,8 @@ class RestaurantController extends Controller {
         $store->test_public_key = null;
 
         $store->is_tap_enable = null;
+        $store->is_tap_created = null;
+        $store->is_tap_business_active = null;
 
         $store->identification_file_back_side = null;
         $store->identification_file_id_back_side = null;
