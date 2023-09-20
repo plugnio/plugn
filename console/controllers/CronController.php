@@ -825,6 +825,18 @@ class CronController extends \yii\console\Controller
                 $store->deleteSite();
             }
         }
+
+        //pollTapStatus
+
+        $query = Restaurant::find()
+            ->andWhere(['!=', 'restaurant.is_deleted', 1])
+            ->andWhere(['is_tap_business_active' => false, 'is_tap_created' => true]);
+
+        foreach ($query->batch() as $stores) {
+            foreach ($stores as $store) {
+                $store->pollTapStatus();
+            }
+        }
     }
 
     /**
