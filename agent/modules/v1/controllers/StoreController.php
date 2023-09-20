@@ -524,6 +524,7 @@ class StoreController extends BaseController
         $identification_file_back_side = Yii::$app->request->getBodyParam('identification_file_back_side');
         $commercial_license_file = Yii::$app->request->getBodyParam('commercial_license_file');
         $authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
+        $iban_certificate_file = Yii::$app->request->getBodyParam('iban_certificate_file');
 
         if ($model->country && $model->country->iso != 'KW') {
             $model->business_type = 'corp';
@@ -584,6 +585,18 @@ class StoreController extends BaseController
                 !$model->uploadFileFromAwsToCloudinary(
                     $authorized_signature_file,
                     'authorized_signature_file'
+                )
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
+
+            if (
+                $iban_certificate_file &&
+                $model->iban_certificate_file != $iban_certificate_file &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $iban_certificate_file,
+                    'iban_certificate_file'
                 )
             ) {
                 $transaction->rollBack();
