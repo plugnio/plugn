@@ -15,6 +15,7 @@ use yii\behaviors\TimestampBehavior;
  * @property string $item_variant_uuid
  * @property string $item_uuid
  * @property string $product_file_name
+ * @property int $sort_number
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -42,6 +43,7 @@ class ItemVariantImage extends \yii\db\ActiveRecord
             [['item_variant_image_uuid', 'item_variant_uuid'], 'string', 'max' => 60],
             [['item_uuid'], 'string', 'max' => 100],
             [['product_file_name'], 'string', 'max' => 255],
+            [['sort_number'], 'number'],
             [['item_variant_image_uuid'], 'unique'],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
             [['item_variant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => ItemVariant::className(), 'targetAttribute' => ['item_variant_uuid' => 'item_variant_uuid']],
@@ -58,6 +60,7 @@ class ItemVariantImage extends \yii\db\ActiveRecord
             'item_variant_uuid' => Yii::t('app', 'Item Variant Uuid'),
             'item_uuid' => Yii::t('app', 'Item Uuid'),
             'product_file_name' => Yii::t('app', 'Product File Name'),
+            'sort_number' => Yii::t('app','Sort number'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
