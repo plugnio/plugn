@@ -10,6 +10,7 @@ use Yii;
  * @property int $item_image_id
  * @property string|null $item_uuid
  * @property string|null $product_file_name
+ * @property int $sort_number
  *
  * @property Item $item
  */
@@ -32,6 +33,7 @@ class ItemImage extends \yii\db\ActiveRecord
             [['item_uuid', 'product_file_name'], 'required'],
             [['item_uuid'], 'string', 'max' => 300],
             [['product_file_name'], 'unique'],
+            [['sort_number'], 'number'],
             [['product_file_name'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
         ];
@@ -45,7 +47,8 @@ class ItemImage extends \yii\db\ActiveRecord
         return [
             'item_image_id' => Yii::t('app','Item Image ID'),
             'item_uuid' => Yii::t('app','Item Uuid'),
-            'product_file_name' => Yii::t('app','Product File Name')
+            'product_file_name' => Yii::t('app','Product File Name'),
+            'sort_number' => Yii::t('app','Sort number'),
         ];
     }
 

@@ -434,6 +434,7 @@ class Item extends \yii\db\ActiveRecord
                     $item_image_model = new ItemImage();
                     $item_image_model->item_uuid = $this->item_uuid;
                     $item_image_model->product_file_name = basename($result['url']);
+                    $item_image_model->sort_number = isset($path['sort_number'])? $path['sort_number']: 0;
                     $item_image_model->save(false);
                 }
 
@@ -561,7 +562,8 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getItemVideos($model = 'common\models\ItemVideo')
     {
-        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid'])
+            ->orderBy('sort_number');
     }
 
     /**
@@ -571,15 +573,15 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getItemImages($model = 'common\models\ItemImage')
     {
-        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid']);
-          //  ->orderBy('sort_order DESC');
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid'])
+            ->orderBy('sort_number');
     }
 
 
     public function getItemImage($model = 'common\models\ItemImage')
     {
-        return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid']);
-          //  ->orderBy('sort_order DESC');
+        return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid'])
+            ->orderBy('sort_number');
     }
 
     /**

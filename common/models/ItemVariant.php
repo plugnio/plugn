@@ -144,6 +144,11 @@ class ItemVariant extends \yii\db\ActiveRecord
 
             if(isset($img['item_variant_image_uuid'])) {
                 $itemVariantImageIds[] = $img['item_variant_image_uuid'];
+
+                $item_image_model = ItemVariantImage::findOne($img['item_variant_image_uuid']);
+                $item_image_model->sort_number = isset($img['sort_number'])? $img['sort_number']: 0;
+                $item_image_model->save(false);
+
                 continue;
             }
 
@@ -163,12 +168,17 @@ class ItemVariant extends \yii\db\ActiveRecord
                     $item_image_model->item_uuid = $this->item_uuid;
                     $item_image_model->item_variant_uuid = $this->item_variant_uuid;
                     $item_image_model->product_file_name = basename($result['url']);
-                    $item_image_model->save(false);
+                    $item_image_model->sort_number = isset($img['sort_number'])? $img['sort_number']: 0;
+
+                    if(!$item_image_model->save(false))
+                    {
+                        Yii::error("Error when uploading item's image to Cloudinry " . json_encode($this->images));
+                    }
 
                     $itemVariantImageIds[] = $item_image_model->item_variant_image_uuid;
 
                 } catch (\Cloudinary\Error $err) {
-                   // Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($this->images));
+                    Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($this->images));
 
                     //todo: notify vendor?
 
@@ -256,6 +266,7 @@ class ItemVariant extends \yii\db\ActiveRecord
      */
     public function getItemVariantImages()
     {
-        return $this->hasMany(ItemVariantImage::className(), ['item_variant_uuid' => 'item_variant_uuid']);
+        return $this->hasMany(ItemVariantImage::className(), ['item_variant_uuid' => 'item_variant_uuid'])
+            ->orderBy('sort_number');;
     }
 }
