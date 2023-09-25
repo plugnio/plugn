@@ -768,8 +768,7 @@ class CronController extends \yii\console\Controller
     public function actionMinute() {
 
         $campaigns = VendorCampaign::find()
-            //->andWhere(['status' => VendorCampaign::STATUS_READY])
-            ->andWhere(['campaign_uuid' => "campaign_cbf2c1ad-5b94-11ee-91df-d85ed3a264df"])
+            ->andWhere(['status' => VendorCampaign::STATUS_READY])
             ->all();
 
         foreach ($campaigns as $campaign) {

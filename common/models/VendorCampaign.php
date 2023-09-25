@@ -151,9 +151,6 @@ class VendorCampaign extends \yii\db\ActiveRecord
                 $query->andWhere([$filter['param'] => $filter['value']]);
             }
         }
-echo 1;
-     //   echo $query->;
-        die();
 
         $total = $query->count();
 

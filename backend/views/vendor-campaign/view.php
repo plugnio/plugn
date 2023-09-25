@@ -2,9 +2,11 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\VendorCampaign */
+/* @var $filterDataProvider */
 
 $this->title = $model->campaign_uuid;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Vendor Email Campaigns'), 'url' => ['index']];
@@ -91,5 +93,19 @@ if ($model->status == \common\models\VendorCampaign::STATUS_IN_PROGRESS) {
             'updated_at',
         ],
     ]) ?>
+
+    <?php if($filterDataProvider->getTotalCount()) { ?>
+
+    <h3>Filters </h3>
+
+    <?= GridView::widget([
+        'dataProvider' => $filterDataProvider,
+        'columns' => [
+            'param',
+            'value',
+        ]
+    ]); ?>
+
+    <?php } ?>
 
 </div>

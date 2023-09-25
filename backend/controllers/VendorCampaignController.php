@@ -6,6 +6,7 @@ use common\models\CampaignFilter;
 use Yii;
 use common\models\VendorCampaign;
 use backend\models\VendorCampaignSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -54,8 +55,15 @@ class VendorCampaignController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        $filterDataProvider = new ActiveDataProvider([
+            'query' => $model->getCampaignFilters(),
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'filterDataProvider' => $filterDataProvider
         ]);
     }
 
@@ -84,6 +92,11 @@ class VendorCampaignController extends Controller
                 $campaignFilter = Yii::$app->request->post('CampaignFilter');
 
                 foreach ($campaignFilter as $key => $value) {
+
+                    if(!$value || strlen($value) == 0) {
+                        continue;
+                    }
+
                     $cf = new CampaignFilter();
                     $cf->campaign_uuid = $model->campaign_uuid;
                     $cf->param = $key;
