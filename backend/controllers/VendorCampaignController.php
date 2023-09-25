@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\CampaignFilter;
 use Yii;
 use common\models\VendorCampaign;
 use backend\models\VendorCampaignSearch;
@@ -74,8 +75,30 @@ class VendorCampaignController extends Controller
     {
         $model = new VendorCampaign();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->campaign_uuid]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            $transaction = Yii::$app->db->beginTransaction();
+
+            if( $model->save()) {
+
+                $campaignFilter = Yii::$app->request->post('CampaignFilter');
+
+                foreach ($campaignFilter as $key => $value) {
+                    $cf = new CampaignFilter();
+                    $cf->campaign_uuid = $model->campaign_uuid;
+                    $cf->param = $key;
+                    $cf->value = $value;
+
+                    if (!$cf->save()) {
+                        $transaction->rollBack();
+                        break;
+                    }
+                }
+
+                $transaction->commit();
+
+                return $this->redirect(['view', 'id' => $model->campaign_uuid]);
+            }
         }
 
         return $this->render('create', [

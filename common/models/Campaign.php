@@ -173,14 +173,14 @@ class Campaign extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurantByCampaigns()
+    public function getRestaurantByCampaigns($modelClass = "\common\models\RestaurantByCampaign")
     {
-        return $this->hasMany(RestaurantByCampaign::className(), ['utm_uuid' => 'utm_uuid']);
+        return $this->hasMany($modelClass::className(), ['utm_uuid' => 'utm_uuid']);
     }
 
-    public function getAgents()
+    public function getAgents($modelClass = "\common\models\Agent")
     {
-        return $this->hasMany(Agent::className(), ['agent_id' => 'agent_id']);
+        return $this->hasMany($modelClass::className(), ['agent_id' => 'agent_id']);
     }
 
     /**
@@ -188,9 +188,9 @@ class Campaign extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getStoresByCampaigns()
+    public function getStoresByCampaigns($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasMany(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
             ->via('restaurantByCampaigns');
     }
 
@@ -199,9 +199,9 @@ class Campaign extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders()
+    public function getOrders($modelClass = "\common\models\Order")
     {
-        return $this->hasMany(Order::className(), ['utm_uuid' => 'utm_uuid']);
+        return $this->hasMany($modelClass::className(), ['utm_uuid' => 'utm_uuid']);
     }
 
     /**
@@ -209,8 +209,8 @@ class Campaign extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRestaurant()
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
     {
-        return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }
