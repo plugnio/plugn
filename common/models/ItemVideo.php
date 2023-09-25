@@ -13,6 +13,7 @@ use yii\db\Expression;
  * @property string $item_uuid
  * @property string $youtube_video_id
  * @property string|null $product_file_name
+ * @property int $sort_number
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -37,6 +38,7 @@ class ItemVideo extends \yii\db\ActiveRecord
             [['item_uuid', 'youtube_video_id'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
             [['item_uuid'], 'string', 'max' => 300],
+            [['sort_number'], 'number'],
             [['youtube_video_id'], 'string', 'max' => 20],
             [['product_file_name'], 'string', 'max' => 255],
             [['item_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Item::className(), 'targetAttribute' => ['item_uuid' => 'item_uuid']],
@@ -67,6 +69,7 @@ class ItemVideo extends \yii\db\ActiveRecord
             'item_uuid' => Yii::t('app', 'Item Uuid'),
             'youtube_video_id' => Yii::t('app', 'Youtube Video ID'),
             'product_file_name' => Yii::t('app', 'Product File Name'),
+            'sort_number' => Yii::t('app','Sort number'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];

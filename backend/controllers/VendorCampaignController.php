@@ -2,9 +2,11 @@
 
 namespace backend\controllers;
 
+use common\models\CampaignFilter;
 use Yii;
 use common\models\VendorCampaign;
 use backend\models\VendorCampaignSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -53,8 +55,15 @@ class VendorCampaignController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        $filterDataProvider = new ActiveDataProvider([
+            'query' => $model->getCampaignFilters(),
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'filterDataProvider' => $filterDataProvider
         ]);
     }
 
@@ -74,8 +83,35 @@ class VendorCampaignController extends Controller
     {
         $model = new VendorCampaign();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->campaign_uuid]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            $transaction = Yii::$app->db->beginTransaction();
+
+            if( $model->save()) {
+
+                $campaignFilter = Yii::$app->request->post('CampaignFilter');
+
+                foreach ($campaignFilter as $key => $value) {
+
+                    if(!$value || strlen($value) == 0) {
+                        continue;
+                    }
+
+                    $cf = new CampaignFilter();
+                    $cf->campaign_uuid = $model->campaign_uuid;
+                    $cf->param = $key;
+                    $cf->value = $value;
+
+                    if (!$cf->save()) {
+                        $transaction->rollBack();
+                        break;
+                    }
+                }
+
+                $transaction->commit();
+
+                return $this->redirect(['view', 'id' => $model->campaign_uuid]);
+            }
         }
 
         return $this->render('create', [

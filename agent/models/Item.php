@@ -47,44 +47,54 @@ class Item extends \common\models\Item {
     {
         foreach ($videos as $video) {
 
+            $query = $this->getItemVideos();
+
+            $model = isset($video['youtube_video_id']) ?
+                $query->andWhere(['youtube_video_id' => $video['youtube_video_id']])
+                    ->one()
+                :
+                $query->andWhere(['product_file_name' => $video['product_file_name']])
+                    ->one();
+
+            if ($model) {
+                $model->sort_number = isset($video['sort_number'])? $video['sort_number']: 0;
+                $model->save(false);
+
+                continue;
+            }
+
             $model = new ItemVideo();
             $model->item_uuid = $this->item_uuid;
             $model->youtube_video_id = $video['youtube_video_id'];
+            $model->sort_number = isset($video['sort_number'])? $video['sort_number']: 0;
 
-            if (isset($video['product_file_name'])) {
-
-                // check if same image exist then skip
-
-                $exist = $this->getItemVideos()->andWhere(['product_file_name'=>$video['product_file_name']])->exists();
-
-                if ($exist) {
-                    continue;
-                }
-
-                try {
-
-                    $url = Yii::$app->temporaryBucketResourceManager->getUrl($video['product_file_name']);
-
-                    $filename = Yii::$app->security->generateRandomString();
-
-                    $result = Yii::$app->cloudinaryManager->upload(
-                        $url,
-                        [
-                            'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
-                        ]
-                    );
-
-                    $model->product_file_name = basename($result['ObjectURL']);
-
-                } catch (\Cloudinary\Error $err) {
-                    //Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
-
-                    //todo: show cloudinary error in api response
-                    return false;
-                }
+            if (!isset($video['product_file_name'])) {
+                $model->save(false);
+                continue;
             }
 
-            $model->save(false);
+            try {
+
+                $url = Yii::$app->temporaryBucketResourceManager->getUrl($video['product_file_name']);
+
+                $filename = Yii::$app->security->generateRandomString();
+
+                $result = Yii::$app->cloudinaryManager->upload(
+                    $url,
+                    [
+                        'public_id' => "restaurants/" . $this->restaurant_uuid . "/items/" . $filename
+                    ]
+                );
+
+                $model->product_file_name = basename($result['ObjectURL']);
+                $model->save(false);
+
+            } catch (\Cloudinary\Error $err) {
+                //Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($images));
+
+                //todo: show cloudinary error in api response
+                return false;
+            }
         }
     }
 
@@ -104,15 +114,23 @@ class Item extends \common\models\Item {
 
                     // check if same image exist then skip
 
-                    $exist = $this->getItemImages()->andWhere(['product_file_name'=>$img['product_file_name']])->exists();
+                    $model = $this->getItemImages()
+                        ->andWhere(['product_file_name'=>$img['product_file_name']])
+                        ->one();
 
-                    if ($exist) {
+                    if ($model) {
+
+                        $model->sort_number = isset($img['sort_number'])? $img['sort_number']: 0;
+                        $model->save(false);
+
                         continue;
                     }
 
                     try {
                         $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
+
                         $filename = Yii::$app->security->generateRandomString();
+
                         $data[] = $result = Yii::$app->cloudinaryManager->upload(
                             $url,
                             [
@@ -123,6 +141,7 @@ class Item extends \common\models\Item {
                         $item_image_model = new ItemImage();
                         $item_image_model->item_uuid = $this->item_uuid;
                         $item_image_model->product_file_name = basename($result['url']);
+                        $item_image_model->sort_number = isset($img['sort_number'])? $img['sort_number']: 0;
                         $item_image_model->save(false);
 
                     } catch (\Cloudinary\Error $err) {
@@ -134,6 +153,7 @@ class Item extends \common\models\Item {
                 }
             }
         }
+
         return $data;
     }
 

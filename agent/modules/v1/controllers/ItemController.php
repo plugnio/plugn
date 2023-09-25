@@ -205,6 +205,7 @@ class ItemController extends BaseController
         foreach($variants as $variant)
         {
             $itemVariant = new ItemVariant();
+
             $itemVariant->item_uuid = $model->item_uuid;
 
             $itemVariant->stock_qty = $variant['stock_qty'];

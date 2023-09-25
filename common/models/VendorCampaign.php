@@ -124,6 +124,34 @@ class VendorCampaign extends \yii\db\ActiveRecord
         $query = Restaurant::find()
             ->andWhere(['=', 'restaurant.is_deleted', 0]);
 
+        $filters = $this->getCampaignFilters()->all();
+
+        foreach ($filters as $filter) {
+            if ($filter['param'] == "warned_delete_at")
+            {
+                $query->andWhere([
+                    'warned_delete_at' => date('Y-m-d', strtotime($filter['value']))
+                ]);
+            }
+            else if (in_array($filter['param'], [
+                "enable_debugger",
+                "is_deleted",
+                "is_under_maintenance",
+                "is_sandbox",
+                "accept_order_247",
+                "is_public",
+                "is_tap_enable",
+                "is_myfatoorah_enable",
+                "support_delivery",
+                "support_pick_up",
+                "not_for_profit"
+            ])) {
+                $query->andWhere([$filter['param'] => true]);
+            } else {
+                $query->andWhere([$filter['param'] => $filter['value']]);
+            }
+        }
+
         $total = $query->count();
 
         $processed = 0;
@@ -155,6 +183,16 @@ class VendorCampaign extends \yii\db\ActiveRecord
         if(!$this->save()) {
             throw new Exception(print_r($this->errors, true));
         }
+    }
+
+    /**
+     * Gets query for [[CampaignFilters]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCampaignFilters($modelClass = "\common\models\CampaignFilter")
+    {
+        return $this->hasOne($modelClass::className(), ['campaign_uuid' => 'campaign_uuid']);
     }
 
     /**
