@@ -301,7 +301,6 @@ class OpeningHour extends \yii\db\ActiveRecord
 
     public static function getAvailableTimeSlots($delivery_time, $store, $timeUnit)
     {
-
         $schedule_time = [];
 
         $currentWeekDay = date('w');
@@ -310,6 +309,7 @@ class OpeningHour extends \yii\db\ActiveRecord
 
             $currentWeekDay = date('w', strtotime($i . " day"));
             $currentDate = date('c', strtotime($i . " day"));
+
             // $selectedDate =  date('c', strtotime('+ ' . $delivery_time . ' min'   ,strtotime($currentDate)));
 
             $getWorkingHours = OpeningHour::find()
@@ -327,14 +327,11 @@ class OpeningHour extends \yii\db\ActiveRecord
                 if ($delivery_time < 180)
                     $startAt = date('c', strtotime('+ ' . $delivery_time . ' min', strtotime($startAt)));
 
-
                 $startAt = static::roundToNextHour($startAt);
-
 
                 while (date('H:i:s', strtotime($startAt)) <= $workingHours->close_at && date('H:i:s', strtotime($startAt)) >= $workingHours->open_at) {
 
                     $endAt = date('c', strtotime("+" . intval($store->schedule_interval) . " min", strtotime($startAt)));
-
 
                     if ($workingHours->day_of_week == date('w', strtotime("today")) && date('c', strtotime("now")) < date('c', strtotime($startAt))) {
 

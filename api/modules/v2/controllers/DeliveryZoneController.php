@@ -4,9 +4,11 @@ namespace api\modules\v2\controllers;
 
 use agent\models\Country;
 use api\models\State;
+use common\models\OpeningHour;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
 use yii\db\Expression;
+use yii\filters\Cors;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
@@ -19,9 +21,10 @@ use common\models\AreaDeliveryZone;
 use common\models\DeliveryZone;
 use yii\web\NotFoundHttpException;
 
-class DeliveryZoneController extends Controller {
-
-    public function behaviors() {
+class DeliveryZoneController extends Controller
+{
+    public function behaviors()
+    {
         $behaviors = parent::behaviors();
 
         // remove authentication filter for cors to work
@@ -29,7 +32,7 @@ class DeliveryZoneController extends Controller {
 
         // Allow XHR Requests from our different subdomains and dev machines
         $behaviors['corsFilter'] = [
-            'class' => \yii\filters\Cors::className(),
+            'class' => Cors::className(),
             'cors' => [
                 'Origin' => Yii::$app->params['allowedOrigins'],
                 'Access-Control-Request-Method' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
@@ -51,7 +54,8 @@ class DeliveryZoneController extends Controller {
     /**
      * @inheritdoc
      */
-    public function actions() {
+    public function actions()
+    {
         $actions = parent::actions();
         $actions['options'] = [
             'class' => 'yii\rest\OptionsAction',
@@ -65,11 +69,12 @@ class DeliveryZoneController extends Controller {
     /**
      * Return List of countries available for delivery
      */
-    public function actionListOfCountries($restaurant_uuid) {
+    public function actionListOfCountries($restaurant_uuid)
+    {
 
-        $store_model = $this->findStore($restaurant_uuid);
+        $store = $this->findStore($restaurant_uuid);
 
-        $subQuery = $store_model->getDeliveryZones()
+        $subQuery = $store->getDeliveryZones()
             ->select('delivery_zone.country_id')
             ->distinct();
 
@@ -81,21 +86,21 @@ class DeliveryZoneController extends Controller {
 
         foreach ($countries as $country) {
 
-            $areas = $store_model->getAreaDeliveryZones()
+            $areas = $store->getAreaDeliveryZones()
                 ->andWhere(new Expression('state_id IS NOT NULL OR city_id IS NOT NULL OR area_id IS NOT NULL'))
                 ->andWhere(['area_delivery_zone.country_id' => $country->country_id])
                 ->count();
 
             $deliveryZone = null;
 
-                $deliveryZone = $store_model->getDeliveryZones()
-                    ->andWhere(['delivery_zone.country_id' => $country->country_id])
-                    ->one();
+            $deliveryZone = $store->getDeliveryZones()
+                ->andWhere(['delivery_zone.country_id' => $country->country_id])
+                ->one();
 
             $data[] = array_merge($country->attributes, [
                 'areas' => $areas,
                 'deliveryZone' => $deliveryZone,
-                'delivery_zone_id' => $deliveryZone? $deliveryZone->delivery_zone_id : null
+                'delivery_zone_id' => $deliveryZone ? $deliveryZone->delivery_zone_id : null
             ]);
         }
 
@@ -105,16 +110,17 @@ class DeliveryZoneController extends Controller {
     /**
      * Return List of business locations that support pickup
      */
-    public function actionListPickupLocations($restaurant_uuid) {
+    public function actionListPickupLocations($restaurant_uuid)
+    {
 
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+        if ($store = Restaurant::findOne($restaurant_uuid)) {
 
-            $pickupLocations = $store_model->getPickupBusinessLocations()->asArray()->all();
+            $pickupLocations = $store->getPickupBusinessLocations()->asArray()->all();
 
             foreach ($pickupLocations as $key => $pickupLocation) {
 
-              unset($pickupLocations[$key]['mashkor_branch_id']);
-              unset($pickupLocations[$key]['armada_api_key']);
+                unset($pickupLocations[$key]['mashkor_branch_id']);
+                unset($pickupLocations[$key]['armada_api_key']);
             }
 
             return $pickupLocations;
@@ -131,60 +137,60 @@ class DeliveryZoneController extends Controller {
     /**
      * Return Delivery zone
      */
-    public function actionGetDeliveryZone($restaurant_uuid, $delivery_zone_id) {
+    public function actionGetDeliveryZone($restaurant_uuid, $delivery_zone_id)
+    {
 
 
         $area_id = Yii::$app->request->get("area_id");
 
 
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+        if ($store = Restaurant::findOne($restaurant_uuid)) {
 
 
-            if( $deliveryZone = $store_model->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id])->asArray()->joinWith(['businessLocation'])->one() ){
+            if ($deliveryZone = $store->getDeliveryZones()->where(['delivery_zone_id' => $delivery_zone_id])->asArray()->joinWith(['businessLocation'])->one()) {
 
                 unset($deliveryZone['businessLocation']['armada_api_key']);
                 unset($deliveryZone['businessLocation']['mashkor_branch_id']);
 
 
-              if($area_id && !AreaDeliveryZone::find()->where(['area_id' => $area_id , 'delivery_zone_id' => $delivery_zone_id])->exists()){
+                if ($area_id && !AreaDeliveryZone::find()->where(['area_id' => $area_id, 'delivery_zone_id' => $delivery_zone_id])->exists()) {
+                    return [
+                        'operation' => 'error',
+                        'message' => 'delivery zone id is invalid'
+                    ];
+                }
+
+                $deliveryTime = intval($deliveryZone['delivery_time']);
+                $deliveryTimeInMin = intval($deliveryZone['delivery_time']);
+
+                if (DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
+                    $deliveryTime = $deliveryTime * 24 * 60 * 60;
+                else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
+                    $deliveryTime = $deliveryTime * 60 * 60;
+                else if (DeliveryZone::TIME_UNIT_MIN == $deliveryZone['time_unit'])
+                    $deliveryTime = $deliveryTime * 60;
+
+                if (DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
+                    $deliveryTimeInMin = $deliveryTimeInMin * 24 * 60;
+                else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
+                    $deliveryTimeInMin = $deliveryTimeInMin * 60;
+
+                $deliveryZone['delivery_time_in_min'] = $deliveryTimeInMin;
+
+                $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryTime);
+
+                Yii::$app->formatter->language = 'ar-KW';
+                $deliveryZone['delivery_time_ar'] = Yii::$app->formatter->asDuration(intval($deliveryTime));
+
+                $deliveryZone['tax'] = $deliveryZone['delivery_zone_tax'] ? $deliveryZone['delivery_zone_tax'] : $deliveryZone['businessLocation']['business_location_tax'];
+
+                return $deliveryZone;
+
+            } else {
                 return [
                     'operation' => 'error',
                     'message' => 'delivery zone id is invalid'
                 ];
-              }
-
-              $deliveryTime = intval($deliveryZone['delivery_time']);
-              $deliveryTimeInMin = intval($deliveryZone['delivery_time']);
-
-              if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
-                $deliveryTime = $deliveryTime * 24 * 60 * 60;
-              else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
-                $deliveryTime = $deliveryTime *  60 * 60;
-              else if (DeliveryZone::TIME_UNIT_MIN == $deliveryZone['time_unit'])
-                $deliveryTime = $deliveryTime *  60;
-
-              if(DeliveryZone::TIME_UNIT_DAY == $deliveryZone['time_unit'])
-                $deliveryTimeInMin = $deliveryTimeInMin * 24 * 60;
-              else if (DeliveryZone::TIME_UNIT_HRS == $deliveryZone['time_unit'])
-                $deliveryTimeInMin = $deliveryTimeInMin *  60;
-
-              $deliveryZone['delivery_time_in_min'] = $deliveryTimeInMin;
-
-              $deliveryZone['delivery_time'] = Yii::$app->formatter->asDuration($deliveryTime);
-
-              Yii::$app->formatter->language = 'ar-KW';
-              $deliveryZone['delivery_time_ar'] = Yii::$app->formatter->asDuration(intval($deliveryTime));
-
-              $deliveryZone['tax'] = $deliveryZone['delivery_zone_tax'] ? $deliveryZone['delivery_zone_tax']  : $deliveryZone['businessLocation']['business_location_tax'] ;
-
-              return $deliveryZone;
-
-            }
-            else {
-              return [
-                  'operation' => 'error',
-                  'message' => 'delivery zone id is invalid'
-              ];
             }
 
         } else {
@@ -205,7 +211,7 @@ class DeliveryZoneController extends Controller {
         $area_id = Yii::$app->request->get('area_id');
         $city_id = Yii::$app->request->get('city_id');
 
-        if(!$area_id && !$city_id) {
+        if (!$area_id && !$city_id) {
             return [
                 "operation" => "error",
                 "message" => "Location details missing"
@@ -215,12 +221,10 @@ class DeliveryZoneController extends Controller {
         $query = $this->findStore()
             ->getAreaDeliveryZones();
 
-        if($area_id) //for kuwait
+        if ($area_id) //for kuwait
         {
             $query->andWhere(['area_delivery_zone.area_id' => $area_id]);
-        }
-        else if($city_id)
-        {
+        } else if ($city_id) {
             $query->andWhere(['area_delivery_zone.city_id' => $city_id]);
         }
 
@@ -230,22 +234,22 @@ class DeliveryZoneController extends Controller {
     /**
      * Return pickup location
      */
-    public function actionGetPickupLocation($restaurant_uuid, $pickup_location_id) {
+    public function actionGetPickupLocation($restaurant_uuid, $pickup_location_id)
+    {
 
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+        if ($store = Restaurant::findOne($restaurant_uuid)) {
 
-            if( $pickupLocation = $store_model->getBusinessLocations()->where(['business_location_id' => $pickup_location_id])->asArray()->one() ){
+            if ($pickupLocation = $store->getBusinessLocations()->where(['business_location_id' => $pickup_location_id])->asArray()->one()) {
 
-              unset($pickupLocation['armada_api_key']);
-              unset($pickupLocation['mashkor_branch_id']);
+                unset($pickupLocation['armada_api_key']);
+                unset($pickupLocation['mashkor_branch_id']);
 
-              return $pickupLocation;
-            }
-            else {
-              return [
-                  'operation' => 'error',
-                  'message' => 'pick up location id is invalid'
-              ];
+                return $pickupLocation;
+            } else {
+                return [
+                    'operation' => 'error',
+                    'message' => 'pick up location id is invalid'
+                ];
             }
 
         } else {
@@ -259,43 +263,43 @@ class DeliveryZoneController extends Controller {
     /**
      * Return list of areas available for delivery
      */
-    public function actionListOfAreas($restaurant_uuid, $country_id) {
+    public function actionListOfAreas($restaurant_uuid, $country_id)
+    {
 
-        if ($store_model = Restaurant::findOne($restaurant_uuid)) {
+        if ($store = Restaurant::findOne($restaurant_uuid)) {
 
-          $countryCities = City::find()
-                  ->andWhere(['country_id' => $country_id])
-                  ->asArray()
-                  ->all();
-          
-                  if($countryCities) {
-                    
-                    $areaDeliveryZones = $store_model->getAreaDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
+            $countryCities = City::find()
+                ->andWhere(['country_id' => $country_id])
+                ->asArray()
+                ->all();
 
-                    foreach ($countryCities as $cityKey => $city) {
-                      foreach ($areaDeliveryZones as $areaDeliveryZoneKey => $areaDeliveryZone) {
+            if ($countryCities) {
 
-                            if(isset($areaDeliveryZone['area'])){
-                              if($areaDeliveryZone['area']['city_id'] == $city['city_id']){
-                                    $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
-                                  }
+                $areaDeliveryZones = $store->getAreaDeliveryZonesForSpecificCountry($country_id)->asArray()->all();
+
+                foreach ($countryCities as $cityKey => $city) {
+                    foreach ($areaDeliveryZones as $areaDeliveryZoneKey => $areaDeliveryZone) {
+
+                        if (isset($areaDeliveryZone['area'])) {
+                            if ($areaDeliveryZone['area']['city_id'] == $city['city_id']) {
+                                $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
                             }
-                            else {
-                              $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
-                            }
-                      }
-                  }
-              }
+                        } else {
+                            $countryCities[$cityKey]['areas'][] = $areaDeliveryZone;
+                        }
+                    }
+                }
+            }
 
-          $citiesData = [];
-          foreach ($countryCities as $key => $city) {
-            if(isset($city['areas']))
-              $citiesData []= $city;
-          }
+            $citiesData = [];
+            foreach ($countryCities as $key => $city) {
+                if (isset($city['areas']))
+                    $citiesData [] = $city;
+            }
 
 
-          if(!empty($citiesData))
-            return $citiesData ;
+            if (!empty($citiesData))
+                return $citiesData;
 
 
         } else {
@@ -309,7 +313,8 @@ class DeliveryZoneController extends Controller {
     /**
      * Return list of states available for delivery
      */
-    public function actionStates($country_id) {
+    public function actionStates($country_id)
+    {
 
         $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
@@ -317,18 +322,18 @@ class DeliveryZoneController extends Controller {
 
         $country = Country::findOne($country_id);
 
-        if(!$country) {
+        if (!$country) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         $query = $country->getStates("\api\models\State");
 
-        if($store_id) {
+        if ($store_id) {
             $query->joinWith('areaDeliveryZones', true, 'inner join')
                 ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
         }
 
-        if($keyword) {
+        if ($keyword) {
             $query->andWhere(['like', 'name', $keyword]);
         }
 
@@ -337,19 +342,20 @@ class DeliveryZoneController extends Controller {
         ]);
     }
 
-    public function actionCityAreas($city_id) {
+    public function actionCityAreas($city_id)
+    {
 
         $keyword = Yii::$app->request->get("keyword");
 
         $city = City::findOne($city_id);
 
-        if(!$city) {
+        if (!$city) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         $query = $city->getAreas("\common\models\Area");
 
-        if($keyword) {
+        if ($keyword) {
             $query->andWhere([
                 'OR',
                 ['like', 'area_name', $keyword],
@@ -362,19 +368,20 @@ class DeliveryZoneController extends Controller {
         ]);
     }
 
-    public function actionCountryAreas($country_id) {
+    public function actionCountryAreas($country_id)
+    {
 
         $keyword = Yii::$app->request->get("keyword");
 
         $country = Country::findOne($country_id);
 
-        if(!$country) {
+        if (!$country) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         $query = $country->getAreas("\common\models\Area");
 
-        if($keyword) {
+        if ($keyword) {
             $query->andWhere([
                 'OR',
                 ['like', 'area_name', $keyword],
@@ -387,19 +394,20 @@ class DeliveryZoneController extends Controller {
         ]);
     }
 
-    public function actionCountryStates($country_id) {
+    public function actionCountryStates($country_id)
+    {
 
         $keyword = Yii::$app->request->get("keyword");
 
         $country = Country::findOne($country_id);
 
-        if(!$country) {
+        if (!$country) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         $query = $country->getStates("\api\models\State");
 
-        if($keyword) {
+        if ($keyword) {
             $query->andWhere(['like', 'name', $keyword]);
         }
 
@@ -412,19 +420,20 @@ class DeliveryZoneController extends Controller {
     /**
      * Return list of cities available for state
      */
-    public function actionCountryCities($country_id) {
+    public function actionCountryCities($country_id)
+    {
 
         $keyword = Yii::$app->request->get("keyword");
 
         $country = Country::findOne($country_id);
 
-        if(!$country) {
+        if (!$country) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         $query = $country->getCities("\api\models\City");
 
-        if($keyword) {
+        if ($keyword) {
             $query->andWhere([
                 'OR',
                 ['like', 'city_name', $keyword],
@@ -440,19 +449,20 @@ class DeliveryZoneController extends Controller {
     /**
      * Return list of cities available for state
      */
-    public function actionStateCities($state_id) {
+    public function actionStateCities($state_id)
+    {
 
         $keyword = Yii::$app->request->get("keyword");
 
         $state = State::findOne($state_id);
 
-        if(!$state) {
+        if (!$state) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         $query = $state->getCities("\api\models\City");
 
-        if($keyword) {
+        if ($keyword) {
             $query->andWhere([
                 'OR',
                 ['like', 'city_name', $keyword],
@@ -468,7 +478,8 @@ class DeliveryZoneController extends Controller {
     /**
      * Return list of cities available for delivery
      */
-    public function actionCities($state_id) {
+    public function actionCities($state_id)
+    {
 
         $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
@@ -476,18 +487,18 @@ class DeliveryZoneController extends Controller {
 
         $state = State::findOne($state_id);
 
-        if(!$state) {
+        if (!$state) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         $query = $state->getCities("\api\models\City");
 
-        if($store_id) {
+        if ($store_id) {
             $query->joinWith('areaDeliveryZones', true, 'inner join')
                 ->andWhere(['area_delivery_zone.restaurant_uuid' => $store_id]);
         }
 
-        if($keyword) {
+        if ($keyword) {
             $query->andWhere([
                 'OR',
                 ['like', 'city_name', $keyword],
@@ -503,13 +514,14 @@ class DeliveryZoneController extends Controller {
     /**
      * Return list of Countries available for delivery
      */
-    public function actionCountries() {
+    public function actionCountries()
+    {
 
         $keyword = Yii::$app->request->get("keyword");
 
         $query = Country::find();
 
-        if($keyword) {
+        if ($keyword) {
             $query->andWhere([
                 'OR',
                 ['like', 'country_name', $keyword],
@@ -524,6 +536,57 @@ class DeliveryZoneController extends Controller {
     }
 
     /**
+     * @return array|string[]
+     */
+    public function actionGetDeliveryTime()
+    {
+        $delivery_zone_id = Yii::$app->request->get("delivery_zone_id");
+        $cart = Yii::$app->request->getBodyParam("cart");
+
+        $store = $this->findStore();
+
+        if (!$store->schedule_order) {
+            return [
+                'operation' => 'error',
+                'message' => "Unfortunately we don't currently supporting this feature."
+            ];
+        }
+
+        $deliveryZone = $store->getDeliveryZones()
+            ->where(['delivery_zone_id' => $delivery_zone_id])
+            ->one();
+
+        if (!$deliveryZone) {
+            return [
+                'operation' => 'error',
+                'message' => "Unfortunately we don't currently deliver to the selected area."
+            ];
+        }
+
+        if ($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_MIN)
+            $deliveryTime = intval($deliveryZone->delivery_time);
+        else if ($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_HRS)
+            $deliveryTime = intval($deliveryZone->delivery_time) * 60;
+        else if ($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_DAY)
+            $deliveryTime = intval($deliveryZone->delivery_time) * 24 * 60;
+
+        $prepTime = 0;
+
+        if ($cart && sizeof($cart) > 0) {
+            foreach ($cart as $item) {
+                if (isset($item['prep_time_in_min']))//&& $item['prep_time_in_min'] > $prepTime
+                    $prepTime += $item['prep_time_in_min'];
+            }
+        }
+
+        $deliveryData = OpeningHour::getDeliveryTime($deliveryTime, $prepTime, $store);
+
+        return [
+            'deliveryData' => $deliveryData
+        ];
+    }
+
+    /**
      * Finds the Item model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
@@ -532,7 +595,7 @@ class DeliveryZoneController extends Controller {
      */
     protected function findStore($id = null)
     {
-        if(!$id)
+        if (!$id)
             $id = Yii::$app->request->getHeaders()->get('Store-Id');
 
         $model = Restaurant::findOne($id);
@@ -543,4 +606,5 @@ class DeliveryZoneController extends Controller {
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
 }
