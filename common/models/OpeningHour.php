@@ -284,7 +284,7 @@ class OpeningHour extends \yii\db\ActiveRecord
             if ($timeSlots) {
                 array_push($schedule_time, [
 
-                    'date' => date('c', strtotime($startAt)),
+                    'date' => date('Y-m-d', strtotime($startAt)),
                     'dayOfWeek' => date('w', strtotime($startAt)),
                     'scheduleTimeSlots' => $timeSlots
                 ]);
