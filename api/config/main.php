@@ -157,7 +157,7 @@ return [
                         'OPTIONS <category_id>' => 'options',
                     ]
                 ],
-                [// ZoneController
+                [// DeliveryZoneController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/delivery-zone',
                     'pluralize' => false,
@@ -177,6 +177,7 @@ return [
                         'GET pickup-location/<restaurant_uuid>/<pickup_location_id>' => 'get-pickup-location',
                         'GET <restaurant_uuid>/<delivery_zone_id>' => 'get-delivery-zone',
                         // 'GET <restaurant_uuid>' => 'delivery-zone',
+                        'POST get-delivery-time' => 'get-delivery-time',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         'OPTIONS city-areas/<city_id>' => 'options',
@@ -193,6 +194,7 @@ return [
                         'OPTIONS pickup-location/<restaurant_uuid>/<pickup_location_id>' => 'options',
                         'OPTIONS <restaurant_uuid>/<delivery_zone_id>' => 'options',
                         // 'OPTIONS <restaurant_uuid>' => 'options'
+                        'OPTIONS get-delivery-time' => 'options',
                     ]
                 ],
                 [// RestaurantController
