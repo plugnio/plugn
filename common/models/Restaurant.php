@@ -32,6 +32,7 @@ use yii\helpers\ArrayHelper;
  * @property int $restaurant_status
  * @property string|null $thumbnail_image
  * @property string|null $logo
+ * @property string|null $logo_file_id
  * @property int|null $support_delivery
  * @property int|null $support_pick_up
  * @property string|null $phone_number
@@ -246,7 +247,7 @@ class Restaurant extends \yii\db\ActiveRecord
             }],
 
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
-            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file', 'iban_certificate_file_id'], 'safe', 'on' => [
+            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file', 'iban_certificate_file_id', 'logo_file_id'], 'safe', 'on' => [
                 self::SCENARIO_CREATE_TAP_ACCOUNT,
                 self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT
             ]],
@@ -468,6 +469,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'authorized_signature_title',
                 'authorized_signature_file',
                 'authorized_signature_file_id',
+                'logo_file_id',
                 'authorized_signature_file_purpose',
                 'iban',
                 'identification_issuing_date',
@@ -500,7 +502,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
                 'vendor_sector', 'iban', 'company_name', 'business_type',
                 'identification_file_id_back_side', 'identification_file_id_front_side',
-                'authorized_signature_file_id', 'commercial_license_file_id',
+                'authorized_signature_file_id', 'commercial_license_file_id', 'logo_file_id',
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
                 'identification_expiry_date', 'iban_certificate_file','iban_certificate_file_id', 'is_tap_business_active'],
@@ -941,6 +943,61 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function uploadDocumentsToTap()
     {
+        //logo
+
+        if (
+            $this->iban_certificate_file
+        )
+        {
+            $tmpFile = sys_get_temp_dir () . '/' . $this->logo;
+
+            if (
+                !file_put_contents (
+                    $tmpFile,
+                    file_get_contents ($this->getRestaurantLogoUrl())
+                )
+            )
+            {
+                //Yii::error ('Error reading authorized signature document: ');
+
+                $this->addError('logo_file_id', 'Error reading logo');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading logo'
+                ];
+            }
+
+            $response = Yii::$app->tapPayments->uploadFileToTap (
+                $tmpFile,
+                "identity_document",
+                "Business Logo"
+            );
+
+            @unlink ($tmpFile);
+
+            if ($response->isOk) {
+                $this->logo_file_id = $response->data['id'];
+            }
+            else
+            {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                //Yii::error ('Error when uploading IBAN document: ' . $error);
+
+                $this->addError('logo_file_id', 'Error reading logo' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading logo' . $error
+                ];
+            }
+        }
+
         //IBAN Certificate
 
         if (
@@ -995,6 +1052,7 @@ class Restaurant extends \yii\db\ActiveRecord
         }
 
         //Upload Authorized Signature file
+
         if (
             $this->authorized_signature_file &&
             $this->authorized_signature_file_purpose &&
@@ -1044,7 +1102,6 @@ class Restaurant extends \yii\db\ActiveRecord
                 ];
             }
         }
-
 
         //Upload commercial_license file
 
@@ -1187,6 +1244,7 @@ class Restaurant extends \yii\db\ActiveRecord
         self::updateAll([
             'iban_certificate_file_id' => $this->iban_certificate_file_id,
             'authorized_signature_file_id' => $this->authorized_signature_file_id,
+            'logo_file_id' => $this->logo_file_id,
             'commercial_license_file_id' => $this->commercial_license_file_id,
             'identification_file_id_front_side' => $this->identification_file_id_front_side,
             'identification_file_id_back_side' => $this->identification_file_id_back_side
