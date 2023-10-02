@@ -270,6 +270,7 @@ class TapPayments extends Component
                         "en" => $restaurant->company_name. '- Plugn',
                         "ar" => $restaurant->name_ar. '- Plugn'
                     ],
+                    "logo" => $restaurant->logo_file_id,
                     "website" => $restaurant->restaurant_domain,
                     "sector" => [
                         $restaurant->vendor_sector
