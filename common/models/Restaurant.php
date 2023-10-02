@@ -1945,7 +1945,7 @@ class Restaurant extends \yii\db\ActiveRecord
             if($isDomainExist)
                 return  $this->addError('restaurant_domain', Yii::t('app','Another store is already using this domain'));
 
-            $this->restaurant_domain = 'https://' . $store_domain . '.plugn.store';
+            $this->restaurant_domain = 'https://' . $store_domain . '.plugn.site';
         }
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
@@ -1990,13 +1990,17 @@ class Restaurant extends \yii\db\ActiveRecord
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
-            //Create a new record in queue table
-            $queue = new Queue();
-            $queue->restaurant_uuid = $this->restaurant_uuid;
-            $queue->queue_status = Queue::QUEUE_STATUS_PENDING;
+            //Create a new record in queue table for netlify if old domain or custom domain
 
-            if (!$queue->save ())
-                Yii::error ('Queue Error:' . json_encode ($queue->errors));
+            if(!str_contains($this->restaurant_domain, ".plugn.site"))
+            {
+                $queue = new Queue();
+                $queue->restaurant_uuid = $this->restaurant_uuid;
+                $queue->queue_status = Queue::QUEUE_STATUS_PENDING;
+
+                if (!$queue->save ())
+                    Yii::error ('Queue Error:' . json_encode ($queue->errors));
+            }
         }
 
         if ($insert) {

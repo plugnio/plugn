@@ -19,8 +19,6 @@ $js = "
         $(function () {
            $('#tabs li:not(.link)').click(function (e) {
                 
-                
-            
                $('#tabs li').removeClass('active');
                $(this).toggleClass('active'); 
                
@@ -55,7 +53,7 @@ $this->registerJs($js);
     </div>
     <?php } ?>
 
-    <?php if (!$model->site_id) { ?>
+    <?php if (!str_contains($model->restaurant_domain, ".plugn.site") && !$model->site_id) { ?>
     <div class="alert alert-danger alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h5><i class="icon fa fa-ban"></i> Warning!</h5>
@@ -78,7 +76,9 @@ $this->registerJs($js);
 
         } else {
 
-            if (!$model->site_id) {
+            if (!str_contains($model->restaurant_domain, ".plugn.site") &&
+                !$model->site_id)
+            {
                 echo Html::a('Publish', ['publish', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-success',
                     'data' => [

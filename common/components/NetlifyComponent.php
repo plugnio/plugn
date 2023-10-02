@@ -49,7 +49,7 @@ class NetlifyComponent extends Component {
      * @param type $subdomain
      * @return type
      */
-    public function createSite($store, $store_branch = "master") {
+    public function createSite($store, $store_branch = "main") {
 
         $createSiteEndpoint = $this->apiEndpoint . "/sites";
 
@@ -66,11 +66,11 @@ class NetlifyComponent extends Component {
                 "id" => 70150125,
                 "force_ssl" => true,
                 "installation_id" => "11420049",
-                "repo" => "plugnio/plugn-ionic",
+                "repo" => "plugnio/plugn-store",
                 "private" => true,
                 "branch" => $store_branch,
                 "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
-                "dir" => "www"
+                "dir" => "dist"
             ],
         ];
 
@@ -224,11 +224,11 @@ class NetlifyComponent extends Component {
                 "id" => 70150125,
                 "force_ssl" => true,
                 "installation_id" => "11420049",
-                "repo" => "plugnio/plugn-ionic",
+                "repo" => "plugnio/plugn-store",
                 "private" => true,
-                "branch" => "master",
+                "branch" => "main",
                 "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
-                "dir" => "www"
+                "dir" => "dist"
             ],
         ];
 

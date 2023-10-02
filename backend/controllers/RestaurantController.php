@@ -472,6 +472,26 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
 
+        if(str_contains($store->restaurant_domain, ".plugn.site"))
+        {
+            Yii::$app->session->setFlash('errorResponse', "Already published!");
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+        else if(str_contains($store->restaurant_domain, ".plugn.store"))
+        {
+            $store->restaurant_domain = str_replace(".plugn.store",
+                ".plugn.site", $store->restaurant_domain);
+
+            if(!$store->save()) {
+                Yii::$app->session->setFlash('errorResponse', json_encode($store->errors));
+            }
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+        //if custom domain
+
         $response = Yii::$app->netlifyComponent->createSite($store);
 
         if ($response->isOk)
@@ -508,11 +528,24 @@ class RestaurantController extends Controller {
     {
         $store = $this->findModel($id);
 
-        if(!$store->site_id) {
-            Yii::$app->session->setFlash('errorResponse', "Site not published yet, can't update unpublished site!");
+        if(str_contains($store->restaurant_domain, ".plugn.site"))
+        {
+            Yii::$app->session->setFlash('errorResponse', "Already using new design!");
 
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
+        else if(str_contains($store->restaurant_domain, ".plugn.store"))
+        {
+            $store->restaurant_domain = str_replace(".plugn.store", ".plugn.site", $store->restaurant_domain);
+
+            if(!$store->save()) {
+                Yii::$app->session->setFlash('errorResponse', json_encode($store->errors));
+            }
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+        //if custom domain
 
         //$response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
 

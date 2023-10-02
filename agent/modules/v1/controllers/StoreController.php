@@ -371,6 +371,23 @@ class StoreController extends BaseController
     {
         $store = $this->findModel();
 
+        if(str_contains($store->restaurant_domain, ".plugn.site"))
+        {
+            return self::message("error", "Already using new design!");
+        }
+        else if(str_contains($store->restaurant_domain, ".plugn.store"))
+        {
+            $store->restaurant_domain = str_replace(".plugn.store", ".plugn.site", $store->restaurant_domain);
+
+            if(!$store->save()) {
+                return self::message("error",$store->errors);
+            }
+
+            return self::message("success","Store migrated to ". $store->restaurant_domain);
+        }
+
+        //if custom domain
+
         if(!$store->site_id) {
             return [
                 'operation' => 'error',
@@ -405,10 +422,10 @@ class StoreController extends BaseController
 
         Yii::error('[Error while upgrading site]' . isset($response->data['message'])? json_encode($response->data['message']): json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
 
-            return [
-                'operation' => 'error',
-                'message' => $response->data['message']
-            ];
+        return [
+            'operation' => 'error',
+            'message' => $response->data['message']
+        ];
     }
 
     /**
