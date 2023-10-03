@@ -109,7 +109,7 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
         if (parent::beforeSave($insert)) {
 
             // Generate Auth key if its a new admin record
-            if($insert){
+            if($insert) {
                 $this->generateAuthKey();
             }
 
@@ -192,6 +192,11 @@ class Admin extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getAuthKey()
     {
+        if(!$this->admin_auth_key) {
+            $this->generateAuthKey();
+            $this->save();
+        }
+
         return $this->admin_auth_key;
     }
 

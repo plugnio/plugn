@@ -58,6 +58,12 @@ return [
             'baseUrl' => 'http://localhost/plugn/api/web',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
+        ],
+        //microservices
+        'blogManager' => [
+            'class' => 'common\components\BlogManager',
+            'apiEndpoint' => 'http://localhost:8080/v1',
+            'token' => 'Lu4vPW4Npfgce6WkXdt9OErpxXdB7GW4'
         ]
     ],
 ];

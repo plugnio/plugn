@@ -2,8 +2,7 @@
 
 namespace backend\controllers;
 
-use backend\models\AddonSearch;
-use backend\models\RestaurantAddonSearch;
+use yii;
 use common\models\Addon;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -35,36 +34,42 @@ class BlogCategoryController  extends Controller
         ];
     }
 
+    public function init()
+    {
+        parent::init();
+
+        // Yii::$app->blogManager->token = Yii::$app->user->identity->getAuthKey();
+    }
+
     /**
      * Lists all Addon models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new AddonSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $page = Yii::$app->request->get('page', 1);
+        $query = Yii::$app->request->get('query');
+
+        $response = Yii::$app->blogManager->listCategory($page, $query);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'categories' => $response->data,
+            'totalCount' => $response->headers->get('total-count'),
         ]);
     }
 
     /**
-     * Displays a single Addon model.
+     * Displays a single blog category
      * @param string $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
-        $searchModel = new RestaurantAddonSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $post = $this->findModel($id);
 
         return $this->render('view', [
-            'model' => $this->findModel($id),
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'category' => $post
         ]);
     }
 
@@ -75,14 +80,29 @@ class BlogCategoryController  extends Controller
      */
     public function actionCreate()
     {
-        $model = new Addon();
+        if (Yii::$app->request->isPost) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->addon_uuid]);
+            $params = Yii::$app->request->getBodyParams();
+
+            $params['sort_number'] = (int)$params['sort_number'];
+            unset($params['_csrf-backend']);
+
+            $response = Yii::$app->blogManager->createCategory($params);
+
+            if($response->getStatusCode() != 200) {
+
+                Yii::$app->session->addFlash("error", json_encode($response->data['message']));
+
+                return $this->render('create', [
+                    "category" => $params
+                ]);
+            }
+
+            return $this->redirect(['view', 'id' => $response->data['blogCategory']['ID']]);
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'category' => null
         ]);
     }
 
@@ -95,14 +115,32 @@ class BlogCategoryController  extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $params = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->addon_uuid]);
+        if (Yii::$app->request->isPost) {
+
+            $params = Yii::$app->request->getBodyParams();
+
+            $params['ID'] = (int)$id;
+            $params['sort_number'] = (int) $params['sort_number'];
+            $params['blogCategoryDescriptions'][0]["ID"] = (int) $params['blogCategoryDescriptions'][0]["ID"];
+            $params['blogCategoryDescriptions'][0]["blog_category_id"] = (int)$id;
+            $params['blogCategoryDescriptions'][1]["ID"] = (int) $params['blogCategoryDescriptions'][1]["ID"];
+            $params['blogCategoryDescriptions'][1]["blog_category_id"] = (int)$id;
+
+            unset($params['_csrf-backend']);
+
+            $response = Yii::$app->blogManager->updateCategory($id, $params);
+
+            if($response->getStatusCode() != 200) {
+                Yii::$app->session->addFlash("error", json_encode($response->data['message']));
+            } else {
+                return $this->redirect(['view', 'id' => $id]);
+            }
         }
 
         return $this->render('update', [
-            'model' => $model,
+            'category' => $params,
         ]);
     }
 
@@ -115,7 +153,13 @@ class BlogCategoryController  extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $response = Yii::$app->blogManager->deleteCategory($id);
+
+        if($response->getStatusCode() != 200) {
+            Yii::$app->session->addFlash("error", json_encode($response->data['message']));
+
+            return $this->redirect(['view', 'id' => $id]);
+        }
 
         return $this->redirect(['index']);
     }
@@ -129,10 +173,14 @@ class BlogCategoryController  extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Addon::findOne($id)) !== null) {
-            return $model;
+        $response = Yii::$app->blogManager->viewCategory($id);
+
+        if($response->getStatusCode() != 200 || empty($response->data['ID'])) {
+            // Yii::$app->session->addFlash("error", json_encode($response->data['message']));
+
+            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
         }
 
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        return $response->data;
     }
 }

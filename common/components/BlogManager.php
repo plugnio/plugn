@@ -2,10 +2,11 @@
 
 namespace common\components;
 
+use yii\base\BaseObject;
 use yii\base\InvalidConfigException;
 use yii\httpclient\Client;
 
-class BlogManager
+class BlogManager extends BaseObject
 {
     public $apiEndpoint = 'http://localhost:8080/v1';
 
@@ -16,7 +17,7 @@ class BlogManager
      */
     public function init() {
         // Fields required by default
-        $requiredAttributes = ['token'];
+        $requiredAttributes = ['apiEndpoint', 'token'];
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -34,7 +35,7 @@ class BlogManager
 
     public function listPost($page, $query = '') {
 
-        $deploySiteEndpoint = $this->apiEndpoint . "/post?per_page=2&page" . $page . '&query=' . $query;
+        $deploySiteEndpoint = $this->apiEndpoint . "/post?per_page=1&page=" . $page . '&query=' . $query;
 
         $client = new Client();
         $response = $client->createRequest()
@@ -94,9 +95,11 @@ class BlogManager
             ->setUrl($endpoint)
             ->setFormat(Client::FORMAT_JSON)
             ->setData($params)
+            //->setContent(json_encode($params))
             ->addHeaders([
                 'Authorization' => 'Bearer ' . $this->token,
                 'User-Agent' => 'request',
+                'Content-Type' => "application/json"
             ])
             ->send();
 
@@ -135,6 +138,7 @@ class BlogManager
             ->addHeaders([
                 'Authorization' => 'Bearer ' . $this->token,
                 'User-Agent' => 'request',
+                'Content-Type' => "application/json"
             ])
             ->send();
     }
@@ -174,7 +178,7 @@ class BlogManager
      */
     public function listCategory($page, $query = '') {
 
-        $deploySiteEndpoint = $this->apiEndpoint . "/category?per_page=2&page" . $page . '&query=' . $query;
+        $deploySiteEndpoint = $this->apiEndpoint . "/category?per_page=2&page=" . $page . '&query=' . $query;
 
         $client = new Client();
         $response = $client->createRequest()
