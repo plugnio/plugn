@@ -3771,7 +3771,7 @@ class Restaurant extends \yii\db\ActiveRecord
             return $model->getPayments()
                 ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
                             SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
-                ->joinWith(['order'])
+                ->join('left join', 'order', '`order`.order_uuid = payment.order_uuid')
                 ->filterPaid()
                 ->groupBy('order.currency_code')
                 ->asArray()

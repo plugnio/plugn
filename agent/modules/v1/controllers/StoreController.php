@@ -284,7 +284,7 @@ class StoreController extends BaseController
 
         //todo: response validation
 
-        if($purchase) {//strpos($domain, '.plugn') > -1
+        if($purchase) {//&& strpos($domain, '.plugn.') == -1
             return $store->notifyDomainRequest($old_domain);
         }
 

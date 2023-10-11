@@ -302,14 +302,7 @@ class RestaurantController extends Controller {
             'pagination' => false
         ]);
 
-        $payments = $model->getPayments()
-            ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
-                SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
-            ->joinWith(['order'])
-            ->filterPaid()
-            ->groupBy('order.currency_code')
-            ->asArray()
-            ->all();
+        $payments = $model->getCSV();
 
         return $this->render('view', [
             'model' => $this->findModel($id),
