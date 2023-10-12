@@ -24,6 +24,7 @@ use common\components\TapPayments;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\UnauthorizedHttpException;
 
 
 class OrderController extends Controller
@@ -1120,6 +1121,8 @@ class OrderController extends Controller
                     ['customer_email' => $email],
                     ['customer_phone_number' => $phone_number]
                 ]);
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         return new ActiveDataProvider([

@@ -38,8 +38,8 @@ class Restaurant extends \common\models\Restaurant {
       //unset($fields['test_public_key']);
       unset($fields['sitemap_require_update']);
       unset($fields['business_type']);
-      unset($fields['restaurant_email']);
-      unset($fields['license_number']);
+     // unset($fields['restaurant_email']);
+     // unset($fields['license_number']);
       unset($fields['not_for_profit']);
       unset($fields['authorized_signature_issuing_date']);
       unset($fields['authorized_signature_issuing_date']);
@@ -65,7 +65,7 @@ class Restaurant extends \common\models\Restaurant {
       unset($fields['tap_queue_id']);
       unset($fields['is_tap_enable']);
       unset($fields['is_myfatoorah_enable']);
-      unset($fields['company_name']);
+    //  unset($fields['company_name']);
       unset($fields['owner_phone_country_code']);
       unset($fields['identification_issuing_date']);
       unset($fields['identification_expiry_date']);
