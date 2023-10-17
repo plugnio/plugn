@@ -33,9 +33,9 @@ class BlogManager extends BaseObject
         parent::init();
     }
 
-    public function listPost($page, $query = '') {
+    public function listPost($page, $query = '', $limit = 10) {
 
-        $deploySiteEndpoint = $this->apiEndpoint . "/post?per_page=1&page=" . $page . '&query=' . $query;
+        $deploySiteEndpoint = $this->apiEndpoint . "/post?limit=".$limit."&page=" . $page . '&query=' . $query;
 
         $client = new Client();
         $response = $client->createRequest()
@@ -176,9 +176,9 @@ class BlogManager extends BaseObject
      * @throws InvalidConfigException
      * @throws \yii\httpclient\Exception
      */
-    public function listCategory($page, $query = '') {
+    public function listCategory($page, $query = '', $limit = 10) {
 
-        $deploySiteEndpoint = $this->apiEndpoint . "/category?per_page=2&page=" . $page . '&query=' . $query;
+        $deploySiteEndpoint = $this->apiEndpoint . "/category?limit=".$limit."&page=" . $page . '&query=' . $query;
 
         $client = new Client();
         $response = $client->createRequest()

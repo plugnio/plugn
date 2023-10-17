@@ -99,6 +99,18 @@ return [
                         'OPTIONS language-pref' => 'options'
                     ]
                 ],
+                [ // BlogController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/blog',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'view',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// BankController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/bank',

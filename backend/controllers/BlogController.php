@@ -49,11 +49,14 @@ class BlogController extends Controller
     {
         $page = Yii::$app->request->get('page', 1);
         $query = Yii::$app->request->get('query');
+        $limit = Yii::$app->request->get('limit', 10);
 
-        $response = Yii::$app->blogManager->listPost($page, $query);
+        $response = Yii::$app->blogManager->listPost($page, $query, $limit);
 
         return $this->render('index', [
-            'posts' => $response->data,
+            'posts' => $response->data['rows'],
+            "total_pages" => $response->data['total_pages'],
+            "page" => $response->data['page'],
             'totalCount' => $response->headers->get('total-count'),
         ]);
     }
