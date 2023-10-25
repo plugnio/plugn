@@ -64,9 +64,14 @@ class StoreController extends Controller
      */
     public function actionList()
     {
+        $filter_public = Yii::$app->request->get('filter_public');
+
         $query = Restaurant::find()
-            //->andWhere(['is_public' => true])
-            ->orderBy('restaurant_created_at DESC');
+            ->orderBy('total_orders DESC, restaurant_created_at DESC');
+
+        if($filter_public) {
+            $query->andWhere(['is_public' => true]);
+        }
 
         return new ActiveDataProvider([
             'query' => $query

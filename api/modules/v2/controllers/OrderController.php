@@ -1140,11 +1140,16 @@ class OrderController extends Controller
     public function actionOrderDetails($id, $restaurant_uuid)
     {
         $model = Order::find()
-            ->andWhere(['order_uuid' => $id, 'restaurant_uuid' => $restaurant_uuid,
-                'order.is_deleted' => 0])
+            ->andWhere([
+                'order_uuid' => str_replace("#", "", $id),
+                'restaurant_uuid' => $restaurant_uuid,
+                'order.is_deleted' => 0
+            ])
             ->one();
 
         if (!$model) {
+            //throw new NotFoundHttpException('The requested record does not exist.');
+
             return [
                 'operation' => 'error',
                 'message' => 'Invalid order uuid'

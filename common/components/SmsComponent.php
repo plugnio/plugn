@@ -9,7 +9,7 @@ use yii\httpclient\Client;
 use yii\base\InvalidConfigException;
 
 /**
- * TapPayments class for payment processing
+ * SmsComponent class to send SMS
  *
  * @author Saoud Al-Turki <saoud@plugn.io>
  * @link http://www.plugn.io
