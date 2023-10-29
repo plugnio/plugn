@@ -119,11 +119,38 @@ Phpmyadmin is running on localhost port 8080.
 ## Events 
 
 - Addon Purchase
-- Store Created
+- Store Created  (with campaign = utm_campaign + utm_medium)
 - Premium Plan Purchase
 - Tap Charge Attempt
 - Order Completed
 - Voucher Created
+
+New events to add 
+
+- Agent Signup (with campaign = utm_campaign + utm_medium)
+- Item Published
+- Order Initiated
+- Domain Requests and Domain Request Updated - with request status
+- Best Selling (cron based event)
+- Item Shared
+- Email Opened - with campaign details
+- From Campaign - if open link from campaign - can be done by creating link in admin > campaign 
+- Refunds Processed
+
+- From Shared Link 
+- Return Initiated //not having return process in our system 
+
+
+- add time in all event?
+
+https://docs.mixpanel.com/docs/data-structure/user-profiles
+https://docs.mixpanel.com/docs/quickstart/connect-your-data
+https://github.com/signalfx/angular-mixpanel/blob/master/README.md
+
+https://github.com/segmentio/analytics-angular
+
+segment + mixpanel
+https://segment.com/docs/connections/spec/identify/
 
 to publish in production
 
@@ -145,6 +172,10 @@ To check amount mismatched orders
 ------------------
 
 select `order`.order_uuid, `order`.total_price, payment.payment_amount_charged, `order`.store_currency_code, `order`.currency_code,  `order`.currency_rate from payment inner join `order` on `order`.payment_uuid = payment.payment_uuid where payment.payment_amount_charged = `order`.total_price and `order`.store_currency_code != `order`.currency_code and payment_current_status="CAPTURED"
+
+## Spy pixel for campaign 
+
+http://localhost:8888/bawes/plugn/agent/web/v1/store/log-email-campaign/campaign_08617922-5bc3-11ee-aa01-5aa7361ade0b
 
 Todo
 ------------------

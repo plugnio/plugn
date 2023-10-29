@@ -5,27 +5,33 @@ namespace agent\modules\v1\controllers;
 use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
-use common\components\TapPayments;
-use common\models\Queue;
 use common\models\RestaurantByCampaign;
-use common\models\RestaurantDomainRequest;
 use common\models\Setting;
+use common\models\VendorCampaign;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
-use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use agent\models\Restaurant;
-use common\components\FileUploader;
 use agent\models\RestaurantPaymentMethod;
-use agent\models\TapQueue;
 use common\models\PaymentGatewayQueue;
+use yii\web\Response;
 
 
 class StoreController extends BaseController
 {
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options', 'log-email-campaign'];
+
+        return $behaviors;
+    }
+
     /**
      * only owner will have access
      */
@@ -33,7 +39,7 @@ class StoreController extends BaseController
     {
         parent::beforeAction ($action);
 
-        if(in_array($action->id, ['options', 'create'])) {
+        if(in_array($action->id, ['options', 'log-email-campaign', 'create'])) {
             return true;
         }
 
@@ -285,6 +291,17 @@ class StoreController extends BaseController
         //todo: response validation
 
         if($purchase) {//&& strpos($domain, '.plugn.') == -1
+ 
+            if(YII_ENV == 'prod') {
+
+                Yii::$app->eventManager->track('Domain Requests', [
+                        "domain" =>  $domain
+                    ],
+                    null,
+                    $store->restaurant_uuid);
+            }
+
+ 
             return $store->notifyDomainRequest($old_domain);
         }
 
@@ -1235,6 +1252,39 @@ class StoreController extends BaseController
         }
 
         return self::message("success", "Status changed successfully");
+    }
+
+    /**
+     * log to invitation when it was seen
+     * @param $id
+     * @throws \yii\web\ServerErrorHttpException
+     */
+    public function actionLogEmailCampaign($id)
+    {
+        $model = VendorCampaign::find()
+            ->andWhere (['campaign_uuid' => $id])
+            ->one();
+
+        if($model) {
+            $model->no_of_email_opened += 1;
+            $model->save(false);
+        }
+
+        $response = Yii::$app->getResponse();
+        $response->headers->set('Content-Type', 'image/png');
+        $response->format = Response::FORMAT_RAW;
+
+        $imgFullPath = Url::to('@web/images/NFFFFFF-0.png', true);
+
+        if ( !is_resource($response->stream = fopen($imgFullPath, 'r')) ) {
+            throw new \yii\web\ServerErrorHttpException('file access failed: permission deny');
+        }
+
+        if (YII_ENV == 'prod') {
+            Yii::$app->eventManager->track('Email Opened', $model);
+        }
+
+        return $response->send();
     }
 
     /**

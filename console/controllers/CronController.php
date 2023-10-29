@@ -2,48 +2,25 @@
 
 namespace console\controllers;
 
+use Yii;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
 use common\models\VendorCampaign;
-use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
-use Yii;
 use common\models\Restaurant;
-use common\models\OrderItem;
 use common\models\Queue;
-use common\models\TapQueue;
 use common\models\AgentAssignment;
 use common\models\PaymentGatewayQueue;
 use common\models\Voucher;
 use common\models\BankDiscount;
 use common\models\Payment;
 use common\models\Item;
-use common\models\Customer;
-use common\models\City;
-use common\models\PaymentMethod;
 use common\models\Refund;
-use common\models\Plan;
-use common\models\Area;
 use common\models\Order;
 use common\models\Subscription;
-use common\models\OpeningHour;
-use common\models\CountryPaymentMethod;
-use common\models\Country;
-use common\models\Agent;
-use common\models\ExtraOption;
-use common\models\ItemImage;
-use common\models\AreaDeliveryZone;
-use common\models\DeliveryZone;
-use common\models\RestaurantTheme;
-use common\models\BusinessLocation;
-use common\models\SubscriptionPayment;
-use common\models\RestaurantBranch;
 use \DateTime;
 use yii\helpers\Console;
-use yii\helpers\ArrayHelper;
 use yii\db\Expression;
 
-
-use common\models\Setting;
 
 /**
  * All Cron actions related to this project
@@ -563,7 +540,8 @@ class CronController extends \yii\console\Controller
 
                     //return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
 
-                } else if ($response->data && isset($response->data['status'])) {
+                }
+                else if ($response->data && isset($response->data['status'])) {
 
                     $refund->refund_reference = isset($response->data['id']) ? $response->data['id'] : null;
                     $refund->refund_status = $response->data['status'];
@@ -577,6 +555,22 @@ class CronController extends \yii\console\Controller
 
                     //return self::EXIT_CODE_NORMAL;
                 }
+            }
+
+            if(YII_ENV == 'prod') {
+
+                $rate = 1;//default rate
+
+                if(isset($refund->order->currency)) {
+                    $rate = 1 / $refund->order->currency->rate;// to USD
+                }
+
+                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund, [
+                        'refund_amount' => $refund->refund_amount * $rate,
+                        'currency' => 'USD'
+                    ]),
+                    null,
+                    $refund->restaurant_uuid);
             }
         }
 
@@ -836,6 +830,19 @@ class CronController extends \yii\console\Controller
             foreach ($stores as $store) {
                 $store->pollTapStatus();
             }
+        }
+
+        //send today's bestselling
+
+        if(YII_ENV == 'prod')
+        {
+            $items = Item::find()
+                ->orderBy (['unit_sold' => SORT_DESC])
+                ->limit (5)
+                ->select (['item_name', 'item_name_ar', 'unit_sold'])
+                ->all ();
+
+            Yii::$app->eventManager->track('Best Selling',  $items);
         }
     }
 

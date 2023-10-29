@@ -15,6 +15,8 @@ use yii\helpers\Console;
  * @property string $campaign_uuid
  * @property string $template_uuid
  * @property int|null $progress
+ * @property int $no_of_email_opened
+ * @property int $no_of_email_sent
  * @property int|null $status
  * @property string|null $created_at
  * @property string|null $updated_at
@@ -43,7 +45,7 @@ class VendorCampaign extends \yii\db\ActiveRecord
     {
         return [
             [['template_uuid'], 'required'],
-            [['progress', 'status'], 'integer'],
+            [['progress', 'no_of_email_opened', 'no_of_email_sent', 'status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['campaign_uuid', 'template_uuid'], 'string', 'max' => 60],
             [['campaign_uuid'], 'unique'],
@@ -103,6 +105,8 @@ class VendorCampaign extends \yii\db\ActiveRecord
             'campaign_uuid' => Yii::t('app', 'Campaign Uuid'),
             'template_uuid' => Yii::t('app', 'Template Uuid'),
             'progress' => Yii::t('app', 'Progress (%)'),
+            'no_of_email_opened' => Yii::t('app', 'No of times email opened'),
+            'no_of_email_sent' => Yii::t('app', 'No of times email opened'),
             'status' => Yii::t('app', 'Status'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
@@ -178,6 +182,7 @@ class VendorCampaign extends \yii\db\ActiveRecord
             sleep(10);
         }
 
+        $this->no_of_email_sent = $total;
         $this->status = self::STATUS_COMPLETED;
 
         if(!$this->save()) {

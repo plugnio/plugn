@@ -881,8 +881,12 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function sendVendorEmailTemplate($campaign) {
 
+        $html = $campaign->template->message
+            . '<img src="'. Yii::$app->agentApiUrlManager->baseUrl . '/v1/store/log-email-campaign/'
+            . $campaign->campaign_uuid .'" />';
+
         $mailer = \Yii::$app->mailer->compose()
-            ->setHtmlBody($campaign->template->message)
+            ->setHtmlBody($html)
             ->setFrom ([Yii::$app->params['supportEmail']])
             ->setSubject($campaign->template->subject);
 
@@ -2241,7 +2245,10 @@ class Restaurant extends \yii\db\ActiveRecord
                 'store_name' => $this->name,
                 'phone_number' => $this->owner_phone_country_code . $this->owner_number,
                 'email' => $agent->agent_email,
-                'store_url' => $this->restaurant_domain
+                'store_url' => $this->restaurant_domain,
+                "country" => $this->country? $this->country->country_name: null,
+                "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign: null,
+                "utm_medium" => $store->sourceCampaign ? $store->sourceCampaign->utm_medium: null,
             ],
                 null,
                 $agent->agent_id
@@ -2530,14 +2537,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
                 ];
             },
-            'bestSeller' => function ($model) {
-                return \common\models\Item::find ()
-                    ->andWhere (['restaurant_uuid' => $model->restaurant_uuid])
-                    ->orderBy (['unit_sold' => SORT_DESC])
-                    ->limit (5)
-                    ->select (['item_name', 'item_name_ar', 'unit_sold'])
-                    ->all ();
-            },
+            'bestSeller',
             'revenueGenerated' => function ($store) {
 
                 return [
@@ -2626,6 +2626,14 @@ class Restaurant extends \yii\db\ActiveRecord
                 ];
             },
         ];
+    }
+
+    public function getBestseller() {
+        return $this->getItems()
+            ->orderBy (['unit_sold' => SORT_DESC])
+            ->limit (5)
+            ->select (['item_name', 'item_name_ar', 'unit_sold'])
+            ->all ();
     }
 
     /**
