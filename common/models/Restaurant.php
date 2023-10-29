@@ -881,8 +881,12 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function sendVendorEmailTemplate($campaign) {
 
+        $html = $campaign->template->message
+            . '<img src="'. Yii::$app->agentApiUrlManager->baseUrl . '/v1/store/log-email-campaign/'
+            . $campaign->campaign_uuid .'" />';
+
         $mailer = \Yii::$app->mailer->compose()
-            ->setHtmlBody($campaign->template->message)
+            ->setHtmlBody($html)
             ->setFrom ([Yii::$app->params['supportEmail']])
             ->setSubject($campaign->template->subject);
 

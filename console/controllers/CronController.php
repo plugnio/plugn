@@ -540,7 +540,8 @@ class CronController extends \yii\console\Controller
 
                     //return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
 
-                } else if ($response->data && isset($response->data['status'])) {
+                }
+                else if ($response->data && isset($response->data['status'])) {
 
                     $refund->refund_reference = isset($response->data['id']) ? $response->data['id'] : null;
                     $refund->refund_status = $response->data['status'];
@@ -554,6 +555,22 @@ class CronController extends \yii\console\Controller
 
                     //return self::EXIT_CODE_NORMAL;
                 }
+            }
+
+            if(YII_ENV == 'prod') {
+
+                $rate = 1;//default rate
+
+                if(isset($refund->order->currency)) {
+                    $rate = 1 / $refund->order->currency->rate;// to USD
+                }
+
+                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund, [
+                        'refund_amount' => $refund->refund_amount * $rate,
+                        'currency' => 'USD'
+                    ]),
+                    null,
+                    $refund->restaurant_uuid);
             }
         }
 

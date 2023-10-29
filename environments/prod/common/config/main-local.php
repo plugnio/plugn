@@ -157,6 +157,12 @@ return [
             'baseUrl' => 'https://api.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ]
+        ],
+        'agentApiUrlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'https://agent.plugn.io',
+            'enablePrettyUrl' => false,
+            'showScriptName' => false,
+        ],
     ],
 ];

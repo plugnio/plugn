@@ -3,7 +3,6 @@
 namespace api\modules\v2\controllers;
 
 use agent\models\PaymentMethod;
-use common\models\CustomerVoucher;
 use common\models\PaymentFailed;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -11,7 +10,6 @@ use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use common\models\Voucher;
-use common\models\Bank;
 use common\models\Currency;
 use api\models\Order;
 use common\models\OrderItem;
@@ -370,6 +368,14 @@ class OrderController extends Controller
         ], [
             'restaurant_uuid' => $restaurant->restaurant_uuid
         ]);
+
+        if(YII_ENV == 'prod') {
+
+            Yii::$app->eventManager->track('Order Initiated', $order,
+                null,
+                $restaurant->restaurant_uuid
+            );
+        }
 
         return [
             'operation' => 'success',

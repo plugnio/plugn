@@ -665,6 +665,8 @@ return [
                         'GET view-payment-methods' => 'view-payment-methods',
                         'GET view-payment-methods/<id>' => 'view-payment-methods',
                         'GET view-shipping-methods' => 'view-shipping-methods',
+                        'GET log-email-campaign/<id>' => 'log-email-campaign',
+
                         'POST' => 'update',
                         'POST upgrade' => 'upgrade',
                         'POST create' => 'create',
@@ -701,6 +703,7 @@ return [
                         'POST update-bank-account' => 'update-bank-account',
                         'POST update-email-settings' => 'update-email-settings',
                         'POST update-store-settings' => 'update-store-settings',
+
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
                         'PATCH process-gateway-queue/<id>' => 'process-gateway-queue',
                         'PATCH deactivate' => 'deactivate',
@@ -715,6 +718,7 @@ return [
                         'DELETE' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS log-email-campaign/<id>' => 'options',
                         'OPTIONS deactivate' => 'options',
                         'OPTIONS remove-store' => 'options',
                         'OPTIONS delete-store' => 'options',

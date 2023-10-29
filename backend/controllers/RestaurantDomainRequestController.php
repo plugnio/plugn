@@ -87,6 +87,14 @@ class RestaurantDomainRequestController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            if(YII_ENV == 'prod') {
+
+                Yii::$app->eventManager->track('Domain Request Updated', $model,
+                    null,
+                    $model->restaurant_uuid);
+            }
+
             return $this->redirect(['view', 'id' => $model->request_uuid]);
         }
 

@@ -113,5 +113,11 @@ return [
             'enablePrettyUrl' => false,
             'showScriptName' => false,
         ],
+        'agentApiUrlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'https://agent.dev.plugn.io',
+            'enablePrettyUrl' => false,
+            'showScriptName' => false,
+        ],
     ],
 ];

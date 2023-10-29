@@ -58,6 +58,12 @@ return [
             'baseUrl' => 'http://localhost/plugn/api/web',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ]
+        ],
+        'agentApiUrlManager' => [
+            'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'http://localhost/plugn/agent/web',
+            'enablePrettyUrl' => false,
+            'showScriptName' => false,
+        ],
     ],
 ];
