@@ -1026,17 +1026,28 @@ class Order extends \yii\db\ActiveRecord
 
         if (YII_ENV == 'prod' && !$this->is_sandbox) {
 
+            $order_total = $this->total_price * $rate;
+
             Yii::$app->eventManager->track('Order Completed', [
+                    "restaurant_uuid" => $this->restaurant_uuid,
+                    "store" => $this->restaurant->name,
+                    "customer_name" => $this->customer_name,
+                    "customer_email" => $this->customer_email,
+                    "customer_id" => $this->customer_id,
+                    "country" => $this->country_name,
                     'checkout_id' => $this->order_uuid,
                     'order_id' => $this->order_uuid,
-                    'total' => ($this->total_price * $rate),
+                    'total' => $order_total,
                     'revenue' => $plugn_fee,
+                    "store_revenue" => $order_total - $plugn_fee,
                     'gateway_fee' => $payment_gateway_fee,
                     'payment_method' => $this->payment_method_name,
-                    'gateway' => $this->payment_uuid ? 'Tap' : null,
+                    'gateway' => $this->payment_method_name,// $this->payment_uuid ? 'Tap' : null,
                     'shipping' => ($this->delivery_fee * $rate),
                     'subtotal' => ($this->subtotal * $rate),
                     'currency' => $this->currency_code,
+                    "cash" => $this->paymentMethod && $this->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH?
+                        ($this->total_price * $rate): 0,
                     'coupon' => $this->voucher && $this->voucher->code ? $this->voucher->code : null,
                     'products' => $productsList ? $productsList : null
                 ],

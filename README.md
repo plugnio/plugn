@@ -119,11 +119,38 @@ Phpmyadmin is running on localhost port 8080.
 ## Events 
 
 - Addon Purchase
-- Store Created
+- Store Created  (with campaign = utm_campaign + utm_medium)
 - Premium Plan Purchase
 - Tap Charge Attempt
 - Order Completed
 - Voucher Created
+
+New events to add 
+
+- Agent Signup (with campaign = utm_campaign + utm_medium)
+- Domain Requests and Domain Request Updated - with request status
+- Email Opened - with campaign details
+- From Campaign - if open link from campaign 
+- Item Shared 
+- From Shared Link 
+- Return Initiated
+- Refunds Processed 
+- Order Initiated 
+- Item Published
+
+cron based event 
+- Best Selling
+
+- add time in all event?
+
+https://docs.mixpanel.com/docs/data-structure/user-profiles
+https://docs.mixpanel.com/docs/quickstart/connect-your-data
+https://github.com/signalfx/angular-mixpanel/blob/master/README.md
+
+https://github.com/segmentio/analytics-angular
+
+segment + mixpanel
+https://segment.com/docs/connections/spec/identify/
 
 to publish in production
 

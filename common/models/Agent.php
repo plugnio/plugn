@@ -651,7 +651,10 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                     'store_name' => $store->name,
                     'phone_number' => $store->owner_number,
                     'email' => $this->agent_email,
-                    'store_url' => $store->restaurant_domain
+                    'store_url' => $store->restaurant_domain,
+                    "country" => $store->country? $store->country->country_name: null,
+                    "campaign" => $store->sourceCampaign ? $store->sourceCampaign->utm_campaign: null,
+                    "utm_medium" => $store->sourceCampaign ? $store->sourceCampaign->utm_medium: null,
                 ], 
                 null, 
                 $store->restaurant_uuid
