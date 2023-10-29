@@ -2529,14 +2529,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
                 ];
             },
-            'bestSeller' => function ($model) {
-                return \common\models\Item::find ()
-                    ->andWhere (['restaurant_uuid' => $model->restaurant_uuid])
-                    ->orderBy (['unit_sold' => SORT_DESC])
-                    ->limit (5)
-                    ->select (['item_name', 'item_name_ar', 'unit_sold'])
-                    ->all ();
-            },
+            'bestSeller',
             'revenueGenerated' => function ($store) {
 
                 return [
@@ -2625,6 +2618,14 @@ class Restaurant extends \yii\db\ActiveRecord
                 ];
             },
         ];
+    }
+
+    public function getBestseller() {
+        return $this->getItems()
+            ->orderBy (['unit_sold' => SORT_DESC])
+            ->limit (5)
+            ->select (['item_name', 'item_name_ar', 'unit_sold'])
+            ->all ();
     }
 
     /**

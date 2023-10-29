@@ -290,7 +290,8 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                     'order_id' => $paymentRecord->payment_uuid,
                     'value' => ( $paymentRecord->payment_amount_charged / $paymentRecord->currency->rate),
                     'paymentMethod' => $paymentRecord->payment_mode,
-                    'currency' => 'USD'
+                    'currency' => 'USD',
+                    'restaurant_uuid' => $paymentRecord->restaurant_uuid
                 ],
                 null, 
                 $paymentRecord->restaurant_uuid

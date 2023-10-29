@@ -349,6 +349,18 @@ class Item extends \yii\db\ActiveRecord
             }
         }
 
+        if($insert && YII_ENV == 'prod' && $this->item_status == self::ITEM_STATUS_PUBLISH)
+        {
+            //Send event to Segment
+
+            Yii::$app->eventManager->track('Item Published',  [
+                'item_uuid' => $this->item_uuid,
+                'item_name' => $this->item_name,
+                'item_name_ar' => $this->item_name_ar,
+                'item_type' => $this->item_type,
+            ]);
+        }
+
         return true;
     }
 
