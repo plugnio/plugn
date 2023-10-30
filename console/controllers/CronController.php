@@ -837,12 +837,24 @@ class CronController extends \yii\console\Controller
 
         if(YII_ENV == 'prod')
         {
-            $items = Item::find()
+
+            $query = Item::find()
                 ->orderBy (['unit_sold' => SORT_DESC])
-                ->limit (5)
-                ->select (['item_name', 'item_name_ar', 'unit_sold'])
-                ->asArray()
-                ->all ();
+                ->limit (5);
+
+            $items = [];
+
+            foreach ($query->all() as $item) {
+                $items[] = [
+                    'unit_sold' => $item->unit_sold,
+                    'item_name' => $item->item_name,
+                    'item_name_ar' => $item->item_name_ar,
+                    "restaurant" => $item->restaurant->name,
+                    'item_type' => $item->item_type,
+                    'item_uuid' => $item->item_uuid,
+                    'restaurant_uuid' => $item->restaurant_uuid,
+                ];
+            }
 
             Yii::$app->eventManager->track('Best Selling',  $items);
         }
