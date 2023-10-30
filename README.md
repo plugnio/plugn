@@ -177,6 +177,10 @@ select `order`.order_uuid, `order`.total_price, payment.payment_amount_charged, 
 
 http://localhost:8888/bawes/plugn/agent/web/v1/store/log-email-campaign/campaign_08617922-5bc3-11ee-aa01-5aa7361ade0b
 
+## menually sync events 
+
+`./yii event/emulate --event="Best Selling"`
+
 Todo
 ------------------
 update cron > crontab

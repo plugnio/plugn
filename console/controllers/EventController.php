@@ -35,11 +35,13 @@ class EventController extends \yii\console\Controller {
 
     public function syncAgentSignup() {
 
-        $query = Agent::find();
+        $query = Agent::find()
+            ->andWhere(new Expression('`agent_created_at` > (NOW() - INTERVAL 1 YEAR)'));
 
         $count = 0;
 
         $total = Agent::find()
+            ->andWhere(new Expression('`agent_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->count();
 
         Console::startProgress(0, $total);
@@ -91,6 +93,7 @@ class EventController extends \yii\console\Controller {
     public function syncBestSelling() {
 
         $query = Item::find()
+            ->andWhere(new Expression('`item_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->orderBy (['unit_sold' => SORT_DESC])
             ->limit (5);
 
@@ -114,11 +117,13 @@ class EventController extends \yii\console\Controller {
     public function syncItemPublished() {
 
         $query = Item::find()
+            ->andWhere(new Expression('`item_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->filterPublished();
 
         $count = 0;
 
         $total = Item::find()
+            ->andWhere(new Expression('`item_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->filterPublished()
             ->count();
 
@@ -150,11 +155,13 @@ class EventController extends \yii\console\Controller {
 
     public function syncDomainRequests() {
 
-        $query = RestaurantDomainRequest::find();
+        $query = RestaurantDomainRequest::find()
+            ->andWhere(new Expression('`created_at` > (NOW() - INTERVAL 1 YEAR)'));
 
         $count = 0;
 
         $total = RestaurantDomainRequest::find()
+            ->andWhere(new Expression('`created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->count();
 
         Console::startProgress(0, $total);
@@ -183,12 +190,14 @@ class EventController extends \yii\console\Controller {
 
     public function syncStoreCreated() {
         
-        $query = Restaurant::find();
+        $query = Restaurant::find()
+            ->andWhere(new Expression('`restaurant_created_at` > (NOW() - INTERVAL 1 YEAR)'));
             //->joinWith(['agents']);
 
         $count = 0;
 
         $total = Restaurant::find()
+            ->andWhere(new Expression('`restaurant_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->count();
 
         Console::startProgress(0, $total);
@@ -237,11 +246,13 @@ class EventController extends \yii\console\Controller {
     public function syncOrderCompleted() {
 
         $query = Order::find()
+            ->andWhere(new Expression('`order_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->checkoutCompleted();
 
         $count = 0;
 
         $total = Order::find()
+            ->andWhere(new Expression('`order_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->checkoutCompleted()
             ->count();
 
@@ -331,14 +342,16 @@ class EventController extends \yii\console\Controller {
     public function syncRefundProcessed() {
 
         $query = Refund::find()
+            ->andWhere(new Expression('`refund_updated_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->joinWith(['order'])
-            ->where(new Expression('refund.refund_reference IS NOT NULL'));
+            ->andWhere(new Expression('refund.refund_reference IS NOT NULL'));
 
         $count = 0;
 
         $total = Refund::find()
+            ->andWhere(new Expression('`refund_updated_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->joinWith(['order'])
-            ->where(new Expression('refund.refund_reference IS NOT NULL'))
+            ->andWhere(new Expression('refund.refund_reference IS NOT NULL'))
             ->count();
 
         Console::startProgress(0, $total);
@@ -370,11 +383,13 @@ class EventController extends \yii\console\Controller {
 
     public function syncOrderInitiated() {
 
-        $query = Order::find();
+        $query = Order::find()
+            ->andWhere(new Expression('`order_created_at` > (NOW() - INTERVAL 1 YEAR)'));
 
         $count = 0;
 
         $total = Order::find()
+            ->andWhere(new Expression('`order_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->count();
 
         Console::startProgress(0, $total);
