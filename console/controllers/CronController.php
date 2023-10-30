@@ -28,7 +28,9 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
-
+        $a = Restaurant::find()->one();
+        echo "<pre />";
+        print_r($a->attributes);
     }
 
     /**
@@ -565,7 +567,7 @@ class CronController extends \yii\console\Controller
                     $rate = 1 / $refund->order->currency->rate;// to USD
                 }
 
-                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund->attributes(), [
+                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund->attributes, [
                         'refund_amount' => $refund->refund_amount,
                         'value' => $refund->refund_amount * $rate, 
                         'currency' => 'USD'

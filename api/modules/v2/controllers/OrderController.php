@@ -371,7 +371,7 @@ class OrderController extends Controller
 
         if(YII_ENV == 'prod') {
 
-            Yii::$app->eventManager->track('Order Initiated', $order->attributes(),
+            Yii::$app->eventManager->track('Order Initiated', $order->attributes,
                 null,
                 $restaurant->restaurant_uuid
             );
