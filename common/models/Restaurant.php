@@ -2244,7 +2244,21 @@ class Restaurant extends \yii\db\ActiveRecord
                 'store_url' => $this->restaurant_domain,
                 "country" => $this->country? $this->country->country_name: null,
                 "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign: null,
-                "utm_medium" => $store->sourceCampaign ? $store->sourceCampaign->utm_medium: null,
+                "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium: null,
+            ],
+                null,
+                $agent->agent_id
+            );
+
+            Yii::$app->eventManager->track('Agent Signup', [
+                'first_name' => trim($firstname),
+                'last_name' => trim($lastname),
+                'phone_number' => $this->owner_phone_country_code . $this->owner_number,
+                'email' => $agent->agent_email,
+                'store_url' => $this->restaurant_domain,
+                "country" => $this->country ? $this->country->country_name : null,
+                "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign : null,
+                "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium : null,
             ],
                 null,
                 $agent->agent_id
