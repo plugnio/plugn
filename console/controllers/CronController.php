@@ -566,7 +566,8 @@ class CronController extends \yii\console\Controller
                 }
 
                 Yii::$app->eventManager->track('Refunds Processed', array_merge($refund, [
-                        'refund_amount' => $refund->refund_amount * $rate,
+                        'refund_amount' => $refund->refund_amount,
+                        'value' => $refund->refund_amount * $rate, 
                         'currency' => 'USD'
                     ]),
                     null,
