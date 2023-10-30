@@ -10,6 +10,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\behaviors\AttributeBehavior;
 use yii\db\Expression;
 use yii\web\NotFoundHttpException;
+use agent\models\Currency;
 
 /**
  * This is the model class for table "payment".
@@ -286,16 +287,24 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         {
             //Send event to Segment
            
+            $kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+            $rate = 1 / $kwdCurrency->rate;// to USD
+            
             Yii::$app->eventManager->track('Premium Plan Purchase',  [
                     'order_id' => $paymentRecord->payment_uuid,
-                    'value' => ( $paymentRecord->payment_amount_charged / $paymentRecord->currency->rate),
+                    'payment_amount_charged' => $paymentRecord->payment_amount_charged,
+                    'amount' => $paymentRecord->payment_amount_charged,
+                    'value' => ( $paymentRecord->payment_amount_charged * $rate),
                     'paymentMethod' => $paymentRecord->payment_mode,
                     'currency' => 'USD',
                     'restaurant_uuid' => $paymentRecord->restaurant_uuid
                 ],
                 null, 
                 $paymentRecord->restaurant_uuid
-            );
+            );//paymentRecord->currency->rate
+
+            //todo: ability to subscribe in multiple languages 
         }
 
         Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and',
