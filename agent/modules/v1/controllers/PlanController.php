@@ -346,11 +346,18 @@ class PlanController extends BaseController
                     
                     //Send event to Segment
                     
+                    $kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+                    $rate = 1 / $kwdCurrency->rate;// to USD
+                    
                     Yii::$app->eventManager->track('Premium Plan Purchase',  [
                             'order_id' => $paymentRecord->payment_uuid,
-                            'value' => ( $paymentRecord->payment_amount_charged * 3.28 ),
+                            'value' => ( $paymentRecord->payment_amount_charged * $rate ),
+                            'payment_amount_charged' => $paymentRecord->payment_amount_charged,
+                            'amount' => $paymentRecord->payment_amount_charged,
                             'paymentMethod' => $paymentRecord->payment_mode,
-                            'currency' => 'USD'
+                            'currency' => 'USD',
+                            'restaurant_uuid' => $paymentRecord->restaurant_uuid
                         ],
                         null,
                         $paymentRecord->restaurant_uuid

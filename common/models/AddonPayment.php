@@ -8,6 +8,7 @@ use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\web\NotFoundHttpException;
+use agent\models\Currency;
 
 /**
  * This is the model class for table "addon_payment".
@@ -200,13 +201,18 @@ class AddonPayment extends \yii\db\ActiveRecord
             if(YII_ENV == 'prod') {
                 //Send event to Segment
                 
+                $kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+                $rate = 1 / $kwdCurrency->rate;// to USD
+            
                 Yii::$app->eventManager->track('Addon Purchase', [
                         'addon_uuid' => $paymentRecord->addon_uuid,
                         'addon' => $paymentRecord->addon->name,
                         'paymentMethod' => $paymentRecord->payment_mode,
                         'charged' => $paymentRecord->payment_amount_charged,
+                        'value' => ( $paymentRecord->payment_amount_charged * $rate),
                         'revenue' => $paymentRecord->payment_net_amount,
-                        'currency' => 'KWD'
+                        'currency' => 'USD'
                     ],
                     null, 
                     $paymentRecord->restaurant_uuid
