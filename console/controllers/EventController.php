@@ -1,9 +1,11 @@
 <?php
 namespace console\controllers;
 
+use common\models\Currency;
 use common\models\Item;
 use common\models\Agent;
 use common\models\Order;
+use common\models\PaymentMethod;
 use common\models\Refund;
 use common\models\RestaurantDomainRequest;
 use Yii;
@@ -338,6 +340,8 @@ class EventController extends \yii\console\Controller {
                     $datetime,
                     $order->restaurant_uuid);
             }
+
+            Console::updateProgress($count, $total);
         }
     }
 
@@ -380,6 +384,8 @@ class EventController extends \yii\console\Controller {
                     $datetime,
                     $refund->restaurant_uuid);
             }
+
+            Console::updateProgress($count, $total);
         }
     }
 
@@ -402,13 +408,83 @@ class EventController extends \yii\console\Controller {
 
             foreach ($orders as $order) {
 
+
+                $productsList = [];
+
+                foreach ($order->orderItems as $orderedItem) {
+                    $productsList[] = [
+                        'product_id' => $orderedItem->item_uuid,
+                        'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null,
+                        'name' => $orderedItem->item_name,
+                        'price' => $orderedItem->item_price,
+                        'quantity' => $orderedItem->qty,
+                        'url' => $order->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
+                    ];
+                }
+
+                $plugn_fee = 0;
+                $payment_gateway_fee = 0;
+                $plugn_fee_kwd = 0;
+
+                //$total_price = $order->total_price;
+                //$delivery_fee = $order->delivery_fee;
+                //$subtotal = $order->subtotal;
+                //$currency = $order->currency_code;
+
+                $kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+                //using store currency instead of user as user can have any currency but totals will be in store currency
+
+                $rateKWD = $kwdCurrency->rate / $order->restaurant->currency->rate;
+
+                $rate = 1 / $order->restaurant->currency->rate;// to USD
+
+                if ($order->payment_uuid) {
+
+                    $plugn_fee_kwd = ($order->payment->plugn_fee + $order->payment->partner_fee) * $rateKWD;
+
+                    $plugn_fee = ($order->payment->plugn_fee + $order->payment->partner_fee) * $rate;
+
+                    //$total_price = $total_price * $rate;
+                    //$delivery_fee = $delivery_fee * $rate;
+                    //$subtotal = $subtotal * $rate;
+                    $payment_gateway_fee = $order->payment->payment_gateway_fee * $rate;
+                }
+
                 $datetime = new \DateTime($order->order_created_at);
 
-                Yii::$app->eventManager->track('Order Initiated', $order,
+                $order_total = $order->total_price * $rate;
+
+                Yii::$app->eventManager->track('Order Initiated',
+                    [
+                        "restaurant_uuid" => $order->restaurant_uuid,
+                        "store" => $order->restaurant->name,
+                        "customer_name" => $order->customer_name,
+                        "customer_email" => $order->customer_email,
+                        "customer_id" => $order->customer_id,
+                        "country" => $order->country_name,
+                        'checkout_id' => $order->order_uuid,
+                        'order_id' => $order->order_uuid,
+                        'total' => $order_total,
+                        'revenue' => $plugn_fee,
+                        "store_revenue" => $order_total - $plugn_fee,
+                        'gateway_fee' => $payment_gateway_fee,
+                        'payment_method' => $order->payment_method_name,
+                        'gateway' => $order->payment_method_name,// $order->payment_uuid ? 'Tap' : null,
+                        'shipping' => ($order->delivery_fee * $rate),
+                        'subtotal' => ($order->subtotal * $rate),
+                        'currency' => $order->currency_code,
+                        "cash" => $order->paymentMethod && $order->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH?
+                            ($order->total_price * $rate): 0,
+                        'coupon' => $order->voucher && $order->voucher->code ? $order->voucher->code : null,
+                        'products' => $productsList ? $productsList : null
+                    ],
                     $datetime,
                     $order->restaurant_uuid
                 );
             }
+
+            Console::updateProgress($count, $total);
         }
     }
 
