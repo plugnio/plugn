@@ -273,7 +273,7 @@ class EventController extends \yii\console\Controller {
                 foreach ($order->orderItems as $orderedItem) {
                     $productsList[] = [
                         'product_id' => $orderedItem->item_uuid,
-                        'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null,
+                        'sku' => $orderedItem->item ? $orderedItem->item->sku : null,
                         'name' => $orderedItem->item_name,
                         'price' => $orderedItem->item_price,
                         'quantity' => $orderedItem->qty,
@@ -407,14 +407,13 @@ class EventController extends \yii\console\Controller {
             $count += sizeof($orders);
 
             foreach ($orders as $order) {
-
-
+                
                 $productsList = [];
 
                 foreach ($order->orderItems as $orderedItem) {
                     $productsList[] = [
                         'product_id' => $orderedItem->item_uuid,
-                        'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null,
+                        'sku' => $orderedItem->item ? $orderedItem->item->sku : null,
                         'name' => $orderedItem->item_name,
                         'price' => $orderedItem->item_price,
                         'quantity' => $orderedItem->qty,
