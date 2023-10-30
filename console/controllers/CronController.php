@@ -841,6 +841,7 @@ class CronController extends \yii\console\Controller
                 ->orderBy (['unit_sold' => SORT_DESC])
                 ->limit (5)
                 ->select (['item_name', 'item_name_ar', 'unit_sold'])
+                ->asArray()
                 ->all ();
 
             Yii::$app->eventManager->track('Best Selling',  $items);
