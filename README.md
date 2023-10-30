@@ -185,7 +185,12 @@ https://blog.logrocket.com/how-to-run-laravel-docker-compose-ubuntu-v22-04/
 
 https://stackoverflow.com/questions/37741512/how-can-i-use-the-aramex-api-with-wsdl-and-python
 
+ 
 need to check for option to use netlify ssl/site etc with single source of build output instead of creating separate build 
 for each site 
-
+ 
 //Alter table customer_address modify address_id BIGINT(20) AUTO_INCREMENT 
+
+
+- list of events + data we passing 
+- fire new events to add data in mixpanel 
