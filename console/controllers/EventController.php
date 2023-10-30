@@ -2,6 +2,8 @@
 namespace console\controllers;
 
 use common\models\Item;
+use common\models\Agent;
+use common\models\Order;
 use common\models\Refund;
 use common\models\RestaurantDomainRequest;
 use Yii;
