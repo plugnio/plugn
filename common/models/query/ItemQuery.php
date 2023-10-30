@@ -2,6 +2,7 @@
 
 namespace common\models\query;
 
+use common\models\Item;
 use yii\db\Expression;
 
 
@@ -23,6 +24,14 @@ class ItemQuery extends \yii\db\ActiveQuery
     public function one($db = null)
     {
         return parent::one ($db);
+    }
+
+    /**
+     * @return ItemQuery
+     */
+    public function filterPublished()
+    {
+        return $this->andWhere(['item.item_status' => Item::ITEM_STATUS_PUBLISH]);
     }
 
     /**

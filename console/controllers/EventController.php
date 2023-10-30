@@ -1,6 +1,7 @@
 <?php
 namespace console\controllers;
 
+use common\models\Item;
 use common\models\Refund;
 use common\models\RestaurantDomainRequest;
 use Yii;
@@ -79,6 +80,53 @@ class EventController extends \yii\console\Controller {
                     $datetime->format('c'),
                     $agent->agent_id
                 );
+            }
+
+            Console::updateProgress($count, $total);
+        }
+
+        Yii::$app->eventManager->flush();
+    }
+
+    public function syncBestSelling() {
+        $items = Item::find()
+            ->orderBy (['unit_sold' => SORT_DESC])
+            ->limit (5)
+            ->select (['item_name', 'item_name_ar', 'unit_sold'])
+            ->all ();
+
+        Yii::$app->eventManager->track('Best Selling',  $items);
+    }
+
+    public function syncItemPublished() {
+
+        $query = Item::find()
+            ->filterPublished();
+
+        $count = 0;
+
+        $total = Item::find()
+            ->filterPublished()
+            ->count();
+
+        Console::startProgress(0, $total);
+
+        foreach($query->batch(100) as $items) {
+
+            $count += sizeof($items);
+
+            foreach ($items as $item) {
+
+                $datetime = new \DateTime($item->item_created_at);
+
+                Yii::$app->eventManager->track('Item Published',  [
+                        'item_uuid' => $item->item_uuid,
+                        'item_name' => $item->item_name,
+                        'item_name_ar' => $item->item_name_ar,
+                        'item_type' => $item->item_type,
+                    ],
+                    $datetime->format('c'),
+                    $item->restaurant_uuid);
             }
 
             Console::updateProgress($count, $total);
@@ -364,6 +412,12 @@ class EventController extends \yii\console\Controller {
             case "Refunds Processed":
                 $this->syncRefundProcessed();
                 break;
+            case "Item Published":
+                $this->syncItemPublished();
+                break;
+            case "Best Selling":
+                $this->syncBestSelling();
+                break;
             default:
                 $this->stdout("Missing event name \n", Console::FG_RED, Console::BOLD);
                 //throwException("Missing event name");
@@ -376,4 +430,6 @@ class EventController extends \yii\console\Controller {
 - Agent Signup
 - Domain Requests
 - Refunds Processed
+- Item Published
+- Best Selling
 - */

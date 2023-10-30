@@ -358,7 +358,7 @@ class Item extends \yii\db\ActiveRecord
                 'item_name' => $this->item_name,
                 'item_name_ar' => $this->item_name_ar,
                 'item_type' => $this->item_type,
-            ]);
+            ], null, $this->restaurant_uuid);
         }
 
         return true;
