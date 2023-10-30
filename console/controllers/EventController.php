@@ -454,8 +454,12 @@ class EventController extends \yii\console\Controller {
 
                 $order_total = $order->total_price * $rate;
 
-                Yii::$app->eventManager->track('Order Initiated',
-                    [
+                $cash = $order->paymentMethod && $order->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH?
+                            ($order->total_price * $rate): 0;
+
+                $coupon = $order->voucher && $order->voucher->code ? $order->voucher->code : null;
+
+                Yii::$app->eventManager->track('Order Initiated', [
                         "restaurant_uuid" => $order->restaurant_uuid,
                         "store" => $order->restaurant->name,
                         "customer_name" => $order->customer_name,
@@ -473,10 +477,9 @@ class EventController extends \yii\console\Controller {
                         'shipping' => ($order->delivery_fee * $rate),
                         'subtotal' => ($order->subtotal * $rate),
                         'currency' => $order->currency_code,
-                        "cash" => $order->paymentMethod && $order->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH?
-                            ($order->total_price * $rate): 0,
-                        'coupon' => $order->voucher && $order->voucher->code ? $order->voucher->code : null,
-                        'products' => $productsList ? $productsList : null
+                        "cash" => $cash,
+                        'coupon' => $coupon,
+                        'products' => $productsList 
                     ],
                     $datetime,
                     $order->restaurant_uuid

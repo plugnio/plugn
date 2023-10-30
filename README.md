@@ -115,7 +115,6 @@ Phpmyadmin is running on localhost port 8080.
 
 [https://dbdiagram.io/d/6409f34a296d97641d86b825](https://dbdiagram.io/d/6409f34a296d97641d86b825)
 
-
 ## Events 
 
 - Addon Purchase
@@ -180,6 +179,10 @@ http://localhost:8888/bawes/plugn/agent/web/v1/store/log-email-campaign/campaign
 ## menually sync events 
 
 `./yii event/emulate --event="Best Selling"`
+
+### Dealing with bad data accidentally sent to Mixpanel
+
+https://medium.com/product-analytics-academy/dealing-with-bad-data-accidentally-sent-to-mixpanel-a417ecc256ba#:~:text=Important%3A%20Mixpanel%20event%20data%20is,be%20deleted%20from%20your%20project.
 
 Todo
 ------------------
