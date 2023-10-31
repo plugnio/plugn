@@ -14,15 +14,19 @@
                             <img *ngIf="order.armada_qr_code_link" [src]="order.armada_qr_code_link" width="100" height="100"></img>
                               -->
 
-                            <?php if(!$order->restaurant->logo) { ?>
-                                <img src="<?= $defaultLogo ?>"></img>
-                            <?php } else { ?>
+                            <?php if(!empty($order->restaurant->logo)) { ?>
+
                                 <img class="ion-float-start" width="75" height="75"
                                      src="https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/<?= $order->restaurant_uuid . '/logo/'
                                      . $order->restaurant->logo ?>"></img>
+
+                            <?php } else { ?>
+
+                                <img src="<?= $defaultLogo ?>"></img>
+
                             <?php } ?>
 
-                            <?php if($order->armada_qr_code_link) { ?>
+                            <?php if(!empty($order->armada_qr_code_link)) { ?>
                                 <img class="ion-float-end" src="<?= $order->armada_qr_code_link ?>" width="70" height="70"></img>
                             <?php } ?>
                         </div>
