@@ -554,7 +554,8 @@ class OrderController extends Controller
                     $payment->payment_token : $order->paymentMethod->source_id,
                 $order->restaurant->warehouse_fee,
                 $order->restaurant->warehouse_delivery_charges,
-                $order->area_id ? $order->area->country->country_name : ''
+                $order->area_id ? $order->area->country->country_name : '',
+                $order->restaurant_uuid
             );
 
             $responseContent = json_decode($response->content);
@@ -725,7 +726,8 @@ class OrderController extends Controller
                 $order->paymentMethod->payment_method_code,
                 $order->restaurant->warehouse_fee,
                 $order->restaurant->warehouse_delivery_charges,
-                $order->area_id ? $order->area->country->country_name : ''
+                $order->area_id ? $order->area->country->country_name : '',
+                $order->restaurant_uuid
             );
 
             $responseContent = json_decode($response->content);

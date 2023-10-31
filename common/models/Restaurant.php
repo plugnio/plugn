@@ -1542,9 +1542,13 @@ class Restaurant extends \yii\db\ActiveRecord
 
             if ($businessApiResponse->isOk)
             {
+                //Yii::info('Create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
+
                 $this->business_id = $businessApiResponse->data['id'];
                 $this->business_entity_id = $businessApiResponse->data['entity']['id'];
-                $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
+
+                if(isset($businessApiResponse->data['entity']['operator']))
+                    $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
 
                 $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
 
@@ -1584,7 +1588,8 @@ class Restaurant extends \yii\db\ActiveRecord
                 $this->currency->code,
                 $this->business_id,
                 $this->business_entity_id,
-                $this->iban
+                $this->iban,
+                $this
             );
 
             if ($merchantApiResponse->isOk)
@@ -1620,7 +1625,8 @@ class Restaurant extends \yii\db\ActiveRecord
         $operatorApiResponse = Yii::$app->tapPayments->createAnOperator(
             $this->name,
             $this->wallet_id,
-            $this->developer_id
+            $this->developer_id,
+            $this
         );
 
         if ($operatorApiResponse->isOk)

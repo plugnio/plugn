@@ -28,9 +28,14 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
-        $a = Restaurant::find()->one();
+        $a = Restaurant::find()
+            ->andWhere(['restaurant_uuid' => "rest_f8363fe6-736f-11ee-8799-069e9504599a"])
+            ->one();
         echo "<pre />";
-        print_r($a->attributes);
+        //print_r($a->attributes);
+
+        Yii::$app->tapPayments->createBussiness($a);
+
     }
 
     /**
@@ -519,7 +524,8 @@ class CronController extends \yii\console\Controller
                     $refund->payment->payment_gateway_transaction_id,
                     $refund->refund_amount,
                     $refund->currency->code,
-                    $refund->reason ? $refund->reason : 'requested_by_customer'
+                    $refund->reason ? $refund->reason : 'requested_by_customer',
+                    $refund->store
                 );
 
                 if (array_key_exists('errors', $response->data)) {

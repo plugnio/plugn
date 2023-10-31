@@ -381,7 +381,8 @@ class OrderController extends Controller {
                                 $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ? $payment->payment_token : $order->paymentMethod->source_id,
                                 $order->restaurant->warehouse_fee,
                                 $order->restaurant->warehouse_delivery_charges,
-                                $order->area_id ? $order->area->country->country_name : ''
+                                $order->area_id ? $order->area->country->country_name : '',
+                                $order->restaurant_uuid
                         );
 
                         $responseContent = json_decode($response->content);

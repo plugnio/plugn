@@ -2,6 +2,7 @@
 
 namespace common\components;
 
+use common\models\ApiLog;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -197,7 +198,7 @@ class TapPayments extends Component
 
         $client = new Client();
 
-        $response = $client->createRequest()
+        return $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($fileEndpoint)
                 ->setData($fileParams)
@@ -207,8 +208,6 @@ class TapPayments extends Component
                     'content-type' => 'application/json',
                 ])
                 ->send();
-
-        return $response;
     }
 
     /**
@@ -222,14 +221,14 @@ class TapPayments extends Component
 
         $bussinessParams = [
             "name" => [
-                "en" => $restaurant->company_name. ' - Plugn',
-                "ar" => $restaurant->name_ar. ' - Plugn'
+                "en" => $restaurant->company_name. ' - Plugn @'. date('Y-m-d H:m:s'),
+                "ar" => $restaurant->name_ar. ' - Plugn @'. date('Y-m-d H:m:s')
             ],
             "type" => $restaurant->business_type,
             "entity" => [
                 "legal_name" => [
-                    "en" => $restaurant->company_name . '- Plugn',
-                    "ar" => $restaurant->name_ar. '- Plugn'
+                    "en" => $restaurant->company_name . '- Plugn @'. date('Y-m-d H:m:s'),
+                    "ar" => $restaurant->name_ar. '- Plugn @'. date('Y-m-d H:m:s')
                 ],
                 "is_licensed" => 'true',
                 "license_number" => $restaurant->license_number,
@@ -336,15 +335,29 @@ class TapPayments extends Component
 
         $client = new Client();
 
+        $headers = [
+            'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+            'content-type' => 'application/json',
+        ];
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($bussinessEndpoint)
                 ->setData($bussinessParams)
-                ->addHeaders([
-                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
-                    'content-type' => 'application/json',
-                ])
+                ->addHeaders($headers)
                 ->send();
+
+        if($restaurant) {// && $restaurant->enable_debugger
+            $log = new ApiLog;
+            $log->restaurant_uuid = $restaurant->restaurant_uuid;
+            $log->method = "POST";
+            $log->endpoint = $bussinessEndpoint;
+            $log->request_headers = print_r($headers, true);
+            $log->request_body = print_r($bussinessParams, true);
+            $log->response_headers = print_r($response->headers, true);
+            $log->response_body = print_r($response->data, true);
+            $log->save();
+        }
 
         return $response;
     }
@@ -380,7 +393,7 @@ class TapPayments extends Component
      * @param type $iban
      * @return type
      */
-    public function createMerchantAccount($company_name,$currency,  $business_id, $business_entity_id, $iban)
+    public function createMerchantAccount($company_name, $currency, $business_id, $business_entity_id, $iban, $restaurant = null)
     {
         $merchantEndpoint = $this->apiEndpoint . "/merchant";
 
@@ -397,15 +410,30 @@ class TapPayments extends Component
         ];
 
         $client = new Client();
+
+        $headers = [
+            'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+            'content-type' => 'application/json',
+        ];
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($merchantEndpoint)
                 ->setData($merchantParams)
-                ->addHeaders([
-                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
-                    'content-type' => 'application/json',
-                ])
+                ->addHeaders($headers)
                 ->send();
+
+        if($restaurant) {// && $restaurant->enable_debugger
+            $log = new ApiLog();
+            $log->restaurant_uuid = $restaurant->restaurant_uuid;
+            $log->method = "POST";
+            $log->endpoint = $merchantEndpoint;
+            $log->request_headers = print_r($headers, true);
+            $log->request_body = print_r($merchantParams, true);
+            $log->response_headers = print_r($response->headers, true);
+            $log->response_body = print_r($response->data, true);
+            $log->save();
+        }
 
         return $response;
     }
@@ -415,7 +443,7 @@ class TapPayments extends Component
      * @param type $restaurant_name
      * @param type $wallet_id
      */
-    public function createAnOperator($restaurant_name, $wallet_id, $developer_id)
+    public function createAnOperator($restaurant_name, $wallet_id, $developer_id, $restaurant = null)
     {
         $operatorEndpoint = $this->apiEndpoint . "/operator";
 
@@ -427,15 +455,29 @@ class TapPayments extends Component
 
         $client = new Client();
 
+        $headers = [
+            'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+            'content-type' => 'application/json',
+        ];
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($operatorEndpoint)
                 ->setData($operatorParams)
-                ->addHeaders([
-                    'authorization' => 'Bearer ' . $this->plugnScretApiKey,
-                    'content-type' => 'application/json',
-                ])
+                ->addHeaders($headers)
                 ->send();
+
+        if($restaurant) {// && $restaurant->enable_debugger
+            $log = new ApiLog();
+            $log->restaurant_uuid = $restaurant->restaurant_uuid;
+            $log->method = "POST";
+            $log->endpoint = $operatorEndpoint;
+            $log->request_headers = print_r($headers, true);
+            $log->request_body = print_r($operatorParams, true);
+            $log->response_headers = print_r($response->headers, true);
+            $log->response_body = print_r($response->data, true);
+            $log->save();
+        }
 
         return $response;
     }
@@ -447,9 +489,9 @@ class TapPayments extends Component
         $chargeId,
         $amount,
         $currency,
-        $reason="requested_by_customer"
+        $reason="requested_by_customer",
+        $restaurant = null
     ) {
-
         $refundEndpoint = $this->apiEndpoint . "/refunds";
 
         $refundParams = [
@@ -461,15 +503,29 @@ class TapPayments extends Component
 
         $client = new Client();
 
+        $headers = [
+            'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+            'content-type' => 'application/json',
+        ];
+
         $response = $client->createRequest()
-                      ->setMethod('POST')
-                      ->setUrl($refundEndpoint)
-                      ->setData($refundParams)
-                      ->addHeaders([
-                          'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
-                          'content-type' => 'application/json',
-                      ])
-                      ->send();
+            ->setMethod('POST')
+            ->setUrl($refundEndpoint)
+            ->setData($refundParams)
+            ->addHeaders($headers)
+            ->send();
+
+        if($restaurant) {// && $restaurant->enable_debugger
+            $log = new ApiLog();
+            $log->restaurant_uuid = $restaurant->restaurant_uuid;
+            $log->method = "POST";
+            $log->endpoint = $refundEndpoint;
+            $log->request_headers = print_r($headers, true);
+            $log->request_body = print_r($refundParams, true);
+            $log->response_headers = print_r($response->headers, true);
+            $log->response_body = print_r($response->data, true);
+            $log->save();
+        }
 
         return $response;
     }
@@ -493,7 +549,8 @@ class TapPayments extends Component
         $gateway,
         $warehouse_fee = 0,
         $warehouse_delivery_charges = 0,
-        $country_name = null
+        $country_name = null,
+        $restaurant_uuid = null
     ) {
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
@@ -536,7 +593,6 @@ class TapPayments extends Component
                 "url" => $webhookUrl
             ]
         ];
-
 
         if($platform_fee > 0) {
           
@@ -619,15 +675,29 @@ class TapPayments extends Component
 
         $client = new Client();
 
+        $headers = [
+            'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+            'content-type' => 'application/json',
+        ];
+
         $response = $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($chargeEndpoint)
                 ->setData($chargeParams)
-                ->addHeaders([
-                    'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
-                    'content-type' => 'application/json',
-                ])
+                ->addHeaders($headers)
                 ->send();
+
+        /*if($restaurant_uuid) {
+            $log = new ApiLog();
+            $log->restaurant_uuid = $restaurant_uuid;
+            $log->method = "POST";
+            $log->endpoint = $chargeEndpoint;
+            $log->request_headers = print_r($headers, true);
+            $log->request_body = print_r($chargeParams, true);
+            $log->response_headers = print_r($response->headers, true);
+            $log->response_body = print_r($response->data, true);
+            $log->save();
+        }*/
 
         return $response;
     }
@@ -854,5 +924,4 @@ class TapPayments extends Component
 
          return $signature == $headerSignature;
      }
-
 }
