@@ -949,10 +949,10 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         //logo
 
-        if (
-            $this->iban_certificate_file
-        )
+
+        if ($this->logo)
         {
+
             $tmpFile = sys_get_temp_dir () . '/' . $this->logo;
 
             if (
