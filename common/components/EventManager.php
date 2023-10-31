@@ -116,12 +116,19 @@ class EventManager extends Component
     {
         if($this->_client) {
             
-            $data = $eventData;
+            $mixpanelData = $eventData;
             
-            if($timestamp)
-                $data["time"] = $timestamp;
-            
-            $this->_client->track($event, $data);
+            if($timestamp) {
+                $mixpanelData =  array_merge([
+                    "\$time" => strtotime($timestamp),
+                    "\$created" => $timestamp,
+                ], $eventData);
+            }
+
+            if($userId)
+                $mixpanelData['$distinct_id'] = $userId;
+
+            $this->_client->track($event, $mixpanelData);
         }
         
         if($this->segmentKey) {

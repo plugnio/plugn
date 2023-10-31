@@ -337,7 +337,7 @@ class EventController extends \yii\console\Controller {
                     'coupon' => $order->voucher && $order->voucher->code ? $order->voucher->code : null,
                     'products' => $productsList ? $productsList : null
                 ],
-                    $datetime,
+                    $datetime->format('c'),
                     $order->restaurant_uuid);
             }
 
@@ -381,7 +381,7 @@ class EventController extends \yii\console\Controller {
                         'value' => $refund->refund_amount * $rate,
                         'currency' => 'USD'
                     ]),
-                    $datetime,
+                    $datetime->format('c'),
                     $refund->restaurant_uuid);
             }
 
@@ -481,7 +481,7 @@ class EventController extends \yii\console\Controller {
                         'coupon' => $coupon,
                         'products' => $productsList 
                     ],
-                    $datetime,
+                    $datetime->format('c'),
                     $order->restaurant_uuid
                 );
             }
@@ -532,6 +532,7 @@ class EventController extends \yii\console\Controller {
         }
     }
 }
+
 //to sync
 /*
 - Order Initiated
