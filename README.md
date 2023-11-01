@@ -199,3 +199,5 @@ https://stackoverflow.com/questions/37741512/how-can-i-use-the-aramex-api-with-w
 - list of events + data we passing 
 - fire new events to add data in mixpanel 
 
+https://developers.tap.company/reference/create-a-charge
+

@@ -29,13 +29,15 @@ class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
         $a = Restaurant::find()
-            ->andWhere(['restaurant_uuid' => "rest_f8363fe6-736f-11ee-8799-069e9504599a"])
+            ->andWhere(['restaurant_uuid' => "rest_adddefb3-ceac-11eb-b079-06c0d704d304"])
+
             ->one();
         echo "<pre />";
         //print_r($a->attributes);
 
-        Yii::$app->tapPayments->createBussiness($a);
+        $response = Yii::$app->tapPayments->getBussiness($a);
 
+        print_r($response);
     }
 
     /**
