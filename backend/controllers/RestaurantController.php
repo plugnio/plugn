@@ -154,6 +154,7 @@ class RestaurantController extends Controller {
         $store->business_entity_id = null;
         $store->wallet_id = null;
         $store->merchant_id = null;
+        $store->tap_merchant_status = null;
         $store->operator_id = null;
 
         $store->live_api_key = null;
@@ -267,6 +268,81 @@ class RestaurantController extends Controller {
         }
 
         return $this->redirect(['view', 'id' => $id]);
+    }
+
+    public function actionFetchMerchant($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->fetchMerchant($model->merchant_id);
+
+        if($response["operation"] == 'error') {
+            Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
+        } else {
+            Yii::$app->session->setFlash('successResponse', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    public function actionUploadDocumentsToTap($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->uploadDocumentsToTap();
+
+        if($response["operation"] == 'error') {
+            Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
+        } else {
+            Yii::$app->session->setFlash('successResponse', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    public function actionCreateBusiness($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->createBusiness();
+
+        if($response["operation"] == 'error') {
+            Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
+        } else {
+            Yii::$app->session->setFlash('successResponse', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    public function actionCreateMerchant($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->createMerchant();
+
+        if($response["operation"] == 'error') {
+            Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
+        } else {
+            Yii::$app->session->setFlash('successResponse', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    public function actionCreateAnOperator($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->createAnOperator();
+
+        if($response["operation"] == 'error') {
+            Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
+        } else {
+            Yii::$app->session->setFlash('successResponse', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
     /**

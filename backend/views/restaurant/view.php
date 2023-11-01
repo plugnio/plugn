@@ -401,6 +401,76 @@ $this->registerJs($js);
 
     <div id="tab-payment" class="tab-content hidden">
 
+        <?php
+
+        if (($model->logo && !$model->logo_file_id) ||
+            ($model->iban_certificate_file && !$model->iban_certificate_file_id) ||
+            ($model->authorized_signature_file && !$model->authorized_signature_file_id) ||
+            ($model->commercial_license_file && !$model->commercial_license_file_id) ||
+            ($model->identification_file_front_side && !$model->identification_file_id_front_side) ||
+            ($model->identification_file_back_side && !$model->identification_file_id_back_side)
+        ) {//|| !$model->developer_id
+
+            echo Html::a('Upload Documents', ['upload-documents-to-tap', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-primary btn-process-queue',
+                'data' => [
+                    'confirm' => 'Are you sure?',
+                    'method' => 'post',
+                ],
+            ]). '&nbsp;&nbsp;';
+        }
+
+        //Create a business for a vendor on Tap if not already exists
+
+        if (!$model->merchant_id && (!$model->business_id || !$model->business_entity_id)) {//|| !$model->developer_id
+
+            echo Html::a('Create Business', ['create-business', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-primary btn-process-queue',
+                'data' => [
+                    'confirm' => 'Are you sure?',
+                    'method' => 'post',
+                ],
+            ]). '&nbsp;&nbsp;';
+        }
+
+        //Create a merchant on Tap if not already added
+
+        if (!$model->merchant_id) {
+
+            echo Html::a('Create Merchant', ['create-an-merchant', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-primary btn-process-queue',
+                'data' => [
+                    'confirm' => 'Are you sure?',
+                    'method' => 'post',
+                ],
+            ]). '&nbsp;&nbsp;';
+        }
+
+        if ($model->merchant_id && !$model->operator_id) {
+
+            echo Html::a('Set API Keys from Merchant Details', ['fetch-merchant', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-primary btn-process-queue',
+                'data' => [
+                    'confirm' => 'Are you sure?',
+                    'method' => 'post',
+                ],
+            ]). '&nbsp;&nbsp;';
+        }
+
+        if ($model->wallet_id && $model->developer_id && !$model->operator_id) {
+
+            echo Html::a('Create An Operator', ['create-an-operator', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-primary btn-process-queue',
+                'data' => [
+                    'confirm' => 'Are you sure?',
+                    'method' => 'post',
+                ],
+            ]). '&nbsp;&nbsp;';
+        }
+
+
+        ?>
+
         <?=
         Html::a('Remove tap account detail', ['reset-tap', 'id' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger btn-process-queue',

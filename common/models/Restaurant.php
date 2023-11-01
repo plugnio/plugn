@@ -49,6 +49,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $business_entity_id
  * @property string|null $wallet_id
  * @property string|null $merchant_id
+ * @property string|null $tap_merchant_status
  * @property string|null $operator_id
  * @property string|null $live_api_key
  * @property string|null $test_api_key
@@ -459,6 +460,7 @@ class Restaurant extends ActiveRecord
                     'commercial_license_file', 'commercial_license_file_purpose', 'commercial_license_title',
                     'owner_first_name', 'owner_last_name',
                     'owner_email',
+                    'tap_merchant_status',
                     'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
@@ -652,6 +654,7 @@ class Restaurant extends ActiveRecord
             self::SCENARIO_RESET_TAP_ACCOUNT => [
                 'business_id',
                 'business_entity_id',
+                'tap_merchant_status',
                 'wallet_id',
                 'merchant_id',
                 'operator_id',
@@ -699,7 +702,8 @@ class Restaurant extends ActiveRecord
                 'authorized_signature_file_id', 'commercial_license_file_id', 'logo_file_id',
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
-                'identification_expiry_date', 'iban_certificate_file', 'iban_certificate_file_id', 'is_tap_business_active'],
+                'identification_expiry_date', 'iban_certificate_file', 'iban_certificate_file_id', 'tap_merchant_status',
+                'is_tap_business_active'],
 
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
@@ -1339,7 +1343,6 @@ class Restaurant extends ActiveRecord
     {
         $photo_url = [];
 
-
         if ($this->identification_file_back_side) {
 
             $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
@@ -1353,7 +1356,6 @@ class Restaurant extends ActiveRecord
 
     public function onMyFatoorahCreated()
     {
-
         $paymentGateway = 'MyFatoorah';
 
         $subject = 'Your ' . $paymentGateway . ' account data has been created';
@@ -1380,6 +1382,376 @@ class Restaurant extends ActiveRecord
      */
     public function createTapAccount()
     {
+        //Upload documents file on our server before we create an account on tap we gonaa delete them
+
+        $response = $this->uploadDocumentsToTap();
+
+        if ($response['operation'] == "error") {
+
+            Yii::error('Error while uploading doc for Business [' . $this->name . '] ' . json_encode($response));
+
+            return $response;
+        }
+
+        //Create a business for a vendor on Tap if not already exists
+
+        if (!$this->business_id || !$this->business_entity_id || !$this->developer_id) {
+
+            $response = $this->createBusiness();
+
+            if($response["operation"] == 'error') {
+                return $response;
+            }
+        }
+
+        //Create a merchant on Tap if not already added
+
+        if (!$this->merchant_id || !$this->wallet_id) {
+
+            $response = $this->createMerchant();
+
+            if($response["operation"] == 'error') {
+                return $response;
+            }
+        }
+
+        //Create an Operator
+
+        if ($this->developer_id) {
+
+            $response = $this->createAnOperator();
+
+            if($response["operation"] == 'error') {
+                return $response;
+            }
+        } else {
+            //if store logo not available, operator, developer id etc,... would be blank, so notify vendor +
+            // fetch api keys from merchant detail api from cron jobs
+            $this->onTapCreated();
+        }
+
+        return [
+            "operation" => 'success',
+            "message" => "Account created successfully!"
+        ];
+    }
+
+    public function createBusiness()
+    {
+        $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
+
+        if ($businessApiResponse->isOk && isset($businessApiResponse->data['entity']['operator'])) {
+
+            //Yii::info('Create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
+
+            $this->business_id = $businessApiResponse->data['id'];
+            $this->business_entity_id = $businessApiResponse->data['entity']['id'];
+
+            if (isset($businessApiResponse->data['entity']['operator']))
+                $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
+
+            $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'is_tap_business_active' => $this->is_tap_business_active
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'success',
+                "message" => "Business created successfully!"
+            ];
+
+        } else {
+            Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
+
+            if (isset(Yii::$app->session->id)) {
+                Yii::$app->session->setFlash('errorResponse', json_encode($businessApiResponse->data));
+            }
+
+            $this->addError('business_id', json_encode($businessApiResponse->data));
+
+            return [
+                "operation" => 'error',
+                "message" => $businessApiResponse->data
+            ];
+        }
+    }
+
+    public function createMerchant()
+    {
+        $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount(
+            $this->company_name . '-' . $this->business_id,
+            $this->currency->code,
+            $this->business_id,
+            $this->business_entity_id,
+            $this->iban,
+            $this
+        );
+
+        if ($merchantApiResponse->isOk) {
+
+            $this->merchant_id = $merchantApiResponse->data['id'];
+            $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
+
+            $this->tap_merchant_status = $merchantApiResponse->data['status'];
+
+            self::updateAll([
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'tap_merchant_status' => $this->tap_merchant_status
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'success',
+                "message" => "Merchant created successfully!"
+            ];
+
+        } else {
+
+            Yii::error('Error while create Merchant [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+
+            if (isset(Yii::$app->session->id))
+                Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
+
+            $this->addError('merchant_id', json_encode($merchantApiResponse->data));
+
+            return [
+                "operation" => 'error',
+                "message" => $merchantApiResponse->data
+            ];
+        }
+    }
+
+    /**
+     * fetch merchant details and set api keys
+     * @return array|string[]
+     */
+    public function fetchMerchant() {
+
+        $operatorApiResponse = Yii::$app->tapPayments->fetchMerchant(
+            $this->merchant_id
+        );
+
+        if ($operatorApiResponse->isOk && isset($operatorApiResponse->data['operator'])) {
+
+            $this->tap_merchant_status = $operatorApiResponse->data['status'];
+
+            if(!$this->wallet_id)
+                $this->wallet_id = $operatorApiResponse->data['operator']['wallet_id'];
+
+            $this->developer_id = $operatorApiResponse->data['operator']['developer_id'];
+
+            $this->operator_id = $operatorApiResponse->data['operator']['id'];
+            $this->test_api_key = $operatorApiResponse->data['operator']['api_credentials']['test']['secret'];
+            $this->test_public_key = $operatorApiResponse->data['operator']['api_credentials']['test']['public'];
+
+            if (array_key_exists('live', $operatorApiResponse->data['operator']['api_credentials'])) {
+                $this->live_api_key = $operatorApiResponse->data['operator']['api_credentials']['live']['secret'];
+                $this->live_public_key = $operatorApiResponse->data['operator']['api_credentials']['live']['public'];
+            }
+
+            //sandbox mode will give only test api keys
+
+            if ($this->live_api_key || $this->test_api_key) {
+                //$this->is_tap_enable = 1;
+                $this->is_tap_created = 1;
+                $this->is_myfatoorah_enable = 0;
+            } else {
+                $this->is_tap_created = 0;
+                //$this->is_tap_enable = 0;
+            }
+
+            if (
+                $this->is_tap_created &&
+                $this->is_tap_business_active &&
+                $this->tap_merchant_status == "Active"
+            ) {
+                $this->is_tap_enable = 1;
+            }
+
+            Yii::info($this->name . " has just created TAP account", __METHOD__);
+
+            self::updateAll([
+                'tap_merchant_status' => $this->tap_merchant_status,
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_tap_created' => $this->is_tap_created,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            if ($this->is_tap_created) {
+
+                if ($this->is_tap_enable) {
+                    $this->onTapApproved();
+               // } else {
+                //    $this->onTapCreated();
+                }
+            }
+
+            return [
+                "operation" => 'success',
+                "message" => "Account created successfully!"
+            ];
+
+        } else {
+
+            Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
+
+            if (isset(Yii::$app->session->id))
+                Yii::$app->session->setFlash('errorResponse', json_encode($operatorApiResponse->data));
+
+            $this->addError('operator_id', json_encode($operatorApiResponse->data));
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'error',
+                "message" => $operatorApiResponse->data
+            ];
+        }
+    }
+
+    public function createAnOperator()
+    {
+        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator(
+            $this->name,
+            $this->wallet_id,
+            $this->developer_id,
+            $this
+        );
+
+        if ($operatorApiResponse->isOk) {
+
+            $this->operator_id = $operatorApiResponse->data['id'];
+            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
+            $this->test_public_key = $operatorApiResponse->data['api_credentials']['test']['public'];
+
+            if (array_key_exists('live', $operatorApiResponse->data['api_credentials'])) {
+                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+                $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
+            }
+
+            //sandbox mode will give only test api keys
+
+            if ($this->live_api_key || $this->test_api_key) {
+                //$this->is_tap_enable = 1;
+                $this->is_tap_created = 1;
+                $this->is_myfatoorah_enable = 0;
+            } else {
+                $this->is_tap_created = 0;
+                //$this->is_tap_enable = 0;
+            }
+
+            if ($this->is_tap_created && $this->is_tap_business_active && $this->tap_merchant_status == "Active") {
+                $this->is_tap_enable = 1;
+            }
+
+            Yii::info($this->name . " has just created TAP account", __METHOD__);
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_tap_created' => $this->is_tap_created,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            if ($this->is_tap_created) {
+
+                if ($this->is_tap_enable) {
+                    $this->onTapApproved();
+                } else {
+                    $this->onTapCreated();
+                }
+            }
+
+            return [
+                "operation" => 'success',
+                "message" => "Account created successfully!"
+            ];
+
+        } else {
+
+            Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
+
+            if (isset(Yii::$app->session->id))
+                Yii::$app->session->setFlash('errorResponse', json_encode($operatorApiResponse->data));
+
+            $this->addError('operator_id', json_encode($operatorApiResponse->data));
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'error',
+                "message" => $operatorApiResponse->data
+            ];
+        }
+    }
+
+    /**
+     * move documents to tap when vendor upload
+     * @return void
+     */
+    public function uploadDocumentsToTap()
+    {
         if (!$this->authorized_signature_title) {
             $this->authorized_signature_title = 'Authorized Signature';
         }
@@ -1404,208 +1776,7 @@ class Restaurant extends ActiveRecord
             $this->identification_title = "Owner's civil id";
         }
 
-        //Upload documents file on our server before we create an account on tap we gonaa delete them
-
-        $response = $this->uploadDocumentsToTap();
-
-        if ($response['operation'] == "error") {
-
-            Yii::error('Error while uploading doc for Business [' . $this->name . '] ' . json_encode($response));
-
-            return $response;
-        }
-
-        //Create a business for a vendor on Tap if not already exists
-
-        if (!$this->business_id || !$this->business_entity_id || !$this->developer_id) {
-            $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
-
-            if ($businessApiResponse->isOk) {
-                //Yii::info('Create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
-
-                $this->business_id = $businessApiResponse->data['id'];
-                $this->business_entity_id = $businessApiResponse->data['entity']['id'];
-
-                if (isset($businessApiResponse->data['entity']['operator']))
-                    $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
-
-                $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
-
-                self::updateAll([
-                    'business_id' => $this->business_id,
-                    'business_entity_id' => $this->business_entity_id,
-                    'developer_id' => $this->developer_id,
-                    'is_tap_business_active' => $this->is_tap_business_active
-                ], [
-                    'restaurant_uuid' => $this->restaurant_uuid
-                ]);
-            } else {
-                Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
-
-                if (isset(Yii::$app->session->id)) {
-                    Yii::$app->session->setFlash('errorResponse', json_encode($businessApiResponse->data));
-                }
-
-                $this->addError('business_id', json_encode($businessApiResponse->data));
-
-                return [
-                    "operation" => 'error',
-                    "message" => $businessApiResponse->data
-                ];
-            }
-            //}
-        }
-
-        //Create a merchant on Tap if not already added
-
-        if (!$this->merchant_id || !$this->wallet_id) {
-            $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount(
-                $this->company_name . '-' . $this->business_id,
-                $this->currency->code,
-                $this->business_id,
-                $this->business_entity_id,
-                $this->iban,
-                $this
-            );
-
-            if ($merchantApiResponse->isOk) {
-                $this->merchant_id = $merchantApiResponse->data['id'];
-                $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
-
-                self::updateAll([
-                    'merchant_id' => $this->merchant_id,
-                    'wallet_id' => $this->wallet_id,
-                ], [
-                    'restaurant_uuid' => $this->restaurant_uuid
-                ]);
-            } else {
-                Yii::error('Error while create Merchant [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
-
-                if (isset(Yii::$app->session->id))
-                    Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
-
-                $this->addError('merchant_id', json_encode($merchantApiResponse->data));
-
-                return [
-                    "operation" => 'error',
-                    "message" => $merchantApiResponse->data
-                ];
-            }
-        }
-
-        //Create an Operator
-
-        if ($this->developer_id) {
-            $operatorApiResponse = Yii::$app->tapPayments->createAnOperator(
-                $this->name,
-                $this->wallet_id,
-                $this->developer_id,
-                $this
-            );
-
-            if ($operatorApiResponse->isOk) {
-                $this->operator_id = $operatorApiResponse->data['id'];
-                $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
-                $this->test_public_key = $operatorApiResponse->data['api_credentials']['test']['public'];
-
-                if (array_key_exists('live', $operatorApiResponse->data['api_credentials'])) {
-                    $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
-                    $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
-                }
-
-                //sandbox mode will give only test api keys
-
-                if ($this->live_api_key || $this->test_api_key) {
-                    //$this->is_tap_enable = 1;
-                    $this->is_tap_created = 1;
-                    $this->is_myfatoorah_enable = 0;
-                } else {
-                    $this->is_tap_created = 0;
-                    //$this->is_tap_enable = 0;
-                }
-
-                if ($this->is_tap_created && $this->is_tap_business_active) {
-                    $this->is_tap_enable = 1;
-                }
-
-                Yii::info($this->name . " has just created TAP account", __METHOD__);
-
-                self::updateAll([
-                    'business_id' => $this->business_id,
-                    'business_entity_id' => $this->business_entity_id,
-                    'developer_id' => $this->developer_id,
-                    'merchant_id' => $this->merchant_id,
-                    'wallet_id' => $this->wallet_id,
-                    'operator_id' => $this->operator_id,
-                    'test_api_key' => $this->test_api_key,
-                    'test_public_key' => $this->test_public_key,
-                    'live_api_key' => $this->live_api_key,
-                    'live_public_key' => $this->live_public_key,
-                    'is_tap_enable' => $this->is_tap_enable,
-                    'is_tap_created' => $this->is_tap_created,
-                    'is_myfatoorah_enable' => $this->is_myfatoorah_enable
-                ], [
-                    'restaurant_uuid' => $this->restaurant_uuid
-                ]);
-
-                if ($this->is_tap_created) {
-
-                    if ($this->is_tap_enable) {
-                        $this->onTapApproved();
-                    } else {
-                        $this->onTapCreated();
-                    }
-                }
-
-                return [
-                    "operation" => 'success',
-                    "message" => "Account created successfully!"
-                ];
-            } else {
-                Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
-
-                if (isset(Yii::$app->session->id))
-                    Yii::$app->session->setFlash('errorResponse', json_encode($operatorApiResponse->data));
-
-                $this->addError('operator_id', json_encode($operatorApiResponse->data));
-
-                self::updateAll([
-                    'business_id' => $this->business_id,
-                    'business_entity_id' => $this->business_entity_id,
-                    'developer_id' => $this->developer_id,
-                    'merchant_id' => $this->merchant_id,
-                    'wallet_id' => $this->wallet_id,
-                    'operator_id' => $this->operator_id,
-                    'test_api_key' => $this->test_api_key,
-                    'test_public_key' => $this->test_public_key,
-                    'live_api_key' => $this->live_api_key,
-                    'live_public_key' => $this->live_public_key,
-                    'is_tap_enable' => $this->is_tap_enable,
-                    'is_myfatoorah_enable' => $this->is_myfatoorah_enable
-                ], [
-                    'restaurant_uuid' => $this->restaurant_uuid
-                ]);
-
-                return [
-                    "operation" => 'error',
-                    "message" => $operatorApiResponse->data
-                ];
-            }
-        }
-
-        return [
-            "operation" => 'success',
-            "message" => "Account created successfully!"
-        ];
-    }
-
-    /**
-     * move documents to tap when vendor upload
-     * @return void
-     */
-    public function uploadDocumentsToTap()
-    {
-        if ($this->logo) {
+        if ($this->logo && !$this->logo_file_id) {
 
             $tmpFile = sys_get_temp_dir() . '/' . $this->logo;
 
@@ -1656,7 +1827,7 @@ class Restaurant extends ActiveRecord
         //IBAN Certificate
 
         if (
-            $this->iban_certificate_file
+            $this->iban_certificate_file && !$this->iban_certificate_file_id
         ) {
             $tmpFile = sys_get_temp_dir() . '/' . $this->iban_certificate_file;
 
@@ -1707,7 +1878,8 @@ class Restaurant extends ActiveRecord
         if (
             $this->authorized_signature_file &&
             $this->authorized_signature_file_purpose &&
-            $this->authorized_signature_title
+            $this->authorized_signature_title &&
+            !$this->authorized_signature_file_id
         ) {
             $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
 
@@ -1752,7 +1924,12 @@ class Restaurant extends ActiveRecord
 
         //Upload commercial_license file
 
-        if ($this->commercial_license_file && $this->commercial_license_file_purpose && $this->commercial_license_title) {
+        if (
+            $this->commercial_license_file &&
+            $this->commercial_license_file_purpose &&
+            $this->commercial_license_title &&
+            !$this->commercial_license_file_id
+        ) {
 
             $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
 
@@ -1794,7 +1971,11 @@ class Restaurant extends ActiveRecord
 
         //Upload Owner civil id front side
 
-        if ($this->identification_file_front_side && $this->identification_file_purpose && $this->identification_title) {
+        if ($this->identification_file_front_side &&
+            $this->identification_file_purpose &&
+            $this->identification_title &&
+            !$this->identification_file_id_front_side
+        ) {
 
             $civilIdFrontSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_front_side;
 
@@ -1837,7 +2018,11 @@ class Restaurant extends ActiveRecord
 
         //Upload Owner civil id back side
 
-        if ($this->identification_file_back_side && $this->identification_file_purpose && $this->identification_title) {
+        if ($this->identification_file_back_side &&
+            $this->identification_file_purpose &&
+            $this->identification_title &&
+            !$this->identification_file_id_back_side
+        ) {
 
             $civilIdBackSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_back_side;
 
@@ -1921,7 +2106,6 @@ class Restaurant extends ActiveRecord
 
     public function onTapApproved()
     {
-
         $this->notifyTapApproved();
 
         $this->enableTapGateways();
@@ -1989,7 +2173,6 @@ class Restaurant extends ActiveRecord
 
     public function onTapCreated()
     {
-
         $subject = 'Your Tap account has been created';
 
         $mailer = Yii::$app->mailer->compose([
@@ -2011,17 +2194,21 @@ class Restaurant extends ActiveRecord
 
     public function pollTapStatus()
     {
+        if(!$this->is_tap_business_active) {
+            $this->pollTapBusinessStatus();
+        }
+
+        if($this->tap_merchant_status != "Active") {
+            $this->fetchMerchant();
+        }
+    }
+
+    public function pollTapBusinessStatus()
+    {
         $businessApiResponse = Yii::$app->tapPayments->getBussiness($this);
 
         if ($businessApiResponse->isOk && $businessApiResponse->data['status'] === 'Active') {
-            self::updateAll([
-                'is_tap_enable' => true,
-                'is_tap_business_active' => true
-            ], [
-                'restaurant_uuid' => $this->restaurant_uuid
-            ]);
-
-            $this->onTapApproved();
+           $this->is_tap_business_active = true;
         }
     }
 
