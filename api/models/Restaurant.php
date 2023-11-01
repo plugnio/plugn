@@ -63,8 +63,8 @@ class Restaurant extends \common\models\Restaurant {
       unset($fields['has_deployed']);
       unset($fields['payment_gateway_queue_id']);
       unset($fields['tap_queue_id']);
-      unset($fields['is_tap_enable']);
-      unset($fields['is_myfatoorah_enable']);
+      //unset($fields['is_tap_enable']);
+      //unset($fields['is_myfatoorah_enable']);
       unset($fields['company_name']);
       unset($fields['owner_phone_country_code']);
       unset($fields['identification_issuing_date']);

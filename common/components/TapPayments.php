@@ -386,6 +386,29 @@ class TapPayments extends Component
     }
 
     /**
+     * retrive merchant details
+     * @param $merchant_id
+     * @return \yii\httpclient\Response
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function fetchMerchant($merchant_id)
+    {
+        $apiEndpoint = $this->apiEndpoint . "/merchant/" . $merchant_id;
+
+        $client = new Client();
+
+        return $client->createRequest()
+            ->setMethod('GET')
+            ->setUrl($apiEndpoint)
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->send();
+    }
+
+    /**
      * Create a merchant account
      * @param type $restaurant_name
      * @param type $business_id
@@ -804,7 +827,6 @@ class TapPayments extends Component
 
         return $response;
     }
-
 
     /**
      * Check refund object for status updates
