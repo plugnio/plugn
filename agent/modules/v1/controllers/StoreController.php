@@ -1281,7 +1281,7 @@ class StoreController extends BaseController
         }
 
         if (YII_ENV == 'prod') {
-            Yii::$app->eventManager->track('Email Opened', $model);
+            Yii::$app->eventManager->track('Email Opened', $model->attributes);
         }
 
         return $response->send();

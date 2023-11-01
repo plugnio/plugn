@@ -4,8 +4,13 @@ namespace common\models;
 
 use agent\models\PaymentMethod;
 use api\models\Item;
+use borales\extensions\phoneInput\PhoneInputBehavior;
+use Cloudinary\Error;
+use Swift_TransportException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\db\Exception;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
@@ -44,6 +49,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $business_entity_id
  * @property string|null $wallet_id
  * @property string|null $merchant_id
+ * @property string|null $tap_merchant_status
  * @property string|null $operator_id
  * @property string|null $live_api_key
  * @property string|null $test_api_key
@@ -130,7 +136,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $last_active_at
  * @property string|null $last_order_at
  * @property number $total_orders
- * 
+ *
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -162,7 +168,7 @@ use yii\helpers\ArrayHelper;
  * @property Voucher[] $vouchers
  * @property WebLink[] $webLinks
  */
-class Restaurant extends \yii\db\ActiveRecord
+class Restaurant extends ActiveRecord
 {
     //Values for `restaurant_status`
     const RESTAURANT_STATUS_OPEN = 1;
@@ -220,6 +226,195 @@ class Restaurant extends \yii\db\ActiveRecord
         return 'restaurant';
     }
 
+    public static function arrStatus()
+    {
+        return [
+            self::RESTAURANT_STATUS_OPEN => "Open",
+            self::RESTAURANT_STATUS_BUSY => "Busy",
+            self::RESTAURANT_STATUS_CLOSED => "Closed"
+        ];
+    }
+
+    public static function getTotalStoresByInterval($interval)
+    {
+        switch ($interval) {
+            case "last-month":
+                return self::getTotalStoresByMonth();
+            case "week":
+                return self::getTotalStoresByWeek();
+            default:
+                return self::getTotalStoresByMonths(str_replace(["last-", "-months"], ["", ""], $interval));
+        }
+    }
+
+    public static function getTotalStoresByMonth()
+    {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
+        $customer_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
+
+        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
+            $customer_data[$i] = array(
+                'day' => $i,
+                'total' => 0
+            );
+        }
+
+        $rows = Restaurant::getDb()->cache(function ($db) {
+
+            return Restaurant::find()
+                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
+                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->groupBy(new Expression('DAY(restaurant_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
+
+        foreach ($rows as $result) {
+            $customer_data[date('j', strtotime($result['restaurant_created_at']))] = array(
+                'day' => (int)date('j', strtotime($result['restaurant_created_at'])),
+                'total' => (int)$result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = Restaurant::getDb()->cache(function ($db) {
+
+            return Restaurant::find()
+                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL 1 MONTH)')
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
+
+        return [
+            'store_created_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int)$number_of_all_customer_gained
+        ];
+    }
+
+    public static function getTotalStoresByWeek()
+    {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
+        $customer_data = [];
+
+        $date_start = strtotime('-6 days');//date('w')
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = date('Y-m-d', $date_start + ($i * 86400));
+
+            $customer_data[date('w', strtotime($date))] = array(
+                'day' => date('D', strtotime($date)),
+                'total' => 0
+            );
+        }
+
+        $rows = Restaurant::getDb()->cache(function ($db) {
+
+            return Restaurant::find()
+                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(restaurant_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy(new Expression('DAYNAME(restaurant_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
+
+        foreach ($rows as $result) {
+            $customer_data[date('w', strtotime($result['restaurant_created_at']))] = array(
+                'day' => date('D', strtotime($result['restaurant_created_at'])),
+                'total' => (int)$result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = Restaurant::getDb()->cache(function ($db) {
+
+            return Restaurant::find()
+                ->andWhere(new Expression("date(restaurant_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
+
+        return [
+            'store_created_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int)$number_of_all_customer_gained
+        ];
+    }
+
+    public static function getTotalStoresByMonths($months)
+    {
+        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+
+        $cacheDependency = Yii::createObject([
+            'class' => 'yii\caching\DbDependency',
+            'reusable' => true,
+            'sql' => 'SELECT COUNT(*) FROM restaurant',
+        ]);
+
+        $customer_data = [];
+
+        $date_start = date('Y') . '-' . date('m', strtotime('-' . $months . ' month')) . '-1';
+        $date_end = date('Y-m-d', strtotime('last day of previous month'));
+        //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
+
+        for ($i = 0; $i <= $months; $i++) {
+
+            $month = date('m', strtotime('-' . ($months - $i) . ' month'));
+
+            $customer_data[$month] = array(
+                'month' => date('F', strtotime('-' . ($months - $i) . ' month')),
+                'total' => 0
+            );
+        }
+
+        $rows = Restaurant::getDb()->cache(function ($db) use ($months) {
+
+            return Restaurant::find()
+                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
+                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL ' . $months . ' MONTH)')
+//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
+                ->groupBy(new Expression('MONTH(restaurant_created_at)'))
+                ->asArray()
+                ->all();
+
+        }, $cacheDuration, $cacheDependency);
+
+        foreach ($rows as $result) {
+            $customer_data[date('m', strtotime($result['restaurant_created_at']))] = array(
+                'month' => Yii::t('app', date('F', strtotime($result['restaurant_created_at']))),
+                'total' => (int)$result['total']
+            );
+        }
+
+        $number_of_all_customer_gained = Restaurant::getDb()->cache(function ($db) use ($months) {
+
+            return Restaurant::find()
+                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL ' . $months . ' MONTH)')
+//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
+
+        return [
+            'store_created_chart_data' => array_values($customer_data),
+            'number_of_all_customer_gained' => (int)$number_of_all_customer_gained
+        ];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -235,24 +430,24 @@ class Restaurant extends \yii\db\ActiveRecord
             ],
             [
                 [
-                   'identification_file_front_side', 'identification_file_back_side', 'commercial_license_file',
+                    'identification_file_front_side', 'identification_file_back_side', 'commercial_license_file',
                 ],
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
 
             [['meta_title', 'meta_title_ar', 'meta_description', 'meta_description_ar'], 'string'],
 
-            [['authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function($model) {
+            [['authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
                 return $model->business_type == 'corp';
             }],
 
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
-            [['identification_file_id_back_side','identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file', 'iban_certificate_file_id', 'logo_file_id'], 'safe', 'on' => [
+            [['identification_file_id_back_side', 'identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file', 'iban_certificate_file_id', 'logo_file_id'], 'safe', 'on' => [
                 self::SCENARIO_CREATE_TAP_ACCOUNT,
                 self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT
             ]],
             [['not_for_profit', 'total_orders'], 'number'],
-            
+
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             ['owner_email', 'email'],
             ['iban', 'safe'],
@@ -265,26 +460,27 @@ class Restaurant extends \yii\db\ActiveRecord
                     'commercial_license_file', 'commercial_license_file_purpose', 'commercial_license_title',
                     'owner_first_name', 'owner_last_name',
                     'owner_email',
+                    'tap_merchant_status',
                     'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                    'live_api_key', 'test_api_key', 'developer_id', 'live_public_key', 'test_public_key','annual_revenue'
+                    'live_api_key', 'test_api_key', 'developer_id', 'live_public_key', 'test_public_key', 'annual_revenue'
                 ],
                 'string', 'max' => 255
             ],
-            ['iban', 'string', 'min'=>10, 'max'=>34 , 'message' => 'The IBAN must be at least 10 characters long.', 'on' =>[ self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
+            ['iban', 'string', 'min' => 10, 'max' => 34, 'message' => 'The IBAN must be at least 10 characters long.', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
 
             ['iban', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Please check the IBAN, we might not support transfering to this bank.', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [['restaurant_commercial_license_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['restaurant_authorized_signature_file', 'owner_identification_file_front_side', 'owner_identification_file_back_side'], 'file', 'skipOnEmpty' => true, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT],
             [['name', 'name_ar', 'support_delivery', 'support_pick_up', 'restaurant_payments_method', 'restaurant_domain', 'restaurant_email', 'store_branch_name', 'app_id'], 'required', 'on' => 'create'],
             [['name', 'name_ar', 'restaurant_email'], 'required', 'on' => 'default'],
-            [['name','restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            [['name', 'restaurant_domain', 'currency_id', 'country_id'], 'required', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 // 'owner_number',
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
             ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
-            
+
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
             [['restaurant_domain'], 'string', 'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
@@ -299,12 +495,12 @@ class Restaurant extends \yii\db\ActiveRecord
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH, self::STORE_LAYOUT_CATEGORY_HALFWIDTH]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
-            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed','tap_queue_id', 'payment_gateway_queue_id'], 'safe'],
+            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed', 'tap_queue_id', 'payment_gateway_queue_id'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
             [['is_public', 'is_deleted', 'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox'], 'boolean'],
-            [['platform_fee', 'warehouse_fee','warehouse_delivery_charges'], 'number'],
+            [['platform_fee', 'warehouse_fee', 'warehouse_delivery_charges'], 'number'],
             [['instagram_url'], 'url'],
             [['export_orders_data_in_specific_date_range', 'export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'google_tag_id', 'google_tag_manager_id', 'tiktok_pixel_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
             [['name', 'name_ar', 'tagline', 'tagline_ar', 'thumbnail_image', 'logo', 'app_id', 'armada_api_key', 'mashkor_branch_id', 'store_branch_name', 'live_public_key', 'test_public_key', 'company_name'], 'string', 'max' => 255],
@@ -322,7 +518,7 @@ class Restaurant extends \yii\db\ActiveRecord
             [['identification_file_purpose'], 'default', 'value' => 'identity_document', 'on' => self::SCENARIO_CREATE_TAP_ACCOUNT],
 
 
-            [[ 'country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent','enable_gift_message'], 'integer'],
+            [['country_id', 'currency_id', 'owner_phone_country_code', 'phone_number_country_code', 'retention_email_sent', 'enable_gift_message'], 'integer'],
 
             [['phone_number', 'owner_number'], 'string', 'min' => 6, 'max' => 20],
 
@@ -342,19 +538,19 @@ class Restaurant extends \yii\db\ActiveRecord
                 ['identification_file_front_side'],
                 '\common\components\S3FileExistValidator',
                 'filePath' => '',
-                'message' => Yii::t('app',"Please upload identification file (front side)"),
+                'message' => Yii::t('app', "Please upload identification file (front side)"),
                 'resourceManager' => Yii::$app->temporaryBucketResourceManager,
-                'when' => function($model, $attribute) {
-                    return $model->{$attribute} !== $model->getOldAttribute($attribute)&& $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
+                'when' => function ($model, $attribute) {
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
             [
                 ['identification_file_back_side'],
                 '\common\components\S3FileExistValidator',
                 'filePath' => '',
-                'message' => Yii::t('app',"Please upload identification file (back side)"),
+                'message' => Yii::t('app', "Please upload identification file (back side)"),
                 'resourceManager' => Yii::$app->temporaryBucketResourceManager,
-                'when' => function($model, $attribute) {
+                'when' => function ($model, $attribute) {
                     return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
@@ -362,37 +558,37 @@ class Restaurant extends \yii\db\ActiveRecord
                 ['commercial_license_file'],
                 '\common\components\S3FileExistValidator',
                 'filePath' => '',
-                'message' => Yii::t('app',"Please upload commercial license file"),
+                'message' => Yii::t('app', "Please upload commercial license file"),
                 'resourceManager' => Yii::$app->temporaryBucketResourceManager,
-                'when' => function($model, $attribute) {
-                  return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
+                'when' => function ($model, $attribute) {
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
             [
                 ['authorized_signature_file'],
                 '\common\components\S3FileExistValidator',
                 'filePath' => '',
-                'message' => Yii::t('app',"Please upload a authorized signature file"),
+                'message' => Yii::t('app', "Please upload a authorized signature file"),
                 'resourceManager' => Yii::$app->temporaryBucketResourceManager,
-                'when' => function($model, $attribute) {
-                  return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
+                'when' => function ($model, $attribute) {
+                    return $model->{$attribute} !== $model->getOldAttribute($attribute) && $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
             [
                 ['iban_certificate_file'],
                 '\common\components\S3FileExistValidator',
                 'filePath' => '',
-                'message' => Yii::t('app',"Please upload IBAN certificate file"),
+                'message' => Yii::t('app', "Please upload IBAN certificate file"),
                 'resourceManager' => Yii::$app->temporaryBucketResourceManager,
-                'when' => function($model, $attribute) {
+                'when' => function ($model, $attribute) {
                     return $model->{$attribute} !== $model->getOldAttribute($attribute) &&
                         $this->scenario == self::SCENARIO_CREATE_TAP_ACCOUNT;
                 }
             ],
             [['restaurant_email_notification', 'demand_delivery', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_tap_created', 'is_tap_business_active', 'is_myfatoorah_enable', 'supplierCode'], 'integer'],
-            [['schedule_interval'], 'required','when' => function($model) {
-                    return $model->schedule_order;
-                }
+            [['schedule_interval'], 'required', 'when' => function ($model) {
+                return $model->schedule_order;
+            }
             ],
             [['custom_subscription_price'], 'number', 'min' => 0],
             [['referral_code'], 'string', 'max' => 6],
@@ -458,6 +654,7 @@ class Restaurant extends \yii\db\ActiveRecord
             self::SCENARIO_RESET_TAP_ACCOUNT => [
                 'business_id',
                 'business_entity_id',
+                'tap_merchant_status',
                 'wallet_id',
                 'merchant_id',
                 'operator_id',
@@ -497,7 +694,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'identification_file_id_back_side',
                 'payment_gateway_queue_id',
                 'tap_queue_id'
-            ],    
+            ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
                 'vendor_sector', 'iban', 'company_name', 'business_type',
@@ -505,7 +702,8 @@ class Restaurant extends \yii\db\ActiveRecord
                 'authorized_signature_file_id', 'commercial_license_file_id', 'logo_file_id',
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
-                'identification_expiry_date', 'iban_certificate_file','iban_certificate_file_id', 'is_tap_business_active'],
+                'identification_expiry_date', 'iban_certificate_file', 'iban_certificate_file_id', 'tap_merchant_status',
+                'is_tap_business_active'],
 
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
@@ -513,7 +711,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'owner_identification_file_back_side', 'restaurant_authorized_signature_file',
             ],
             self::SCENARIO_UPDATE => [
-                'country_id', 'restaurant_email_notification', 'demand_delivery','phone_number', 'phone_number_country_code',
+                'country_id', 'restaurant_email_notification', 'demand_delivery', 'phone_number', 'phone_number_country_code',
                 'name', 'name_ar', 'schedule_interval', 'schedule_order', 'is_sandbox',
                 'restaurant_email', 'tagline', 'tagline_ar', 'currency_id', 'meta_description', 'meta_description_ar',
                 'owner_first_name', 'owner_last_name', 'owner_number', 'owner_email', 'owner_phone_country_code',
@@ -535,93 +733,93 @@ class Restaurant extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
-            'country_id' => Yii::t('app','Country'),
-            'currency_id' => Yii::t('app','Store currency'),
-            'name' => Yii::t('app','Store name / Business name in English'),
-            'name_ar' => Yii::t('app','Store name / Business name in Arabic'),
-            'tagline' => Yii::t('app','Tagline in English'),
-            'tagline_ar' => Yii::t('app','Tagline in Arabic'),
-            'meta_title' => Yii::t('app','Page Title'),
-            'meta_title_ar' => Yii::t('app','Page Title in Arabic'),
-            'meta_description' => Yii::t('app','Meta Tag Description'),
-            'meta_description_ar' => Yii::t('app','Meta Tag Description in Arabic'),
-            'restaurant_domain' => Yii::t('app','Store Url'),
-            'app_id' => Yii::t('app','App id'),
-            'restaurant_payments_method' => Yii::t('app','Payment method'),
-            'restaurant_status' => Yii::t('app','Store Status'),
-            'thumbnail_image' => Yii::t('app','Header Image'),
-            'logo' => Yii::t('app','Logo'),
-            'restaurant_thumbnail_image' => Yii::t('app','Header Image'),
-            'restaurant_logo' => Yii::t('app','Logo'),
-            'support_delivery' => Yii::t('app','Support Delivery'),
-            'support_pick_up' => Yii::t('app','Support Pick Up'),
-            'hide_request_driver_button' => Yii::t('app','Hide request driver button'),
-            'restaurant_delivery_area' => Yii::t('app','Delivery Areas'),
-            'export_orders_data_in_specific_date_range' => Yii::t('app','Export orders data in a specific date range'),
-            'export_sold_items_data_in_specific_date_range' => Yii::t('app','Export sold items data in a specific date range'),
-            'phone_number' => Yii::t('app',"Store's phone number"),
-            'restaurant_email' => Yii::t('app',"Store's Email"),
-            'restaurant_created_at' => Yii::t('app','Store Created At'),
-            'restaurant_updated_at' => Yii::t('app','Store Updated At'),
-            'armada_api_key' => Yii::t('app','Armada Api Key'),
-            'armada_branch_id' => Yii::t('app','Mashkor Branch ID'),
-            'restaurant_email_notification' => Yii::t('app','Email notification'),
-            'show_opening_hours' => Yii::t('app','Show Opening hours'),
-            'phone_number_display' => Yii::t('app','Phone number display'),
-            'store_branch_name' => Yii::t('app','Github repo branch name'),
-            'custom_css' => Yii::t('app','Custom css'),
-            'platform_fee' => Yii::t('app','Platform fee'),
-            'warehouse_fee' => Yii::t('app','Warehouse fee'),
-            'warehouse_delivery_charges' =>Yii::t('app','Delivery charges'),
-            'company_name' => Yii::t('app','Company name'),
-            'store_layout' => Yii::t('app','Store layout'),
-            'google_analytics_id' => Yii::t('app','Google Analytics ID'),
-            'facebook_pixil_id' => Yii::t('app','Facebook Pixil ID'),
-            'google_tag_id' => Yii::t('app','Google Tag ID'),
-            'google_tag_manager_id'=> Yii::t('app','Google Tag Manager ID'),
-            'tiktok_pixel_id' => Yii::t('app','TokTok Pixel ID'),
-            'instagram_url' => Yii::t('app','Instagram url'),
-            'schedule_order' => Yii::t('app','Schedule order'),
-            'schedule_interval' => Yii::t('app','Schedule interval'),
-            'business_type' => Yii::t('app','Account type'),
-            'vendor_sector' => Yii::t('app','Vendor sector'),
-            'license_number' => Yii::t('app','License number'),
-            'owner_identification_file_front_side' => Yii::t('app','Civil ID Front side'),
-            'owner_identification_file_back_side' => Yii::t('app','Civil ID Back side'),
-            'authorized_signature_issuing_date' => Yii::t('app','Authorized Signature Issuing Date'),
-            'authorized_signature_expiry_date' => Yii::t('app','Authorized Signature Expiry Date'),
-            'authorized_signature_file' => Yii::t('app','Authorized signature'),
-            'restaurant_authorized_signature_file' => Yii::t('app','Authorized Signature'),
-            'authorized_signature_title' => Yii::t('app','Authorized Signature Title'),
-            'authorized_signature_file_purpose' => Yii::t('app','Authorized Signature File Purpose'),
-            'commercial_license_issuing_date' => Yii::t('app','Commercial License Issuing Date'),
-            'commercial_license_expiry_date' => Yii::t('app','Commercial License Expiry Date'),
-            'commercial_license_file' => Yii::t('app','License copy'),
-            'restaurant_commercial_license_file' => Yii::t('app','License copy'),
-            'commercial_license_title' => Yii::t('app','Commercial License Title'),
-            'commercial_license_file_purpose' => Yii::t('app','Commercial License File Purpose'),
-            'iban' => Yii::t('app','IBAN'),
-            'owner_first_name' => Yii::t('app','First Name'),
-            'owner_last_name' => Yii::t('app','Last Name'),
-            'owner_email' => Yii::t('app','Owner/ Tap account Email Address'),
-            'owner_number' => Yii::t('app','Owner Phone Number'),
-            'identification_issuing_date' => Yii::t('app','Identification Issuing Date'),
-            'identification_expiry_date' => Yii::t('app','Identification Expiry Date'),
-            'identification_file_front_side' => Yii::t('app',' National ID File front side'),
-            'identification_file_back_side' => Yii::t('app',' National ID File back side'),
-            'identification_title' => Yii::t('app','Identification Title'),
-            'identification_file_purpose' => Yii::t('app','Identification File Purpose'),
-            'iban_certificate_file' => Yii::t('app','IBAN Certificate'),
-            'live_api_key' => Yii::t('app','Live secret key'),
-            'test_api_key' => Yii::t('app','Test secret key'),
-            'default_language' => Yii::t('app','Default Language'),
-            'custom_subscription_price'  => Yii::t('app','Custom Subscription Price'),
+            'restaurant_uuid' => Yii::t('app', 'Restaurant Uuid'),
+            'country_id' => Yii::t('app', 'Country'),
+            'currency_id' => Yii::t('app', 'Store currency'),
+            'name' => Yii::t('app', 'Store name / Business name in English'),
+            'name_ar' => Yii::t('app', 'Store name / Business name in Arabic'),
+            'tagline' => Yii::t('app', 'Tagline in English'),
+            'tagline_ar' => Yii::t('app', 'Tagline in Arabic'),
+            'meta_title' => Yii::t('app', 'Page Title'),
+            'meta_title_ar' => Yii::t('app', 'Page Title in Arabic'),
+            'meta_description' => Yii::t('app', 'Meta Tag Description'),
+            'meta_description_ar' => Yii::t('app', 'Meta Tag Description in Arabic'),
+            'restaurant_domain' => Yii::t('app', 'Store Url'),
+            'app_id' => Yii::t('app', 'App id'),
+            'restaurant_payments_method' => Yii::t('app', 'Payment method'),
+            'restaurant_status' => Yii::t('app', 'Store Status'),
+            'thumbnail_image' => Yii::t('app', 'Header Image'),
+            'logo' => Yii::t('app', 'Logo'),
+            'restaurant_thumbnail_image' => Yii::t('app', 'Header Image'),
+            'restaurant_logo' => Yii::t('app', 'Logo'),
+            'support_delivery' => Yii::t('app', 'Support Delivery'),
+            'support_pick_up' => Yii::t('app', 'Support Pick Up'),
+            'hide_request_driver_button' => Yii::t('app', 'Hide request driver button'),
+            'restaurant_delivery_area' => Yii::t('app', 'Delivery Areas'),
+            'export_orders_data_in_specific_date_range' => Yii::t('app', 'Export orders data in a specific date range'),
+            'export_sold_items_data_in_specific_date_range' => Yii::t('app', 'Export sold items data in a specific date range'),
+            'phone_number' => Yii::t('app', "Store's phone number"),
+            'restaurant_email' => Yii::t('app', "Store's Email"),
+            'restaurant_created_at' => Yii::t('app', 'Store Created At'),
+            'restaurant_updated_at' => Yii::t('app', 'Store Updated At'),
+            'armada_api_key' => Yii::t('app', 'Armada Api Key'),
+            'armada_branch_id' => Yii::t('app', 'Mashkor Branch ID'),
+            'restaurant_email_notification' => Yii::t('app', 'Email notification'),
+            'show_opening_hours' => Yii::t('app', 'Show Opening hours'),
+            'phone_number_display' => Yii::t('app', 'Phone number display'),
+            'store_branch_name' => Yii::t('app', 'Github repo branch name'),
+            'custom_css' => Yii::t('app', 'Custom css'),
+            'platform_fee' => Yii::t('app', 'Platform fee'),
+            'warehouse_fee' => Yii::t('app', 'Warehouse fee'),
+            'warehouse_delivery_charges' => Yii::t('app', 'Delivery charges'),
+            'company_name' => Yii::t('app', 'Company name'),
+            'store_layout' => Yii::t('app', 'Store layout'),
+            'google_analytics_id' => Yii::t('app', 'Google Analytics ID'),
+            'facebook_pixil_id' => Yii::t('app', 'Facebook Pixil ID'),
+            'google_tag_id' => Yii::t('app', 'Google Tag ID'),
+            'google_tag_manager_id' => Yii::t('app', 'Google Tag Manager ID'),
+            'tiktok_pixel_id' => Yii::t('app', 'TokTok Pixel ID'),
+            'instagram_url' => Yii::t('app', 'Instagram url'),
+            'schedule_order' => Yii::t('app', 'Schedule order'),
+            'schedule_interval' => Yii::t('app', 'Schedule interval'),
+            'business_type' => Yii::t('app', 'Account type'),
+            'vendor_sector' => Yii::t('app', 'Vendor sector'),
+            'license_number' => Yii::t('app', 'License number'),
+            'owner_identification_file_front_side' => Yii::t('app', 'Civil ID Front side'),
+            'owner_identification_file_back_side' => Yii::t('app', 'Civil ID Back side'),
+            'authorized_signature_issuing_date' => Yii::t('app', 'Authorized Signature Issuing Date'),
+            'authorized_signature_expiry_date' => Yii::t('app', 'Authorized Signature Expiry Date'),
+            'authorized_signature_file' => Yii::t('app', 'Authorized signature'),
+            'restaurant_authorized_signature_file' => Yii::t('app', 'Authorized Signature'),
+            'authorized_signature_title' => Yii::t('app', 'Authorized Signature Title'),
+            'authorized_signature_file_purpose' => Yii::t('app', 'Authorized Signature File Purpose'),
+            'commercial_license_issuing_date' => Yii::t('app', 'Commercial License Issuing Date'),
+            'commercial_license_expiry_date' => Yii::t('app', 'Commercial License Expiry Date'),
+            'commercial_license_file' => Yii::t('app', 'License copy'),
+            'restaurant_commercial_license_file' => Yii::t('app', 'License copy'),
+            'commercial_license_title' => Yii::t('app', 'Commercial License Title'),
+            'commercial_license_file_purpose' => Yii::t('app', 'Commercial License File Purpose'),
+            'iban' => Yii::t('app', 'IBAN'),
+            'owner_first_name' => Yii::t('app', 'First Name'),
+            'owner_last_name' => Yii::t('app', 'Last Name'),
+            'owner_email' => Yii::t('app', 'Owner/ Tap account Email Address'),
+            'owner_number' => Yii::t('app', 'Owner Phone Number'),
+            'identification_issuing_date' => Yii::t('app', 'Identification Issuing Date'),
+            'identification_expiry_date' => Yii::t('app', 'Identification Expiry Date'),
+            'identification_file_front_side' => Yii::t('app', ' National ID File front side'),
+            'identification_file_back_side' => Yii::t('app', ' National ID File back side'),
+            'identification_title' => Yii::t('app', 'Identification Title'),
+            'identification_file_purpose' => Yii::t('app', 'Identification File Purpose'),
+            'iban_certificate_file' => Yii::t('app', 'IBAN Certificate'),
+            'live_api_key' => Yii::t('app', 'Live secret key'),
+            'test_api_key' => Yii::t('app', 'Test secret key'),
+            'default_language' => Yii::t('app', 'Default Language'),
+            'custom_subscription_price' => Yii::t('app', 'Custom Subscription Price'),
             //'demand_delivery' => Yii::t('app','Accept order 24/7')
-            'accept_order_247' => Yii::t('app','Accept order 24/7'),
-            'is_public' => Yii::t('app','Is Public?'),
-            'is_deleted' => Yii::t('app','Is Deleted?'),
-            'is_under_maintenance' => Yii::t('app','Is Under Maintenance?'),
+            'accept_order_247' => Yii::t('app', 'Accept order 24/7'),
+            'is_public' => Yii::t('app', 'Is Public?'),
+            'is_deleted' => Yii::t('app', 'Is Deleted?'),
+            'is_under_maintenance' => Yii::t('app', 'Is Under Maintenance?'),
         ];
     }
 
@@ -633,25 +831,25 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         return [
             [
-                'class' => AttributeBehavior::className (),
+                'class' => AttributeBehavior::className(),
                 'attributes' => [
-                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'restaurant_uuid',
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'restaurant_uuid',
                 ],
                 'value' => function () {
                     if (!$this->restaurant_uuid)
-                        $this->restaurant_uuid = 'rest_' . Yii::$app->db->createCommand ('SELECT uuid()')->queryScalar ();
+                        $this->restaurant_uuid = 'rest_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
 
                     return $this->restaurant_uuid;
                 }
             ],
             [
-                'class' => TimestampBehavior::className (),
+                'class' => TimestampBehavior::className(),
                 'createdAtAttribute' => 'restaurant_created_at',
                 'updatedAtAttribute' => 'restaurant_updated_at',
                 'value' => new Expression('NOW()'),
             ],
             [
-                'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className (),
+                'class' => PhoneInputBehavior::className(),
                 // 'attributes' => [
                 //           ActiveRecord::EVENT_BEFORE_INSERT => ['owner_phone_country_code', 'owner_number'],
                 //       ],
@@ -659,7 +857,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 'phoneAttribute' => 'owner_number',
             ],
             [
-                'class' => \borales\extensions\phoneInput\PhoneInputBehavior::className (),
+                'class' => PhoneInputBehavior::className(),
                 // 'attributes' => [
                 //           ActiveRecord::EVENT_BEFORE_INSERT => ['phone_number_country_code', 'phone_number'],
                 //       ],
@@ -690,14 +888,6 @@ class Restaurant extends \yii\db\ActiveRecord
         return "Couldnt find a status";
     }
 
-    public static function arrStatus() {
-        return [
-            self::RESTAURANT_STATUS_OPEN => "Open",
-            self::RESTAURANT_STATUS_BUSY => "Busy",
-            self::RESTAURANT_STATUS_CLOSED => "Closed"
-        ];
-    }
-
     /**
      * Upload a File from AWS to cloudinary
      * @param $file_path
@@ -709,34 +899,34 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         $url = Yii::$app->temporaryBucketResourceManager->getUrl($file);
 
-        try
-        {
+        try {
             $filename = Yii::$app->security->generateRandomString();
 
-            $result = Yii::$app->cloudinaryManager->upload (
+            $result = Yii::$app->cloudinaryManager->upload(
                 $url, [
-                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
-                ]);
+                'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
+            ]);
 
-                if ($result || count ($result) > 0) {
-                    $this[$attribute] = basename ($result['url']);
-                    $this->$attribute = basename ($result['url']);
-                    return true;
-                }
-
-            } catch (\Cloudinary\Error $err) {
-              //Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
-              $this->addError($attribute, $err->getMessage());
-              return false;
+            if ($result || count($result) > 0) {
+                $this[$attribute] = basename($result['url']);
+                $this->$attribute = basename($result['url']);
+                return true;
             }
+
+        } catch (Error $err) {
+            //Yii::error ('Error when uploading restaurant document to Cloudinary: ' . json_encode ($err));
+            $this->addError($attribute, $err->getMessage());
+            return false;
+        }
     }
 
-    public function validateDomain($attribute, $params, $validator) {
+    public function validateDomain($attribute, $params, $validator)
+    {
 
         $count = $this->getRestaurantDomainRequests()->count();
 
-        if($count > 3) {
-            Yii::error("Store #". $this->restaurant_uuid . " having more than 3 domain assigned to store");
+        if ($count > 3) {
+            Yii::error("Store #" . $this->restaurant_uuid . " having more than 3 domain assigned to store");
             //$this->addError($attribute, 'You can not assign more than 3 domain to site');
         }
 
@@ -752,11 +942,23 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[RestaurantDomainRequest]].
+     *
+     * @return ActiveQuery
+     */
+    public function getRestaurantDomainRequests($modelClass = "\common\models\RestaurantDomainRequest")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->orderBy('created_at DESC');
+    }
+
+    /**
      * request for new domain
      * @param $old_domain
      * @return array
      */
-    public function notifyDomainRequest($old_domain) {
+    public function notifyDomainRequest($old_domain)
+    {
 
         $model = new RestaurantDomainRequest;
         $model->restaurant_uuid = $this->restaurant_uuid;
@@ -767,10 +969,10 @@ class Restaurant extends \yii\db\ActiveRecord
 
         //if custom domain + want to purchase
 
-        \Yii::info("[Store Domain Update Request] " . $this->name . " want to change domain from " .
-            $old_domain ." to " . $this->restaurant_domain, __METHOD__);
+        Yii::info("[Store Domain Update Request] " . $this->name . " want to change domain from " .
+            $old_domain . " to " . $this->restaurant_domain, __METHOD__);
 
-        $mailer = \Yii::$app->mailer->compose([
+        $mailer = Yii::$app->mailer->compose([
             'html' => 'domain-update-request',
         ], [
             'store_name' => $this->name,
@@ -783,14 +985,28 @@ class Restaurant extends \yii\db\ActiveRecord
 
         try {
             $mailer->send();
-        } catch (\Swift_TransportException $e) {
+        } catch (Swift_TransportException $e) {
             Yii::error($e->getMessage(), "email");
         }
 
-        return self::message("success","Our customer service agent will contact you soon!");
+        return self::message("success", "Our customer service agent will contact you soon!");
     }
 
-    public function notifyDomainUpdated($old_domain) {
+    /**
+     * @param string $type
+     * @param $message
+     * @return array
+     */
+    public static function message($type = "success", $message)
+    {
+        return [
+            "operation" => $type,
+            "message" => is_string($message) ? Yii::t('agent', $message) : $message
+        ];
+    }
+
+    public function notifyDomainUpdated($old_domain)
+    {
 
         $model = new RestaurantDomainRequest;
         $model->restaurant_uuid = $this->restaurant_uuid;
@@ -799,10 +1015,10 @@ class Restaurant extends \yii\db\ActiveRecord
         $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
         $model->save(false);
 
-        \Yii::info("[Store Domain Updated] " . $this->name . " changed domain from " .
-            $old_domain ." to " . $this->restaurant_domain, __METHOD__);
+        Yii::info("[Store Domain Updated] " . $this->name . " changed domain from " .
+            $old_domain . " to " . $this->restaurant_domain, __METHOD__);
 
-        $mailer = \Yii::$app->mailer->compose([
+        $mailer = Yii::$app->mailer->compose([
             'html' => 'store/domain-updated',
         ], [
             'store_name' => $this->name,
@@ -821,7 +1037,7 @@ class Restaurant extends \yii\db\ActiveRecord
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
-            } catch (\Swift_TransportException $e) {
+            } catch (Swift_TransportException $e) {
                 Yii::error($e->getMessage(), "email");
             }
         }
@@ -830,7 +1046,7 @@ class Restaurant extends \yii\db\ActiveRecord
             try {
                 $mailer->setTo($this->restaurant_email)
                     ->send();
-            } catch (\Swift_TransportException $e) {
+            } catch (Swift_TransportException $e) {
                 Yii::error($e->getMessage(), "email");
             }
         }
@@ -838,12 +1054,22 @@ class Restaurant extends \yii\db\ActiveRecord
         return self::message("success", "Congratulations you have successfully changed your domain name");
     }
 
+    /**
+     * Get Agent Assignment Records
+     * @return ActiveQuery
+     */
+    public function getAgentAssignments($modelClass = "\common\models\AgentAssignment")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->with('agent');
+    }
+
     public function alertInActive()
     {
         $mailer = Yii::$app->mailer->compose([
-                'html' => 'store/in-active'
-            ])
-            ->setFrom ([Yii::$app->params['supportEmail']])
+            'html' => 'store/in-active'
+        ])
+            ->setFrom([Yii::$app->params['supportEmail']])
             ->setSubject("We miss you!");
 
         $agents = $this->getAgentAssignments()
@@ -854,7 +1080,7 @@ class Restaurant extends \yii\db\ActiveRecord
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
-            } catch (\Swift_TransportException $e) {
+            } catch (Swift_TransportException $e) {
                 Yii::error($e->getMessage(), "email");
             }
         }
@@ -863,7 +1089,7 @@ class Restaurant extends \yii\db\ActiveRecord
             try {
                 $mailer->setTo($this->restaurant_email)
                     ->send();
-            } catch (\Swift_TransportException $e) {
+            } catch (Swift_TransportException $e) {
                 Yii::error($e->getMessage(), "email");
             }
         }
@@ -879,15 +1105,16 @@ class Restaurant extends \yii\db\ActiveRecord
      * @param $campaign
      * @return void
      */
-    public function sendVendorEmailTemplate($campaign) {
+    public function sendVendorEmailTemplate($campaign)
+    {
 
         $html = $campaign->template->message
-            . '<img src="'. Yii::$app->agentApiUrlManager->baseUrl . '/v1/store/log-email-campaign/'
-            . $campaign->campaign_uuid .'" />';
+            . '<img src="' . Yii::$app->agentApiUrlManager->baseUrl . '/v1/store/log-email-campaign/'
+            . $campaign->campaign_uuid . '" />';
 
-        $mailer = \Yii::$app->mailer->compose()
+        $mailer = Yii::$app->mailer->compose()
             ->setHtmlBody($html)
-            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setFrom([Yii::$app->params['supportEmail']])
             ->setSubject($campaign->template->subject);
 
         $agents = $this->getAgentAssignments()
@@ -898,7 +1125,7 @@ class Restaurant extends \yii\db\ActiveRecord
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
-            } catch (\Swift_TransportException $e) {
+            } catch (Swift_TransportException $e) {
                 Yii::error($e->getMessage(), "email");
             }
         }
@@ -907,38 +1134,616 @@ class Restaurant extends \yii\db\ActiveRecord
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
-            } catch (\Swift_TransportException $e) {
+            } catch (Swift_TransportException $e) {
                 Yii::error($e->getMessage(), "email");
             }
         }
     }
 
     /**
-     * Upload a File to cloudinary
-     * @param type $imageURL
+     * Create an account for vendor on MyFatoorah
      */
-    public function uploadFileToCloudinary($file_path, $attribute) {
-        $filename = Yii::$app->security->generateRandomString();
+    public function createMyFatoorahAccount()
+    {
 
-            try {
+        //Create  supplier for a vendor on MyFatoorah
+        Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
 
-                $result = Yii::$app->cloudinaryManager->upload(
-                        $file_path, [
-                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
-                        ]
-                );
+        $response = Yii::$app->myFatoorahPayment->createSupplier($this);
 
-                if ($result || count($result) > 0) {
+        $supplierApiResponse = json_decode($response->content);
 
-                    //delete the file from temp folder
-                    unlink($file_path);
-                    $this[$attribute] = basename($result['url']);
-                }
-            } catch (\Cloudinary\Error $err) {
-                //todo: notify vendor?
-                //Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+        if ($supplierApiResponse->IsSuccess) {
+
+            $this->supplierCode = $supplierApiResponse->Data->SupplierCode;
+
+            Yii::info($this->name . " has just created MyFatooraha account", __METHOD__);
+
+            if ($this->supplierCode) {
+                $this->is_myfatoorah_enable = 1;
+                $this->is_tap_enable = 0;
+            } else {
+                $this->is_myfatoorah_enable = 0;
             }
 
+            if ($this->save()) {
+                // //Upload documents file on our server before we create an account on MyFatoorah we gonaa delete them
+                $this->uploadDocumentsToMyFatoorah();
+            }
+
+            $this->onMyFatoorahCreated();
+
+            return [
+                "operation" => 'success',
+            ];
+
+        } else {
+
+            Yii::error('Error while create supplier [' . $this->name . '] ' . json_encode($supplierApiResponse));
+
+            return [
+                "operation" => 'error',
+                "message" => $supplierApiResponse
+            ];
+        }
+    }
+
+    public function uploadDocumentsToMyFatoorah()
+    {
+
+        //Upload Authorized Signature file
+        if ($this->authorized_signature_file) {
+
+            $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
+
+            if (!file_put_contents($tmpFile, file_get_contents($this->getAuthorizedSignaturePhoto())))
+                return Yii::error('Error reading authorized signature document: ');
+
+            Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
+
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($tmpFile, 2, $this->supplierCode); //Upload Signature file
+
+            $responseContent = json_decode($response->content);
+
+            @unlink($tmpFile);
+
+
+            if (!$response->isOk || ($responseContent && !$responseContent->IsSuccess)) {
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?
+                    json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+                return Yii::error('Error when uploading authorized signature document: ' . $errorMessage);
+            }
+
+        }
+
+        //Upload commercial_license file
+        if ($this->commercial_license_file) {
+
+            $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
+
+            if (!file_put_contents($commercialLicenseTmpFile, file_get_contents($this->getCommercialLicensePhoto())))
+                return Yii::error('Error reading commercial license document: ');
+
+            Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($commercialLicenseTmpFile, 1, $this->supplierCode); //Upload commercial License
+
+            $responseContent = json_decode($response->content);
+
+            @unlink($commercialLicenseTmpFile);
+
+
+            if (!$response->isOk || ($responseContent && !$responseContent->IsSuccess)) {
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+                return Yii::error('Error when uploading commercial license document: ' . $errorMessage);
+            }
+
+        }
+
+        //Upload Owner civil id front side
+        if ($this->identification_file_front_side) {
+
+            $civilIdFrontSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_front_side;
+
+            if (!file_put_contents($civilIdFrontSideTmpFile, file_get_contents($this->getCivilIdFrontSidePhoto())))
+                return Yii::error('Error reading civil id (front side): ');
+
+            Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdFrontSideTmpFile, 4, $this->supplierCode); //Upload civil Id Front Side
+
+            $responseContent = json_decode($response->content);
+
+            @unlink($civilIdFrontSideTmpFile);
+
+            if (!$response->isOk || ($responseContent && !$responseContent->IsSuccess)) {
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+                return Yii::error('Error when uploading civil id (front side): ' . $errorMessage);
+            }
+        }
+
+        //Upload Owner civil id back side
+        if ($this->identification_file_back_side) {
+            $civilIdBackSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_back_side;
+
+            if (!file_put_contents($civilIdBackSideTmpFile, file_get_contents($this->getCivilIdBackSidePhoto())))
+                return Yii::error('Error reading civil id (back side): ');
+
+            Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
+
+            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdBackSideTmpFile, 5, $this->supplierCode); //Upload civil Id back Side
+
+            $responseContent = json_decode($response->content);
+
+            @unlink($civilIdBackSideTmpFile);
+
+            if (!$response->isOk || ($responseContent && !$responseContent->IsSuccess)) {
+                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+                return Yii::error('Error when uploading civil id (back side): ' . $errorMessage);
+            }
+        }
+    }
+
+    /**
+     * Return authorized_signature_file url
+     * @return string
+     */
+    public function getAuthorizedSignaturePhoto()
+    {
+        if (!$this->authorized_signature_file) {
+            return false;
+        }
+
+        return 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+            . $this->restaurant_uuid . '/private_documents/'
+            . $this->authorized_signature_file;
+    }
+
+    /**
+     * Return commercial_license_file
+     * @return string
+     */
+    public function getCommercialLicensePhoto()
+    {
+        $photo_url = [];
+
+        if ($this->commercial_license_file) {
+
+            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->commercial_license_file;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
+    }
+
+    /**
+     * Return Civil id front side url
+     * @return string
+     */
+    public function getCivilIdFrontSidePhoto()
+    {
+        $photo_url = [];
+
+        if ($this->identification_file_front_side) {
+
+            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->identification_file_front_side;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
+    }
+
+    /**
+     * Return Civil id back side url
+     * @return string
+     */
+    public function getCivilIdBackSidePhoto()
+    {
+        $photo_url = [];
+
+        if ($this->identification_file_back_side) {
+
+            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->identification_file_back_side;
+            $photo_url = $url;
+        }
+
+        return $photo_url;
+    }
+
+    public function onMyFatoorahCreated()
+    {
+        $paymentGateway = 'MyFatoorah';
+
+        $subject = 'Your ' . $paymentGateway . ' account data has been created';
+
+        $mailer = Yii::$app->mailer->compose([
+            'html' => 'payment-gateway-created',
+        ], [
+            'store' => $this,
+            'paymentGateway' => 'MyFatoorah',
+        ])
+            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo([$this->restaurant_email])
+            ->setSubject($subject);
+
+        try {
+            $mailer->send();
+        } catch (Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
+    }
+
+    /**
+     * Create an account for vendor on tap
+     */
+    public function createTapAccount()
+    {
+        //Upload documents file on our server before we create an account on tap we gonaa delete them
+
+        $response = $this->uploadDocumentsToTap();
+
+        if ($response['operation'] == "error") {
+
+            Yii::error('Error while uploading doc for Business [' . $this->name . '] ' . json_encode($response));
+
+            return $response;
+        }
+
+        //Create a business for a vendor on Tap if not already exists
+
+        if (!$this->business_id || !$this->business_entity_id || !$this->developer_id) {
+
+            $response = $this->createBusiness();
+
+            if($response["operation"] == 'error') {
+                return $response;
+            }
+        }
+
+        //Create a merchant on Tap if not already added
+
+        if (!$this->merchant_id || !$this->wallet_id) {
+
+            $response = $this->createMerchant();
+
+            if($response["operation"] == 'error') {
+                return $response;
+            }
+        }
+
+        //Create an Operator
+
+        if ($this->developer_id) {
+
+            $response = $this->createAnOperator();
+
+            if($response["operation"] == 'error') {
+                return $response;
+            }
+        } else {
+            //if store logo not available, operator, developer id etc,... would be blank, so notify vendor +
+            // fetch api keys from merchant detail api from cron jobs
+            $this->onTapCreated();
+        }
+
+        return [
+            "operation" => 'success',
+            "message" => "Account created successfully!"
+        ];
+    }
+
+    public function createBusiness()
+    {
+        $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
+
+        if ($businessApiResponse->isOk && isset($businessApiResponse->data['entity']['operator'])) {
+
+            //Yii::info('Create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
+
+            $this->business_id = $businessApiResponse->data['id'];
+            $this->business_entity_id = $businessApiResponse->data['entity']['id'];
+
+            if (isset($businessApiResponse->data['entity']['operator']))
+                $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
+
+            $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'is_tap_business_active' => $this->is_tap_business_active
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'success',
+                "message" => "Business created successfully!"
+            ];
+
+        } else {
+            Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
+
+            if (isset(Yii::$app->session->id)) {
+                Yii::$app->session->setFlash('errorResponse', json_encode($businessApiResponse->data));
+            }
+
+            $this->addError('business_id', json_encode($businessApiResponse->data));
+
+            return [
+                "operation" => 'error',
+                "message" => $businessApiResponse->data
+            ];
+        }
+    }
+
+    public function createMerchant()
+    {
+        $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount(
+            $this->company_name . '-' . $this->business_id,
+            $this->currency->code,
+            $this->business_id,
+            $this->business_entity_id,
+            $this->iban,
+            $this
+        );
+
+        if ($merchantApiResponse->isOk) {
+
+            $this->merchant_id = $merchantApiResponse->data['id'];
+            $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
+
+            $this->tap_merchant_status = $merchantApiResponse->data['status'];
+
+            self::updateAll([
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'tap_merchant_status' => $this->tap_merchant_status
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'success',
+                "message" => "Merchant created successfully!"
+            ];
+
+        } else {
+
+            Yii::error('Error while create Merchant [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+
+            if (isset(Yii::$app->session->id))
+                Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
+
+            $this->addError('merchant_id', json_encode($merchantApiResponse->data));
+
+            return [
+                "operation" => 'error',
+                "message" => $merchantApiResponse->data
+            ];
+        }
+    }
+
+    /**
+     * fetch merchant details and set api keys
+     * @return array|string[]
+     */
+    public function fetchMerchant() {
+
+        $operatorApiResponse = Yii::$app->tapPayments->fetchMerchant(
+            $this->merchant_id
+        );
+
+        if ($operatorApiResponse->isOk && isset($operatorApiResponse->data['operator'])) {
+
+            $this->tap_merchant_status = $operatorApiResponse->data['status'];
+
+            if(!$this->wallet_id)
+                $this->wallet_id = $operatorApiResponse->data['operator']['wallet_id'];
+
+            $this->developer_id = $operatorApiResponse->data['operator']['developer_id'];
+
+            $this->operator_id = $operatorApiResponse->data['operator']['id'];
+            $this->test_api_key = $operatorApiResponse->data['operator']['api_credentials']['test']['secret'];
+            $this->test_public_key = $operatorApiResponse->data['operator']['api_credentials']['test']['public'];
+
+            if (array_key_exists('live', $operatorApiResponse->data['operator']['api_credentials'])) {
+                $this->live_api_key = $operatorApiResponse->data['operator']['api_credentials']['live']['secret'];
+                $this->live_public_key = $operatorApiResponse->data['operator']['api_credentials']['live']['public'];
+            }
+
+            //sandbox mode will give only test api keys
+
+            if ($this->live_api_key || $this->test_api_key) {
+                //$this->is_tap_enable = 1;
+                $this->is_tap_created = 1;
+                $this->is_myfatoorah_enable = 0;
+            } else {
+                $this->is_tap_created = 0;
+                //$this->is_tap_enable = 0;
+            }
+
+            if (
+                $this->is_tap_created &&
+                $this->is_tap_business_active &&
+                $this->tap_merchant_status == "Active"
+            ) {
+                $this->is_tap_enable = 1;
+            }
+
+            Yii::info($this->name . " has just created TAP account", __METHOD__);
+
+            self::updateAll([
+                'tap_merchant_status' => $this->tap_merchant_status,
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_tap_created' => $this->is_tap_created,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            if ($this->is_tap_created) {
+
+                if ($this->is_tap_enable) {
+                    $this->onTapApproved();
+               // } else {
+                //    $this->onTapCreated();
+                }
+            }
+
+            return [
+                "operation" => 'success',
+                "message" => "Account created successfully!"
+            ];
+
+        } else {
+
+            Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
+
+            if (isset(Yii::$app->session->id))
+                Yii::$app->session->setFlash('errorResponse', json_encode($operatorApiResponse->data));
+
+            $this->addError('operator_id', json_encode($operatorApiResponse->data));
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'error',
+                "message" => $operatorApiResponse->data
+            ];
+        }
+    }
+
+    public function createAnOperator()
+    {
+        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator(
+            $this->name,
+            $this->wallet_id,
+            $this->developer_id,
+            $this
+        );
+
+        if ($operatorApiResponse->isOk) {
+
+            $this->operator_id = $operatorApiResponse->data['id'];
+            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
+            $this->test_public_key = $operatorApiResponse->data['api_credentials']['test']['public'];
+
+            if (array_key_exists('live', $operatorApiResponse->data['api_credentials'])) {
+                $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
+                $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
+            }
+
+            //sandbox mode will give only test api keys
+
+            if ($this->live_api_key || $this->test_api_key) {
+                //$this->is_tap_enable = 1;
+                $this->is_tap_created = 1;
+                $this->is_myfatoorah_enable = 0;
+            } else {
+                $this->is_tap_created = 0;
+                //$this->is_tap_enable = 0;
+            }
+
+            if ($this->is_tap_created && $this->is_tap_business_active && $this->tap_merchant_status == "Active") {
+                $this->is_tap_enable = 1;
+            }
+
+            Yii::info($this->name . " has just created TAP account", __METHOD__);
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_tap_created' => $this->is_tap_created,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            if ($this->is_tap_created) {
+
+                if ($this->is_tap_enable) {
+                    $this->onTapApproved();
+                } else {
+                    $this->onTapCreated();
+                }
+            }
+
+            return [
+                "operation" => 'success',
+                "message" => "Account created successfully!"
+            ];
+
+        } else {
+
+            Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
+
+            if (isset(Yii::$app->session->id))
+                Yii::$app->session->setFlash('errorResponse', json_encode($operatorApiResponse->data));
+
+            $this->addError('operator_id', json_encode($operatorApiResponse->data));
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'error',
+                "message" => $operatorApiResponse->data
+            ];
+        }
     }
 
     /**
@@ -947,21 +1752,40 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function uploadDocumentsToTap()
     {
-        //logo
+        if (!$this->authorized_signature_title) {
+            $this->authorized_signature_title = 'Authorized Signature';
+        }
 
-        if (
-            $this->iban_certificate_file
-        )
-        {
-            $tmpFile = sys_get_temp_dir () . '/' . $this->logo;
+        if (!$this->authorized_signature_file_purpose) {
+            $this->authorized_signature_file_purpose = 'customer_signature';
+        }
+
+        if (!$this->commercial_license_title) {
+            $this->commercial_license_title = 'Commercial License';
+        }
+
+        if (!$this->commercial_license_file_purpose) {
+            $this->commercial_license_file_purpose = 'customer_signature';
+        }
+
+        if (!$this->identification_file_purpose) {
+            $this->identification_file_purpose = 'identity_document';
+        }
+
+        if (!$this->identification_title) {
+            $this->identification_title = "Owner's civil id";
+        }
+
+        if ($this->logo && !$this->logo_file_id) {
+
+            $tmpFile = sys_get_temp_dir() . '/' . $this->logo;
 
             if (
-                !file_put_contents (
+                !file_put_contents(
                     $tmpFile,
-                    file_get_contents ($this->getRestaurantLogoUrl())
+                    file_get_contents($this->getRestaurantLogoUrl())
                 )
-            )
-            {
+            ) {
                 //Yii::error ('Error reading authorized signature document: ');
 
                 $this->addError('logo_file_id', 'Error reading logo');
@@ -972,21 +1796,19 @@ class Restaurant extends \yii\db\ActiveRecord
                 ];
             }
 
-            $response = Yii::$app->tapPayments->uploadFileToTap (
+            $response = Yii::$app->tapPayments->uploadFileToTap(
                 $tmpFile,
                 "identity_document",
                 "Business Logo"
             );
 
-            @unlink ($tmpFile);
+            @unlink($tmpFile);
 
             if ($response->isOk) {
                 $this->logo_file_id = $response->data['id'];
-            }
-            else
-            {
+            } else {
                 try {
-                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
                 } catch (\Exception $e) {
                     $error = "500 error from server";
                 }
@@ -1005,13 +1827,11 @@ class Restaurant extends \yii\db\ActiveRecord
         //IBAN Certificate
 
         if (
-            $this->iban_certificate_file
-        )
-        {
-            $tmpFile = sys_get_temp_dir () . '/' . $this->iban_certificate_file;
+            $this->iban_certificate_file && !$this->iban_certificate_file_id
+        ) {
+            $tmpFile = sys_get_temp_dir() . '/' . $this->iban_certificate_file;
 
-            if (!file_put_contents ($tmpFile, file_get_contents ($this->getIBANCertificatePhoto ())))
-            {
+            if (!file_put_contents($tmpFile, file_get_contents($this->getIBANCertificatePhoto()))) {
                 //Yii::error ('Error reading authorized signature document: ');
 
                 $this->addError('iban_certificate_file', 'Error reading IBAN certificate document');
@@ -1022,7 +1842,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 ];
             }
 
-            $response = Yii::$app->tapPayments->uploadFileToTap (
+            $response = Yii::$app->tapPayments->uploadFileToTap(
                 $tmpFile,
                 "identity_document",
                 "IBAN Certificate",
@@ -1031,15 +1851,13 @@ class Restaurant extends \yii\db\ActiveRecord
                 ]
             );
 
-            @unlink ($tmpFile);
+            @unlink($tmpFile);
 
             if ($response->isOk) {
                 $this->iban_certificate_file_id = $response->data['id'];
-            }
-            else
-            {
+            } else {
                 try {
-                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
                 } catch (\Exception $e) {
                     $error = "500 error from server";
                 }
@@ -1060,13 +1878,12 @@ class Restaurant extends \yii\db\ActiveRecord
         if (
             $this->authorized_signature_file &&
             $this->authorized_signature_file_purpose &&
-            $this->authorized_signature_title
-        )
-        {
-            $tmpFile = sys_get_temp_dir () . '/' . $this->authorized_signature_file;
+            $this->authorized_signature_title &&
+            !$this->authorized_signature_file_id
+        ) {
+            $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
 
-            if (!file_put_contents ($tmpFile, file_get_contents ($this->getAuthorizedSignaturePhoto ())))
-            {
+            if (!file_put_contents($tmpFile, file_get_contents($this->getAuthorizedSignaturePhoto()))) {
                 //Yii::error ('Error reading authorized signature document: ');
 
                 $this->addError('authorized_signature_file', 'Error reading authorized signature document');
@@ -1075,27 +1892,25 @@ class Restaurant extends \yii\db\ActiveRecord
                     "operation" => 'error',
                     "message" => 'Error reading authorized signature document'
                 ];
-            }    
+            }
 
-            $response = Yii::$app->tapPayments->uploadFileToTap (
+            $response = Yii::$app->tapPayments->uploadFileToTap(
                 $tmpFile,
                 $this->authorized_signature_file_purpose,
                 $this->authorized_signature_title
             );
 
-            @unlink ($tmpFile);
+            @unlink($tmpFile);
 
             if ($response->isOk) {
                 $this->authorized_signature_file_id = $response->data['id'];
-            }
-            else
-            {
+            } else {
                 try {
-                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
                 } catch (\Exception $e) {
                     $error = "500 error from server";
                 }
-                
+
                 //Yii::error ('Error when uploading authorized signature document: ' . $error);
 
                 $this->addError('authorized_signature_file', 'Error reading authorized signature document' . $error);
@@ -1109,12 +1924,16 @@ class Restaurant extends \yii\db\ActiveRecord
 
         //Upload commercial_license file
 
-        if ($this->commercial_license_file && $this->commercial_license_file_purpose && $this->commercial_license_title) {
+        if (
+            $this->commercial_license_file &&
+            $this->commercial_license_file_purpose &&
+            $this->commercial_license_title &&
+            !$this->commercial_license_file_id
+        ) {
 
-            $commercialLicenseTmpFile = sys_get_temp_dir () . '/' . $this->commercial_license_file;
+            $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
 
-            if (!file_put_contents ($commercialLicenseTmpFile, file_get_contents ($this->getCommercialLicensePhoto ())))
-            {
+            if (!file_put_contents($commercialLicenseTmpFile, file_get_contents($this->getCommercialLicensePhoto()))) {
                 //Yii::error ('Error reading commercial license document: ');
 
                 $this->addError('commercial_license_file', 'Error reading commercial license document');
@@ -1125,19 +1944,16 @@ class Restaurant extends \yii\db\ActiveRecord
                 ];
             }
 
-            $response = Yii::$app->tapPayments->uploadFileToTap (
+            $response = Yii::$app->tapPayments->uploadFileToTap(
                 $commercialLicenseTmpFile, $this->commercial_license_file_purpose, $this->commercial_license_title);
 
-            @unlink ($commercialLicenseTmpFile);
+            @unlink($commercialLicenseTmpFile);
 
-            if ($response->isOk)
-            {
+            if ($response->isOk) {
                 $this->commercial_license_file_id = $response->data['id'];
-            }
-            else 
-            {
+            } else {
                 try {
-                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
                 } catch (\Exception $e) {
                     $error = "500 error from server";
                 }
@@ -1150,17 +1966,20 @@ class Restaurant extends \yii\db\ActiveRecord
                     "operation" => 'error',
                     "message" => 'Error when uploading commercial license document: ' . $error
                 ];
-            }                
+            }
         }
 
         //Upload Owner civil id front side
 
-        if ($this->identification_file_front_side && $this->identification_file_purpose && $this->identification_title) {
+        if ($this->identification_file_front_side &&
+            $this->identification_file_purpose &&
+            $this->identification_title &&
+            !$this->identification_file_id_front_side
+        ) {
 
-            $civilIdFrontSideTmpFile = sys_get_temp_dir () . '/' . $this->identification_file_front_side;
+            $civilIdFrontSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_front_side;
 
-            if (!file_put_contents ($civilIdFrontSideTmpFile, file_get_contents ($this->getCivilIdFrontSidePhoto ())))
-            {
+            if (!file_put_contents($civilIdFrontSideTmpFile, file_get_contents($this->getCivilIdFrontSidePhoto()))) {
                 //Yii::error ('Error reading civil id (front side): ');
 
                 $this->addError('identification_file_front_side', 'Error reading civil id (front side)');
@@ -1169,20 +1988,18 @@ class Restaurant extends \yii\db\ActiveRecord
                     "operation" => 'error',
                     "message" => 'Error when uploading civil id (front side)'
                 ];
-            }    
+            }
 
-            $response = Yii::$app->tapPayments->uploadFileToTap (
+            $response = Yii::$app->tapPayments->uploadFileToTap(
                 $civilIdFrontSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
-            @unlink ($civilIdFrontSideTmpFile);
+            @unlink($civilIdFrontSideTmpFile);
 
-            if ($response->isOk) {  
+            if ($response->isOk) {
                 $this->identification_file_id_front_side = $response->data['id'];
-            }
-            else 
-            {
+            } else {
                 try {
-                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
                 } catch (\Exception $e) {
                     $error = "500 error from server";
                 }
@@ -1195,18 +2012,21 @@ class Restaurant extends \yii\db\ActiveRecord
                     "operation" => 'error',
                     "message" => 'Error when uploading civil id (front side): ' . $error
                 ];
-            }                
+            }
 
         }
 
         //Upload Owner civil id back side
 
-        if ($this->identification_file_back_side && $this->identification_file_purpose && $this->identification_title) {
+        if ($this->identification_file_back_side &&
+            $this->identification_file_purpose &&
+            $this->identification_title &&
+            !$this->identification_file_id_back_side
+        ) {
 
-            $civilIdBackSideTmpFile = sys_get_temp_dir () . '/' . $this->identification_file_back_side;
+            $civilIdBackSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_back_side;
 
-            if (!file_put_contents ($civilIdBackSideTmpFile, file_get_contents ($this->getCivilIdBackSidePhoto ())))
-            {
+            if (!file_put_contents($civilIdBackSideTmpFile, file_get_contents($this->getCivilIdBackSidePhoto()))) {
                 //Yii::error ('Error reading civil id (back side): ');
 
                 $this->addError('identification_file_back_side', 'Error reading civil id (back side)');
@@ -1215,21 +2035,18 @@ class Restaurant extends \yii\db\ActiveRecord
                     "operation" => 'error',
                     "message" => 'Error when uploading civil id (back side)'
                 ];
-            }    
+            }
 
-            $response = Yii::$app->tapPayments->uploadFileToTap (
+            $response = Yii::$app->tapPayments->uploadFileToTap(
                 $civilIdBackSideTmpFile, $this->identification_file_purpose, $this->identification_title);
 
-            @unlink ($civilIdBackSideTmpFile);
+            @unlink($civilIdBackSideTmpFile);
 
-            if ($response->isOk) 
-            {
+            if ($response->isOk) {
                 $this->identification_file_id_back_side = $response->data['id'];
-            }
-            else 
-            {
+            } else {
                 try {
-                    $error = is_object($response->data) || is_array($response->data) ? print_r ($response->data, true) :$response->data;
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
                 } catch (\Exception $e) {
                     $error = "500 error from server";
                 }
@@ -1261,156 +2078,15 @@ class Restaurant extends \yii\db\ActiveRecord
         ];
     }
 
-    public function uploadDocumentsToMyFatoorah() {
-
-        //Upload Authorized Signature file
-        if ($this->authorized_signature_file) {
-
-          $tmpFile = sys_get_temp_dir() . '/' . $this->authorized_signature_file;
-
-          if(!file_put_contents($tmpFile, file_get_contents($this->getAuthorizedSignaturePhoto())))
-              return Yii::error('Error reading authorized signature document: ');
-
-            Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
-
-            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($tmpFile, 2 ,$this->supplierCode); //Upload Signature file
-
-            $responseContent = json_decode($response->content);
-
-            @unlink($tmpFile);
-
-
-            if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
-                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?
-                    json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-                return Yii::error('Error when uploading authorized signature document: ' . $errorMessage);
-            }
-
-        }
-
-        //Upload commercial_license file
-        if ($this->commercial_license_file ) {
-
-          $commercialLicenseTmpFile = sys_get_temp_dir() . '/' . $this->commercial_license_file;
-
-          if(!file_put_contents($commercialLicenseTmpFile, file_get_contents($this->getCommercialLicensePhoto())))
-              return Yii::error('Error reading commercial license document: ');
-
-            Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
-            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($commercialLicenseTmpFile, 1 ,$this->supplierCode); //Upload commercial License
-
-            $responseContent = json_decode($response->content);
-
-            @unlink($commercialLicenseTmpFile);
-
-
-            if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
-                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-                return Yii::error('Error when uploading commercial license document: ' . $errorMessage);
-            }
-
-        }
-
-        //Upload Owner civil id front side
-        if ($this->identification_file_front_side) {
-
-          $civilIdFrontSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_front_side;
-
-          if(!file_put_contents($civilIdFrontSideTmpFile, file_get_contents($this->getCivilIdFrontSidePhoto())))
-              return Yii::error('Error reading civil id (front side): ');
-
-            Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
-            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdFrontSideTmpFile, 4 ,$this->supplierCode); //Upload civil Id Front Side
-
-            $responseContent = json_decode($response->content);
-
-            @unlink($civilIdFrontSideTmpFile);
-
-            if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
-                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-                return Yii::error('Error when uploading civil id (front side): ' . $errorMessage);
-            }
-        }
-
-        //Upload Owner civil id back side
-        if ($this->identification_file_back_side)
-        {
-            $civilIdBackSideTmpFile = sys_get_temp_dir() . '/' . $this->identification_file_back_side;
-
-            if(!file_put_contents($civilIdBackSideTmpFile, file_get_contents($this->getCivilIdBackSidePhoto())))
-                return Yii::error('Error reading civil id (back side): ');
-
-            Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
-
-            $response = Yii::$app->myFatoorahPayment->uploadSupplierDocument($civilIdBackSideTmpFile, 5 ,$this->supplierCode); //Upload civil Id back Side
-
-            $responseContent = json_decode($response->content);
-
-            @unlink($civilIdBackSideTmpFile);
-
-            if ( !$response->isOk || ($responseContent && !$responseContent->IsSuccess)){
-                $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ?  json_encode($responseContent->ValidationErrors) :  $responseContent->Message;
-                return Yii::error('Error when uploading civil id (back side): ' . $errorMessage);
-            }
-        }
-    }
-
     /**
-     * Return Civil id front side url
-     * @return string
+     * Return Restaurant's logo url
      */
-    public function getCivilIdFrontSidePhoto()
+    public function getRestaurantLogoUrl()
     {
-        $photo_url = [];
-
-        if ($this->identification_file_front_side) {
-
-            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                . $this->restaurant_uuid . '/private_documents/'
-                . $this->identification_file_front_side;
-            $photo_url = $url;
-        }
-
-        return $photo_url;
-    }
-
-    /**
-     * Return Civil id back side url
-     * @return string
-     */
-    public function getCivilIdBackSidePhoto()
-    {
-        $photo_url = [];
-
-
-        if ($this->identification_file_back_side) {
-
-            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                . $this->restaurant_uuid . '/private_documents/'
-                . $this->identification_file_back_side;
-            $photo_url = $url;
-        }
-
-        return $photo_url;
-    }
-
-    /**
-     * Return commercial_license_file
-     * @return string
-     */
-    public function getCommercialLicensePhoto()
-    {
-        $photo_url = [];
-
-        if ($this->commercial_license_file) {
-
-            $url = 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-                . $this->restaurant_uuid . '/private_documents/'
-                . $this->commercial_license_file;
-            $photo_url = $url;
-        }
-
-        return $photo_url;
+        if ($this->logo)
+            return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
+        else
+            return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/plugn-icon.png';
     }
 
     /**
@@ -1428,390 +2104,33 @@ class Restaurant extends \yii\db\ActiveRecord
             . $this->iban_certificate_file;
     }
 
-    /**
-     * Return authorized_signature_file url
-     * @return string
-     */
-    public function getAuthorizedSignaturePhoto()
+    public function onTapApproved()
     {
-        if (!$this->authorized_signature_file) {
-            return false;
-        }
-
-        return 'https://res.cloudinary.com/plugn/image/upload/restaurants/'
-            . $this->restaurant_uuid . '/private_documents/'
-            . $this->authorized_signature_file;
-    }
-
-    /**
-     * Create an account for vendor on MyFatoorah
-     */
-    public function createMyFatoorahAccount() {
-
-        //Create  supplier for a vendor on MyFatoorah
-        Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
-
-        $response = Yii::$app->myFatoorahPayment->createSupplier($this);
-
-        $supplierApiResponse = json_decode($response->content);
-
-        if ($supplierApiResponse->IsSuccess) {
-
-            $this->supplierCode = $supplierApiResponse->Data->SupplierCode;
-
-            \Yii::info($this->name . " has just created MyFatooraha account", __METHOD__);
-
-          if ($this->supplierCode)
-          {
-            $this->is_myfatoorah_enable = 1;
-            $this->is_tap_enable = 0;
-          }
-          else
-          {
-              $this->is_myfatoorah_enable = 0;
-          }
-
-            if($this->save())
-            {
-                // //Upload documents file on our server before we create an account on MyFatoorah we gonaa delete them
-                $this->uploadDocumentsToMyFatoorah();
-            }
-
-            $this->onMyFatoorahCreated();
-
-            return [
-                "operation" => 'success',
-            ];
-
-        } else {
-
-            Yii::error('Error while create supplier [' . $this->name . '] ' . json_encode($supplierApiResponse));
-
-            return [
-                "operation" => 'error',
-                "message" => $supplierApiResponse
-            ];
-        }
-    }
-
-    /**
-     * Create an account for vendor on tap
-     */
-    public function createTapAccount()
-    {
-        if(!$this->authorized_signature_title) {
-            $this->authorized_signature_title = 'Authorized Signature';
-        }
-
-        if(!$this->authorized_signature_file_purpose) {
-            $this->authorized_signature_file_purpose = 'customer_signature';
-        }
-
-        if(!$this->commercial_license_title) {
-            $this->commercial_license_title = 'Commercial License';
-        }
-
-        if(!$this->commercial_license_file_purpose) {
-            $this->commercial_license_file_purpose = 'customer_signature';
-        }
-
-        if(!$this->identification_file_purpose) {
-            $this->identification_file_purpose = 'identity_document';
-        }
-
-        if(!$this->identification_title) {
-            $this->identification_title = "Owner's civil id";
-        }
-
-        //Upload documents file on our server before we create an account on tap we gonaa delete them
- 
-        $response = $this->uploadDocumentsToTap();
-
-        if ($response['operation'] == "error") {
-
-            Yii::error('Error while uploading doc for Business [' . $this->name . '] ' . json_encode($response));
-
-            return $response;
-        }
-
-        //Create a business for a vendor on Tap if not already exists
-
-        //if(!$this->business_id || !$this->business_entity_id || !$this->developer_id)
-        //{
-            $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
-
-            if ($businessApiResponse->isOk)
-            {
-                $this->business_id = $businessApiResponse->data['id'];
-                $this->business_entity_id = $businessApiResponse->data['entity']['id'];
-                $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
-
-                $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
-
-                self::updateAll([
-                    'business_id' => $this->business_id,
-                    'business_entity_id' => $this->business_entity_id,
-                    'developer_id' => $this->developer_id,
-                    'is_tap_business_active' => $this->is_tap_business_active
-                ], [
-                    'restaurant_uuid' => $this->restaurant_uuid
-                ]);
-            }
-            else
-            {
-                Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
-
-                if (isset(Yii::$app->session->id))
-                {
-                    Yii::$app->session->setFlash('errorResponse', json_encode($businessApiResponse->data));
-                }
-
-                $this->addError('business_id', json_encode($businessApiResponse->data));
-
-                return [
-                    "operation" => 'error',
-                    "message" => $businessApiResponse->data
-                ];
-            }
-        //}
-
-        //Create a merchant on Tap if not already added
-
-        //if(!$this->merchant_id || !$this->wallet_id)
-        //{
-            $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount(
-                $this->company_name .'-'. $this->business_id,
-                $this->currency->code,
-                $this->business_id,
-                $this->business_entity_id,
-                $this->iban
-            );
-
-            if ($merchantApiResponse->isOk)
-            {
-                $this->merchant_id = $merchantApiResponse->data['id'];
-                $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
-
-                self::updateAll([
-                    'merchant_id' => $this->merchant_id,
-                    'wallet_id' => $this->wallet_id,
-                ], [
-                    'restaurant_uuid' => $this->restaurant_uuid
-                ]);
-            }
-            else
-            {
-                Yii::error('Error while create Merchant [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
-
-                if (isset(Yii::$app->session->id))
-                    Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
-
-                $this->addError('merchant_id', json_encode($merchantApiResponse->data));
-
-                return [
-                    "operation" => 'error',
-                    "message" => $merchantApiResponse->data
-                ];
-            }
-       // }
-
-        //Create an Operator
-
-        $operatorApiResponse = Yii::$app->tapPayments->createAnOperator(
-            $this->name,
-            $this->wallet_id,
-            $this->developer_id
-        );
-
-        if ($operatorApiResponse->isOk)
-        {
-            $this->operator_id = $operatorApiResponse->data['id'];
-            $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
-            $this->test_public_key = $operatorApiResponse->data['api_credentials']['test']['public'];
-
-            if (array_key_exists('live', $operatorApiResponse->data['api_credentials']))
-            {
-              $this->live_api_key = $operatorApiResponse->data['api_credentials']['live']['secret'];
-              $this->live_public_key = $operatorApiResponse->data['api_credentials']['live']['public'];
-            }
-
-            //sandbox mode will give only test api keys
-
-            if ($this->live_api_key || $this->test_api_key)
-            {
-              //$this->is_tap_enable = 1;
-              $this->is_tap_created = 1;
-              $this->is_myfatoorah_enable = 0;
-            }
-            else
-            {
-                $this->is_tap_created = 0;
-                //$this->is_tap_enable = 0;
-            }
-
-            if($this->is_tap_created && $this->is_tap_business_active) {
-                $this->is_tap_enable = 1;
-            }
-
-            \Yii::info($this->name . " has just created TAP account", __METHOD__);
-
-            self::updateAll([
-                'business_id' => $this->business_id,
-                'business_entity_id' => $this->business_entity_id,
-                'developer_id' => $this->developer_id,
-                'merchant_id' => $this->merchant_id,
-                'wallet_id' => $this->wallet_id,
-                'operator_id' => $this->operator_id,
-                'test_api_key' => $this->test_api_key,
-                'test_public_key' => $this->test_public_key,
-                'live_api_key' => $this->live_api_key,
-                'live_public_key' => $this->live_public_key,
-                'is_tap_enable' => $this->is_tap_enable,
-                'is_tap_created' => $this->is_tap_created,
-                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
-            ], [
-              'restaurant_uuid' => $this->restaurant_uuid
-            ]);
-
-            if($this->is_tap_created) {
-
-                if ($this->is_tap_enable) {
-                    $this->onTapApproved();
-                } else {
-                    $this->onTapCreated();
-                }
-            }
-
-            return [
-                "operation" => 'success',
-                "message" => "Account created successfully!"
-            ];
-        }
-        else
-        {
-            Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
-
-            if (isset(Yii::$app->session->id))
-                Yii::$app->session->setFlash('errorResponse', json_encode($operatorApiResponse->data));
-
-            $this->addError('operator_id', json_encode($operatorApiResponse->data));
-
-            self::updateAll([
-                'business_id' => $this->business_id,
-                'business_entity_id' => $this->business_entity_id,
-                'developer_id' => $this->developer_id,
-                'merchant_id' => $this->merchant_id,
-                'wallet_id' => $this->wallet_id,
-                'operator_id' => $this->operator_id,
-                'test_api_key' => $this->test_api_key,
-                'test_public_key' => $this->test_public_key,
-                'live_api_key' => $this->live_api_key,
-                'live_public_key' => $this->live_public_key,
-                'is_tap_enable' => $this->is_tap_enable,
-                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
-            ], [
-              'restaurant_uuid' => $this->restaurant_uuid
-            ]);
-
-            return [
-                "operation" => 'error',
-                "message" => $operatorApiResponse->data
-            ];
-        }
-
-        return [
-            "operation" => 'success',
-            "message" => "Account created successfully!"
-        ];
-    }
-
-    public function pollTapStatus()
-    {
-        $businessApiResponse = Yii::$app->tapPayments->getBussiness($this);
-
-        if ($businessApiResponse->isOk && $businessApiResponse->data['status'] === 'Active')
-        {
-            self::updateAll([
-                'is_tap_enable' => true,
-                'is_tap_business_active' => true
-            ], [
-                'restaurant_uuid' => $this->restaurant_uuid
-            ]);
-
-            $this->onTapApproved();
-        }
-    }
-
-    public function onMyFatoorahCreated() {
-
-        $paymentGateway = 'MyFatoorah';
-
-        $subject = 'Your ' . $paymentGateway . ' account data has been created';
-
-        $mailer = \Yii::$app->mailer->compose([
-            'html' => 'payment-gateway-created',
-        ], [
-            'store' => $this,
-            'paymentGateway' => 'MyFatoorah',
-        ])
-            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-            ->setTo([$this->restaurant_email])
-            ->setSubject($subject);
-
-        try {
-            $mailer->send();
-        } catch (\Swift_TransportException $e) {
-            Yii::error($e->getMessage(), "email");
-        }
-    }
-
-    public function onTapCreated() {
-
-        $subject = 'Your Tap account has been created';
-
-        $mailer = \Yii::$app->mailer->compose([
-            'html' => 'payment-gateway-created',
-        ], [
-            'store' => $this,
-            'paymentGateway' => 'Tap',
-        ])
-            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
-            ->setTo([$this->restaurant_email])
-            ->setSubject($subject);
-
-        try {
-            $mailer->send();
-        } catch (\Swift_TransportException $e) {
-            Yii::error($e->getMessage(), "email");
-        }
-    }
-
-    public function onTapApproved() {
-
         $this->notifyTapApproved();
 
         $this->enableTapGateways();
     }
 
-    public function notifyTapApproved() {
+    public function notifyTapApproved()
+    {
 
         $paymentGateway = 'Tap Payments';
 
         $subject = 'Your ' . $paymentGateway . ' account data has been approved';
 
-        $mailer = \Yii::$app->mailer->compose([
+        $mailer = Yii::$app->mailer->compose([
             'html' => 'agent/tap-approved',
         ], [
             'store' => $this,
             'paymentGateway' => $paymentGateway,
         ])
-            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
             ->setSubject($subject);
 
         try {
             $mailer->send();
-        } catch (\Swift_TransportException $e) {
+        } catch (Swift_TransportException $e) {
             Yii::error($e->getMessage(), "email");
         }
     }
@@ -1820,7 +2139,8 @@ class Restaurant extends \yii\db\ActiveRecord
      * enable tap payment gateways from tap
      * @return void
      */
-    public function enableTapGateways() {
+    public function enableTapGateways()
+    {
 
         $subQuery = $this->getRestaurantPaymentMethods()
             ->select('payment_method_id');
@@ -1841,6 +2161,58 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[RestaurantPaymentMethods]].
+     *
+     * @return ActiveQuery
+     */
+    public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere(['status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
+    }
+
+    public function onTapCreated()
+    {
+        $subject = 'Your Tap account has been created';
+
+        $mailer = Yii::$app->mailer->compose([
+            'html' => 'payment-gateway-created',
+        ], [
+            'store' => $this,
+            'paymentGateway' => 'Tap',
+        ])
+            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo([$this->restaurant_email])
+            ->setSubject($subject);
+
+        try {
+            $mailer->send();
+        } catch (Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
+    }
+
+    public function pollTapStatus()
+    {
+        if(!$this->is_tap_business_active) {
+            $this->pollTapBusinessStatus();
+        }
+
+        if($this->tap_merchant_status != "Active") {
+            $this->fetchMerchant();
+        }
+    }
+
+    public function pollTapBusinessStatus()
+    {
+        $businessApiResponse = Yii::$app->tapPayments->getBussiness($this);
+
+        if ($businessApiResponse->isOk && $businessApiResponse->data['status'] === 'Active') {
+           $this->is_tap_business_active = true;
+        }
+    }
+
+    /**
      * save restaurant payment method
      */
     public function saveRestaurantPaymentMethod($payments_method = null)
@@ -1848,13 +2220,13 @@ class Restaurant extends \yii\db\ActiveRecord
 
         if ($payments_method) {
 
-            $sotred_restaurant_payment_method = RestaurantPaymentMethod::find ()
-                ->andWhere (['restaurant_uuid' => $this->restaurant_uuid])
-                ->all ();
+            $sotred_restaurant_payment_method = RestaurantPaymentMethod::find()
+                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                ->all();
 
             foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
-                if (!in_array ($restaurant_payment_method->payment_method_id, $payments_method)) {
-                    RestaurantPaymentMethod::deleteAll (['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
+                if (!in_array($restaurant_payment_method->payment_method_id, $payments_method)) {
+                    RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid, 'payment_method_id' => $restaurant_payment_method->payment_method_id]);
                 }
             }
 
@@ -1862,22 +2234,11 @@ class Restaurant extends \yii\db\ActiveRecord
                 $payments_method = new RestaurantPaymentMethod();
                 $payments_method->payment_method_id = $payment_method_id;
                 $payments_method->restaurant_uuid = $this->restaurant_uuid;
-                $payments_method->save ();
+                $payments_method->save();
             }
         } else {
-            RestaurantPaymentMethod::deleteAll (['restaurant_uuid' => $this->restaurant_uuid]);
+            RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
         }
-    }
-
-    /**
-     * Return Restaurant's logo url
-     */
-    public function getRestaurantLogoUrl()
-    {
-        if ($this->logo)
-            return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/' . $this->restaurant_uuid . "/logo/" . $this->logo;
-        else
-            return 'https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/plugn-icon.png';
     }
 
     /**
@@ -1894,41 +2255,82 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function uploadLogo($imageURL)
     {
-        $filename = Yii::$app->security->generateRandomString ();
+        $filename = Yii::$app->security->generateRandomString();
 
         try {
             //Delete old store's logo
 
             if ($this->logo) {
-                $this->deleteRestaurantLogo ();
+                $this->deleteRestaurantLogo();
             }
 
-            if(!$imageURL) {
+            if (!$imageURL) {
                 return true;
             }
 
-            $result = Yii::$app->cloudinaryManager->upload (
+            $result = Yii::$app->cloudinaryManager->upload(
                 $imageURL,
                 [
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/logo/" . $filename
                 ]
             );
 
-            if ($result || count ($result) > 0) {
+            if ($result || count($result) > 0) {
                 //todo: refactor
-                $this->logo = basename ($result['url']);
-                $this->save ();
+                $this->logo = basename($result['url']);
+                $this->save();
             }
 
-            if(!str_contains ($imageURL, 'amazonaws.com'))
-                unlink ($imageURL);
+            if (!str_contains($imageURL, 'amazonaws.com'))
+                unlink($imageURL);
 
             return true;
 
-        } catch (\Cloudinary\Error $err) {
-            Yii::error ("Error when uploading logo photos to Cloudinry: " . json_encode ($err));
+        } catch (Error $err) {
+            Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($err));
         }
     }
+
+    /**
+     * Delete Restaurant's logo
+     */
+    public function deleteRestaurantLogo($logo = null)
+    {
+        if (!$logo)
+            $logo = $this->logo;
+
+        $imageURL = "restaurants/" . $this->restaurant_uuid . "/logo/" . $logo;
+
+        try {
+            Yii::$app->cloudinaryManager->delete($imageURL);
+
+            $this->logo = null;
+
+        } catch (Error $err) {
+            Yii::error('Error while deleting logo photos to Cloudinry: ' . json_encode($err));
+        }
+    }
+
+    // public function isOpen($asap = null) {
+    //
+    //     $restaurant = self::findOne(['restaurant_uuid'=>$this->restaurant_uuid]);
+    //     $opening_hour_model = OpeningHour::find()
+    //                             ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
+    //                             ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
+    //                             ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
+    //                             ->orderBy(['open_at' => SORT_ASC])
+    //                             ->one();
+    //
+    //       if ($opening_hour_model && (
+    //                date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
+    //                strtotime("now") > strtotime(date('c', strtotime($opening_hour_model->open_at, strtotime("now") ))) &&
+    //                strtotime("now") <  strtotime(date('c', strtotime($opening_hour_model->close_at, strtotime("now") )) )
+    //               ) && $restaurant->restaurant_status == self::RESTAURANT_STATUS_OPEN
+    //       ) {
+    //           return true;
+    //       }
+    //     return false;
+    // }
 
     /**
      * Upload thumbnailImage  to cloudinary
@@ -1936,38 +2338,59 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function uploadThumbnailImage($imageURL)
     {
-        $filename = Yii::$app->security->generateRandomString ();
+        $filename = Yii::$app->security->generateRandomString();
 
         try {
             //Delete old store's ThumbnailImage
 
             if ($this->thumbnail_image) {
-                $this->deleteRestaurantThumbnailImage ();
+                $this->deleteRestaurantThumbnailImage();
             }
 
-            if(!$imageURL) {
+            if (!$imageURL) {
                 return true;
             }
 
-            $result = Yii::$app->cloudinaryManager->upload (
+            $result = Yii::$app->cloudinaryManager->upload(
                 $imageURL, [
                     'public_id' => "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $filename
                 ]
             );
 
-            if ($result || count ($result) > 0) {
+            if ($result || count($result) > 0) {
                 //todo: refactor
-                $this->thumbnail_image = basename ($result['url']);
-                $this->save ();
+                $this->thumbnail_image = basename($result['url']);
+                $this->save();
             }
 
-            if(!str_contains ($imageURL, 'amazonaws.com'))
-                unlink ($imageURL);
+            if (!str_contains($imageURL, 'amazonaws.com'))
+                unlink($imageURL);
 
             return true;
 
-        } catch (\Cloudinary\Error $err) {
-            Yii::error ("Error when uploading thumbnail photos to Cloudinry: " . json_encode ($err));
+        } catch (Error $err) {
+            Yii::error("Error when uploading thumbnail photos to Cloudinry: " . json_encode($err));
+        }
+    }
+
+    /**
+     * Delete Restaurant's Thumbnail Image
+     */
+    public function deleteRestaurantThumbnailImage($thumbnail_image = null)
+    {
+
+        if (!$thumbnail_image)
+            $thumbnail_image = $this->thumbnail_image;
+
+        $imageURL = "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $thumbnail_image;
+
+        try {
+            Yii::$app->cloudinaryManager->delete($imageURL);
+
+            $this->thumbnail_image = null;
+
+        } catch (Error $err) {
+            Yii::error('Error while deleting thumbnail image to Cloudinry: ' . json_encode($err));
         }
     }
 
@@ -1975,11 +2398,12 @@ class Restaurant extends \yii\db\ActiveRecord
      * @param $insert
      * @return bool|void
      */
-    public function beforeSave($insert) {
+    public function beforeSave($insert)
+    {
 
-        if($insert && $this->referral_code != null) {
-            if(!Partner::find()->where(['referral_code' => $this->referral_code])->exists())
-              $this->referral_code = null;
+        if ($insert && $this->referral_code != null) {
+            if (!Partner::find()->where(['referral_code' => $this->referral_code])->exists())
+                $this->referral_code = null;
         }
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
@@ -1998,14 +2422,14 @@ class Restaurant extends \yii\db\ActiveRecord
 
             $isBranchExists = Yii::$app->githubComponent->isBranchExists($this->store_branch_name);
 
-            if($isBranchExists) {
-                return  $this->addError('restaurant_domain', Yii::t('app','Another store is already using this domain'));
+            if ($isBranchExists) {
+                return $this->addError('restaurant_domain', Yii::t('app', 'Another store is already using this domain'));
             }
 
             $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
 
-            if($isDomainExist)
-                return  $this->addError('restaurant_domain', Yii::t('app','Another store is already using this domain'));
+            if ($isDomainExist)
+                return $this->addError('restaurant_domain', Yii::t('app', 'Another store is already using this domain'));
 
             $this->restaurant_domain = 'https://' . $store_domain . '.plugn.site';
         }
@@ -2018,27 +2442,63 @@ class Restaurant extends \yii\db\ActiveRecord
         return parent::beforeSave($insert);
     }
 
+    /**
+     * @return query\RestaurantQuery
+     */
+    public static function find()
+    {
+        return new query\RestaurantQuery(get_called_class());
+    }
 
     /**
      * Deletes the files associated with this project
      */
     public function deleteTempFiles()
     {
-        if ($this->authorized_signature_file && file_exists (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->authorized_signature_file)) {
-            $this->uploadFileToCloudinary (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->authorized_signature_file, 'authorized_signature_file');
+        if ($this->authorized_signature_file && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->authorized_signature_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->authorized_signature_file, 'authorized_signature_file');
         }
 
-        if ($this->commercial_license_file && file_exists (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->commercial_license_file)) {
-            $this->uploadFileToCloudinary (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->commercial_license_file, 'commercial_license_file');
+        if ($this->commercial_license_file && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->commercial_license_file)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->commercial_license_file, 'commercial_license_file');
         }
 
-        if ($this->identification_file_front_side && file_exists (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->identification_file_front_side)) {
-            $this->uploadFileToCloudinary (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->identification_file_front_side, 'identification_file_front_side');
+        if ($this->identification_file_front_side && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_front_side)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_front_side, 'identification_file_front_side');
         }
 
-        if ($this->identification_file_back_side && file_exists (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->identification_file_back_side)) {
-            $this->uploadFileToCloudinary (Yii::getAlias ('@privateDocuments') . "/uploads/" . $this->identification_file_back_side, 'identification_file_back_side');
+        if ($this->identification_file_back_side && file_exists(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_back_side)) {
+            $this->uploadFileToCloudinary(Yii::getAlias('@privateDocuments') . "/uploads/" . $this->identification_file_back_side, 'identification_file_back_side');
         }
+    }
+
+    /**
+     * Upload a File to cloudinary
+     * @param type $imageURL
+     */
+    public function uploadFileToCloudinary($file_path, $attribute)
+    {
+        $filename = Yii::$app->security->generateRandomString();
+
+        try {
+
+            $result = Yii::$app->cloudinaryManager->upload(
+                $file_path, [
+                    'public_id' => "restaurants/" . $this->restaurant_uuid . "/private_documents/" . $filename
+                ]
+            );
+
+            if ($result || count($result) > 0) {
+
+                //delete the file from temp folder
+                unlink($file_path);
+                $this[$attribute] = basename($result['url']);
+            }
+        } catch (Error $err) {
+            //todo: notify vendor?
+            //Yii::error('Error when uploading restaurant document to Cloudinary: ' . json_encode($err));
+        }
+
     }
 
     /**
@@ -2048,7 +2508,7 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function afterSave($insert, $changedAttributes)
     {
-        parent::afterSave ($insert, $changedAttributes);
+        parent::afterSave($insert, $changedAttributes);
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
@@ -2063,15 +2523,16 @@ class Restaurant extends \yii\db\ActiveRecord
                 if (!$queue->save ())
                     Yii::error ('Queue Error:' . json_encode ($queue->errors));
             }
+
         }
 
         if ($insert) {
 
-            $freePlan = Plan::find ()
-                ->where (['valid_for' => 0])
-                ->one ();
+            $freePlan = Plan::find()
+                ->where(['valid_for' => 0])
+                ->one();
 
-            if(!$freePlan) {
+            if (!$freePlan) {
                 $freePlan = new Plan();
                 $freePlan->description = "";
                 $freePlan->name = "Free plan auto generated";
@@ -2085,14 +2546,14 @@ class Restaurant extends \yii\db\ActiveRecord
             $subscription->restaurant_uuid = $this->restaurant_uuid;
             $subscription->plan_id = $freePlan->plan_id; //Free plan by default
             $subscription->subscription_status = Subscription::STATUS_ACTIVE; //Free plan by default
-            $subscription->save ();
+            $subscription->save();
 
             $restaurant_theme = new RestaurantTheme();
             $restaurant_theme->restaurant_uuid = $this->restaurant_uuid;
-            $restaurant_theme->save ();
+            $restaurant_theme->save();
 
             //Add opening hrs
-            
+
             /*for ($i = 0; $i < 7; ++$i)
             {
                 $opening_hour = new OpeningHour();
@@ -2109,7 +2570,7 @@ class Restaurant extends \yii\db\ActiveRecord
             $currecy->save();
         }
 
-        if(!$insert && isset($changedAttributes["restaurant_domain"])) {
+        if (!$insert && isset($changedAttributes["restaurant_domain"])) {
 
             $old_domain = $changedAttributes["restaurant_domain"];
             //$this->getOldAttribute("restaurant_domain");
@@ -2119,8 +2580,7 @@ class Restaurant extends \yii\db\ActiveRecord
             $isNotOriginalDomain = $this->getRestaurantDomainRequests()
                 ->exists();
 
-            if(!empty($old_domain) && !$isNotOriginalDomain)
-            {
+            if (!empty($old_domain) && !$isNotOriginalDomain) {
                 $model = new RestaurantDomainRequest();
                 $model->restaurant_uuid = $this->restaurant_uuid;
                 $model->created_at = $this->restaurant_created_at;
@@ -2131,7 +2591,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
             //update in netlify
 
-            if($this->site_id) {
+            if ($this->site_id) {
 
                 $domain = str_replace([
                     'http://',
@@ -2158,7 +2618,8 @@ class Restaurant extends \yii\db\ActiveRecord
         }
     }
 
-    public function setupStore($agent) {
+    public function setupStore($agent)
+    {
 
         //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
 
@@ -2196,9 +2657,9 @@ class Restaurant extends \yii\db\ActiveRecord
             ->andWhere(['payment_method_code' => PaymentMethod::CODE_CASH])
             ->one();
 
-        if(!$paymentMethod) {
+        if (!$paymentMethod) {
             $paymentMethod = new PaymentMethod();
-            $paymentMethod->payment_method_code =  PaymentMethod::CODE_CASH;
+            $paymentMethod->payment_method_code = PaymentMethod::CODE_CASH;
             $paymentMethod->payment_method_name = "Cash on delivery";
             $paymentMethod->payment_method_name_ar = "الدفع عند الاستلام";
             $paymentMethod->vat = 0;
@@ -2231,7 +2692,7 @@ class Restaurant extends \yii\db\ActiveRecord
             ];
         }
 
-        \Yii::info("[New Store Signup] " . $this->name . " has just joined Plugn", __METHOD__);
+        Yii::info("[New Store Signup] " . $this->name . " has just joined Plugn", __METHOD__);
 
         if (YII_ENV == 'prod') {
 
@@ -2246,9 +2707,9 @@ class Restaurant extends \yii\db\ActiveRecord
                 'phone_number' => $this->owner_phone_country_code . $this->owner_number,
                 'email' => $agent->agent_email,
                 'store_url' => $this->restaurant_domain,
-                "country" => $this->country? $this->country->country_name: null,
-                "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign: null,
-                "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium: null,
+                "country" => $this->country ? $this->country->country_name : null,
+                "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign : null,
+                "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium : null,
             ],
                 null,
                 $agent->agent_id
@@ -2268,7 +2729,7 @@ class Restaurant extends \yii\db\ActiveRecord
                 $agent->agent_id
             );
 
-            if($agent->tempPassword) {
+            if ($agent->tempPassword) {
 
                 $param = [
                     'email' => $agent->agent_email,
@@ -2291,11 +2752,12 @@ class Restaurant extends \yii\db\ActiveRecord
     /**
      * delete store + remove from netlify
      */
-    public function deleteSite() {
+    public function deleteSite()
+    {
 
         //remove from netlify
 
-        if($this->site_id)
+        if ($this->site_id)
             Yii::$app->netlifyComponent->deleteSite($this->site_id);
 
         //remove from local
@@ -2304,7 +2766,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $this->site_id = null;
         $this->is_deleted = true;
 
-        if(!$this->save()) {
+        if (!$this->save()) {
             return [
                 "operation" => "error",
                 "message" => $this->errors
@@ -2315,7 +2777,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         //Yii::$app->githubComponent->
 
-        Yii::info ($this->name . ' Store deleted by user #' . $this->restaurant_uuid);
+        Yii::info($this->name . ' Store deleted by user #' . $this->restaurant_uuid);
 
         return [
             'message' => Yii::t('agent', "Store deleted successfully"),
@@ -2332,7 +2794,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $photo_url = [];
 
         if ($this->logo) {
-            $restaurantName = str_replace (' ', '', $this->name);
+            $restaurantName = str_replace(' ', '', $this->name);
             $url = 'https://res.cloudinary.com/agent/image/upload/v1579525808/restaurants/'
                 . $restaurantName . '/logo/'
                 . $this->logo;
@@ -2351,7 +2813,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $photo_url = [];
 
         if ($this->thumbnail_image) {
-            $restaurantName = str_replace (' ', '', $this->name);
+            $restaurantName = str_replace(' ', '', $this->name);
             $url = 'https://res.cloudinary.com/agent/image/upload/v1579525808/restaurants/'
                 . $restaurantName . '/thumbnail-image/'
                 . $this->thumbnail_image;
@@ -2361,33 +2823,13 @@ class Restaurant extends \yii\db\ActiveRecord
         return $photo_url;
     }
 
-    // public function isOpen($asap = null) {
-    //
-    //     $restaurant = self::findOne(['restaurant_uuid'=>$this->restaurant_uuid]);
-    //     $opening_hour_model = OpeningHour::find()
-    //                             ->where(['restaurant_uuid' => $this->restaurant_uuid, 'day_of_week' => date('w', strtotime("now"))])
-    //                             ->andWhere(['<=','open_at', date("H:i:s", strtotime("now"))])
-    //                             ->andWhere(['>=','close_at', date("H:i:s", strtotime("now"))])
-    //                             ->orderBy(['open_at' => SORT_ASC])
-    //                             ->one();
-    //
-    //       if ($opening_hour_model && (
-    //                date("w", strtotime("now")) == $opening_hour_model->day_of_week &&
-    //                strtotime("now") > strtotime(date('c', strtotime($opening_hour_model->open_at, strtotime("now") ))) &&
-    //                strtotime("now") <  strtotime(date('c', strtotime($opening_hour_model->close_at, strtotime("now") )) )
-    //               ) && $restaurant->restaurant_status == self::RESTAURANT_STATUS_OPEN
-    //       ) {
-    //           return true;
-    //       }
-    //     return false;
-    // }
-
-    public function isOpen($asap = null) {
+    public function isOpen($asap = null)
+    {
 
         //always open
 
-        if($this->accept_order_247)
-          return true;
+        if ($this->accept_order_247)
+            return true;
 
         /*(TIME(open_at) < TIME(close_at)  AND (TIME(open_at) < NOW() AND TIME(close_at) > NOW()))
         OR
@@ -2418,16 +2860,13 @@ class Restaurant extends \yii\db\ActiveRecord
             //->andWhere(new Expression("TIME(open_at) < NOW() AND TIME(close_at) > NOW()"))
             ->all();
 
-        foreach ($timeslots as $timeslot)
-        {
-            if(strtotime($timeslot->open_at) < strtotime($timeslot->close_at))
-            {
-                if(strtotime($timeslot->open_at) < time() && strtotime($timeslot->close_at) > time())
+        foreach ($timeslots as $timeslot) {
+            if (strtotime($timeslot->open_at) < strtotime($timeslot->close_at)) {
+                if (strtotime($timeslot->open_at) < time() && strtotime($timeslot->close_at) > time())
                     return true;
 
-            //store open after 12:00 AM /  1 day = 60*60*24 = 86400
-            } else  if(strtotime($timeslot->open_at) < time() && strtotime($timeslot->close_at) + 86400 > time())
-            {
+                //store open after 12:00 AM /  1 day = 60*60*24 = 86400
+            } else if (strtotime($timeslot->open_at) < time() && strtotime($timeslot->close_at) + 86400 > time()) {
                 return true;
             }
         }
@@ -2463,91 +2902,91 @@ class Restaurant extends \yii\db\ActiveRecord
             },
             'restaurantUploads',
             'isOpen' => function ($restaurant) {
-                if($this->accept_order_247)
+                if ($this->accept_order_247)
                     return true;
 
-                return $restaurant->isOpen ();
+                return $restaurant->isOpen();
             },
-            'reopeningAt' => function($restaurant) {
-                if($this->accept_order_247)
+            'reopeningAt' => function ($restaurant) {
+                if ($this->accept_order_247)
                     return null;
 
                 return OpeningHour::getReopeningAt($restaurant);
             },
-            'webLinks' => function($restaurant) {
+            'webLinks' => function ($restaurant) {
                 return $restaurant->getWebLinks()->all();
             },
             'country' => function ($restaurant) {
-                return $restaurant->getCountry ()->one ();
+                return $restaurant->getCountry()->one();
             },
             'storeTheme' => function ($restaurant) {
-                return $restaurant->getRestaurantTheme ()->one ();
+                return $restaurant->getRestaurantTheme()->one();
             },
             'currencies',
             'currency' => function ($restaurant) {
-                return $restaurant->getCurrency ()->one ();
+                return $restaurant->getCurrency()->one();
             },
             'supportDelivery' => function ($restaurant) {
-                return $restaurant->getAreaDeliveryZones ()->count () > 0 ? 1 : 0;
+                return $restaurant->getAreaDeliveryZones()->count() > 0 ? 1 : 0;
             },
             'supportPickup' => function ($restaurant) {
-                return $restaurant->getPickupBusinessLocations ()->count () > 0 ? 1 : 0;
+                return $restaurant->getPickupBusinessLocations()->count() > 0 ? 1 : 0;
             },
             //not using anymore
             'customerGained' => function ($store) {
 
                 return [
                     'customerGainedThisMonth' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), 1)), date ("Y-m-d H:i:s")),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), 1)), date("Y-m-d H:i:s")),
 
                     'customerGainedLastMonth' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 1, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 1, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), 0))),
 
                     'customerGainedLastTwoMonth' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 2, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 1, 0))),
 
                     'customerGainedLastThreeMonth' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 3, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 2, 0))),
 
                     'customerGainedLastFourMonth' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 4, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 3, 0))),
 
                     'customerGainedLastFiveMonth' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 5, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 5, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 4, 0))),
 
                     'customerGainedLastSixDays' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 6)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 6))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 6)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 6))),
 
                     'customerGainedLastFiveDays' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 5)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 5))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 5)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 5))),
 
                     'customerGainedLastFourDays' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 4)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 4))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 4)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 4))),
 
                     'customerGainedLastThreeDays' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 3)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 3))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 3)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 3))),
 
                     'customerGainedLastTwoDays' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 2)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 2))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 2)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 2))),
 
                     'customerGainedYesterday' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 1))),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 1))),
 
                     'customerGainedToday' => $store
-                        ->getCustomerGained (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d"))), date ("Y-m-d H:i:s")),
+                        ->getCustomerGained(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d"))), date("Y-m-d H:i:s")),
 
                 ];
             },
             'soldItems' => function ($model) {
 
                 return [
-                    'soldItemsLastSixDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')->sum ('order_item.qty'),
-                    'soldItemsLastFiveDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')->sum ('order_item.qty'),
-                    'soldItemsLastFourDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')->sum ('order_item.qty'),
-                    'soldItemsLastThreeDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')->sum ('order_item.qty'),
-                    'soldItemsLastTwoDays' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')->sum ('order_item.qty'),
-                    'soldItemsYesterday' => $model->getOrderItems ()->andWhere (' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')->sum ('order_item.qty'),
-                    'soldItemsToday' => $model->getOrderItems ()->andWhere (['DATE(order.order_created_at)' => new Expression('CURDATE()')])->sum ('order_item.qty'),
+                    'soldItemsLastSixDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 6 DAY) ')->sum('order_item.qty'),
+                    'soldItemsLastFiveDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')->sum('order_item.qty'),
+                    'soldItemsLastFourDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 4 DAY) ')->sum('order_item.qty'),
+                    'soldItemsLastThreeDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 3 DAY) ')->sum('order_item.qty'),
+                    'soldItemsLastTwoDays' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')->sum('order_item.qty'),
+                    'soldItemsYesterday' => $model->getOrderItems()->andWhere(' DATE(order.order_created_at) = DATE(NOW() - INTERVAL 1 DAY) ')->sum('order_item.qty'),
+                    'soldItemsToday' => $model->getOrderItems()->andWhere(['DATE(order.order_created_at)' => new Expression('CURDATE()')])->sum('order_item.qty'),
 
                 ];
             },
@@ -2556,139 +2995,109 @@ class Restaurant extends \yii\db\ActiveRecord
 
                 return [
                     'revenueGeneratedThisMonth' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), 1)), date ("Y-m-d H:i:s")),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), 1)), date("Y-m-d H:i:s")),
 
                     'revenueGeneratedLastMonth' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 1, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 1, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), 0))),
 
                     'revenueGeneratedLastTwoMonth' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 2, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 1, 0))),
 
                     'revenueGeneratedLastThreeMonth' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 3, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 2, 0))),
 
                     'revenueGeneratedLastFourMonth' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 4, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 3, 0))),
 
                     'revenueGeneratedLastFiveMonth' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 5, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 5, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 4, 0))),
 
                     'revenueGeneratedLastSixDays' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 6)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 6))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 6)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 6))),
 
                     'revenueGeneratedLastFiveDays' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 5)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 5))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 5)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 5))),
 
                     'revenueGeneratedLastFourDays' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 4)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 4))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 4)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 4))),
 
                     'revenueGeneratedLastThreeDays' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 3)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 3))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 3)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 3))),
 
                     'revenueGeneratedLastTwoDays' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 2)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 2))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 2)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 2))),
 
                     'revenueGeneratedYesterday' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 1))),
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 1))),
 
                     'revenueGeneratedToday' => $store
-                        ->getStoreRevenue (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d"))), date ("Y-m-d H:i:s"))
+                        ->getStoreRevenue(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d"))), date("Y-m-d H:i:s"))
                 ];
             },
             'orderReceived' => function ($store) {
 
                 return [
                     'ordersRecivedThisMonth' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), 1)), date ("Y-m-d H:i:s")),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), 1)), date("Y-m-d H:i:s")),
 
                     'ordersRecivedLastMonth' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 1, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), 0))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 1, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), 0))),
 
                     'ordersRecivedLastTwoMonth' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 2, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 1, 0))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 2, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 1, 0))),
 
                     'ordersRecivedLastThreeMonth' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 3, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 2, 0))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 3, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 2, 0))),
 
                     'ordersRecivedLastFourMonth' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 4, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 3, 0))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 4, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 3, 0))),
 
                     'ordersRecivedLastFiveMonth' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m") - 5, 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m") - 4, 0))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m") - 5, 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m") - 4, 0))),
 
                     'ordersRecivedLastSixDays' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 6)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 6))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 6)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 6))),
 
                     'ordersRecivedLastFiveDays' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 5)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 5))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 5)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 5))),
 
                     'ordersRecivedLastFourDays' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 4)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 4))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 4)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 4))),
 
                     'ordersRecivedLastThreeDays' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 3)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 3))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 3)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 3))),
 
                     'ordersRecivedLastTwoDays' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 2)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 2))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 2)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 2))),
 
                     'ordersRecivedYesterday' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d") - 1)), date ("Y-m-d H:i:s", mktime (23, 59, 59, date ("m"), date ("d") - 1))),
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") - 1)), date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") - 1))),
 
                     'ordersRecivedToday' => $store
-                        ->getOrdersReceived (date ("Y-m-d H:i:s", mktime (00, 00, 0, date ("m"), date ("d"))), date ("Y-m-d H:i:s"))
+                        ->getOrdersReceived(date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d"))), date("Y-m-d H:i:s"))
 
                 ];
             },
         ];
     }
 
-    public function getBestseller() {
+    public function getBestseller()
+    {
         return $this->getItems()
-            ->orderBy (['unit_sold' => SORT_DESC])
-            ->limit (5)
-            ->select (['item_name', 'item_name_ar', 'unit_sold'])
-            ->all ();
+            ->orderBy(['unit_sold' => SORT_DESC])
+            ->limit(5)
+            ->select(['item_name', 'item_name_ar', 'unit_sold'])
+            ->all();
     }
 
     /**
-     * Delete Restaurant's logo
+     * Gets query for [[Items]].
+     *
+     * @return ActiveQuery
      */
-    public function deleteRestaurantLogo($logo = null)
+    public function getItems($modelClass = "\common\models\Item")
     {
-        if (!$logo)
-            $logo = $this->logo;
-
-        $imageURL = "restaurants/" . $this->restaurant_uuid . "/logo/" . $logo;
-
-        try {
-            Yii::$app->cloudinaryManager->delete ($imageURL);
-
-            $this->logo = null;
-
-        } catch (\Cloudinary\Error $err) {
-            Yii::error ('Error while deleting logo photos to Cloudinry: ' . json_encode ($err));
-        }
-    }
-
-    /**
-     * Delete Restaurant's Thumbnail Image
-     */
-    public function deleteRestaurantThumbnailImage($thumbnail_image = null)
-    {
-
-        if (!$thumbnail_image)
-            $thumbnail_image = $this->thumbnail_image;
-
-        $imageURL = "restaurants/" . $this->restaurant_uuid . "/thumbnail-image/" . $thumbnail_image;
-
-        try {
-            Yii::$app->cloudinaryManager->delete ($imageURL);
-
-            $this->thumbnail_image = null;
-
-        } catch (\Cloudinary\Error $err) {
-            Yii::error ('Error while deleting thumbnail image to Cloudinry: ' . json_encode ($err));
-        }
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     public function beforeDelete()
@@ -2696,25 +3105,24 @@ class Restaurant extends \yii\db\ActiveRecord
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
-            Queue::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            Category::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            RestaurantTheme::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            Subscription::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            AreaDeliveryZone::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            DeliveryZone::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            AgentAssignment::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            BusinessLocation::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            RestaurantPaymentMethod::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            OpeningHour::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            RestaurantCurrency::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
-            Restaurant::deleteAll(['restaurant_uuid'=>$this->restaurant_uuid]);
+            Queue::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            Category::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            RestaurantTheme::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            Subscription::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            AreaDeliveryZone::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            DeliveryZone::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            AgentAssignment::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            BusinessLocation::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            RestaurantPaymentMethod::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            OpeningHour::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            RestaurantCurrency::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
+            Restaurant::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
 
-            $this->deleteRestaurantThumbnailImage ();
-            $this->deleteRestaurantLogo ();
+            $this->deleteRestaurantThumbnailImage();
+            $this->deleteRestaurantLogo();
             $transaction->commit();
-            return parent::beforeDelete ();
-        }
-        catch(Exception $e) {
+            return parent::beforeDelete();
+        } catch (Exception $e) {
             $transaction->rollBack();
             die($e->getMessage());
             return false;
@@ -2747,24 +3155,13 @@ class Restaurant extends \yii\db\ActiveRecord
     public function saveRestaurantDeliveryArea($delivery_areas)
     {
 
-        RestaurantDelivery::deleteAll (['restaurant_uuid' => $this->restaurant_uuid]);
+        RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
 
         foreach ($delivery_areas as $area_id) {
             $delivery_area = new RestaurantDelivery();
             $delivery_area->area_id = $area_id;
             $delivery_area->restaurant_uuid = $this->restaurant_uuid;
-            $delivery_area->save ();
-        }
-    }
-
-    public static function getTotalStoresByInterval($interval) {
-        switch ($interval) {
-            case "last-month":
-                return self::getTotalStoresByMonth();
-            case "week":
-                return self::getTotalStoresByWeek();
-            default:
-                return self::getTotalStoresByMonths(str_replace(["last-", "-months"], ["", ""], $interval));
+            $delivery_area->save();
         }
     }
 
@@ -2775,23 +3172,23 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $customer_data = [];
 
-        $date_start = strtotime ('-6 days');//date('w')
+        $date_start = strtotime('-6 days');//date('w')
 
         for ($i = 0; $i < 7; $i++) {
-            $date = date ('Y-m-d', $date_start + ($i * 86400));
+            $date = date('Y-m-d', $date_start + ($i * 86400));
 
-            $customer_data[date ('w', strtotime ($date))] = array(
-                'day' => date ('D', strtotime ($date)),
+            $customer_data[date('w', strtotime($date))] = array(
+                'day' => date('D', strtotime($date)),
                 'total' => 0
             );
         }
 
-        $rows = Customer::getDb()->cache(function($db) {
+        $rows = Customer::getDb()->cache(function ($db) {
 
             return $this->getCustomers()
                 ->select(new Expression('customer_created_at, COUNT(*) as total'))
@@ -2803,13 +3200,13 @@ class Restaurant extends \yii\db\ActiveRecord
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $customer_data[date ('w', strtotime ($result['customer_created_at']))] = array(
-                'day' => date ('D', strtotime ($result['customer_created_at'])),
-                'total' => (int) $result['total']
+            $customer_data[date('w', strtotime($result['customer_created_at']))] = array(
+                'day' => date('D', strtotime($result['customer_created_at'])),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) {
+        $number_of_all_customer_gained = Customer::getDb()->cache(function ($db) {
 
             return $this->getCustomers()
                 ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
@@ -2819,8 +3216,19 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'customer_chart_data' => array_values($customer_data),
-            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+            'number_of_all_customer_gained' => (int)$number_of_all_customer_gained
         ];
+    }
+
+    /**
+     * Gets query for [[Customers]].
+     *
+     * @return ActiveQuery
+     */
+    public function getCustomers($modelClass = "\common\models\Customer")
+    {
+        return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id'])
+            ->via('orders');
     }
 
     public function getTotalRevenueByWeek()
@@ -2830,42 +3238,42 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $revenue_generated_chart_data = [];
 
-        $date_start = strtotime ('-6 days');//date('w')
+        $date_start = strtotime('-6 days');//date('w')
 
         for ($i = 0; $i < 7; $i++) {
-            $date = date ('Y-m-d', $date_start + ($i * 86400));
+            $date = date('Y-m-d', $date_start + ($i * 86400));
 
-            $revenue_generated_chart_data[date ('w', strtotime ($date))] = array(
-                'day' => date ('D', strtotime ($date)),
+            $revenue_generated_chart_data[date('w', strtotime($date))] = array(
+                'day' => date('D', strtotime($date)),
                 'total' => 0
             );
         }
 
-        $rows = Order::getDb()->cache(function($db) {
+        $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders ()
-                ->activeOrders ($this->restaurant_uuid)
-                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-                ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-                ->groupBy (new Expression('DAY(order.order_created_at)'))
-                ->asArray ()
-                ->all ();
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->select(new Expression('order.order_created_at, SUM(`total_price`) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy(new Expression('DAY(order.order_created_at)'))
+                ->asArray()
+                ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $revenue_generated_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
-                'day' => date ('D', strtotime ($result['order_created_at'])),
-                'total' => (float) $result['total']
+            $revenue_generated_chart_data[date('w', strtotime($result['order_created_at']))] = array(
+                'day' => date('D', strtotime($result['order_created_at'])),
+                'total' => (float)$result['total']
             );
         }
 
-        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) {
+        $number_of_all_revenue_generated = Order::getDb()->cache(function ($db) {
 
             return $this->getOrders()
                 ->activeOrders($this->restaurant_uuid)
@@ -2876,8 +3284,19 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float)$number_of_all_revenue_generated
         ];
+    }
+
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return ActiveQuery
+     */
+    public function getOrders($modelClass = "\common\models\Order")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere(['order.is_deleted' => 0]);
     }
 
     public function getTotalOrdersByWeek()
@@ -2887,53 +3306,53 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $orders_received_chart_data = [];
 
-        $date_start = strtotime ('-6 days');//date('w')
+        $date_start = strtotime('-6 days');//date('w')
 
         for ($i = 0; $i < 7; $i++) {
-            $date = date ('Y-m-d', $date_start + ($i * 86400));
+            $date = date('Y-m-d', $date_start + ($i * 86400));
 
-            $orders_received_chart_data[date ('w', strtotime ($date))] = array(
-                'day' => date ('D', strtotime ($date)),
+            $orders_received_chart_data[date('w', strtotime($date))] = array(
+                'day' => date('D', strtotime($date)),
                 'total' => 0
             );
         }
 
-        $rows = Order::getDb()->cache(function($db) {
+        $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders ()
-                ->activeOrders ($this->restaurant_uuid)
-                ->select (new Expression('order_created_at, COUNT(*) as total'))
-                ->andWhere (new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-                ->groupBy (new Expression('DAY(order.order_created_at)'))
-                ->asArray ()
-                ->all ();
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->select(new Expression('order_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy(new Expression('DAY(order.order_created_at)'))
+                ->asArray()
+                ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $orders_received_chart_data[date ('w', strtotime ($result['order_created_at']))] = array(
-                'day' => date ('D', strtotime ($result['order_created_at'])),
-                'total' => (int) $result['total']
+            $orders_received_chart_data[date('w', strtotime($result['order_created_at']))] = array(
+                'day' => date('D', strtotime($result['order_created_at'])),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_orders_received = Order::getDb()->cache(function($db) {
+        $number_of_all_orders_received = Order::getDb()->cache(function ($db) {
 
-         return $this->getOrders()
-            ->activeOrders($this->restaurant_uuid)
-            ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-            ->count();
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->count();
 
         }, $cacheDuration, $cacheDependency);
 
         return [
-            'orders_received_chart_data' => array_values ($orders_received_chart_data),
-            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+            'orders_received_chart_data' => array_values($orders_received_chart_data),
+            'number_of_all_orders_received' => (int)$number_of_all_orders_received
         ];
     }
 
@@ -2944,41 +3363,41 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $sold_item_chart_data = [];
 
-        $date_start = strtotime ('-6 days');//date('w')
+        $date_start = strtotime('-6 days');//date('w')
 
         for ($i = 0; $i < 7; $i++) {
-            $date = date ('Y-m-d', $date_start + ($i * 86400));
+            $date = date('Y-m-d', $date_start + ($i * 86400));
 
-            $sold_item_chart_data[date ('w', strtotime ($date))] = array(
-                'day' => date ('D', strtotime ($date)),
+            $sold_item_chart_data[date('w', strtotime($date))] = array(
+                'day' => date('D', strtotime($date)),
                 'total' => 0
             );
         }
 
-        $rows = Order::getDb()->cache(function($db) {
+        $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getSoldOrderItems ()
-                ->select ('order_item_created_at, SUM(order_item.qty) as total')
-                ->andWhere (new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-                ->groupBy (new Expression('DAY(order_item_created_at)'))
-                ->asArray ()
-                ->all ();
+            return $this->getSoldOrderItems()
+                ->select('order_item_created_at, SUM(order_item.qty) as total')
+                ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
+                ->groupBy(new Expression('DAY(order_item_created_at)'))
+                ->asArray()
+                ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $sold_item_chart_data[date ('w', strtotime ($result['order_item_created_at']))] = array(
-                'day' => date ('D', strtotime ($result['order_item_created_at'])),
-                'total' => (int) $result['total']
+            $sold_item_chart_data[date('w', strtotime($result['order_item_created_at']))] = array(
+                'day' => date('D', strtotime($result['order_item_created_at'])),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_sold_item = Order::getDb()->cache(function($db) {
+        $number_of_all_sold_item = Order::getDb()->cache(function ($db) {
 
             return $this->getSoldOrderItems()
                 ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
@@ -2988,8 +3407,20 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'sold_item_chart_data' => array_values($sold_item_chart_data),
-            'number_of_all_sold_item' => (int) $number_of_all_sold_item
+            'number_of_all_sold_item' => (int)$number_of_all_sold_item
         ];
+    }
+
+    /**
+     * Gets query for [[OrderItems]].
+     *
+     * @return ActiveQuery
+     */
+    public function getSoldOrderItems($modelClass = "\common\models\OrderItem")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->joinWith('order', false)
+            ->activeOrders();
     }
 
     public function getTotalCustomersByMonth()
@@ -2999,21 +3430,21 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $customer_data = [];
 
-        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
+        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')) . '-1';
 
         for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
             $customer_data[$i] = array(
-                'day'   => $i,
+                'day' => $i,
                 'total' => 0
             );
         }
 
-        $rows = Customer::getDb()->cache(function($db) {
+        $rows = Customer::getDb()->cache(function ($db) {
 
             return $this->getCustomers()
                 ->select(new Expression('customer_created_at, COUNT(*) as total'))
@@ -3025,13 +3456,13 @@ class Restaurant extends \yii\db\ActiveRecord
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $customer_data[date ('j', strtotime ($result['customer_created_at']))] = array(
-                'day' => (int) date ('j', strtotime ($result['customer_created_at'])),
-                'total' => (int) $result['total']
+            $customer_data[date('j', strtotime($result['customer_created_at']))] = array(
+                'day' => (int)date('j', strtotime($result['customer_created_at'])),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) {
+        $number_of_all_customer_gained = Customer::getDb()->cache(function ($db) {
 
             return $this->getCustomers()
                 ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
@@ -3041,7 +3472,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'customer_chart_data' => array_values($customer_data),
-            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+            'number_of_all_customer_gained' => (int)$number_of_all_customer_gained
         ];
     }
 
@@ -3052,7 +3483,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $revenue_generated_chart_data = [];
@@ -3061,31 +3492,31 @@ class Restaurant extends \yii\db\ActiveRecord
 
         for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
             $revenue_generated_chart_data[$i] = array(
-                'day'   => $i,
+                'day' => $i,
                 'total' => 0
             );
         }
 
-        $rows = Order::getDb()->cache(function($db) {
+        $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders ()
-                ->activeOrders ($this->restaurant_uuid)
-                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->select(new Expression('order.order_created_at, SUM(`total_price`) as total'))
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-                ->groupBy (new Expression('DAY(order.order_created_at)'))
-                ->asArray ()
-                ->all ();
+                ->groupBy(new Expression('DAY(order.order_created_at)'))
+                ->asArray()
+                ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $revenue_generated_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
-                'day' => (int) date ('j', strtotime ($result['order_created_at'])),
-                'total' => (float) $result['total']
+            $revenue_generated_chart_data[date('j', strtotime($result['order_created_at']))] = array(
+                'day' => (int)date('j', strtotime($result['order_created_at'])),
+                'total' => (float)$result['total']
             );
         }
 
-        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) {
+        $number_of_all_revenue_generated = Order::getDb()->cache(function ($db) {
 
             return $this->getOrders()
                 ->activeOrders($this->restaurant_uuid)
@@ -3096,7 +3527,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float)$number_of_all_revenue_generated
         ];
     }
 
@@ -3107,7 +3538,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $orders_received_chart_data = [];
@@ -3116,31 +3547,31 @@ class Restaurant extends \yii\db\ActiveRecord
 
         for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
             $orders_received_chart_data[$i] = array(
-                'day'   => $i,
+                'day' => $i,
                 'total' => 0
             );
         }
 
-        $rows = Order::getDb()->cache(function($db) {
+        $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders ()
-                ->activeOrders ($this->restaurant_uuid)
-                ->select (new Expression('order_created_at, COUNT(*) as total'))
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->select(new Expression('order_created_at, COUNT(*) as total'))
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-                ->groupBy (new Expression('DAY(order.order_created_at)'))
-                ->asArray ()
-                ->all ();
+                ->groupBy(new Expression('DAY(order.order_created_at)'))
+                ->asArray()
+                ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $orders_received_chart_data[date ('j', strtotime ($result['order_created_at']))] = array(
-                'day' => (int) date ('j', strtotime ($result['order_created_at'])),
-                'total' => (int) $result['total']
+            $orders_received_chart_data[date('j', strtotime($result['order_created_at']))] = array(
+                'day' => (int)date('j', strtotime($result['order_created_at'])),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_orders_received = Order::getDb()->cache(function($db) {
+        $number_of_all_orders_received = Order::getDb()->cache(function ($db) {
 
             return $this->getOrders()
                 ->activeOrders($this->restaurant_uuid)
@@ -3150,8 +3581,8 @@ class Restaurant extends \yii\db\ActiveRecord
         }, $cacheDuration, $cacheDependency);
 
         return [
-            'orders_received_chart_data' => array_values ($orders_received_chart_data),
-            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+            'orders_received_chart_data' => array_values($orders_received_chart_data),
+            'number_of_all_orders_received' => (int)$number_of_all_orders_received
         ];
     }
 
@@ -3162,7 +3593,7 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $sold_item_chart_data = [];
@@ -3171,30 +3602,30 @@ class Restaurant extends \yii\db\ActiveRecord
 
         for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
             $sold_item_chart_data[$i] = array(
-                'day'   => $i,
+                'day' => $i,
                 'total' => 0
             );
         }
 
-        $rows = Order::getDb()->cache(function($db) {
+        $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getSoldOrderItems ()
-                ->select ('order_item_created_at, SUM(order_item.qty) as total')
+            return $this->getSoldOrderItems()
+                ->select('order_item_created_at, SUM(order_item.qty) as total')
                 ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
-                ->groupBy (new Expression('DATE(order_item_created_at)'))
-                ->asArray ()
-                ->all ();
+                ->groupBy(new Expression('DATE(order_item_created_at)'))
+                ->asArray()
+                ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $sold_item_chart_data[date ('j', strtotime ($result['order_item_created_at']))] = array(
-                'day' => (int) date ('j', strtotime ($result['order_item_created_at'])),
-                'total' => (int) $result['total']
+            $sold_item_chart_data[date('j', strtotime($result['order_item_created_at']))] = array(
+                'day' => (int)date('j', strtotime($result['order_item_created_at'])),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_sold_item = Order::getDb()->cache(function($db) {
+        $number_of_all_sold_item = Order::getDb()->cache(function ($db) {
 
             return $this->getSoldOrderItems()
                 ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
@@ -3204,7 +3635,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'sold_item_chart_data' => array_values($sold_item_chart_data),
-            'number_of_all_sold_item' => (int) $number_of_all_sold_item
+            'number_of_all_sold_item' => (int)$number_of_all_sold_item
         ];
     }
 
@@ -3215,30 +3646,30 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `customer` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $customer_data = [];
 
-        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+        $date_start = date('Y') . '-' . date('m', strtotime('-' . $months . ' month')) . '-1';
         $date_end = date('Y-m-d', strtotime('last day of previous month'));
         //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
         for ($i = 0; $i <= $months; $i++) {
 
-            $month = date('m', strtotime('-'.($months - $i).' month'));
+            $month = date('m', strtotime('-' . ($months - $i) . ' month'));
 
             $customer_data[$month] = array(
-                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'month' => date('F', strtotime('-' . ($months - $i) . ' month')),
                 'total' => 0
             );
         }
 
-        $rows = Customer::getDb()->cache(function($db) use ($months) {
+        $rows = Customer::getDb()->cache(function ($db) use ($months) {
 
             return $this->getCustomers()
                 ->select(new Expression('customer_created_at, COUNT(*) as total'))
-                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL ' . $months . ' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
                 ->groupBy(new Expression('MONTH(customer_created_at)'))
                 ->asArray()
@@ -3247,16 +3678,16 @@ class Restaurant extends \yii\db\ActiveRecord
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $customer_data[date ('m', strtotime ($result['customer_created_at']))] = array(
-                'month' => Yii::t('app', date ('F', strtotime ($result['customer_created_at']))),
-                'total' => (int) $result['total']
+            $customer_data[date('m', strtotime($result['customer_created_at']))] = array(
+                'month' => Yii::t('app', date('F', strtotime($result['customer_created_at']))),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_customer_gained = Customer::getDb()->cache(function($db) use ($months) {
+        $number_of_all_customer_gained = Customer::getDb()->cache(function ($db) use ($months) {
 
             return $this->getCustomers()
-                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
+                ->andWhere('`customer_created_at` >= (NOW() - INTERVAL ' . $months . ' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
                 ->count();
 
@@ -3264,7 +3695,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
         return [
             'customer_chart_data' => array_values($customer_data),
-            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
+            'number_of_all_customer_gained' => (int)$number_of_all_customer_gained
         ];
     }
 
@@ -3275,56 +3706,56 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $revenue_generated_chart_data = [];
 
-        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+        $date_start = date('Y') . '-' . date('m', strtotime('-' . $months . ' month')) . '-1';
         $date_end = date('Y-m-d', strtotime('last day of previous month'));
         //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
         for ($i = 0; $i <= $months; $i++) {
 
-            $month = date('m', strtotime('-'.($months - $i).' month'));
+            $month = date('m', strtotime('-' . ($months - $i) . ' month'));
 
             $revenue_generated_chart_data[$month] = array(
-                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'month' => date('F', strtotime('-' . ($months - $i) . ' month')),
                 'total' => 0
             );
         }
 
-        $rows = Order::getDb()->cache(function($db) use ($months) {
+        $rows = Order::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getOrders ()
-                ->activeOrders ($this->restaurant_uuid)
-                ->select (new Expression('order.order_created_at, SUM(`total_price`) as total'))
-                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-                ->groupBy (new Expression('MONTH(order.order_created_at)'))
-                ->asArray ()
-                ->all ();
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->select(new Expression('order.order_created_at, SUM(`total_price`) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
+                ->groupBy(new Expression('MONTH(order.order_created_at)'))
+                ->asArray()
+                ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $revenue_generated_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
-                'total' => (float) $result['total']
+            $revenue_generated_chart_data[date('m', strtotime($result['order_created_at']))] = array(
+                'month' => Yii::t('app', date('F', strtotime($result['order_created_at']))),
+                'total' => (float)$result['total']
             );
         }
 
-        $number_of_all_revenue_generated = Order::getDb()->cache(function($db) use ($months)  {
+        $number_of_all_revenue_generated = Order::getDb()->cache(function ($db) use ($months) {
 
             return $this->getOrders()
                 ->activeOrders($this->restaurant_uuid)
-                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
                 ->sum('total_price');
 
         }, $cacheDuration, $cacheDependency);
 
         return [
             'revenue_generated_chart_data' => array_values($revenue_generated_chart_data),
-            'number_of_all_revenue_generated' => (float) $number_of_all_revenue_generated
+            'number_of_all_revenue_generated' => (float)$number_of_all_revenue_generated
         ];
     }
 
@@ -3335,56 +3766,56 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $orders_received_chart_data = [];
 
-        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+        $date_start = date('Y') . '-' . date('m', strtotime('-' . $months . ' month')) . '-1';
         $date_end = date('Y-m-d', strtotime('last day of previous month'));
         //date('Y') . '-' . date('m') . '-1';
 
         for ($i = 0; $i <= $months; $i++) {
 
-            $month = date('m', strtotime('-'.($months - $i).' month'));
+            $month = date('m', strtotime('-' . ($months - $i) . ' month'));
 
             $orders_received_chart_data[$month] = array(
-                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'month' => date('F', strtotime('-' . ($months - $i) . ' month')),
                 'total' => 0
             );
         }
 
-        $rows = Order::getDb()->cache(function($db) use($months) {
+        $rows = Order::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getOrders ()
-                ->activeOrders ($this->restaurant_uuid)
-                ->select (new Expression('order_created_at, COUNT(*) as total'))
-                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-                ->groupBy (new Expression('MONTH(order.order_created_at)'))
-                ->asArray ()
-                ->all ();
+            return $this->getOrders()
+                ->activeOrders($this->restaurant_uuid)
+                ->select(new Expression('order_created_at, COUNT(*) as total'))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
+                ->groupBy(new Expression('MONTH(order.order_created_at)'))
+                ->asArray()
+                ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $orders_received_chart_data[date ('m', strtotime ($result['order_created_at']))] = array(
-                'month' => Yii::t('app', date ('F', strtotime ($result['order_created_at']))),
-                'total' => (int) $result['total']
+            $orders_received_chart_data[date('m', strtotime($result['order_created_at']))] = array(
+                'month' => Yii::t('app', date('F', strtotime($result['order_created_at']))),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_orders_received = Order::getDb()->cache(function($db) use($months) {
+        $number_of_all_orders_received = Order::getDb()->cache(function ($db) use ($months) {
 
             return $this->getOrders()
                 ->activeOrders($this->restaurant_uuid)
-                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
                 ->count();
 
         }, $cacheDuration, $cacheDependency);
 
         return [
-            'orders_received_chart_data' => array_values ($orders_received_chart_data),
-            'number_of_all_orders_received' => (int) $number_of_all_orders_received
+            'orders_received_chart_data' => array_values($orders_received_chart_data),
+            'number_of_all_orders_received' => (int)$number_of_all_orders_received
         ];
     }
 
@@ -3395,54 +3826,54 @@ class Restaurant extends \yii\db\ActiveRecord
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="'.$this->restaurant_uuid.'"',
+            'sql' => 'SELECT COUNT(*) FROM `order` where restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $sold_item_chart_data = [];
 
-        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
+        $date_start = date('Y') . '-' . date('m', strtotime('-' . $months . ' month')) . '-1';
         $date_end = date('Y-m-d', strtotime('last day of previous month'));
         //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
 
         for ($i = 0; $i <= $months; $i++) {
 
-            $month = date('m', strtotime('-'.($months - $i).' month'));
+            $month = date('m', strtotime('-' . ($months - $i) . ' month'));
 
             $sold_item_chart_data[$month] = array(
-                'month'   => date('F', strtotime('-'.($months - $i).' month')),
+                'month' => date('F', strtotime('-' . ($months - $i) . ' month')),
                 'total' => 0
             );
         }
 
-        $rows = OrderItem::getDb()->cache(function($db) use($months) {
+        $rows = OrderItem::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getSoldOrderItems ()
-                ->select ('order_item_created_at, SUM(order_item.qty) as total')
-                ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
-                ->groupBy (new Expression('MONTH(order_item_created_at)'))
+            return $this->getSoldOrderItems()
+                ->select('order_item_created_at, SUM(order_item.qty) as total')
+                ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
+                ->groupBy(new Expression('MONTH(order_item_created_at)'))
                 ->asArray()
                 ->all();
 
         }, $cacheDuration, $cacheDependency);
 
         foreach ($rows as $result) {
-            $sold_item_chart_data[date ('m', strtotime ($result['order_item_created_at']))] = array(
-                'month' => Yii::t('app', date ('F', strtotime ($result['order_item_created_at']))),
-                'total' => (int) $result['total']
+            $sold_item_chart_data[date('m', strtotime($result['order_item_created_at']))] = array(
+                'month' => Yii::t('app', date('F', strtotime($result['order_item_created_at']))),
+                'total' => (int)$result['total']
             );
         }
 
-        $number_of_all_sold_item = OrderItem::getDb()->cache(function($db) use($months) {
+        $number_of_all_sold_item = OrderItem::getDb()->cache(function ($db) use ($months) {
 
             return $this->getSoldOrderItems()
-                ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL ".$months." MONTH)"))
+                ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
                 ->sum('order_item.qty');
 
         }, $cacheDuration, $cacheDependency);
 
         return [
             'sold_item_chart_data' => array_values($sold_item_chart_data),
-            'number_of_all_sold_item' => (int) $number_of_all_sold_item
+            'number_of_all_sold_item' => (int)$number_of_all_sold_item
         ];
     }
 
@@ -3455,12 +3886,12 @@ class Restaurant extends \yii\db\ActiveRecord
     {
         $most_sold_item_chart_data = [];
 
-        $rows = $this->getItems ()
+        $rows = $this->getItems()
             ->orderBy(['unit_sold' => SORT_DESC])
             ->limit(5)
-            ->all ();
+            ->all();
 
-        foreach($rows as $item) {
+        foreach ($rows as $item) {
             $most_sold_item_chart_data[] = [
                 'item_name' => $item->item_name,
                 'item_name_ar' => $item->item_name_ar,
@@ -3468,25 +3899,26 @@ class Restaurant extends \yii\db\ActiveRecord
             ];
         }
 
-        return array_reverse ($most_sold_item_chart_data);
+        return array_reverse($most_sold_item_chart_data);
     }
 
     /**
      * Gets query for [[NoOfItems]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getNoOfItems($modelClass = "\common\models\Item")
     {
-        return $this->getItems ($modelClass)
-            ->andWhere (['item_status' => Item::ITEM_STATUS_PUBLISH])
+        return $this->getItems($modelClass)
+            ->andWhere(['item_status' => Item::ITEM_STATUS_PUBLISH])
             ->count();
     }
 
     /**
      * send weekly store stats in email
      */
-    public function sendWeeklyReport() {
+    public function sendWeeklyReport()
+    {
 
         //Revenue generated
         $lastWeekRevenue = $this
@@ -3579,7 +4011,7 @@ class Restaurant extends \yii\db\ActiveRecord
 
                 if ($agentAssignment->receive_weekly_stats) {
 
-                    $weeklyStoreSummaryEmail = \Yii::$app->mailer->compose([
+                    $weeklyStoreSummaryEmail = Yii::$app->mailer->compose([
                         'html' => 'weekly-summary',
                     ], [
                         'store' => $this,
@@ -3591,16 +4023,16 @@ class Restaurant extends \yii\db\ActiveRecord
                         'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
                         'thisWeekCustomerGained' => $thisWeekCustomerGained,
                     ])
-                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                        ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
                         ->setTo([$agentAssignment->agent->agent_email])
                         ->setSubject('Weekly Store Summary');
 
                     if ($key == 0)
-                        $weeklyStoreSummaryEmail->setBcc(\Yii::$app->params['supportEmail']);
+                        $weeklyStoreSummaryEmail->setBcc(Yii::$app->params['supportEmail']);
 
                     try {
                         $weeklyStoreSummaryEmail->send();
-                    } catch (\Swift_TransportException $e) {
+                    } catch (Swift_TransportException $e) {
                         Yii::error($e->getMessage(), "email");
                     }
                 }
@@ -3608,187 +4040,89 @@ class Restaurant extends \yii\db\ActiveRecord
         }
     }
 
-    public static function getTotalStoresByWeek()
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return ActiveQuery
+     */
+    public function getStoreRevenue($start_date, $end_date, $modelClass = "\common\models\Order")
     {
-        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
 
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM restaurant',
+            'sql' => 'SELECT COUNT(*) FROM `order` WHERE restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
-        $customer_data = [];
+        return Order::getDb()->cache(function ($db) use ($modelClass, $start_date, $end_date) {
 
-        $date_start = strtotime ('-6 days');//date('w')
-
-        for ($i = 0; $i < 7; $i++) {
-            $date = date ('Y-m-d', $date_start + ($i * 86400));
-
-            $customer_data[date ('w', strtotime ($date))] = array(
-                'day' => date ('D', strtotime ($date)),
-                'total' => 0
-            );
-        }
-
-        $rows = Restaurant::getDb()->cache(function($db)  {
-
-            return Restaurant::find()
-                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
-                ->andWhere(new Expression("DATE(restaurant_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-                ->groupBy(new Expression('DAYNAME(restaurant_created_at)'))
-                ->asArray()
-                ->all();
+            return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                ->activeOrders($this->restaurant_uuid)
+                ->andWhere(['between', 'order.order_created_at', $start_date, $end_date])
+                ->sum('total_price');
 
         }, $cacheDuration, $cacheDependency);
-
-        foreach ($rows as $result) {
-            $customer_data[date ('w', strtotime ($result['restaurant_created_at']))] = array(
-                'day' => date ('D', strtotime ($result['restaurant_created_at'])),
-                'total' => (int) $result['total']
-            );
-        }
-
-        $number_of_all_customer_gained = Restaurant::getDb()->cache(function($db) {
-
-            return Restaurant::find()
-                ->andWhere(new Expression("date(restaurant_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
-                ->count();
-
-        }, $cacheDuration, $cacheDependency);
-
-        return [
-            'store_created_chart_data' => array_values($customer_data),
-            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
-        ];
     }
 
-    public static function getTotalStoresByMonth()
+    /**
+     * Gets query for [[Orders]].
+     *
+     * @return ActiveQuery
+     */
+    public function getOrdersReceived($start_date, $end_date, $modelClass = "\common\models\Order")
     {
-        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
 
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM restaurant',
+            'sql' => 'SELECT COUNT(*) FROM `order` WHERE restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
-        $customer_data = [];
+        return Order::getDb()->cache(function ($db) use ($modelClass, $start_date, $end_date) {
 
-        $date_start = date('Y') . '-' . date('m', strtotime('-1 month')).'-1';
-
-        for ($i = 1; $i <= date('t', strtotime($date_start)); $i++) {
-            $customer_data[$i] = array(
-                'day'   => $i,
-                'total' => 0
-            );
-        }
-
-        $rows = Restaurant::getDb()->cache(function($db) {
-
-            return Restaurant::find()
-                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
-                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL 1 MONTH)')
-                ->groupBy(new Expression('DAY(restaurant_created_at)'))
-                ->asArray()
-                ->all();
+            return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                ->ordersReceived($this->restaurant_uuid, $start_date, $end_date);
 
         }, $cacheDuration, $cacheDependency);
-
-        foreach ($rows as $result) {
-            $customer_data[date ('j', strtotime ($result['restaurant_created_at']))] = array(
-                'day' => (int) date ('j', strtotime ($result['restaurant_created_at'])),
-                'total' => (int) $result['total']
-            );
-        }
-
-        $number_of_all_customer_gained = Restaurant::getDb()->cache(function($db) {
-
-            return Restaurant::find()
-                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL 1 MONTH)')
-                ->count();
-
-        }, $cacheDuration, $cacheDependency);
-
-        return [
-            'store_created_chart_data' => array_values($customer_data),
-            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
-        ];
     }
 
-    public static function getTotalStoresByMonths($months)
+    /**
+     * Gets query for [[Customers]].
+     *
+     * @return ActiveQuery
+     */
+    public function getCustomerGained($start_date, $end_date, $modelClass = "\common\models\Customer")
     {
-        $cacheDuration = 60 * 60 * 24 * 365;// 365 day then delete from cache
+        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
 
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM restaurant',
+            'sql' => 'SELECT COUNT(*) FROM customer WHERE restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
-        $customer_data = [];
-
-        $date_start = date('Y') . '-' . date('m', strtotime('-'.$months.' month')) . '-1';
-        $date_end = date('Y-m-d', strtotime('last day of previous month'));
-        //date('Y-m-d');//date('Y') . '-' . date('m') . '-1';
-
-        for ($i = 0; $i <= $months; $i++) {
-
-            $month = date('m', strtotime('-'.($months - $i).' month'));
-
-            $customer_data[$month] = array(
-                'month'   => date('F', strtotime('-'.($months - $i).' month')),
-                'total' => 0
-            );
-        }
-
-        $rows = Restaurant::getDb()->cache(function($db) use ($months) {
-
-            return Restaurant::find()
-                ->select(new Expression('restaurant_created_at, COUNT(*) as total'))
-                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
-//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-                ->groupBy(new Expression('MONTH(restaurant_created_at)'))
-                ->asArray()
-                ->all();
-
+        return Customer::getDb()->cache(function ($db) use ($modelClass, $start_date, $end_date) {
+            return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+                ->customerGained($this->restaurant_uuid, $start_date, $end_date);
         }, $cacheDuration, $cacheDependency);
-
-        foreach ($rows as $result) {
-            $customer_data[date ('m', strtotime ($result['restaurant_created_at']))] = array(
-                'month' => Yii::t('app', date ('F', strtotime ($result['restaurant_created_at']))),
-                'total' => (int) $result['total']
-            );
-        }
-
-        $number_of_all_customer_gained = Restaurant::getDb()->cache(function($db) use ($months) {
-
-            return Restaurant::find()
-                ->andWhere('`restaurant_created_at` >= (NOW() - INTERVAL '.$months.' MONTH)')
-//            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
-                ->count();
-
-        }, $cacheDuration, $cacheDependency);
-
-        return [
-            'store_created_chart_data' => array_values($customer_data),
-            'number_of_all_customer_gained' => (int) $number_of_all_customer_gained
-        ];
     }
 
-    public function getCSV() {
+    public function getCSV()
+    {
 
         $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
 
         $cacheDependency = Yii::createObject([
             'class' => 'yii\caching\DbDependency',
             'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM payment WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
+            'sql' => 'SELECT COUNT(*) FROM payment WHERE restaurant_uuid="' . $this->restaurant_uuid . '"',
         ]);
 
         $model = $this;
 
-        return Payment::getDb()->cache(function($db) use ($model) {
+        return Payment::getDb()->cache(function ($db) use ($model) {
 
             return $model->getPayments()
                 ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
@@ -3803,54 +4137,23 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Customers]].
+     * Gets query for [[Payments]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCustomerGained($start_date, $end_date, $modelClass = "\common\models\Customer")
+    public function getPayments($modelClass = "\common\models\Payment")
     {
-        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
-
-        $cacheDependency = Yii::createObject([
-            'class' => 'yii\caching\DbDependency',
-            'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM customer WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
-        ]);
-
-        return Customer::getDb()->cache(function($db) use ($modelClass, $start_date, $end_date) {
-            return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-                ->customerGained ($this->restaurant_uuid, $start_date, $end_date);
-        }, $cacheDuration, $cacheDependency);
-    }
-
-    /**
-     * Gets query for [[Items]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getItems($modelClass = "\common\models\Item")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
-    }
-
-    /**
-     * Get Agent Assignment Records
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAgentAssignments($modelClass = "\common\models\AgentAssignment")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->with ('agent');
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Get Agents assigned to this Restaurant
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getAgents($modelClass = "\common\models\Agent")
     {
-        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id'])
-            ->via ('agentAssignments');
+        return $this->hasMany($modelClass::className(), ['agent_id' => 'agent_id'])
+            ->via('agentAssignments');
     }
 
     /**
@@ -3858,30 +4161,30 @@ class Restaurant extends \yii\db\ActiveRecord
      */
     public function getOwnerAgent($modelClass = "\common\models\Agent")
     {
-        return $this->hasMany ($modelClass::className (), ['agent_id' => 'agent_id'])
-            ->via ('agentAssignments', function ($query) {
-                return $query->andWhere (['agent_assignment.role' => AgentAssignment::AGENT_ROLE_OWNER]);
+        return $this->hasMany($modelClass::className(), ['agent_id' => 'agent_id'])
+            ->via('agentAssignments', function ($query) {
+                return $query->andWhere(['agent_assignment.role' => AgentAssignment::AGENT_ROLE_OWNER]);
             });
     }
 
     /**
      * Gets query for [[Subscriptions]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getSubscriptions($modelClass = "\common\models\Subscription")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Subscriptions]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getActiveSubscription($modelClass = "\common\models\Subscription")
     {
-        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
             ->andWhere([
                 'AND',
                 ['subscription_status' => Subscription::STATUS_ACTIVE],
@@ -3893,18 +4196,18 @@ class Restaurant extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Subscriptions]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getPlan($modelClass = "\common\models\Plan")
     {
-        return $this->hasOne ($modelClass::className (), ['plan_id' => 'plan_id'])
-            ->via ('activeSubscription');
+        return $this->hasOne($modelClass::className(), ['plan_id' => 'plan_id'])
+            ->via('activeSubscription');
     }
 
     /**
      * Gets query for [[Setting]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getSettings($modelClass = "\common\models\Setting")
     {
@@ -3914,89 +4217,78 @@ class Restaurant extends \yii\db\ActiveRecord
     /**
      * Gets query for [[RestaurantDeliveryAreas]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRestaurantDeliveryAreas($modelClass = "\common\models\RestaurantDelivery")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Areas]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getAvailableAreas($modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere (['is', 'area_delivery_zone.area_id', null]);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere(['is', 'area_delivery_zone.area_id', null]);
     }
 
     /**
      * Gets query for [[RestaurantBranches]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRestaurantBranches($modelClass = "\common\models\RestaurantBranch")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * @param $modelClass
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRestaurantShippingMethods($modelClass = "\common\models\RestaurantShippingMethod")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[restaurantPages]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRestaurantPages($modelClass = "\common\models\RestaurantPage")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
-    }
-
-    /**
-     * Gets query for [[RestaurantPaymentMethods]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere(['status'=>RestaurantPaymentMethod::STATUS_ACTIVE]);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Campaign]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCampaigns($modelClass = "\common\models\Campaign")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[SourceCampaign]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getSourceCampaign($modelClass = "\common\models\Campaign")
     {
-        return $this->hasOne ($modelClass::className (), ['utm_uuid' => 'utm_uuid'])
+        return $this->hasOne($modelClass::className(), ['utm_uuid' => 'utm_uuid'])
             ->via('restaurantByCampaign');
     }
 
     /**
      * Gets query for [[ShippingMethods]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getShippingMethods($modelClass = "\common\models\ShippingMethod")
     {
@@ -4005,35 +4297,25 @@ class Restaurant extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Payments]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPayments($modelClass = "\common\models\Payment")
-    {
-        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
-    }
-
-    /**
      * Gets query for [[RestaurantByCampaign]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRestaurantByCampaign($modelClass = "\common\models\RestaurantByCampaign")
     {
-        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[PaymentMethods]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getPaymentMethods($modelClass = "\common\models\PaymentMethod")
     {
-        return $this->hasMany ($modelClass::className (), ['payment_method_id' => 'payment_method_id'])
+        return $this->hasMany($modelClass::className(), ['payment_method_id' => 'payment_method_id'])
             ->viaTable(RestaurantPaymentMethod::tableName(), ['restaurant_uuid' => 'restaurant_uuid'],
-                function($query) {
+                function ($query) {
                     $query->onCondition(['status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
                 });
     }
@@ -4041,289 +4323,171 @@ class Restaurant extends \yii\db\ActiveRecord
     /**
      * Gets query for [[OpeningHours]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getOpeningHours($modelClass = "\common\models\OpeningHour")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Orders]].
      *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOrders($modelClass = "\common\models\Order")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere (['order.is_deleted' => 0]);
-    }
-
-    /**
-     * Gets query for [[Orders]].
-     *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getActiveOrders($modelClass = "\common\models\Order")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->activeOrders ($this->restaurant_uuid);;
-    }
-
-    /**
-     * Gets query for [[RestaurantDomainRequest]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRestaurantDomainRequests($modelClass = "\common\models\RestaurantDomainRequest")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->orderBy('created_at DESC');
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->activeOrders($this->restaurant_uuid);
     }
 
     /**
      * Gets query for [[Tickets]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getTickets($modelClass = "\common\models\Ticket")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[OrderItems]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getOrderItems($modelClass = "\common\models\OrderItem")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->joinWith ('order')
-            ->activeOrders ();
-    }
-
-    /**
-     * Gets query for [[OrderItems]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSoldOrderItems($modelClass = "\common\models\OrderItem")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->joinWith ('order', false)
-            ->activeOrders ();
-    }
-
-    /**
-     * Gets query for [[Orders]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStoreRevenue($start_date, $end_date, $modelClass = "\common\models\Order")
-    {
-        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
-
-        $cacheDependency = Yii::createObject([
-            'class' => 'yii\caching\DbDependency',
-            'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
-        ]);
-
-        return Order::getDb()->cache(function($db) use ($modelClass, $start_date, $end_date) {
-
-            return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-                ->activeOrders ($this->restaurant_uuid)
-                ->andWhere (['between', 'order.order_created_at', $start_date, $end_date])
-                ->sum ('total_price');
-
-        }, $cacheDuration, $cacheDependency);
-    }
-
-    /**
-     * Gets query for [[Orders]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOrdersReceived($start_date, $end_date, $modelClass = "\common\models\Order")
-    {
-        $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
-
-        $cacheDependency = Yii::createObject([
-            'class' => 'yii\caching\DbDependency',
-            'reusable' => true,
-            'sql' => 'SELECT COUNT(*) FROM `order` WHERE restaurant_uuid="'.$this->restaurant_uuid .'"',
-        ]);
-
-        return Order::getDb()->cache(function($db) use ($modelClass, $start_date, $end_date) {
-
-            return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-                ->ordersReceived ($this->restaurant_uuid, $start_date, $end_date);
-
-        }, $cacheDuration, $cacheDependency);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->joinWith('order')
+            ->activeOrders();
     }
 
     /**
      * Gets query for [[Vouchers]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getVouchers($modelClass = "\common\models\Voucher")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[StoreUpdates]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStoreUpdates($modelClass = "\common\models\StoreUpdate")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
-    }
-
-    /**
-     * Gets query for [[Customers]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCustomers($modelClass = "\common\models\Customer")
-    {
-        return $this->hasMany ($modelClass::className (), ['customer_id' => 'customer_id'])
-            ->via('orders');
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Refunds]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRefunds($modelClass = "\common\models\Refund")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Queues]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getQueues($modelClass = "\common\models\Queue")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     public function getQueue($modelClass = "\common\models\Queue")
     {
-        return $this->hasOne($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])->orderBy('queue_id DESC');
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])->orderBy('queue_id DESC');
     }
 
     /**
      * Gets query for [[RestaurantTheme]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRestaurantTheme($modelClass = "\common\models\RestaurantTheme")
     {
-        return $this->hasOne ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[TapQueue]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getTapQueue($modelClass = "\common\models\TapQueue")
     {
-        return $this->hasOne ($modelClass::className (), ['tap_queue_id' => 'tap_queue_id']);
+        return $this->hasOne($modelClass::className(), ['tap_queue_id' => 'tap_queue_id']);
     }
 
     /**
      * Gets query for [[TapQueue]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getPaymentGatewayQueue()
     {
-        return $this->hasOne(PaymentGatewayQueue::className(), ['payment_gateway_queue_id' => 'payment_gateway_queue_id'])
-            ;
+        return $this->hasOne(PaymentGatewayQueue::className(), ['payment_gateway_queue_id' => 'payment_gateway_queue_id']);
     }
-
 
     /**
      * Gets query for [[WebLinks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getWebLinks($modelClass = "\common\models\WebLink")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[StorePages]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStorePages($modelClass = "\common\models\RestaurantPage")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[StoreWebLinks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getStoreWebLinks($modelClass = "\common\models\StoreWebLink")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[BusinessLocations]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCountryDeliveryZones($countryId, $modelClass = "\common\models\DeliveryZone")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->where (['country_id' => $countryId, 'delivery_zone.is_deleted' => 0]);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->where(['country_id' => $countryId, 'delivery_zone.is_deleted' => 0]);
     }
 
     /**
      * Gets query for [[BusinessLocations]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getBusinessLocations($modelClass = "\common\models\BusinessLocation")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
             ->andWhere(['business_location.is_deleted' => 0]);
-    }
-
-    /**
-     * Gets query for [[BusinessLocations]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPickupBusinessLocations($modelClass = "\common\models\BusinessLocation")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere (['support_pick_up' => 1, 'business_location.is_deleted' => 0]);
-    }
-
-    /**
-     * Gets query for [[DeliveryZones]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
-    {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->joinWith('businessLocation')
-            ->andWhere(['delivery_zone.is_deleted' => 0, 'business_location.is_deleted' => 0]);
     }
 
     // /**
@@ -4341,152 +4505,157 @@ class Restaurant extends \yii\db\ActiveRecord
     /**
      * Gets query for [[BusinessLocations]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
+     */
+    public function getPickupBusinessLocations($modelClass = "\common\models\BusinessLocation")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->andWhere(['support_pick_up' => 1, 'business_location.is_deleted' => 0]);
+    }
+
+    /**
+     * Gets query for [[DeliveryZones]].
+     *
+     * @return ActiveQuery
+     */
+    public function getDeliveryZones($modelClass = "\common\models\DeliveryZone")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->joinWith('businessLocation')
+            ->andWhere(['delivery_zone.is_deleted' => 0, 'business_location.is_deleted' => 0]);
+    }
+
+    /**
+     * Gets query for [[BusinessLocations]].
+     *
+     * @return ActiveQuery
      */
     public function getAreaDeliveryZonesForSpecificCountry($countryId, $modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany ($modelClass::className (), ['delivery_zone_id' => 'delivery_zone_id'])
-            ->via ('deliveryZones')
-            ->andWhere (['delivery_zone.country_id' => $countryId])
-            ->joinWith (['deliveryZone', 'city']);
+        return $this->hasMany($modelClass::className(), ['delivery_zone_id' => 'delivery_zone_id'])
+            ->via('deliveryZones')
+            ->andWhere(['delivery_zone.country_id' => $countryId])
+            ->joinWith(['deliveryZone', 'city']);
     }
 
     /**
      * Gets query for [[Areas]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getAreas($modelClass = "\common\models\Area")
     {
-        return $this->hasMany ($modelClass::className (), ['area_id' => 'area_id'])->via ('areaDeliveryZones');
+        return $this->hasMany($modelClass::className(), ['area_id' => 'area_id'])->via('areaDeliveryZones');
     }
 
     /**
      * Gets query for [[AreaDeliveryZones]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getAreaDeliveryZones($modelClass = "\common\models\AreaDeliveryZone")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Partner]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getPartner()
     {
         return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])
-                ->where(['partner_status' => Partner::STATUS_ACTIVE]);
+            ->where(['partner_status' => Partner::STATUS_ACTIVE]);
     }
 
     /**
      * Gets query for [[RestaurantUploads]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRestaurantUploads($modelClass = "\common\models\RestaurantUpload")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Country]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCategories($modelClass = "\common\models\Category")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
-    public function getCountryName($modelClass = "\common\models\Country") {
+    public function getCountryName($modelClass = "\common\models\Country")
+    {
 
         $country = $this->getCountry($modelClass)->one();
 
-        if($country)
+        if ($country)
             return $country->country_name;
     }
 
     /**
      * Gets query for [[Country]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCountry($modelClass = "\common\models\Country")
     {
-        return $this->hasOne ($modelClass::className (), ['country_id' => 'country_id']);
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
     }
 
     /**
      * Gets query for [[Currency]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCurrency($modelClass = "\common\models\Currency")
     {
-        return $this->hasOne ($modelClass::className (), ['currency_id' => 'currency_id']);
+        return $this->hasOne($modelClass::className(), ['currency_id' => 'currency_id']);
     }
 
     /**
      * Gets query for [[Currencies]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCurrencies($modelClass = "\common\models\Currency")
     {
-        return $this->hasMany($modelClass::className (), ['currency_id' => 'currency_id'])
+        return $this->hasMany($modelClass::className(), ['currency_id' => 'currency_id'])
             ->via('restaurantCurrencies');
     }
 
     /**
      * Gets query for [[BankDiscount]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getBankDiscounts($modelClass = "\common\models\BankDiscount")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[RestaurantCurrencies]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getRestaurantCurrencies($modelClass = "\common\models\RestaurantCurrency")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
      * Gets query for [[Invoices]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getInvoices($modelClass = "\common\models\RestaurantInvoice")
     {
-        return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid']);
-    }
-
-    /**
-     * @return query\RestaurantQuery
-     */
-    public static function find() {
-        return new query\RestaurantQuery(get_called_class());
-    }
-
-    /**
-     * @param string $type
-     * @param $message
-     * @return array
-     */
-    public static function message($type = "success", $message) {
-        return [
-            "operation" => $type,
-            "message" => is_string ($message)? Yii::t('agent', $message): $message
-        ];
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }

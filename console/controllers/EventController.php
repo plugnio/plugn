@@ -1,7 +1,11 @@
 <?php
 namespace console\controllers;
 
+use common\models\Currency;
 use common\models\Item;
+use common\models\Agent;
+use common\models\Order;
+use common\models\PaymentMethod;
 use common\models\Refund;
 use common\models\RestaurantDomainRequest;
 use Yii;
@@ -35,11 +39,13 @@ class EventController extends \yii\console\Controller {
 
     public function syncAgentSignup() {
 
-        $query = Agent::find();
+        $query = Agent::find()
+            ->andWhere(new Expression('`agent_created_at` > (NOW() - INTERVAL 1 YEAR)'));
 
         $count = 0;
 
         $total = Agent::find()
+            ->andWhere(new Expression('`agent_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->count();
 
         Console::startProgress(0, $total);
@@ -89,11 +95,25 @@ class EventController extends \yii\console\Controller {
     }
 
     public function syncBestSelling() {
-        $items = Item::find()
+
+        $query = Item::find()
+            ->andWhere(new Expression('`item_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->orderBy (['unit_sold' => SORT_DESC])
-            ->limit (5)
-            ->select (['item_name', 'item_name_ar', 'unit_sold'])
-            ->all ();
+            ->limit (5);
+
+        $items = [];
+
+        foreach ($query->all() as $item) {
+            $items[] = [
+                'unit_sold' => $item->unit_sold,
+                'item_name' => $item->item_name,
+                'item_name_ar' => $item->item_name_ar,
+                "restaurant" => $item->restaurant->name,
+                'item_type' => $item->item_type,
+                'item_uuid' => $item->item_uuid,
+                'restaurant_uuid' => $item->restaurant_uuid,
+            ];
+        }
 
         Yii::$app->eventManager->track('Best Selling',  $items);
     }
@@ -101,11 +121,13 @@ class EventController extends \yii\console\Controller {
     public function syncItemPublished() {
 
         $query = Item::find()
+            ->andWhere(new Expression('`item_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->filterPublished();
 
         $count = 0;
 
         $total = Item::find()
+            ->andWhere(new Expression('`item_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->filterPublished()
             ->count();
 
@@ -137,11 +159,13 @@ class EventController extends \yii\console\Controller {
 
     public function syncDomainRequests() {
 
-        $query = RestaurantDomainRequest::find();
+        $query = RestaurantDomainRequest::find()
+            ->andWhere(new Expression('`created_at` > (NOW() - INTERVAL 1 YEAR)'));
 
         $count = 0;
 
         $total = RestaurantDomainRequest::find()
+            ->andWhere(new Expression('`created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->count();
 
         Console::startProgress(0, $total);
@@ -170,12 +194,14 @@ class EventController extends \yii\console\Controller {
 
     public function syncStoreCreated() {
         
-        $query = Restaurant::find();
+        $query = Restaurant::find()
+            ->andWhere(new Expression('`restaurant_created_at` > (NOW() - INTERVAL 1 YEAR)'));
             //->joinWith(['agents']);
 
         $count = 0;
 
         $total = Restaurant::find()
+            ->andWhere(new Expression('`restaurant_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->count();
 
         Console::startProgress(0, $total);
@@ -224,11 +250,13 @@ class EventController extends \yii\console\Controller {
     public function syncOrderCompleted() {
 
         $query = Order::find()
+            ->andWhere(new Expression('`order_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->checkoutCompleted();
 
         $count = 0;
 
         $total = Order::find()
+            ->andWhere(new Expression('`order_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->checkoutCompleted()
             ->count();
 
@@ -245,7 +273,7 @@ class EventController extends \yii\console\Controller {
                 foreach ($order->orderItems as $orderedItem) {
                     $productsList[] = [
                         'product_id' => $orderedItem->item_uuid,
-                        'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null,
+                        'sku' => $orderedItem->item ? $orderedItem->item->sku : null,
                         'name' => $orderedItem->item_name,
                         'price' => $orderedItem->item_price,
                         'quantity' => $orderedItem->qty,
@@ -309,26 +337,30 @@ class EventController extends \yii\console\Controller {
                     'coupon' => $order->voucher && $order->voucher->code ? $order->voucher->code : null,
                     'products' => $productsList ? $productsList : null
                 ],
-                    $datetime,
+                    $datetime->format('c'),
                     $order->restaurant_uuid);
             }
+
+            Console::updateProgress($count, $total);
         }
     }
 
     public function syncRefundProcessed() {
 
         $query = Refund::find()
+            ->andWhere(new Expression('`refund_updated_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->joinWith(['order'])
-            ->where(new Expression('refund.refund_reference IS NOT NULL'));
+            ->andWhere(new Expression('refund.refund_reference IS NOT NULL'));
 
         $count = 0;
 
         $total = Refund::find()
+            ->andWhere(new Expression('`refund_updated_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->joinWith(['order'])
-            ->where(new Expression('refund.refund_reference IS NOT NULL'))
+            ->andWhere(new Expression('refund.refund_reference IS NOT NULL'))
             ->count();
 
-        Console::startProgress(0, $total);
+        //Console::startProgress(0, $total);
 
         foreach($query->batch(100) as $refunds) {
 
@@ -344,24 +376,28 @@ class EventController extends \yii\console\Controller {
                     $rate = 1 / $refund->order->currency->rate;// to USD
                 }
 
-                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund, [
+                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund->attributes, [
                         'refund_amount' => $refund->refund_amount,
                         'value' => $refund->refund_amount * $rate,
                         'currency' => 'USD'
                     ]),
-                    $datetime,
+                    $datetime->format('c'),
                     $refund->restaurant_uuid);
             }
+
+            Console::updateProgress($count, $total);
         }
     }
 
     public function syncOrderInitiated() {
 
-        $query = Order::find();
+        $query = Order::find()
+            ->andWhere(new Expression('`order_created_at` > (NOW() - INTERVAL 1 YEAR)'));
 
         $count = 0;
 
         $total = Order::find()
+            ->andWhere(new Expression('`order_created_at` > (NOW() - INTERVAL 1 YEAR)'))
             ->count();
 
         Console::startProgress(0, $total);
@@ -372,13 +408,85 @@ class EventController extends \yii\console\Controller {
 
             foreach ($orders as $order) {
 
+                $productsList = [];
+
+                foreach ($order->orderItems as $orderedItem) {
+                    $productsList[] = [
+                        'product_id' => $orderedItem->item_uuid,
+                        'sku' => $orderedItem->item ? $orderedItem->item->sku : null,
+                        'name' => $orderedItem->item_name,
+                        'price' => $orderedItem->item_price,
+                        'quantity' => $orderedItem->qty,
+                        'url' => $order->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
+                    ];
+                }
+
+                $plugn_fee = 0;
+                $payment_gateway_fee = 0;
+                $plugn_fee_kwd = 0;
+
+                //$total_price = $order->total_price;
+                //$delivery_fee = $order->delivery_fee;
+                //$subtotal = $order->subtotal;
+                //$currency = $order->currency_code;
+
+                $kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+                //using store currency instead of user as user can have any currency but totals will be in store currency
+
+                $rateKWD = $kwdCurrency->rate / $order->restaurant->currency->rate;
+
+                $rate = 1 / $order->restaurant->currency->rate;// to USD
+
+                if ($order->payment_uuid) {
+
+                    $plugn_fee_kwd = ($order->payment->plugn_fee + $order->payment->partner_fee) * $rateKWD;
+
+                    $plugn_fee = ($order->payment->plugn_fee + $order->payment->partner_fee) * $rate;
+
+                    //$total_price = $total_price * $rate;
+                    //$delivery_fee = $delivery_fee * $rate;
+                    //$subtotal = $subtotal * $rate;
+                    $payment_gateway_fee = $order->payment->payment_gateway_fee * $rate;
+                }
+
                 $datetime = new \DateTime($order->order_created_at);
 
-                Yii::$app->eventManager->track('Order Initiated', $order,
-                    $datetime,
+                $order_total = $order->total_price * $rate;
+
+                $cash = $order->paymentMethod && $order->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH?
+                            ($order->total_price * $rate): 0;
+
+                $coupon = $order->voucher && $order->voucher->code ? $order->voucher->code : null;
+
+                Yii::$app->eventManager->track('Order Initiated', [
+                        "restaurant_uuid" => $order->restaurant_uuid,
+                        "store" => $order->restaurant->name,
+                        "customer_name" => $order->customer_name,
+                        "customer_email" => $order->customer_email,
+                        "customer_id" => $order->customer_id,
+                        "country" => $order->country_name,
+                        'checkout_id' => $order->order_uuid,
+                        'order_id' => $order->order_uuid,
+                        'total' => $order_total,
+                        'revenue' => $plugn_fee,
+                        "store_revenue" => $order_total - $plugn_fee,
+                        'gateway_fee' => $payment_gateway_fee,
+                        'payment_method' => $order->payment_method_name,
+                        'gateway' => $order->payment_method_name,// $order->payment_uuid ? 'Tap' : null,
+                        'shipping' => ($order->delivery_fee * $rate),
+                        'subtotal' => ($order->subtotal * $rate),
+                        'currency' => $order->currency_code,
+                        "cash" => $cash,
+                        'coupon' => $coupon,
+                        'products' => $productsList 
+                    ],
+                    $datetime->format('c'),
                     $order->restaurant_uuid
                 );
             }
+
+            Console::updateProgress($count, $total);
         }
     }
 
@@ -424,6 +532,7 @@ class EventController extends \yii\console\Controller {
         }
     }
 }
+
 //to sync
 /*
 - Order Initiated

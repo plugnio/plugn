@@ -28,7 +28,16 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
+        $a = Restaurant::find()
+            ->andWhere(['restaurant_uuid' => "rest_adddefb3-ceac-11eb-b079-06c0d704d304"])
 
+            ->one();
+        echo "<pre />";
+        //print_r($a->attributes);
+
+        $response = Yii::$app->tapPayments->getBussiness($a);
+
+        print_r($response);
     }
 
     /**
@@ -517,7 +526,8 @@ class CronController extends \yii\console\Controller
                     $refund->payment->payment_gateway_transaction_id,
                     $refund->refund_amount,
                     $refund->currency->code,
-                    $refund->reason ? $refund->reason : 'requested_by_customer'
+                    $refund->reason ? $refund->reason : 'requested_by_customer',
+                    $refund->store
                 );
 
                 if (array_key_exists('errors', $response->data)) {
@@ -565,7 +575,7 @@ class CronController extends \yii\console\Controller
                     $rate = 1 / $refund->order->currency->rate;// to USD
                 }
 
-                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund, [
+                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund->attributes, [
                         'refund_amount' => $refund->refund_amount,
                         'value' => $refund->refund_amount * $rate, 
                         'currency' => 'USD'
@@ -821,11 +831,17 @@ class CronController extends \yii\console\Controller
             }
         }
 
-        //pollTapStatus
+        //pollTapStatus, as they said it will take 1 day to approve docs, if someone do checkout before that, they might
+        // need to process refund etc,... so better enable checkout once accounts approved ... once payout enabled
 
         $query = Restaurant::find()
             ->andWhere(['!=', 'restaurant.is_deleted', 1])
-            ->andWhere(['is_tap_business_active' => false, 'is_tap_created' => true]);
+            ->andWhere([
+                'OR',
+                ['is_tap_business_active' => false],
+                ['!=', 'tap_merchant_status', 'Active']
+            ])
+            ->andWhere(['is_tap_created' => true]);
 
         foreach ($query->batch() as $stores) {
             foreach ($stores as $store) {
@@ -837,11 +853,24 @@ class CronController extends \yii\console\Controller
 
         if(YII_ENV == 'prod')
         {
-            $items = Item::find()
+
+            $query = Item::find()
                 ->orderBy (['unit_sold' => SORT_DESC])
-                ->limit (5)
-                ->select (['item_name', 'item_name_ar', 'unit_sold'])
-                ->all ();
+                ->limit (5);
+
+            $items = [];
+
+            foreach ($query->all() as $item) {
+                $items[] = [
+                    'unit_sold' => $item->unit_sold,
+                    'item_name' => $item->item_name,
+                    'item_name_ar' => $item->item_name_ar,
+                    "restaurant" => $item->restaurant->name,
+                    'item_type' => $item->item_type,
+                    'item_uuid' => $item->item_uuid,
+                    'restaurant_uuid' => $item->restaurant_uuid,
+                ];
+            }
 
             Yii::$app->eventManager->track('Best Selling',  $items);
         }

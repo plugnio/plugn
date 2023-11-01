@@ -372,7 +372,7 @@ class OrderController extends Controller
 
         if(YII_ENV == 'prod') {
 
-            Yii::$app->eventManager->track('Order Initiated', $order,
+            Yii::$app->eventManager->track('Order Initiated', $order->attributes,
                 null,
                 $restaurant->restaurant_uuid
             );
@@ -555,7 +555,8 @@ class OrderController extends Controller
                     $payment->payment_token : $order->paymentMethod->source_id,
                 $order->restaurant->warehouse_fee,
                 $order->restaurant->warehouse_delivery_charges,
-                $order->area_id ? $order->area->country->country_name : ''
+                $order->area_id ? $order->area->country->country_name : '',
+                $order->restaurant_uuid
             );
 
             $responseContent = json_decode($response->content);
@@ -726,7 +727,8 @@ class OrderController extends Controller
                 $order->paymentMethod->payment_method_code,
                 $order->restaurant->warehouse_fee,
                 $order->restaurant->warehouse_delivery_charges,
-                $order->area_id ? $order->area->country->country_name : ''
+                $order->area_id ? $order->area->country->country_name : '',
+                $order->restaurant_uuid
             );
 
             $responseContent = json_decode($response->content);

@@ -80,6 +80,7 @@ AppAsset::register($this);
                     ['label' => 'Subscription', 'url' => ['/subscription/index']],
                     ['label' => 'Customers', 'url' => ['/customer/index']],
                     ['label' => 'Debugger', 'url' => Yii::$app->apiUrlManager->getBaseUrl(). '/debug'],
+                    ['label' => 'API Log', 'url' => ['/api-log/index']],
                 ]
             ],
             [

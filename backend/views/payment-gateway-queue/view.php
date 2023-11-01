@@ -42,7 +42,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'payment_gateway_queue_id',
-            'restaurant_uuid',
+           // 'restaurant_uuid',
+            [
+                'attribute' => 'restaurant',
+                'format' => 'raw',
+                'value' => function ($data) {
+                    return Html::a($data->restaurant->name, ['restaurant/view', 'id' => $data->restaurant_uuid],
+                        ['target'=>'_blank']);
+                },
+            ],
             'payment_gateway',
             'queueStatusName',
             'queue_response',

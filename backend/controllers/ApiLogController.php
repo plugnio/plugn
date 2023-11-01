@@ -2,17 +2,18 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
-use common\models\RestaurantDomainRequest;
-use common\models\RestaurantDomainRequestSearch;
+use common\models\ApiLog;
+use backend\models\ApiLogSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * RestaurantDomainRequestController implements the CRUD actions for RestaurantDomainRequest model.
+ * ApiLogController implements the CRUD actions for ApiLog model.
  */
-class RestaurantDomainRequestController extends Controller
+class ApiLogController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -29,6 +30,11 @@ class RestaurantDomainRequestController extends Controller
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
+                    [
+                        'allow' => Yii::$app->user->identity && Yii::$app->user->identity->admin_role != Admin::ROLE_CUSTOMER_SERVICE_AGENT,
+                        'actions' => ['create', 'update', 'delete'],
+                        'roles' => ['@'],
+                    ],
                     [//allow authenticated users only
                         'allow' => true,
                         'roles' => ['@'],
@@ -39,12 +45,12 @@ class RestaurantDomainRequestController extends Controller
     }
 
     /**
-     * Lists all RestaurantDomainRequest models.
+     * Lists all ApiLog models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new RestaurantDomainRequestSearch();
+        $searchModel = new ApiLogSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -54,7 +60,7 @@ class RestaurantDomainRequestController extends Controller
     }
 
     /**
-     * Displays a single RestaurantDomainRequest model.
+     * Displays a single ApiLog model.
      * @param string $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -67,16 +73,16 @@ class RestaurantDomainRequestController extends Controller
     }
 
     /**
-     * Creates a new RestaurantDomainRequest model.
+     * Creates a new ApiLog model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new RestaurantDomainRequest();
+        $model = new ApiLog();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->request_uuid]);
+            return $this->redirect(['view', 'id' => $model->log_uuid]);
         }
 
         return $this->render('create', [
@@ -85,7 +91,7 @@ class RestaurantDomainRequestController extends Controller
     }
 
     /**
-     * Updates an existing RestaurantDomainRequest model.
+     * Updates an existing ApiLog model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
@@ -96,15 +102,7 @@ class RestaurantDomainRequestController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-
-            if(YII_ENV == 'prod') {
-
-                Yii::$app->eventManager->track('Domain Request Updated', $model->attributes,
-                    null,
-                    $model->restaurant_uuid);
-            }
-
-            return $this->redirect(['view', 'id' => $model->request_uuid]);
+            return $this->redirect(['view', 'id' => $model->log_uuid]);
         }
 
         return $this->render('update', [
@@ -113,7 +111,7 @@ class RestaurantDomainRequestController extends Controller
     }
 
     /**
-     * Deletes an existing RestaurantDomainRequest model.
+     * Deletes an existing ApiLog model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
@@ -127,15 +125,15 @@ class RestaurantDomainRequestController extends Controller
     }
 
     /**
-     * Finds the RestaurantDomainRequest model based on its primary key value.
+     * Finds the ApiLog model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
-     * @return RestaurantDomainRequest the loaded model
+     * @return ApiLog the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = RestaurantDomainRequest::findOne($id)) !== null) {
+        if (($model = ApiLog::findOne($id)) !== null) {
             return $model;
         }
 
