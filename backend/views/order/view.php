@@ -209,6 +209,7 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                                 return $data->order_mode == Order::ORDER_MODE_DELIVERY ? 'Delivery' : 'Pickup';
                             },
                         ],
+                        'is_market_order:boolean',
                         // 'total_price:currency',
                         // 'subtotal:currency',
                         // 'delivery_fee:currency',

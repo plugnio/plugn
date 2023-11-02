@@ -85,6 +85,7 @@ use yii\web\BadRequestHttpException;
  * @property boolean estimated_time_of_arrival
  * @property string $diggipack_awb_no
  * @property boolean $is_sandbox
+ * @property boolean $is_market_order
  * @property decimal $total
  * @property Area
  * @property BankDiscount $bankDiscount
@@ -165,6 +166,9 @@ class Order extends \yii\db\ActiveRecord
                 'order_mode', 'restaurant_uuid', 'customer_phone_number', 'customer_phone_country_code', 'customer_name'], 'required'],
 
             [['is_order_scheduled'], 'required', 'on' => 'create'],
+
+            [['is_market_order', 'is_sandbox'], 'boolean'],
+
             [['payment_method_id'], 'required', 'except' => [
                 self::SCENARIO_CREATE_ORDER_BY_ADMIN,
                 self::SCENARIO_INIT_ORDER
@@ -728,7 +732,8 @@ class Order extends \yii\db\ActiveRecord
             'mashkor_tracking_link' => Yii::t('app','Mashkor order tracking link'),
             'mashkor_driver_name' => Yii::t('app','Name of the driver'),
             'mashkor_driver_phone' => Yii::t('app','Driver phone number'),
-            'mashkor_order_status' => Yii::t('app','Mashkor order status')
+            'mashkor_order_status' => Yii::t('app','Mashkor order status'),
+            'is_market_order' => Yii::t('app','Is market order'),
         ];
     }
 
@@ -1033,6 +1038,7 @@ class Order extends \yii\db\ActiveRecord
                     "country" => $this->country_name,
                     'checkout_id' => $this->order_uuid,
                     'order_id' => $this->order_uuid,
+                    'is_market_order' => $this->is_market_order,
                     'total' => $order_total,
                     'revenue' => $plugn_fee,
                     "store_revenue" => $order_total - $plugn_fee,
