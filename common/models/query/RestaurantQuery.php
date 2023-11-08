@@ -53,6 +53,17 @@ class RestaurantQuery extends \yii\db\ActiveQuery
             ->andWhere( new Expression("item_uuid IS NULL AND last_order_at IS NULL"));
     }
 
+    /**
+     * @param $db
+     * @return RestaurantQuery
+     */
+    public function active($db = null)
+    {
+        return $this
+            ->joinWith(['items'])
+            ->andWhere( new Expression("item_uuid IS NOT NULL OR last_order_at IS NOT NULL"));
+    }
+
     public function filterByDateRange($date_start, $date_end) {
         if(!$date_start || !$date_end) {
             return $this;
