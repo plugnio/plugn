@@ -853,7 +853,6 @@ class CronController extends \yii\console\Controller
 
         if(YII_ENV == 'prod')
         {
-
             $query = Item::find()
                 ->orderBy (['unit_sold' => SORT_DESC])
                 ->limit (5);
@@ -873,6 +872,23 @@ class CronController extends \yii\console\Controller
             }
 
             Yii::$app->eventManager->track('Best Selling',  $items);
+
+            //inactive stores
+
+            $inactive = Restaurant::find()
+                ->inActive()
+                ->count();
+
+            $total = Restaurant::find()
+                ->count();
+
+            $data = [
+                "inactive" => $inactive,
+                "active" => $total - $inactive,
+                "total" => $total
+            ];
+
+            Yii::$app->eventManager->track('Inactive stores',  $data);
         }
     }
 
