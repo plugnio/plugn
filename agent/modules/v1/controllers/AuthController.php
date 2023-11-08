@@ -218,7 +218,7 @@ class AuthController extends Controller {
         $agent->agent_name = Yii::$app->request->getBodyParam('name');
         $agent->agent_email = Yii::$app->request->getBodyParam('email');
         $agent->agent_number = Yii::$app->request->getBodyParam ('owner_number');
-        $agent->agent_phone_country_code= Yii::$app->request->getBodyParam ('owner_phone_country_code');
+        $agent->agent_phone_country_code = Yii::$app->request->getBodyParam ('owner_phone_country_code');
 
         $agent->tempPassword = Yii::$app->request->getBodyParam ('password');
 
@@ -247,6 +247,21 @@ class AuthController extends Controller {
             ];
 
             Yii::$app->auth0->createUser($param);
+
+            $full_name = explode(' ', $agent->agent_name);
+            $firstname = $full_name[0];
+            $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+
+            Yii::$app->eventManager->track('Agent Signup', [
+                    'first_name' => trim($firstname),
+                    'last_name' => trim($lastname),
+                    'email' => $agent->agent_email,
+                    "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
+                    "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
+                ],
+                null,
+                $agent->agent_id
+            );
         }
 
         if($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED)
@@ -324,6 +339,28 @@ class AuthController extends Controller {
                     "message" => $agent->errors
                 ];
             }
+
+        if (YII_ENV == 'prod') {
+
+            $full_name = explode(' ', $agent->agent_name);
+            $firstname = $full_name[0];
+            $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+
+            Yii::$app->eventManager->track('Agent Signup', [
+                'first_name' => trim($firstname),
+                'last_name' => trim($lastname),
+                'store_name' => $store->name,
+                'phone_number' => $store->owner_number,
+                'email' => $agent->agent_email,
+                'store_url' => $store->restaurant_domain,
+                "country" => $store->country ? $store->country->country_name : null,
+                "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
+                "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
+            ],
+                null,
+                $agent->agent_id
+            );
+        }
 
             if (!$store->save()) {
                 return [

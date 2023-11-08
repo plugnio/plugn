@@ -2715,7 +2715,8 @@ class Restaurant extends ActiveRecord
                 $agent->agent_id
             );
 
-            Yii::$app->eventManager->track('Agent Signup', [
+            /**
+             * Yii::$app->eventManager->track('Agent Signup', [
                 'first_name' => trim($firstname),
                 'last_name' => trim($lastname),
                 'phone_number' => $this->owner_phone_country_code . $this->owner_number,
@@ -2727,7 +2728,7 @@ class Restaurant extends ActiveRecord
             ],
                 null,
                 $agent->agent_id
-            );
+            );*/
 
             if ($agent->tempPassword) {
 
