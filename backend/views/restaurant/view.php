@@ -112,6 +112,8 @@ $this->registerJs($js);
         <li class="active" id="general">
             <a href="#">Details</a>
         </li>
+
+        <li id="restaurantType"><a href="#">Restaurant Type</a></li>
         <li id="payment"><a href="#">Tap payment</a></li>
         <li id="fees"><a href="#">Our Fees</a></li>
         <li id="theme"><a href="#">Theme color</a></li>
@@ -397,6 +399,43 @@ $this->registerJs($js);
                 'meta_description_ar',
             ]
         ]); ?>
+    </div>
+
+
+    <div id="tab-restaurantType" class="tab-restaurantType hidden">
+
+        <?= Html::a('Update', ['restaurant-type', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-primary',
+        ]) ?>
+
+        <br /><br />
+
+        <?php if($model->restaurantType) {
+            echo DetailView::widget([
+                'model' => $model->restaurantType,
+                'attributes' => [
+                    'businessCategory.business_category_en',
+                    'businessType.business_type_en',
+                    'merchantType.merchant_type_en',
+                ],
+            ]);
+        } ?>
+
+        <?=
+        GridView::widget([
+            'dataProvider' => $restaurantItemType,
+            'columns' => [
+                [
+                    'label' => 'Item type',
+                    'value' => 'businessItemType.business_item_type_en'
+                ]
+            ],
+            'layout' => '{summary}<div class="card-body">{items}{pager}</div>',
+            'tableOptions' => ['class' => 'table table-bordered table-hover'],
+            'summaryOptions' => ['class' => "card-header"],
+        ]);
+        ?>
+
     </div>
 
     <div id="tab-payment" class="tab-content hidden">

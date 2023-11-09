@@ -14,7 +14,6 @@ use yii\db\ActiveRecord;
 use yii\db\Exception;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
-use borales\extensions\phoneInput\PhoneInputValidator;
 use yii\helpers\ArrayHelper;
 
 
@@ -167,6 +166,8 @@ use yii\helpers\ArrayHelper;
  * @property TapQueue[] $tapQueues
  * @property Voucher[] $vouchers
  * @property WebLink[] $webLinks
+ * @property RestaurantType[] $restaurantType
+ * @property RestaurantItemType[] $restaurantItemTypes
  */
 class Restaurant extends ActiveRecord
 {
@@ -4658,5 +4659,23 @@ class Restaurant extends ActiveRecord
     public function getInvoices($modelClass = "\common\models\RestaurantInvoice")
     {
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * @param $modelClass
+     * @return ActiveQuery
+     */
+    public function getRestaurantItemTypes($modelClass = "\common\models\RestaurantItemType")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * @param $modelClass
+     * @return ActiveQuery
+     */
+    public function getRestaurantType($modelClass = "\common\models\RestaurantType")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 }

@@ -4,13 +4,20 @@ namespace backend\controllers;
 
 use agent\models\PaymentMethod;
 use backend\models\Admin;
+use common\models\BusinessCategory;
+use common\models\BusinessItemType;
+use common\models\BusinessType;
+use common\models\MerchantType;
 use common\models\PaymentGatewayQueue;
+use common\models\RestaurantItemType;
 use common\models\RestaurantPaymentMethod;
+use common\models\RestaurantType;
 use Yii;
 use common\models\Restaurant;
 use common\models\TapQueue;
 use backend\models\RestaurantSearch;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -368,6 +375,14 @@ class RestaurantController extends Controller {
 
         $model = $this->findModel($id);
 
+        //print_r($model->restaurantType->businessCategory);
+        //die();
+
+        $restaurantItemType = new \yii\data\ActiveDataProvider([
+            'query' => $model->getRestaurantItemTypes(),
+            'pagination' => false
+        ]);
+
         $storeThemeColors = new \yii\data\ActiveDataProvider([
             'query' => $model->getRestaurantTheme(),
             'pagination' => false
@@ -384,6 +399,7 @@ class RestaurantController extends Controller {
             'model' => $this->findModel($id),
             'storeThemeColors' => $storeThemeColors,
             'domainRequests' => $domainRequests,
+            'restaurantItemType' => $restaurantItemType,
             "payments" => $payments
         ]);
     }
@@ -712,6 +728,128 @@ class RestaurantController extends Controller {
 
       return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
 
+    }
+
+    /**
+     * update store type details
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionRestaurantType($id)
+    {
+        $model = $this->findModel($id);
+
+        $restaurantType = $model->restaurantType;
+
+        if(!$restaurantType) {
+            $restaurantType = new RestaurantType();
+            $restaurantType->restaurant_uuid = $id;
+        }
+
+        if (Yii::$app->request->isPost && $restaurantType->load(Yii::$app->request->post())) {
+
+            $transaction = Yii::$app->db->beginTransaction();
+
+            if (!$restaurantType->save()) {
+
+                $transaction->rollBack();
+
+                Yii::$app->session->setFlash('error', print_r($restaurantType->errors, true));
+                return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+            }
+
+            $restaurantItemTypes = Yii::$app->request->getBodyParam('restaurantItemTypes');
+                //$restaurantType->arrRestaurantItemTypes;
+
+            if(!$restaurantItemTypes) {
+                $restaurantItemTypes = [];
+            }
+
+            $arrRitUUID = [];
+
+            foreach ($restaurantItemTypes as $business_item_type_uuid)//$restaurantItemType
+            {
+                $rtModel = null;
+
+                //if(!empty($restaurantItemType['rit_uuid'])) {
+
+                    $rtModel = RestaurantItemType::findOne([
+                        //'rit_uuid' => $restaurantItemType['rit_uuid'],
+                        'business_item_type_uuid' => $business_item_type_uuid,
+                        'restaurant_uuid' => $model->restaurant_uuid
+                    ]);
+                //}
+
+                if(!$rtModel) {
+                    $rtModel = new RestaurantItemType();
+                }
+
+                $rtModel->restaurant_uuid = $id;
+                $rtModel->business_item_type_uuid = $business_item_type_uuid;
+                //$restaurantItemType['business_item_type_uuid'];
+
+                if(!$rtModel->save()) {
+
+                    $transaction->rollBack();
+
+                    Yii::$app->session->setFlash('error', print_r($rtModel->errors, true));
+                    return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+                }
+
+                $arrRitUUID[] = $rtModel->rit_uuid;
+            }
+
+            //delete removed store item type
+
+            RestaurantItemType::deleteAll([
+                "AND",
+                ['restaurant_uuid' => $model->restaurant_uuid],
+                ['NOT IN', 'rit_uuid', $arrRitUUID]
+            ]);
+
+            $transaction->commit();
+
+            //todo: send mixpanel event
+
+            if(YII_ENV == 'prod') {
+
+                $itemTypes = [];
+
+                foreach ($model->restaurantItemTypes as $restaurantItemType) {
+                    $itemTypes[] = $restaurantItemType->businessItemType->business_item_type_en;
+                }
+
+                Yii::$app->eventManager->track('Store type', [
+                        'restaurant' => $model->name,
+                        'merchant_type' => $restaurantType->merchantType? $restaurantType->merchantType->merchant_type_en: null,
+                        'business_type' => $restaurantType->businessType? $restaurantType->businessType->business_type_en: null,
+                        'business_category' => $restaurantType->businessCategory? $restaurantType->businessCategory->business_category_en: null,
+                        'itemTypes' => $itemTypes
+                    ],
+                    null,
+                    $model->restaurant_uuid);
+            }
+
+            return $this->redirect(['view', 'id' => $model->restaurant_uuid, 'tab' => 'restaurantType']);
+        }
+
+        $merchantTypes = ArrayHelper::map(MerchantType::find()->all(), 'merchant_type_uuid', 'merchant_type_en');
+        $businessTypes = ArrayHelper::map(BusinessType::find()->all(), 'business_type_uuid', 'business_type_en');
+        $businessCategories = ArrayHelper::map(BusinessCategory::find()->all(), 'business_category_uuid', 'business_category_en');
+        $businessItemTypes = BusinessItemType::find()->all();
+
+        $restaurantItemTypes = ArrayHelper::getColumn($model->restaurantItemTypes, 'business_item_type_uuid');
+
+        return $this->render('restaurant_type', [
+            'model' => $model,
+            'restaurantType' => $restaurantType,
+            'merchantTypes' => $merchantTypes,
+            'businessTypes' => $businessTypes,
+            'businessCategories' => $businessCategories,
+            'businessItemTypes' => $businessItemTypes,
+            'restaurantItemTypes' => $restaurantItemTypes
+        ]);
     }
 
     /**
