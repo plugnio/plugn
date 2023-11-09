@@ -408,16 +408,18 @@ $this->registerJs($js);
             'class' => 'btn btn-primary',
         ]) ?>
 
-        <?=
-        DetailView::widget([
-            'model' => $model->restaurantType,
-            'attributes' => [
-                'businessCategory.business_category_en',
-                'businessType.business_type_en',
-                'merchantType.merchant_type_en',
-            ],
-        ]);
-        ?>
+        <br /><br />
+
+        <?php if($model->restaurantType) {
+            echo DetailView::widget([
+                'model' => $model->restaurantType,
+                'attributes' => [
+                    'businessCategory.business_category_en',
+                    'businessType.business_type_en',
+                    'merchantType.merchant_type_en',
+                ],
+            ]);
+        } ?>
 
         <?=
         GridView::widget([

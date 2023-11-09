@@ -786,6 +786,24 @@ class RestaurantController extends Controller {
 
             //todo: send mixpanel event
 
+            if(YII_ENV == 'prod') {
+
+                $itemTypes = [];
+
+                foreach ($model->restaurantItemTypes as $restaurantItemType) {
+                    $itemTypes[] = $restaurantItemType->businessItemType->business_item_type_en;
+                }
+
+                Yii::$app->eventManager->track('Store type', [
+                        'restaurant' => $model->name,
+                        'merchant_type' => $restaurantType->merchantType? $restaurantType->merchantType->merchant_type_en: null,
+                        'business_type' => $restaurantType->businessType? $restaurantType->businessType->business_type_en: null,
+                        'business_category' => $restaurantType->businessCategory? $restaurantType->businessCategory->business_category_en: null,
+                        'itemTypes' => $itemTypes
+                    ],
+                    null,
+                    $model->restaurant_uuid);
+            }
 
             return $this->redirect(['view', 'id' => $model->restaurant_uuid, 'tab' => 'restaurantType']);
         }
