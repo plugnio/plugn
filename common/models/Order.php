@@ -1028,29 +1028,71 @@ class Order extends \yii\db\ActiveRecord
 
             $order_total = $this->total_price * $rate;
 
-            Yii::$app->eventManager->track('Order Completed', [
-                    "restaurant_uuid" => $this->restaurant_uuid,
-                    "store" => $this->restaurant->name,
-                    "customer_name" => $this->customer_name,
-                    "customer_email" => $this->customer_email,
-                    "customer_id" => $this->customer_id,
-                    "country" => $this->country_name,
-                    'checkout_id' => $this->order_uuid,
-                    'order_id' => $this->order_uuid,
-                    'total' => $order_total,
-                    'revenue' => $plugn_fee,
-                    "store_revenue" => $order_total - $plugn_fee,
-                    'gateway_fee' => $payment_gateway_fee,
-                    'payment_method' => $this->payment_method_name,
-                    'gateway' => $this->payment_method_name,// $this->payment_uuid ? 'Tap' : null,
-                    'shipping' => ($this->delivery_fee * $rate),
-                    'subtotal' => ($this->subtotal * $rate),
-                    'currency' => $this->currency_code,
-                    "cash" => $this->paymentMethod && $this->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH?
-                        ($this->total_price * $rate): 0,
-                    'coupon' => $this->voucher && $this->voucher->code ? $this->voucher->code : null,
-                    'products' => $productsList ? $productsList : null
-                ],
+            $store = $this->restaurant;
+
+            $itemTypes = [];
+            foreach ($store->restaurantItemTypes as $restaurantItemType) {
+                $itemTypes[] = $restaurantItemType->businessItemType->business_item_type_en;
+            }
+
+            $data = [
+                "restaurant_uuid" => $this->restaurant_uuid,
+                "store" => $store->name,
+                "customer_name" => $this->customer_name,
+                "customer_email" => $this->customer_email,
+                "customer_id" => $this->customer_id,
+                "country" => $this->country_name,
+                'checkout_id' => $this->order_uuid,
+                'order_id' => $this->order_uuid,
+                'total' => $order_total,
+                'revenue' => $plugn_fee,
+                "store_revenue" => $order_total - $plugn_fee,
+                'gateway_fee' => $payment_gateway_fee,
+                'payment_method' => $this->payment_method_name,
+                'gateway' => $this->payment_method_name,// $this->payment_uuid ? 'Tap' : null,
+                'shipping' => ($this->delivery_fee * $rate),
+                'subtotal' => ($this->subtotal * $rate),
+                'currency' => $this->currency_code,
+                "cash" => $this->paymentMethod && $this->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH?
+                    ($this->total_price * $rate): 0,
+                'coupon' => $this->voucher && $this->voucher->code ? $this->voucher->code : null,
+                'products' => $productsList ? $productsList : null,
+                'storeItemTypes' => $itemTypes,
+            ];
+
+            if($store->restaurantType) {
+
+                $data = array_combine($data, [
+                    'merchant_type' => $store->restaurantType->merchantType ? $store->restaurantType->merchantType->merchant_type_en : null,
+                    'business_type' => $store->restaurantType->businessType ? $store->restaurantType->businessType->business_type_en : null,
+                    'business_category' => $store->restaurantType->businessCategory ? $store->restaurantType->businessCategory->business_category_en : null,
+                ]);
+
+                //for order in specific category
+
+                if($store->restaurantType->businessCategory)
+                    Yii::$app->eventManager->track('Order Completed in Category', $data,
+                        null,
+                        $store->restaurantType->businessCategory->business_category_en);
+
+                //for order in specific business type
+
+                if($store->restaurantType->businessType)
+                    Yii::$app->eventManager->track('Order Completed in Business Type', $data,
+                        null,
+                        $store->restaurantType->businessType->business_type_en);
+
+                //for order in specific merchant type
+
+                if($store->restaurantType->merchantType)
+                    Yii::$app->eventManager->track('Order Completed in Merchant Type', $data,
+                        null,
+                        $store->restaurantType->merchantType->merchant_type_en);
+            }
+
+            //for order tracking
+
+            Yii::$app->eventManager->track('Order Completed', $data,
                 null, 
                 $this->restaurant_uuid);
 
