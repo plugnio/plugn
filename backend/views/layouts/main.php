@@ -118,6 +118,16 @@ AppAsset::register($this);
                   ['label' => 'Plans', 'url' => ['/plan/index']],
                   ['label' => 'Bank', 'url' => ['/bank/index']],
                   ['label' => 'Admins', 'url' => ['/admin/index']],
+                  [
+                      'label' => "Store Category",
+                      'items' => [
+                         ['label' => 'Business Category', 'url' => ['/business-category/index']],
+                         ['label' => 'Business Item Type', 'url' => ['/business-item-type/index']],
+                          ['label' => 'Business Type', 'url' => ['/business-type/index']],
+                          ['label' => 'Merchant Type', 'url' => ['/merchant-type/index']],
+                          //['label' => 'Restaurant Item Type', 'url' => ['/restaurant-item-type/index']],
+                      ]
+                  ],
                   ['label' => 'Plugn Settings', 'url' => ['/setting/update']],
                 ],
             ],

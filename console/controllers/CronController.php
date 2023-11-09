@@ -28,16 +28,6 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
-        $a = Restaurant::find()
-            ->andWhere(['restaurant_uuid' => "rest_adddefb3-ceac-11eb-b079-06c0d704d304"])
-
-            ->one();
-        echo "<pre />";
-        //print_r($a->attributes);
-
-        $response = Yii::$app->tapPayments->getBussiness($a);
-
-        print_r($response);
     }
 
     /**
