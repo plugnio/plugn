@@ -586,7 +586,16 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validatePickupLocation($attribute)
     {
-        if (!BusinessLocation::find()->where(['restaurant_uuid' => $this->restaurant_uuid, 'business_location_id' => $this->pickup_location_id])->one())
+        if($this->order_mode == self::ORDER_MODE_DELIVERY)
+            return true;
+
+        $model = BusinessLocation::find()
+            ->where([
+                'restaurant_uuid' => $this->restaurant_uuid,
+                'business_location_id' => $this->pickup_location_id]
+            )->one();
+
+        if (!$model)
             $this->addError($attribute, "Pickup location doesn't exist");
     }
 
@@ -1252,22 +1261,24 @@ class Order extends \yii\db\ActiveRecord
         {
             $this->is_sandbox = $this->restaurant->is_sandbox;
 
-            if($this->order_mode == Order::ORDER_MODE_DELIVERY) {
+            if($this->order_mode == Order::ORDER_MODE_DELIVERY) {//&& $this->delivery_zone_id
 
-                $isExists = $this->restaurant->getDeliveryZones()->andWhere(['delivery_zone_id' => $this->delivery_zone_id])->exists();
+                $isExists = $this->restaurant->getDeliveryZones()
+                    ->andWhere(['delivery_zone_id' => $this->delivery_zone_id])
+                    ->exists();
 
                 if (!$isExists)
                     return $this->addError('delivery_zone_id', Yii::t('app', 'Store not delivering to this area.'));
             }
 
-            if($this->order_mode == Order::ORDER_MODE_PICK_UP) {
+            if($this->order_mode == Order::ORDER_MODE_PICK_UP) { // && $this->pickup_location_id
 
                 $isExists = $this->restaurant->getPickupBusinessLocations()
                     ->andWhere(['business_location.business_location_id' => $this->pickup_location_id])
                     ->exists();
 
                 if (!$isExists)
-                    return $this->addError('pickup_location_id', Yii::t('app', 'Store not delivering to this area.'));
+                    return $this->addError('pickup_location_id', Yii::t('app', 'Invalid pickup location.'));
             }
         }
 
