@@ -61,6 +61,8 @@ class BusinessLocationController extends BaseController
     {
 //        $this->ownerCheck();
         $keyword = Yii::$app->request->get ('keyword');
+        $support_pick_up = Yii::$app->request->get ('support_pick_up');
+        $list_all = Yii::$app->request->get ('list_all');
 
         $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -75,12 +77,21 @@ class BusinessLocationController extends BaseController
             ]);
         }
 
+        if($support_pick_up) {
+            $query->andWhere(['support_pick_up' => $support_pick_up]);
+        }
+
         $query->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
             ->orderBy('business_location_id DESC');
 
-        return new ActiveDataProvider([
-            'query' => $query
-        ]);
+        $params = $list_all?  [
+            'query' => $query,
+            'pagination' => false
+        ]: [
+            'query' => $query,
+        ];
+
+        return new ActiveDataProvider($params);
     }
 
     /**
