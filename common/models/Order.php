@@ -119,6 +119,10 @@ class Order extends \yii\db\ActiveRecord
     const ORDER_MODE_DELIVERY = 1;
     const ORDER_MODE_PICK_UP = 2;
 
+    const UNIT_TYPE_OFFICE = 'office';
+    const UNIT_TYPE_HOUSE = 'house';
+    const UNIT_TYPE_APARTMENT = 'apartment';
+
     //Values for `mashkor_order_status`
     const MASHKOR_ORDER_STATUS_NEW = 0;
     const MASHKOR_ORDER_STATUS_CONFIRMED = 1;
@@ -254,22 +258,26 @@ class Order extends \yii\db\ActiveRecord
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
 
             ['house_number', function ($attribute, $params, $validator) {
-                if ($this->area_id && $this->unit_type != 'Office' && $this->house_number == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
+                if ($this->area_id && strtolower($this->unit_type) != self::UNIT_TYPE_OFFICE && $this->house_number == null
+                    && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                 {
-                    $this->addError($attribute, Yii::t('app','House number cannot be blank.'));
+                    $this->addError($attribute, strtolower($this->unit_type) .':'.  self::UNIT_TYPE_OFFICE .':'.Yii::t('app','House number cannot be blank.'));
                 }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
 
             [['floor'], 'required', 'when' => function ($model) {
-                return ($model->unit_type == 'Office' || $model->unit_type == 'Apartment') && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
-            }
-            ],
+                return strtolower($model->unit_type) == self::UNIT_TYPE_APARTMENT &&
+                    $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
+            }],//(strtolower($model->unit_type) == self::UNIT_TYPE_OFFICE ||
+
             [['office'], 'required', 'when' => function ($model) {
-                return $model->unit_type == 'Office' && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
+                return strtolower($model->unit_type) == self::UNIT_TYPE_OFFICE &&
+                    $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
             }
             ],
             [['apartment'], 'required', 'when' => function ($model) {
-                return $model->unit_type == 'Apartment' && ($model->restaurant->version == 2 || $model->restaurant->version == 3 || $model->restaurant->version == 4);
+                return strtolower($model->unit_type) == self::UNIT_TYPE_APARTMENT &&
+                    $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
             }],
 
             ['order_mode', 'validateOrderMode', 'except' => self::SCENARIO_CREATE_ORDER_BY_ADMIN],
