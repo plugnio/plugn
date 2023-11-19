@@ -101,10 +101,24 @@ class OrderController extends Controller
 
         //Save Customer Info
         $order->utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
-        $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
-        $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("phone_number")));
-        $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
-        $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
+
+        if (Yii::$app->user->isGuest)
+        {
+            $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
+            $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("phone_number")));
+            $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
+            $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
+        }
+        else
+        {
+            $customer = Yii::$app->user->identity;
+
+            $order->customer_name = $customer->customer_name;
+            $order->customer_phone_number = $customer->customer_phone_number;
+            $order->customer_phone_country_code = $customer->country_code;
+            $order->customer_email =  $customer->customer_email;
+            $order->customer_id = Yii::$app->user->getId();
+        }
 
         if ($order->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a') {
             if (Yii::$app->request->getBodyParam("civil_id"))
@@ -1094,11 +1108,6 @@ class OrderController extends Controller
      */
     public function actionList()
     {
-        $authHeader = Yii::$app->request->getHeaders()->get('Authorization');
-        if ($authHeader !== null && preg_match('/^Bearer\s+(.*?)$/', $authHeader, $matches)) {
-            Yii::$app->user->loginByAccessToken($matches[1]);
-        }
-
         $store_uuid = Yii::$app->request->get('restaurant_uuid');
         $phone_number = Yii::$app->request->get('phone_number');
         $email = Yii::$app->request->get('email');
