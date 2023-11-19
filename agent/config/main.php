@@ -252,7 +252,7 @@ return [
                         'POST request-payment-status-from-tap/<order_uuid>' => 'request-payment-status-from-tap',
                         'POST create/<store_uuid>' => 'create',
                         'POST create' => 'create',
-                        'POST <store_uuid>' => 'place-an-order',
+                        'POST <store_uuid>' => 'create',
                         'PATCH update-order-status/<order_uuid>/<store_uuid>' => 'update-order-status',
                         'PATCH update-order-status/<order_uuid>' => 'update-order-status',
                         'PATCH refund/<order_uuid>' => 'refund',

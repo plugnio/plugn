@@ -1632,6 +1632,10 @@ class OrderController extends BaseController
         $building = Yii::$app->request->getBodyParam('building');
         $house_number = Yii::$app->request->getBodyParam('house_number');
         $block = Yii::$app->request->getBodyParam('block');
+        $office = Yii::$app->request->getBodyParam('office');
+        $apartment = Yii::$app->request->getBodyParam('apartment');
+        $floor = Yii::$app->request->getBodyParam('floor');
+
         $customer_email = Yii::$app->request->getBodyParam('customer_email');
         $customer_phone_country_code = Yii::$app->request->getBodyParam('customer_phone_country_code');
         $customer_phone_number = Yii::$app->request->getBodyParam('customer_phone_number');
@@ -1679,14 +1683,26 @@ class OrderController extends BaseController
         $model->order_mode = $order_mode;
         $model->customer_name = $customer_name;
         $model->area_name = $area_name;
+        $model->area_name_ar = Yii::$app->request->getBodyParam('area_name_ar');
         $model->area_id = $area_id;
         $model->delivery_zone_id = $delivery_zone_id;
         $model->unit_type = $unit_type;
         $model->street = $street;
+        $model->office = $office;
+        $model->apartment = $apartment;
+        $model->floor = $floor;
         $model->avenue = $avenue;
         $model->house_number = $house_number;
         $model->building = $building;
         $model->block = $block;
+        $model->customer_id = Yii::$app->request->getBodyParam('customer_id');
+        $model->city = Yii::$app->request->getBodyParam('city');
+        $model->postalcode = Yii::$app->request->getBodyParam('postalcode');
+        $model->address_1 = Yii::$app->request->getBodyParam('address_1');
+        $model->address_2 = Yii::$app->request->getBodyParam('address_2');
+
+        //$model->shipping_country_id = Yii::$app->request->getBodyParam('shipping_country_id');
+
         $model->customer_email = $customer_email;
         $model->customer_phone_country_code = $customer_phone_country_code;
         $model->customer_phone_number = $customer_phone_number;
