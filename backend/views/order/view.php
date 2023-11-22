@@ -851,7 +851,7 @@ DetailView::widget([
                             'value' => function ($data) {
                                 return $data->floor;
                             },
-                            'visible' => $model->area_id && $model->floor != null && ( $model->unit_type == 'Apartment'  ||  $model->unit_type == 'Office' ) ? true : false,
+                            'visible' => $model->area_id && $model->floor != null ? true : false,
                         ],
                         [
                             'label' => 'Office No.',
@@ -859,7 +859,7 @@ DetailView::widget([
                             'value' => function ($data) {
                                 return $data->office;
                             },
-                            'visible' => $model->area_id && $model->unit_type == 'Office' && $model->office != null ? true : false,
+                            'visible' => $model->area_id && strtolower($model->unit_type) == Order::UNIT_TYPE_OFFICE && $model->office != null ? true : false,
                         ],
                         [
                             'label' => 'Apartment No.',
@@ -867,10 +867,10 @@ DetailView::widget([
                             'value' => function ($data) {
                                 return $data->apartment;
                             },
-                            'visible' => $model->area_id && $model->unit_type == 'Apartment' && $model->apartment != null ? true : false,
+                            'visible' => $model->area_id && strtolower($model->unit_type) == Order::UNIT_TYPE_APARTMENT && $model->apartment != null ? true : false,
                         ],
                         [
-                            'label' => $model->unit_type == 'House' ? 'House No.' : 'Building',
+                            'label' => strtolower($model->unit_type) == Order::UNIT_TYPE_HOUSE ? 'House No.' : 'Building',
                             'format' => 'html',
                             'value' => function ($data) {
                                 return $data->house_number;

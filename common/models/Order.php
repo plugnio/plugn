@@ -243,12 +243,12 @@ class Order extends \yii\db\ActiveRecord
                 }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
 
-            ['block', function ($attribute, $params, $validator) {
+            /*['block', function ($attribute, $params, $validator) {
                 if ($this->area_id && $this->block == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                 {
                     $this->addError($attribute, Yii::t('app','Block cannot be blank.'));
                 }
-            }, 'skipOnError' => false, 'skipOnEmpty' => false],
+            }, 'skipOnError' => false, 'skipOnEmpty' => false],*/
 
             ['street', function ($attribute, $params, $validator) {
                 if ($this->area_id && $this->street == null && $this->order_mode == Order::ORDER_MODE_DELIVERY)
