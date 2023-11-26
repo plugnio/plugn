@@ -28,6 +28,14 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
+        /*Yii::$app->mailer->compose ([
+            'text' => 'test',
+        ])
+            ->setFrom ([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setSubject ('Test email')
+            ->setTo ("kathrechakrushn@gmail.com")
+            //->setCc($contactEmails)
+            ->send ();*/
     }
 
     /**

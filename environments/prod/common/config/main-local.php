@@ -85,7 +85,7 @@ return [
         ], 
 
         //aws
-        'mailer' => [
+        /*'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
             'transport' => [
@@ -96,8 +96,7 @@ return [
                     'port' => '587',
                     'encryption' => 'tls',
             ],
-        ],
-        /*
+        ],*/
 
         //mailgun
         'mailer' => [
@@ -116,7 +115,7 @@ return [
                 //     ],
                 // ],
             ],
-        ],
+        ],/*
         //sendgrid
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',

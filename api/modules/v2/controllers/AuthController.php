@@ -60,6 +60,26 @@ class AuthController extends Controller {
                     return null;
                 }
 
+                if (!$customer->customer_password_hash) {
+
+                    //send mail with password form page link
+
+                    $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+                    $store = Restaurant::find()->andWhere(['restaurant_uuid' => $store_id])->one();
+
+                    $model = new PasswordResetRequestForm;
+                    $model->email = $customer->customer_email;
+                    $model->sendEmail($customer, $store);
+
+                    Yii::$app->response->headers->set (
+                        'X-Empty-Password',
+                        Yii::t('api', 'Please set password')
+                    );
+
+                    return null;
+                }
+
                 if ($customer->validatePassword($password)) {
                     return $customer;
                 }
