@@ -2256,7 +2256,7 @@ class Restaurant extends ActiveRecord
      */
     public function uploadLogo($imageURL)
     {
-        if(!str_contains($imageURL, "https://")) {
+        if($imageURL && !str_contains($imageURL, "https://")) {
             $imageURL = Yii::$app->temporaryBucketResourceManager->getUrl($imageURL);
         }
 
@@ -2345,7 +2345,7 @@ class Restaurant extends ActiveRecord
     {
         $filename = Yii::$app->security->generateRandomString();
 
-        if(!str_contains($imageURL, "https://")) {
+        if($imageURL && !str_contains($imageURL, "https://")) {
             $imageURL = Yii::$app->temporaryBucketResourceManager->getUrl($imageURL);
         }
 

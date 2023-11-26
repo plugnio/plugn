@@ -1009,6 +1009,9 @@ class StoreController extends BaseController
      */
     public function actionUpdateLayout() {
 
+        $logo = Yii::$app->request->getBodyParam('logo');
+        $thumbnail_image = Yii::$app->request->getBodyParam('thumbnail_image');
+
         $model = Yii::$app->accountManager->getManagedAccount();
 
         $model->setScenario(Restaurant::SCENARIO_UPDATE_LAYOUT);
@@ -1030,13 +1033,12 @@ class StoreController extends BaseController
 
         $transaction = Yii::$app->db->beginTransaction ();
 
-        if($model->logo != Yii::$app->request->getBodyParam('logo')) {
-            $logo = Yii::$app->request->getBodyParam('logo');
+        if($model->logo != $logo) {
             $model->uploadLogo($logo);
         }
 
-        if($model->thumbnail_image != Yii::$app->request->getBodyParam('thumbnail_image')) {
-            $model->uploadThumbnailImage(Yii::$app->request->getBodyParam('thumbnail_image'));
+        if($model->thumbnail_image != $thumbnail_image) {
+            $model->uploadThumbnailImage($thumbnail_image);
         }
 
         if(!$model->save()) {
