@@ -62,8 +62,14 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             //'customer_email', 
             [['restaurant_uuid'], 'string', 'max' => 60],
 
-            [['customer_phone_number'], 'unique', 'comboNotUnique' => Yii::t('app', 'Phone no. already exist.'),
-                'targetAttribute' => ['country_code', 'customer_phone_number', 'deleted']],
+            //[['customer_phone_number'], 'unique', 'comboNotUnique' => Yii::t('app', 'Phone no. already exist.'),
+            //    'targetAttribute' => ['restaurant_uuid']],//, 'customer_phone_number' => 'country_code',
+
+            //[['customer_email'], 'unique', 'comboNotUnique' => Yii::t('app', 'Phone no. already exist.'),
+            //    'targetAttribute' => ['restaurant_uuid']],
+
+            [['customer_email'], 'validateEmail'],
+            [['customer_phone_number'], 'validatePhone'],
 
             //[['customer_phone_number'], 'unique'],
             //[['customer_email'], 'unique'],
@@ -75,6 +81,61 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             [['customer_name', 'customer_email'], 'string', 'max' => 255],
             [['civil_id', 'section','class'], 'string', 'max' => 255], //Temp fields
         ];
+    }
+
+    /**
+     * @param $attribute
+     * @param $params
+     * @param $validator
+     * @return bool
+     */
+    public function validatePhone($attribute, $params, $validator)
+    {
+        $query = self::find()
+            ->andWhere([
+                'restaurant_uuid' => $this->restaurant_uuid,
+                'customer_phone_number' => $this->customer_phone_number,
+                'country_code' => $this->country_code,
+                'deleted' => 0
+            ]);
+
+        if($this->customer_id) {
+            $query->andWhere(['!=', 'customer_id', $this->customer_id]);
+        }
+
+        if ($query->exists()) {
+            $this->addError($attribute, 'Phone number has already been taken.');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $attribute
+     * @param $params
+     * @param $validator
+     * @return bool
+     */
+    public function validateEmail($attribute, $params, $validator)
+    {
+        $query = self::find()
+            ->andWhere([
+                'restaurant_uuid' => $this->restaurant_uuid,
+                'customer_email' => $this->customer_email,
+                'deleted' => 0
+            ]);
+
+       if($this->customer_id) {
+           $query->andWhere(['!=', 'customer_id', $this->customer_id]);
+       }
+
+        if ($query->exists()) {
+            $this->addError($attribute, 'Email has already been taken.');
+            return false;
+        }
+
+        return true;
     }
 
     /**
