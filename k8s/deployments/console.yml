@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: console
+spec:
+  selector:
+    matchLabels:
+      app: console
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: console
+    spec:
+      containers:
+      - name: console
+        image: console
+        resources:
+          #requests:
+          #  memory: "64Mi"
+          #  cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog
+spec:
+  selector:
+    matchLabels:
+      app: blog
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: blog
+    spec:
+      containers:
+      - name: plugn-blog-prod
+        image: 438663597141.dkr.ecr.eu-west-2.amazonaws.com/plugn-blog-prod
+        resources:
+          #requests:
+          #  memory: "64Mi"
+          #  cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

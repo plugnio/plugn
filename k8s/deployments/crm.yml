@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crm
+spec:
+  selector:
+    matchLabels:
+      app: crm
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: crm
+    spec:
+      containers:
+      - name: crm
+        image: crm
+        resources:
+          #requests:
+          #  memory: "64Mi"
+          #  cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

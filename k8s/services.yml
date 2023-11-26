@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: plugn-agent-api
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: agent
+
+  ports:
+    - name: http
+      port: 23080
+      nodePort: 23080
+
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plugn-store-api
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: api
+
+  ports:
+    - name: http
+      port: 25080
+      nodePort: 25080
+
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plugn-backend
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: backend
+
+  ports:
+    - name: http
+      port: 21080
+      nodePort: 21080
+
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plugn-blog
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: blog
+
+  ports:
+    - name: http
+      port: 8081
+      nodePort: 8080
+
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plugn-console
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: console
+
+  ports:
+    - name: http
+      port: 27080
+      nodePort: 27080
+
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plugn-crm
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: crm
+
+  ports:
+    - name: http
+      port: 24080
+      nodePort: 24080
+
+  type: NodePort
+

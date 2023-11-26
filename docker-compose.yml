@@ -138,8 +138,8 @@ services:
     depends_on:
       - "load-fixture"
 
-  crmapi:
-    build: crmapi
+  crm:
+    build: crm
     ports:
       - 24080:80
     volumes:
@@ -166,6 +166,18 @@ services:
     build: shortner
     ports:
       - 26080:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+    depends_on:
+      - "load-fixture"
+
+  console:
+    build: console
+    ports:
+      - 27080:80
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
