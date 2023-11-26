@@ -1031,7 +1031,8 @@ class StoreController extends BaseController
         $transaction = Yii::$app->db->beginTransaction ();
 
         if($model->logo != Yii::$app->request->getBodyParam('logo')) {
-            $model->uploadLogo(Yii::$app->request->getBodyParam('logo'));
+            $logo = Yii::$app->request->getBodyParam('logo');
+            $model->uploadLogo($logo);
         }
 
         if($model->thumbnail_image != Yii::$app->request->getBodyParam('thumbnail_image')) {

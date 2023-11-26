@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent
+spec:
+  selector:
+    matchLabels:
+      app: agent
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: agent
+    spec:
+      containers:
+      - name: agent
+        image: agent
+        resources:
+          #requests:
+          #  memory: "64Mi"
+          #  cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+            
+              

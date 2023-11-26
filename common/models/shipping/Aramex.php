@@ -65,7 +65,7 @@ class Aramex
 
         $shipment_receiver_street = '';
 
-        if($model->unit_type == "House") {
+        if(strtolower($model->unit_type) == Order::UNIT_TYPE_HOUSE) {
             $shipment_receiver_street .= "House number: " . $model->house_number;
         }
 

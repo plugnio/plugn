@@ -102,10 +102,24 @@ class OrderController extends Controller
 
         //Save Customer Info
         $order->utm_uuid = Yii::$app->request->getBodyParam("utm_uuid");
-        $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
-        $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("phone_number")));
-        $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
-        $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
+
+        if (Yii::$app->user->isGuest)
+        {
+            $order->customer_name = Yii::$app->request->getBodyParam("customer_name");
+            $order->customer_phone_number = str_replace(' ', '', strval(Yii::$app->request->getBodyParam("phone_number")));
+            $order->customer_phone_country_code = Yii::$app->request->getBodyParam("country_code") ? Yii::$app->request->getBodyParam("country_code") : 965;
+            $order->customer_email = Yii::$app->request->getBodyParam("email"); //optional
+        }
+        else
+        {
+            $customer = Yii::$app->user->identity;
+
+            $order->customer_name = $customer->customer_name;
+            $order->customer_phone_number = $customer->customer_phone_number;
+            $order->customer_phone_country_code = $customer->country_code;
+            $order->customer_email =  $customer->customer_email;
+            $order->customer_id = Yii::$app->user->getId();
+        }
 
         $order->is_market_order = Yii::$app->request->getBodyParam("is_market_order");
 
@@ -156,13 +170,13 @@ class OrderController extends Controller
                 $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam("house_number");
 
-                if (Yii::$app->request->getBodyParam("floor") != null && ($order->unit_type == 'Apartment' || $order->unit_type == 'Office'))
+                if ((strtolower($order->unit_type) == Order::UNIT_TYPE_APARTMENT || strtolower($order->unit_type) == Order::UNIT_TYPE_OFFICE))
                     $order->floor = Yii::$app->request->getBodyParam("floor");
 
-                if (Yii::$app->request->getBodyParam("apartment") != null && $order->unit_type == 'Apartment')
+                if (strtolower($order->unit_type) == Order::UNIT_TYPE_APARTMENT)
                     $order->apartment = Yii::$app->request->getBodyParam("apartment");
 
-                if (Yii::$app->request->getBodyParam("office") != null && $order->unit_type == 'Office')
+                if (strtolower($order->unit_type) == Order::UNIT_TYPE_OFFICE)
                     $order->office = Yii::$app->request->getBodyParam("office");
 
             $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
@@ -1114,11 +1128,6 @@ class OrderController extends Controller
      */
     public function actionList()
     {
-        $authHeader = Yii::$app->request->getHeaders()->get('Authorization');
-        if ($authHeader !== null && preg_match('/^Bearer\s+(.*?)$/', $authHeader, $matches)) {
-            Yii::$app->user->loginByAccessToken($matches[1]);
-        }
-
         $store_uuid = Yii::$app->request->get('restaurant_uuid');
         $phone_number = Yii::$app->request->get('phone_number');
         $email = Yii::$app->request->get('email');

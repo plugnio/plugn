@@ -2,6 +2,7 @@
 
 namespace common\components;
 
+use common\models\Order;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -171,16 +172,15 @@ class MashkorDelivery extends Component {
         ];
 
 
-                  if($model->unit_type == 'Office'){
-
+                  if(strtolower($model->unit_type) == Order::UNIT_TYPE_OFFICE)
+                  {
                     $mashkorParams['drop_off']['floor'] = $model->floor;
                     $mashkorParams['drop_off']['room_number'] = $model->office;
-
-                  } else if( $model->unit_type == 'Apartment' ) {
-
+                  }
+                  else if( strtolower($model->unit_type) == Order::UNIT_TYPE_APARTMENT )
+                  {
                       $mashkorParams['drop_off']['floor'] = $model->floor;
                       $mashkorParams['drop_off']['room_number'] = $model->apartment;
-
                   }
 
         $client = new Client();
