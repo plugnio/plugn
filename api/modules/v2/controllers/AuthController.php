@@ -38,7 +38,10 @@ class AuthController extends Controller {
                     'X-Pagination-Current-Page',
                     'X-Pagination-Page-Count',
                     'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
+                    'X-Pagination-Total-Count',
+                    'X-Empty-Password',
+                    'X-Error-Email',
+                    'X-Error-Password'
                 ],
             ],
         ];
@@ -60,24 +63,50 @@ class AuthController extends Controller {
                     return null;
                 }
 
-                if (!$customer->customer_password_hash) {
+                if(empty($customer->customer_password_hash)) {
 
-                    //send mail with password form page link
+                    //Check if this user sent an email in past few minutes (to limit email spam)
+                    $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
+                    date_add($emailLimitDatetime, date_interval_create_from_date_string('60 minutes'));
+                    $currentDatetime = new \DateTime();
 
-                    $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+                    if ($customer->customer_limit_email && $currentDatetime < $emailLimitDatetime) {
 
-                    $store = Restaurant::find()->andWhere(['restaurant_uuid' => $store_id])->one();
+                        $difference = $currentDatetime->diff($emailLimitDatetime);
+                        $minuteDifference = (int)$difference->i;
+                        $secondDifference = (int)$difference->s;
 
-                    $model = new PasswordResetRequestForm;
-                    $model->email = $customer->customer_email;
-                    $model->sendEmail($customer, $store);
+                        $errors = Yii::t('agent', "Email was sent previously, you may request another one in {numMinutes, number} minutes and {numSeconds, number} seconds", [
+                            'numMinutes' => $minuteDifference,
+                            'numSeconds' => $secondDifference,
+                        ]);
 
-                    Yii::$app->response->headers->set (
-                        'X-Empty-Password',
-                        Yii::t('api', 'Please set password')
-                    );
+                        Yii::$app->response->headers->set(
+                            'X-Empty-Password',
+                            Yii::t('api', $errors)
+                        );
 
-                    return null;
+                        return null;
+
+                    } else {
+
+                        //send mail with password form page link
+
+                        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+                        $store = Restaurant::find()->andWhere(['restaurant_uuid' => $store_id])->one();
+
+                        $model = new PasswordResetRequestForm;
+                        $model->email = $customer->customer_email;
+                        $model->sendEmail($customer, $store);
+
+                        Yii::$app->response->headers->set(
+                            'X-Empty-Password',
+                            Yii::t('agent', 'Please check the link sent to you on your email to set new password.')
+                        );
+
+                        return null;
+                    }
                 }
 
                 if ($customer->validatePassword($password)) {
