@@ -61,8 +61,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             [['customer_name', 'customer_phone_number'], 'required'],// 'customer_phone_number','country_code'
             //'customer_email', 
             [['restaurant_uuid'], 'string', 'max' => 60],
-            [['customer_phone_number'], 'unique'],
-            [['customer_email'], 'unique'],
+
+            [['customer_phone_number'], 'unique', 'comboNotUnique' => Yii::t('app', 'Phone no. already exist.'),
+                'targetAttribute' => ['country_code', 'customer_phone_number', 'deleted']],
+
+            //[['customer_phone_number'], 'unique'],
+            //[['customer_email'], 'unique'],
+
             [['customer_email'], 'email'],
             [['country_code'], 'integer'],
             [['customer_phone_number'], 'string', 'min' => 5, 'max' => 20],
@@ -308,6 +313,10 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
         return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id']);
     }
 
+    /**
+     * @param $modelClass
+     * @return \yii\db\ActiveQuery
+     */
     public function getCustomerAddresses($modelClass = "\common\models\CustomerAddress") {
         return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id']);
     }
@@ -319,7 +328,7 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function getActiveOrders($modelClass = "\common\models\Order") {
         return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id'])
-        ->activeOrders($this->restaurant_uuid);
+            ->activeOrders($this->restaurant_uuid);
     }
 
     /**
@@ -328,8 +337,8 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public function getTotalSpent($modelClass = "\common\models\Order") {
         return $this->hasMany($modelClass::className(), ['customer_id' => 'customer_id'])
-        ->activeOrders($this->restaurant_uuid)
-        ->sum('total_price');
+            ->activeOrders($this->restaurant_uuid)
+            ->sum('total_price');
     }
 
     /**
@@ -371,7 +380,14 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public static function findByEmail($email)
     {
-        return static::findOne (['customer_email' => $email, 'deleted' => 0]);
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+        $filter = ['customer_email' => $email, 'deleted' => 0];
+
+        if($store_id)
+            $filter['restaurant_uuid'] = $store_id;
+
+        return static::findOne ($filter);
     }
 
     /**
@@ -522,6 +538,7 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      * @inheritdoc
      */
     public static function findIdentityByUnVerifiedTokenToken($token, $modelClass = "\api\models\CustomerToken") {
+
         $token = $modelClass::find()
             ->andWhere(['token_value' => $token])
             ->with('customer')
@@ -602,12 +619,24 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
      */
     public static function verifyEmail($email, $code) {
 
-        $model = self::find()
-            ->andWhere([
+        $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+        $filter = $store_id ? [
+            'AND',
+            ['restaurant_uuid' => $store_id],
+            [
                 'OR',
                 ['customer_new_email' => $email],
                 ['customer_email' => $email]
-            ])
+            ]
+        ]: [
+                'OR',
+                ['customer_new_email' => $email],
+                ['customer_email' => $email]
+        ];
+
+        $model = self::find()
+            ->andWhere($filter)
             ->one();
 
         if(!$model) {

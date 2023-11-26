@@ -252,11 +252,23 @@ class AuthController extends Controller {
 
         $emailInput = Yii::$app->request->getBodyParam("email");
 
-        $customer = Customer::find()->andWhere([
+        $filter = $store_id ? [
+            'AND',
+            [
+                'restaurant_uuid' => $store_id
+            ],
+            [
+                'OR',
+                ['customer_email' => $emailInput],
+                ['customer_new_email' => $emailInput],
+            ]
+        ]: [
             'OR',
             ['customer_email' => $emailInput],
             ['customer_new_email' => $emailInput],
-        ])->one();
+        ];
+
+        $customer = Customer::find()->andWhere($filter)->one();
 
         $errors = false;
         $errorCode = null; //error code
@@ -423,9 +435,14 @@ class AuthController extends Controller {
             ];
         }
 
-        $customer = Customer::findOne([
+        $filter = $store_id? [
             'customer_email' => $model->email,
-        ]);
+            'restaurant_uuid' => $store_id
+        ]: [
+            'customer_email' => $model->email,
+        ];
+
+        $customer = Customer::findOne($filter);
 
         //Check if this user sent an email in past few minutes (to limit email spam)
         $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
