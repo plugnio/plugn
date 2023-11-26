@@ -217,6 +217,10 @@ class NetlifyComponent extends Component {
      */
     public function upgradeSite($store) {
 
+        if(!$store) {
+            return false;
+        }
+
         $params = [
             "build_image" => "focal",
             "repo" => [

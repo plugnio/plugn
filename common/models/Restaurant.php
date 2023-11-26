@@ -2256,6 +2256,10 @@ class Restaurant extends ActiveRecord
      */
     public function uploadLogo($imageURL)
     {
+        if(!str_contains($imageURL, "https://")) {
+            $imageURL = Yii::$app->temporaryBucketResourceManager->getUrl($imageURL);
+        }
+
         $filename = Yii::$app->security->generateRandomString();
 
         try {
@@ -2340,6 +2344,10 @@ class Restaurant extends ActiveRecord
     public function uploadThumbnailImage($imageURL)
     {
         $filename = Yii::$app->security->generateRandomString();
+
+        if(!str_contains($imageURL, "https://")) {
+            $imageURL = Yii::$app->temporaryBucketResourceManager->getUrl($imageURL);
+        }
 
         try {
             //Delete old store's ThumbnailImage
