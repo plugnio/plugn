@@ -4,14 +4,9 @@ namespace agent\modules\v1\controllers;
 
 use agent\models\AgentToken;
 use agent\models\Currency;
-use agent\models\PaymentMethod;
 use agent\models\Restaurant;
 use common\models\RestaurantByCampaign;
-use common\models\AgentAssignment;
 use common\models\AgentEmailVerifyAttempt;
-use common\models\BusinessLocation;
-use common\models\Category;
-use common\models\RestaurantPaymentMethod;
 use Yii;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
@@ -211,6 +206,21 @@ class AuthController extends Controller {
     public function actionSignupStepOne()
     {
         $accessToken = Yii::$app->request->getBodyParam('accessToken');
+        $token = Yii::$app->request->getBodyParam('token');
+
+        //TODO: make token as required field once we update android app
+
+        if($token) {
+            $response = Yii::$app->reCaptcha->verify($token);
+
+            if (!$response->data || !$response->data['success']) {
+                return [
+                    "operation" => "error",
+                    "code" => 0,
+                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                ];
+            }
+        }
 
         $agent = new Agent();
         $agent->setScenario(Agent::SCENARIO_CREATE_NEW_AGENT);
@@ -288,6 +298,21 @@ class AuthController extends Controller {
         $currencyCode = Yii::$app->request->getBodyParam('currency');
         $accessToken = Yii::$app->request->getBodyParam('accessToken');
         $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
+        $token = Yii::$app->request->getBodyParam('token');
+
+        //TODO: make token as required field once we update android app
+
+        if($token) {
+            $response = Yii::$app->reCaptcha->verify($token);
+
+            if (!$response->data || !$response->data['success']) {
+                return [
+                    "operation" => "error",
+                    "code" => 0,
+                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                ];
+            }
+        }
 
         $currency = Currency::findOne(['code' => $currencyCode]);
  
@@ -425,7 +450,22 @@ class AuthController extends Controller {
 
         $unVerifiedToken = Yii::$app->request->getBodyParam("unVerifiedToken");
         $new_email = Yii::$app->request->getBodyParam("newEmail");
+        $token = Yii::$app->request->getBodyParam('token');
 
+        //TODO: make token as required field once we update android app
+
+        if($token) {
+            $response = Yii::$app->reCaptcha->verify($token);
+
+            if (!$response->data || !$response->data['success']) {
+                return [
+                    "operation" => "error",
+                    "code" => 0,
+                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                ];
+            }
+        }
+        
         $agent = Agent::findIdentityByUnVerifiedTokenToken($unVerifiedToken);
 
         if (!$agent) {
@@ -496,6 +536,21 @@ class AuthController extends Controller {
     public function actionResendVerificationEmail()
     {
         $emailInput = Yii::$app->request->getBodyParam("email");
+        $token = Yii::$app->request->getBodyParam('token');
+
+        //TODO: make token as required field once we update android app
+
+        if($token) {
+            $response = Yii::$app->reCaptcha->verify($token);
+
+            if (!$response->data || !$response->data['success']) {
+                return [
+                    "operation" => "error",
+                    "code" => 0,
+                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                ];
+            }
+        }
 
         $agent = Agent::find()->andWhere([
             'OR',
@@ -653,6 +708,22 @@ class AuthController extends Controller {
     public function actionRequestResetPassword() {
 
         $emailInput = Yii::$app->request->getBodyParam("email");
+        $token = Yii::$app->request->getBodyParam('token');
+
+        //TODO: make token as required field once we update android app
+
+        if($token) {
+            $response = Yii::$app->reCaptcha->verify($token);
+
+            if (!$response->data || !$response->data['success']) {
+                return [
+                    "operation" => "error",
+                    "code" => 0,
+                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                ];
+            }
+        }
+
         $errors = false;
         $model = new PasswordResetRequestForm();
         $model->email = $emailInput;

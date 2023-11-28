@@ -91,8 +91,8 @@ return [
             'transport' => [
                     'class' => 'Swift_SmtpTransport',
                     'host' => 'email-smtp.eu-west-1.amazonaws.com',
-                    'username' => 'AKIAWMITDJRKTH5HBB2O',
-                    'password' => 'BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ',
+                    'username' => 'AKIAWMITDJRKTQGXUQT3',//AKIAWMITDJRKTH5HBB2O
+                    'password' => 'GDkiUbOkIxx4qpd0fcksh//0qKvAITbj4PCywBjh',//BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ
                     'port' => '587',
                     'encryption' => 'tls',
             ],
@@ -104,11 +104,19 @@ return [
             'viewPath' => '@common/mail',
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.elasticemail.com',
+                'username' => 'support@plugn.io',
+                'password' => 'CD006D3ED0C5BD796D1D2C77B111CC24AF9E',
+                'port' => '2525',
+                'encryption' => 'tls'
+
+                /*
+                'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.eu.mailgun.org',
                 'username' => 'postmaster@plugn.io',
                 'password' => '2d43d23b68911184532de9f81810f5ca-18e06deb-d74119cb',
                 'port' => '587',
-                'encryption' => 'tls',
+                'encryption' => 'tls',*/
                 // 'plugins' => [
                 //     [
                 //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
