@@ -111,6 +111,11 @@ class AccountController extends Controller
             . Yii::$app->request->getBodyParam("last_name");
 
         $model->customer_phone_number = Yii::$app->request->getBodyParam("phone_number");
+        $model->country_code = Yii::$app->request->getBodyParam("country_code");
+
+        if($model->country_code && $model->customer_phone_number) {
+            $model->customer_phone_number = "+" . $model->country_code . $model->customer_phone_number;
+        }
 
         if (!$model->save ()) {
             return [
