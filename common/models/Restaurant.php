@@ -2764,7 +2764,6 @@ class Restaurant extends ActiveRecord
      */
     public function deleteSite()
     {
-
         //remove from netlify
 
         if ($this->site_id)
@@ -2788,6 +2787,21 @@ class Restaurant extends ActiveRecord
         //Yii::$app->githubComponent->
 
         Yii::info($this->name . ' Store deleted by user #' . $this->restaurant_uuid);
+
+        if(YII_ENV == 'prod')
+        {
+            Yii::$app->eventManager->track('Account deleted',  [
+                    'store_name' => $this->name,
+                    'phone_number' => $this->owner_phone_country_code . $this->owner_number,
+                    'store_url' => $this->restaurant_domain,
+                    "country" => $this->country ? $this->country->country_name : null,
+                    "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign : null,
+                    "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium : null,
+                ],
+                null,
+                $this->restaurant_uuid
+            );
+        }
 
         return [
             'message' => Yii::t('agent', "Store deleted successfully"),
