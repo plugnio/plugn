@@ -7,6 +7,7 @@ use common\models\Queue;
 use common\models\Restaurant;
 use common\models\RestaurantDomainRequest;
 use common\models\Subscription;
+use common\models\Ticket;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -70,6 +71,10 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $openTickets = Ticket::find()
+            ->andWhere(['!=', 'ticket_status', Ticket::STATUS_COMPLETED])
+            ->count();
+
         $draft = RestaurantInvoice::find()
             ->andWhere(['invoice_status' => RestaurantInvoice::STATUS_UNPAID])
             ->count();
@@ -122,6 +127,7 @@ class SiteController extends Controller
             'draft' => $draft,
             'pending' => $pending,
             'paid' => $paid,
+            'openTickets' => $openTickets,
             'notPublished' => $notPublished,
             "failedInQueue" => $failedInQueue,
             "premiumStores" => $premiumStores,

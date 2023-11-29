@@ -13,11 +13,33 @@ $this->title = 'Admin dashboard';
 ?>
 <div class="site-index">
 
+    <h3>Customer service tasks</h3>
+    <div class="alert alert-danger" role="alert">
+        <?= $openTickets ?> tickets in CRM need attention,
+        <a href="https://crm.plugn.io/login" target="_blank">Check it now! </a>
+    </div>
+
+    <h3>Operation team tasks</h3>
     <?php if($failedInPaymentQueue > 0) { ?>
         <div class="alert alert-danger" role="alert">
             <?= $failedInPaymentQueue ?> Payment Gateway Request Failed, <?= Html::a('Check it now!', ['payment-gateway-queue/index']) ?>
         </div>
     <?php } ?>
+
+    <?php if($pendingDomain > 0) { ?>
+        <div class="alert alert-warning" role="alert">
+            <?= $pendingDomain ?> Domains pending to purchase,
+            <?= Html::a('Check it now!', ['restaurant-domain-request/index', 'RestaurantDomainRequestSearch[status]' => 2]) ?>
+        </div>
+    <?php } ?>
+
+    <?php if($pending > 0) { ?>
+        <div class="alert alert-warning" role="alert">
+            <?= $pending ?> Unpaid store invoices
+        </div>
+    <?php } ?>
+
+    <h3>Tech Team tasks</h3>
 
     <?php if($failedInQueue > 0) { ?>
         <div class="alert alert-danger" role="alert">
