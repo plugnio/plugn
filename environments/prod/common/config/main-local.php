@@ -85,7 +85,6 @@ return [
         ], 
 
         //aws
-
         /*'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
@@ -124,8 +123,7 @@ return [
                 //     ],
                 // ],
             ],
-        ],
-        /*
+        ],/*
         //sendgrid
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -167,11 +165,17 @@ return [
             'enablePrettyUrl' => false,
             'showScriptName' => false,
         ],
+        //microservices
+        'blogManager' => [
+            'class' => 'common\components\BlogManager',
+            'apiEndpoint' => 'http://localhost:8080/v1',
+            'token' => 'Lu4vPW4Npfgce6WkXdt9OErpxXdB7GW4'
+        ],
         'agentApiUrlManager' => [
             'class' => 'yii\web\UrlManager',
             'baseUrl' => 'https://agent.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ],
+        ]
     ],
 ];

@@ -103,6 +103,13 @@ AppAsset::register($this);
                 ]
             ],
             [
+                'label' => 'Blog',
+                'items' => [
+                    ['label' => 'Posts', 'url' => ['/blog/index']],
+                    ['label' => 'Categories', 'url' => ['/blog-category/index']],
+                ]
+            ],
+            [
                 'label' => 'Settings',
                 'items' => [
                     ['label' => 'Add-ons', 'url' => ['/addon/index']],

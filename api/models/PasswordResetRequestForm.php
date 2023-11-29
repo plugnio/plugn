@@ -5,6 +5,7 @@ namespace api\models;
 use Yii;
 use yii\base\Model;
 use common\models\Customer;
+use yii\db\Expression;
 
 /**
  * Password reset request form
@@ -49,7 +50,15 @@ class PasswordResetRequestForm extends Model {
                 $customer->generatePasswordResetToken();
             }
 
+            //$customer->customer_limit_email = new Expression('NOW()');
+
             if ($customer->save(false)) {
+
+                Customer::updateAll([
+                    'customer_limit_email' => new Expression('NOW()')
+                ], [
+                    "customer_id" => $customer->customer_id
+                ]);
 
                 if($restaurant) {
                     $resetLink = $restaurant->restaurant_domain . '/update-password/' . $customer->customer_password_reset_token;

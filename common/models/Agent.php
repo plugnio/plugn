@@ -660,6 +660,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                 $store->restaurant_uuid
             );
 
+            /**
+             * 
             Yii::$app->eventManager->track('Agent Signup', [
                 'first_name' => trim ($firstname),
                 'last_name' => trim ($lastname),
@@ -673,7 +675,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ],
                 null,
                 $this->agent_id
-            );
+            );*/
         }
 
         return [

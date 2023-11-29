@@ -290,8 +290,8 @@ class StoreController extends BaseController
 
         //todo: response validation
 
-        if($purchase) {//strpos($domain, '.plugn') > -1
-
+        if($purchase) {//&& strpos($domain, '.plugn.') == -1
+ 
             if(YII_ENV == 'prod') {
 
                 Yii::$app->eventManager->track('Domain Requests', [
@@ -301,6 +301,7 @@ class StoreController extends BaseController
                     $store->restaurant_uuid);
             }
 
+ 
             return $store->notifyDomainRequest($old_domain);
         }
 
@@ -387,6 +388,23 @@ class StoreController extends BaseController
     {
         $store = $this->findModel();
 
+        if(str_contains($store->restaurant_domain, ".plugn.site"))
+        {
+            return self::message("error", "Already using new design!");
+        }
+        else if(str_contains($store->restaurant_domain, ".plugn.store"))
+        {
+            $store->restaurant_domain = str_replace(".plugn.store", ".plugn.site", $store->restaurant_domain);
+
+            if(!$store->save()) {
+                return self::message("error",$store->errors);
+            }
+
+            return self::message("success","Store migrated to ". $store->restaurant_domain);
+        }
+
+        //if custom domain
+
         if(!$store->site_id) {
             return [
                 'operation' => 'error',
@@ -421,10 +439,10 @@ class StoreController extends BaseController
 
         Yii::error('[Error while upgrading site]' . isset($response->data['message'])? json_encode($response->data['message']): json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
 
-            return [
-                'operation' => 'error',
-                'message' => $response->data['message']
-            ];
+        return [
+            'operation' => 'error',
+            'message' => $response->data['message']
+        ];
     }
 
     /**
@@ -991,6 +1009,9 @@ class StoreController extends BaseController
      */
     public function actionUpdateLayout() {
 
+        $logo = Yii::$app->request->getBodyParam('logo');
+        $thumbnail_image = Yii::$app->request->getBodyParam('thumbnail_image');
+
         $model = Yii::$app->accountManager->getManagedAccount();
 
         $model->setScenario(Restaurant::SCENARIO_UPDATE_LAYOUT);
@@ -1012,13 +1033,12 @@ class StoreController extends BaseController
 
         $transaction = Yii::$app->db->beginTransaction ();
 
-        if($model->logo != Yii::$app->request->getBodyParam('logo')) {
-            $logo = Yii::$app->request->getBodyParam('logo');
+        if($model->logo != $logo) {
             $model->uploadLogo($logo);
         }
 
-        if($model->thumbnail_image != Yii::$app->request->getBodyParam('thumbnail_image')) {
-            $model->uploadThumbnailImage(Yii::$app->request->getBodyParam('thumbnail_image'));
+        if($model->thumbnail_image != $thumbnail_image) {
+            $model->uploadThumbnailImage($thumbnail_image);
         }
 
         if(!$model->save()) {

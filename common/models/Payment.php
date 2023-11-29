@@ -856,7 +856,6 @@ class Payment extends \yii\db\ActiveRecord
         return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
 
-
     /**
      * Gets query for [[PaymentMethod]].
      *

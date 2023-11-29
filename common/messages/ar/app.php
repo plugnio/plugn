@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "Phone no. already exist." => "رقم الهاتف. موجود مسبقا.",
     "Credit card" => "بطاقة ائتمان",
     "Mada" => "مدى",
     "Credit card mada" => "بطاقة الائتمان مدى",

@@ -59,11 +59,17 @@ return [
             'enablePrettyUrl' => false,
             'showScriptName' => false,
         ],
+        //microservices
+        'blogManager' => [
+            'class' => 'common\components\BlogManager',
+            'apiEndpoint' => 'http://localhost:8080/v1',
+            'token' => 'Lu4vPW4Npfgce6WkXdt9OErpxXdB7GW4'
+        ],
         'agentApiUrlManager' => [
             'class' => 'yii\web\UrlManager',
             'baseUrl' => 'http://localhost/plugn/agent/web',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ],
+        ]
     ],
 ];

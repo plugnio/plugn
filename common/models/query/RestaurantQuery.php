@@ -122,12 +122,12 @@ class RestaurantQuery extends \yii\db\ActiveQuery
     public function filterPlugnDomain($db = null)
     {
         return $this
-            ->andWhere( new Expression("restaurant_domain like '%.plugn.store%'"));
+            ->andWhere( new Expression("restaurant_domain like '%.plugn.store%' OR restaurant_domain like '%.plugn.site%'"));
     }
 
     public function filterCustomDomain($db = null)
     {
         return $this
-            ->andWhere( new Expression("restaurant_domain not like '%.plugn.store%'"));
+            ->andWhere( new Expression("restaurant_domain not like '%.plugn.store%' AND restaurant_domain not like '%.plugn.site%'"));
     }
 }

@@ -2440,7 +2440,7 @@ class Restaurant extends ActiveRecord
             if ($isDomainExist)
                 return $this->addError('restaurant_domain', Yii::t('app', 'Another store is already using this domain'));
 
-            $this->restaurant_domain = 'https://' . $store_domain . '.plugn.store';
+            $this->restaurant_domain = 'https://' . $store_domain . '.plugn.site';
         }
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
@@ -2521,13 +2521,18 @@ class Restaurant extends ActiveRecord
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
 
-            //Create a new record in queue table
-            $queue = new Queue();
-            $queue->restaurant_uuid = $this->restaurant_uuid;
-            $queue->queue_status = Queue::QUEUE_STATUS_PENDING;
+            //Create a new record in queue table for netlify if old domain or custom domain
 
-            if (!$queue->save())
-                Yii::error('Queue Error:' . json_encode($queue->errors));
+            if(!str_contains($this->restaurant_domain, ".plugn.site"))
+            {
+                $queue = new Queue();
+                $queue->restaurant_uuid = $this->restaurant_uuid;
+                $queue->queue_status = Queue::QUEUE_STATUS_PENDING;
+
+                if (!$queue->save ())
+                    Yii::error ('Queue Error:' . json_encode ($queue->errors));
+            }
+
         }
 
         if ($insert) {
@@ -2719,7 +2724,8 @@ class Restaurant extends ActiveRecord
                 $agent->agent_id
             );
 
-            Yii::$app->eventManager->track('Agent Signup', [
+            /**
+             * Yii::$app->eventManager->track('Agent Signup', [
                 'first_name' => trim($firstname),
                 'last_name' => trim($lastname),
                 'phone_number' => $this->owner_phone_country_code . $this->owner_number,
@@ -2731,7 +2737,7 @@ class Restaurant extends ActiveRecord
             ],
                 null,
                 $agent->agent_id
-            );
+            );*/
 
             if ($agent->tempPassword) {
 
@@ -4131,7 +4137,7 @@ class Restaurant extends ActiveRecord
             return $model->getPayments()
                 ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
                             SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
-                ->joinWith(['order'])
+                ->join('left join', 'order', '`order`.order_uuid = payment.order_uuid')
                 ->filterPaid()
                 ->groupBy('order.currency_code')
                 ->asArray()

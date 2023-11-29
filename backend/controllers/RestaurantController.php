@@ -393,14 +393,7 @@ class RestaurantController extends Controller {
             'pagination' => false
         ]);
 
-        $payments = $model->getPayments()
-            ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
-                SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
-            ->joinWith(['order'])
-            ->filterPaid()
-            ->groupBy('order.currency_code')
-            ->asArray()
-            ->all();
+        $payments = $model->getCSV();
 
         return $this->render('view', [
             'model' => $this->findModel($id),
@@ -564,6 +557,26 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
 
+        if(str_contains($store->restaurant_domain, ".plugn.site"))
+        {
+            Yii::$app->session->setFlash('errorResponse', "Already published!");
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+        else if(str_contains($store->restaurant_domain, ".plugn.store"))
+        {
+            $store->restaurant_domain = str_replace(".plugn.store",
+                ".plugn.site", $store->restaurant_domain);
+
+            if(!$store->save()) {
+                Yii::$app->session->setFlash('errorResponse', json_encode($store->errors));
+            }
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+        //if custom domain
+
         $response = Yii::$app->netlifyComponent->createSite($store);
 
         if ($response->isOk)
@@ -600,11 +613,24 @@ class RestaurantController extends Controller {
     {
         $store = $this->findModel($id);
 
-        if(!$store->site_id) {
-            Yii::$app->session->setFlash('errorResponse', "Site not published yet, can't update unpublished site!");
+        if(str_contains($store->restaurant_domain, ".plugn.site"))
+        {
+            Yii::$app->session->setFlash('errorResponse', "Already using new design!");
 
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
+        else if(str_contains($store->restaurant_domain, ".plugn.store"))
+        {
+            $store->restaurant_domain = str_replace(".plugn.store", ".plugn.site", $store->restaurant_domain);
+
+            if(!$store->save()) {
+                Yii::$app->session->setFlash('errorResponse', json_encode($store->errors));
+            }
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+        //if custom domain
 
         //$response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
 

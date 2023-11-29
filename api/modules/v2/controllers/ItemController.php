@@ -8,7 +8,6 @@ use yii\data\ActiveDataProvider;
 use api\models\Item;
 use api\models\Category;
 use api\models\Restaurant;
-use common\models\ItemImage;
 use yii\web\NotFoundHttpException;
 
 class ItemController extends Controller {

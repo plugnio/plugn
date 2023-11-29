@@ -115,7 +115,7 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if($this->item->item_type == Item::TYPE_SIMPLE) {
             if($this->qty > $this->item->stock_qty) {
-                $this->addError($attribute, Yii::t('app', 'Out of stock'));
+                $this->addError($attribute, Yii::t('app', 'Item out of stock'));
             }
         } else {
             if(!$this->variant) {
@@ -123,7 +123,7 @@ class OrderItem extends \yii\db\ActiveRecord {
             }
             else if($this->qty > $this->variant->stock_qty)
             {
-                $this->addError($attribute, Yii::t('app', 'Out of stock'));
+                $this->addError($attribute, Yii::t('app', 'Variant out of stock'));
             }
         }
     }
@@ -292,21 +292,52 @@ class OrderItem extends \yii\db\ActiveRecord {
             return true;
         }
 
-        if ($insert) {
+        //stock validation : already doing in attributes
 
-            if ($this->item_uuid && $this->item->track_quantity && $this->qty > $this->item->stock_qty) {
-                return $this->addError('qty',  Yii::t('app', "{name} is currently out of stock and unavailable.", [
-                    'name' => $this->item->item_name
-                ]));
-            }
-        }
-        else
-        {
-            if ($this->item_uuid && $this->item->track_quantity && $this->qty > ( $this->item->stock_qty + $this->getOldAttribute('qty')))
-            {
-                return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
-                    'name' => $this->item->item_name
-                ]));
+        if($this->item && $this->item->track_quantity) {
+
+            if ($insert) {
+
+                if($this->item->item_type == Item::TYPE_SIMPLE) {
+                    if ($this->qty > $this->item->stock_qty) {
+                        return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                            'name' => $this->item->item_name
+                        ]));
+                    }
+                }
+                else
+                {
+                    if(!$this->variant) {
+                        return $this->addError("variant_item_uuid", Yii::t('app', 'Variant detail missing'));
+                    }
+                    else if ($this->qty > $this->variant->stock_qty)
+                    {
+                        return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                            'name' => $this->item->item_name
+                        ]));
+                    }
+                }
+
+            } else {
+                if($this->item->item_type == Item::TYPE_SIMPLE) {
+                    if ($this->qty > $this->item->stock_qty + $this->getOldAttribute('qty')) {
+                        return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                            'name' => $this->item->item_name
+                        ]));
+                    }
+                }
+                else
+                {
+                    if(!$this->variant) {
+                        return $this->addError("variant_item_uuid", Yii::t('app', 'Variant detail missing'));
+                    }
+                    else if ($this->qty > $this->variant->stock_qty + $this->getOldAttribute('qty') )
+                    {
+                        return $this->addError('qty', Yii::t('app', "{name} is currently out of stock and unavailable.", [
+                            'name' => $this->item->item_name
+                        ]));
+                    }
+                }
             }
         }
 
