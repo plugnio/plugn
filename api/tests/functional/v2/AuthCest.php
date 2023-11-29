@@ -29,13 +29,18 @@ class AuthCest
 
     public function _before(FunctionalTester $I) {
 
-        $this->customer = Customer::find()->one();//['customer_email_verification'=>1]
+        $this->customer = Customer::find()
+            //->andWhere(['restaurant_uuid' => ])
+            ->one();//['customer_email_verification'=>1]
 
         $this->token = $this->customer->getAccessToken()->token_value;
 
         $I->amBearerAuthenticated($this->token);
 
         $this->store = Restaurant::find()->one();
+
+        $this->customer->restaurant_uuid = $this->store->restaurant_uuid;
+        $this->customer->save(false);
 
         $I->haveHttpHeader('Store-Id', $this->store->restaurant_uuid);
     }
