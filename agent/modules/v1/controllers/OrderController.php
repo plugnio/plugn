@@ -7,7 +7,9 @@ use agent\models\Item;
 use agent\models\Refund;
 use agent\models\RefundedItem;
 use common\models\AreaDeliveryZone;
+use common\models\Currency;
 use common\models\Payment;
+use common\models\PaymentMethod;
 use common\models\shipping\Aramex;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -1174,6 +1176,91 @@ class OrderController extends BaseController
                     "message" => Yii::t('agent', "We've faced a problem updating the order status")
                 ];
             }
+        }
+
+        if (YII_ENV == 'prod') {
+
+            $plugn_fee = 0;
+            $payment_gateway_fee = 0;
+            $plugn_fee_kwd = 0;
+
+            //$total_price = $this->total_price;
+            //$delivery_fee = $this->delivery_fee;
+            //$subtotal = $this->subtotal;
+            //$currency = $this->currency_code;
+
+            $kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+            //using store currency instead of user as user can have any currency but totals will be in store currency
+
+            $rateKWD = $kwdCurrency->rate / $model->restaurant->currency->rate;
+
+            $rate = 1 / $model->restaurant->currency->rate;// to USD
+
+            if ($model->payment_uuid) {
+
+                $plugn_fee_kwd = ($model->payment->plugn_fee + $model->payment->partner_fee) * $rateKWD;
+
+                $plugn_fee = ($model->payment->plugn_fee + $model->payment->partner_fee) * $rate;
+
+                //$total_price = $total_price * $rate;
+                //$delivery_fee = $delivery_fee * $rate;
+                //$subtotal = $subtotal * $rate;
+                $payment_gateway_fee = $model->payment->payment_gateway_fee * $rate;
+            }
+
+            $order_total = $model->total_price * $rate;
+
+            $store = $model->restaurant;
+
+            $itemTypes = [];
+            foreach ($store->restaurantItemTypes as $restaurantItemType) {
+                $itemTypes[] = $restaurantItemType->businessItemType->business_item_type_en;
+            }
+
+            $productsList = null;
+
+            foreach ($model->orderItems as $orderedItem) {
+                $productsList[] = [
+                    'product_id' => $orderedItem->item_uuid,
+                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null,
+                    'name' => $orderedItem->item_name,
+                    'price' => $orderedItem->item_price,
+                    'quantity' => $orderedItem->qty,
+                    'url' => $model->restaurant->restaurant_domain . '/product/' . $orderedItem->item_uuid,
+                ];
+            }
+
+            $data = [
+                'order_id' => $model->order_uuid,
+                "status" => $model->getOrderStatusInEnglish(),
+                "restaurant_uuid" => $model->restaurant_uuid,
+                "store" => $store->name,
+                "customer_name" => $model->customer_name,
+                "customer_email" => $model->customer_email,
+                "customer_id" => $model->customer_id,
+                "country" => $model->country_name,
+                'checkout_id' => $model->order_uuid,
+                'is_market_order' => $model->is_market_order,
+                'total' => $order_total,
+                'revenue' => $plugn_fee,
+                "store_revenue" => $order_total - $plugn_fee,
+                'gateway_fee' => $payment_gateway_fee,
+                'payment_method' => $model->payment_method_name,
+                'gateway' => $model->payment_method_name,// $this->payment_uuid ? 'Tap' : null,
+                'shipping' => ($model->delivery_fee * $rate),
+                'subtotal' => ($model->subtotal * $rate),
+                'currency' => $model->currency_code,
+                "cash" => $model->paymentMethod && $model->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH ?
+                    ($model->total_price * $rate) : 0,
+                'coupon' => $model->voucher && $model->voucher->code ? $model->voucher->code : null,
+                'products' => $productsList,
+                'storeItemTypes' => $itemTypes,
+            ];
+
+            Yii::$app->eventManager->track('Order Status Updated', $data,
+                null,
+                $model->restaurant_uuid);
         }
 
         return [
