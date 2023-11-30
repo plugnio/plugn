@@ -1055,6 +1055,7 @@ class Order extends \yii\db\ActiveRecord
 
             $data = [
                 "restaurant_uuid" => $this->restaurant_uuid,
+                "status" => $this->getOrderStatusInEnglish(),
                 "store" => $store->name,
                 "customer_name" => $this->customer_name,
                 "customer_email" => $this->customer_email,
@@ -1090,28 +1091,28 @@ class Order extends \yii\db\ActiveRecord
                 //for order in specific category
 
                 if($store->restaurantType->businessCategory)
-                    Yii::$app->eventManager->track('Order Completed in Category', $data,
+                    Yii::$app->eventManager->track('Order Placed in Category', $data,
                         null,
                         $store->restaurantType->businessCategory->business_category_en);
 
                 //for order in specific business type
 
                 if($store->restaurantType->businessType)
-                    Yii::$app->eventManager->track('Order Completed in Business Type', $data,
+                    Yii::$app->eventManager->track('Order Placed in Business Type', $data,
                         null,
                         $store->restaurantType->businessType->business_type_en);
 
                 //for order in specific merchant type
 
                 if($store->restaurantType->merchantType)
-                    Yii::$app->eventManager->track('Order Completed in Merchant Type', $data,
+                    Yii::$app->eventManager->track('Order Placed in Merchant Type', $data,
                         null,
                         $store->restaurantType->merchantType->merchant_type_en);
             }
 
             //for order tracking
 
-            Yii::$app->eventManager->track('Order Completed', $data,
+            Yii::$app->eventManager->track('Order Placed', $data,
                 null, 
                 $this->restaurant_uuid);
 
@@ -1766,18 +1767,21 @@ failed: the order has failed to find a driver */
             }
         }
 
+        /* nonsense code
         if (!$insert && $this->customer_id) {
 
             //Save Customer data
             $customer = Customer::findOne($this->customer_id);
 
-            $customer->customer_name = $this->customer_name;
+            if($customer) {
+                $customer->customer_name = $this->customer_name;
 
-            if ($this->customer_email != null)
-                $customer->customer_email = $this->customer_email;
+                if ($this->customer_email != null)
+                    $customer->customer_email = $this->customer_email;
 
-            $customer->save(false);
-        }
+                $customer->save(false);
+            }
+        }*/
 
         //todo : notification based on order status
 
