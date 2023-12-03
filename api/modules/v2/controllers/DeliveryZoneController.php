@@ -71,7 +71,6 @@ class DeliveryZoneController extends Controller
      */
     public function actionListOfCountries($restaurant_uuid)
     {
-
         $store = $this->findStore($restaurant_uuid);
 
         $subQuery = $store->getDeliveryZones()
@@ -87,8 +86,10 @@ class DeliveryZoneController extends Controller
         foreach ($countries as $country) {
 
             $areas = $store->getAreaDeliveryZones()
+                ->joinWith(['deliveryZone'])
                 ->andWhere(new Expression('state_id IS NOT NULL OR city_id IS NOT NULL OR area_id IS NOT NULL'))
-                ->andWhere(['area_delivery_zone.country_id' => $country->country_id])
+                //->andWhere(['area_delivery_zone.country_id' => $country->country_id])
+                ->andWhere(['delivery_zone.country_id' => $country->country_id])
                 ->count();
 
             $deliveryZone = null;
