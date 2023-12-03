@@ -313,7 +313,7 @@ class StoreController extends Controller
             ->andWhere([
                 "OR",
                 ['restaurant_domain' => 'https://'. $domain],
-                ['restaurant_domain' => 'https://wwww.'. $domain]
+                ['restaurant_domain' => 'https://www.'. $domain]
             ])
             ->one();
 
