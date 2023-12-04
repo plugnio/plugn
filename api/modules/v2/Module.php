@@ -45,6 +45,11 @@ class Module extends \yii\base\Module
             \Yii::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE, [$component, 'setDebugHeaders']);
         }*/
 
+        $authHeader = Yii::$app->request->getHeaders()->get('Authorization');
+        if ($authHeader !== null && preg_match('/^Bearer\s+(.*?)$/', $authHeader, $matches)) {
+            Yii::$app->user->loginByAccessToken($matches[1]);
+        }
+
         $lang = \Yii::$app->request->headers->get('language');
 
         $currency = \Yii::$app->request->headers->get('currency');

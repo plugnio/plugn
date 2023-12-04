@@ -1145,8 +1145,9 @@ class OrderController extends Controller
             )*/
             ->andWhere(['order.is_deleted' => 0])
             ->orderBy(['order_created_at' => SORT_DESC]);
+            //->andWhere(['customer_id' => Yii::$app->user->getId()]);
 
-        if(!Yii::$app->user->isGuest) 
+        if(!Yii::$app->user->isGuest)
         {
             $query->andWhere(['customer_id' => Yii::$app->user->getId()]);
         } 

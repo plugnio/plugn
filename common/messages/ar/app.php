@@ -26,7 +26,6 @@ return [
     "Stc pay" => "Stc pay",
     "Apple pay not configured" => "لم يتم تكوين Apple pay",
     "Apple pay not supported" => "Apple pay غير مدعوم",
-
     "Is Public?" => "هل عامة؟",
     'Accept order 24/7' => "اطلب أسبوعًا على مدار الساعة طوال أيام الأسبوع",
     'Store not delivering to this area.' => "المتجر لا يسلم لهذه المنطقة.",
