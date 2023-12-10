@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "We limiting no of store per user to 5 for now!" => "نحن نحدد عدد المتاجر لكل مستخدم بـ 5 في الوقت الحالي!",
     "Phone no. already exist." => "رقم الهاتف. موجود مسبقا.",
     "Credit card" => "بطاقة ائتمان",
     "Mada" => "مدى",

@@ -170,6 +170,14 @@ class StoreController extends BaseController
     {
         $store = new Restaurant();
 
+        $totalStores = Yii::$app->user->identity
+            ->getAccountsManaged()
+            ->count();
+
+        if ($totalStores > 4) {
+            return self::message("error", Yii::t('app', "We limiting no of store per user to 5 for now!"));
+        }
+
         $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
 
         $store->version = Yii::$app->params['storeVersion'];
