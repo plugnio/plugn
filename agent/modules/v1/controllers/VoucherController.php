@@ -64,6 +64,8 @@ class VoucherController extends BaseController
         $model->description_ar = Yii::$app->request->getBodyParam("description_ar");
         $model->discount_type = (int)Yii::$app->request->getBodyParam("discount_type");
         $model->discount_amount = (int)Yii::$app->request->getBodyParam("discount_amount");
+        $model->is_public = Yii::$app->request->getBodyParam("is_public");
+
         $model->voucher_status = Voucher::VOUCHER_STATUS_ACTIVE;
 
         if (Yii::$app->request->getBodyParam("valid_from"))
@@ -112,6 +114,7 @@ class VoucherController extends BaseController
         $model->limit_per_customer = Yii::$app->request->getBodyParam("limit_per_customer") ? Yii::$app->request->getBodyParam("limit_per_customer") : 0;
         $model->minimum_order_amount = Yii::$app->request->getBodyParam("minimum_order_amount") ? Yii::$app->request->getBodyParam("minimum_order_amount") : 0;
         $model->exclude_discounted_items = Yii::$app->request->getBodyParam("exclude_discounted_items");
+        $model->is_public = Yii::$app->request->getBodyParam("is_public");
 
         if (!$model->save()) {
             if (isset($model->errors)) {

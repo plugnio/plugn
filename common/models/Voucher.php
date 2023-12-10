@@ -24,6 +24,7 @@ use yii\db\Expression;
  * @property int|null $limit_per_customer
  * @property int|null $minimum_order_amount
  * @property int|null $exclude_discounted_items
+ * @property boolean is_public
  * @property int is_deleted
  * @property string|null $voucher_created_at
  * @property string|null $voucher_updated_at
@@ -72,11 +73,11 @@ class Voucher extends \yii\db\ActiveRecord {
             /*['discount_amount', 'compare', 'compareValue' => 0, 'operator' => '>', 'when' => function($model) {
                 return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
             }],*/
-            [['exclude_discounted_items', 'is_deleted'], 'integer'],
+            [['exclude_discounted_items', 'is_deleted', 'is_public'], 'integer'],
             [['discount_amount'], 'integer', 'min' => 1, 'when' => function($model) {
                 return $model->discount_type != self::DISCOUNT_TYPE_FREE_DELIVERY;
             }],
-            [['voucher_created_at', 'voucher_updated_at'], 'safe'],
+            [['voucher_created_at', 'voucher_updated_at', 'is_public'], 'safe'],
             [['code','description','description_ar'], 'string', 'max' => 255],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
@@ -117,7 +118,8 @@ class Voucher extends \yii\db\ActiveRecord {
             'max_redemption' => Yii::t('app','Max Redemption'),
             'limit_per_customer' => Yii::t('app','Limit Per Customer'),
             'minimum_order_amount' => Yii::t('app','Minimum Order Amount'),
-            'exclude_discounted_items' => Yii::t('app', 'exclude_discounted_items')
+            'exclude_discounted_items' => Yii::t('app', 'exclude_discounted_items'),
+            'is_public' => Yii::t('app', 'Is Public?'),
         ];
     }
 
