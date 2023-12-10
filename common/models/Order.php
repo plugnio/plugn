@@ -1093,7 +1093,7 @@ class Order extends \yii\db\ActiveRecord
                 if ($store->restaurantType->businessCategory) {
                     $data['business_category'] = $store->restaurantType->businessCategory->business_category_en;
                 }
-                
+
                 //for order in specific category
 
                 if($store->restaurantType->businessCategory)

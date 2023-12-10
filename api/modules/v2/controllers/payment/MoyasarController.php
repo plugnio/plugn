@@ -190,7 +190,7 @@ class MoyasarController extends Controller
 
         $payment = new \api\models\Payment;
         $payment->restaurant_uuid = $order->restaurant_uuid;
-        $payment->customer_id = $order->customer->customer_id; //customer id
+        $payment->customer_id = $order->customer? $order->customer->customer_id: null; //customer id
         $payment->order_uuid = $order->order_uuid;
         $payment->payment_amount_charged = $order->total;
         //$payment->is_sandbox = $order->restaurant->is_sandbox;
