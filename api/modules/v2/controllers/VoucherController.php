@@ -60,7 +60,10 @@ class VoucherController extends Controller
 
         $query = $store->getVouchers()
             ->orderBy('voucher_created_at DESC')
-            ->where(['voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE]);
+            ->where([
+                'is_public' => 1,
+                'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE
+            ]);
 
         return new ActiveDataProvider([
             'query' => $query

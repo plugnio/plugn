@@ -807,7 +807,7 @@ class CronController extends \yii\console\Controller
             ->andWhere(new Expression("site_id IS NOT NULL"))
             ->inActive()
             ->andWhere(new Expression("warned_delete_at IS NULL AND DATE(restaurant_created_at) < DATE('".
-                date('Y-m-d', strtotime("-30 days"))."')"));
+                date('Y-m-d', strtotime("-60 days"))."')"));
 
         foreach ($query->batch() as $stores) {
             foreach ($stores as $store) {

@@ -170,6 +170,26 @@ class StoreController extends BaseController
     {
         $store = new Restaurant();
 
+        $totalStores = Yii::$app->user->identity
+            ->getAccountsManaged()
+            ->count();
+
+        if ($totalStores > 4) {
+            return self::message("error", Yii::t('app', "We limiting no of store per user to 5 for now!"));
+        }
+
+        $token = Yii::$app->request->getBodyParam('token');
+
+        $response = Yii::$app->reCaptcha->verify($token);
+
+        if (!$response->data || !$response->data['success']) {
+            return [
+                "operation" => "error",
+                "code" => 0,
+                "message" => Yii::t('candidate', "Invalid captcha validation")
+            ];
+        }
+
         $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
 
         $store->version = Yii::$app->params['storeVersion'];

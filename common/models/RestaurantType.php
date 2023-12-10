@@ -96,6 +96,25 @@ class RestaurantType extends \yii\db\ActiveRecord
         ];
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        /*if($insert && YII_ENV == 'prod') {
+
+            Yii::$app->eventManager->track('Store Type', [
+                'merchant_type' => $this->merchantType ? $this->merchantType->merchant_type_en : null,
+                'business_type' => $this->businessType ? $this->businessType->business_type_en : null,
+                'business_category' => $this->businessCategory ? $this->businessCategory->business_category_en : null,
+            ],
+                null,
+                $this->restaurant_uuid
+            );
+
+            //Yii::$app->user->getId()
+        }*/
+    }
+
     /**
      * Gets query for [[BusinessCategoryUu]].
      *

@@ -71,6 +71,8 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             [['customer_email'], 'validateEmail'],
             [['customer_phone_number'], 'validatePhone'],
 
+            [['ip_address'], 'string', 'max' => 45],
+
             //[['customer_phone_number'], 'unique'],
             //[['customer_email'], 'unique'],
 
@@ -145,13 +147,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
     {
         $scenarios = parent::scenarios ();
 
-        $scenarios['updateLanguagePref'] = ['customer_language_pref'];
+        $scenarios['updateLanguagePref'] = ['customer_language_pref', 'ip_address'];
 
-        $scenarios['update-email'] = ['customer_email', 'customer_new_email'];
+        $scenarios['update-email'] = ['customer_email', 'customer_new_email', 'ip_address'];
 
-        $scenarios['verify-email'] = ['customer_email', 'customer_new_email', 'customer_email_verification', 'customer_auth_key'];
+        $scenarios['verify-email'] = ['customer_email', 'customer_new_email', 'customer_email_verification', 'customer_auth_key', 'ip_address'];
 
-        $scenarios['SCENARIO_DELETE'] = ['deleted'];
+        $scenarios['SCENARIO_DELETE'] = ['deleted', 'ip_address'];
 
         return $scenarios;
     }
@@ -184,6 +186,29 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             'customer_created_at' => Yii::t('app','Customer Created At'),
             'customer_updated_at' => Yii::t('app','Customer Updated At'),
         ];
+    }
+
+    public function beforeSave($insert)
+    {
+        if(!parent::beforeSave($insert)) {
+            return false;
+        }
+
+        // Get initial IP address of requester
+        $ip = Yii::$app->request->getRemoteIP();
+
+        // Check if request is forwarded via load balancer or cloudfront on behalf of user
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $forwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+            // as "X-Forwarded-For" is usually a list of IP addresses that have routed
+            $IParray = array_values(array_filter(explode(',', $forwardedFor)));
+
+            // Get the first ip from forwarded array to get original requester
+            $ip = $IParray[0];
+        }
+
+        $this->ip_address = $ip;
     }
 
     public static function getTotalCustomersByWeek()

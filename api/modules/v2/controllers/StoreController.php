@@ -309,7 +309,13 @@ class StoreController extends Controller
      */
     protected function findByDomain($domain)
     {
-        $model = Restaurant::findOne(['restaurant_domain' => 'https://'. $domain]);
+        $model = Restaurant::find()
+            ->andWhere([
+                "OR",
+                ['restaurant_domain' => 'https://'. $domain],
+                ['restaurant_domain' => 'https://www.'. $domain]
+            ])
+            ->one();
 
         if ($model !== null) {
             return $model;

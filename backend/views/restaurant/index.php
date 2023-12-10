@@ -84,6 +84,15 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         [
+
+                            'label' => "Category",
+                            //'filter' => \common\models\BusinessCategory::arrFilter(),
+                            'value' => function ($data) {
+                                if($data->businessCategory)
+                                    return $data->businessCategory->business_category_en;
+                            }
+                        ],
+                        [
                             'attribute' => 'restaurant_domain',
                             'label' => "URL",
                             'format' => 'raw',
@@ -91,6 +100,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return '<a target="_blank" href="'. $data->restaurant_domain .'">'. $data->restaurant_domain .'</a>';
                             }
                         ],
+
+                        'ip_address',
+
                         //'country_name',
                         'total_orders',
                         /*[

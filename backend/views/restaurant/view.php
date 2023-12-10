@@ -149,6 +149,7 @@ $this->registerJs($js);
     DetailView::widget([
         'model' => $model,
         'attributes' => [
+            'ip_address',
            'retention_email_sent',
             'sitemap_require_update',
             'country.country_name',
@@ -269,6 +270,8 @@ $this->registerJs($js);
             'annual_revenue',
             'referral_code',
             'custom_subscription_price',
+
+
         ],
     ])
     ?>

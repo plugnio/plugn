@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                       }
                   ],
                   'customer_email:email',
-
+                  'ip_address',
                   [
                       'label' => 'Number of orders',
                       "format" => "raw",

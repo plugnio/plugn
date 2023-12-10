@@ -128,6 +128,10 @@ use common\models\Restaurant;
         <div class="row">
 
             <div class="col-md-3">
+                <?= $form->field($model, 'ip_address') ?>
+            </div>
+
+            <div class="col-md-3">
                 <?php echo $form->field($model, 'noOrder')->checkbox(['label' => 'No order in last 30 days']) ?>
             </div>
             <div class="col-md-3">

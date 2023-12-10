@@ -488,6 +488,8 @@ class Restaurant extends ActiveRecord
 
             ['restaurant_domain', 'validateDomain'],
 
+            [['ip_address'], 'string', 'max' => 45],
+
             [['name', 'name_ar'], 'string', 'min' => 3],
             [['restaurant_thumbnail_image', 'restaurant_logo'], 'file', 'extensions' => 'jpg, jpeg , png, pdf', 'maxFiles' => 1],
             [['restaurant_delivery_area', 'restaurant_payments_method'], 'safe'],
@@ -609,11 +611,11 @@ class Restaurant extends ActiveRecord
         $scenarios = parent::scenarios();
 
         return array_merge($scenarios, [
-            self::SCENARIO_DELETE => ['is_deleted', 'site_id'],
-            self::SCENARIO_UPDATE_BANK => ['iban'],
-            self::SCENARIO_TOGGLE_DEBUGGER => ['enable_debugger'],
-            self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain'],
-            self::SCENARIO_UPDATE_STATUS => ['restaurant_status'],
+            self::SCENARIO_DELETE => ['is_deleted', 'site_id', 'ip_address'],
+            self::SCENARIO_UPDATE_BANK => ['iban', 'ip_address'],
+            self::SCENARIO_TOGGLE_DEBUGGER => ['enable_debugger', 'ip_address'],
+            self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain', 'ip_address'],
+            self::SCENARIO_UPDATE_STATUS => ['restaurant_status', 'ip_address'],
             self::SCENARIO_UPDATE_ANALYTICS => [
                 'google_analytics_id',
                 'facebook_pixil_id',
@@ -621,27 +623,30 @@ class Restaurant extends ActiveRecord
                 'google_tag_id',
                 'google_tag_manager_id',
                 'tiktok_pixel_id',
-                'sitemap_require_update'
+                'sitemap_require_update',
+                'ip_address'
             ],
             self::SCENARIO_CREATE_STORE_BY_AGENT => [
                 'name',
                 'owner_number',
                 'restaurant_domain',
                 'currency_id',
-                'country_id'
+                'country_id',
+                'ip_address'
             ],
             self::SCENARIO_UPDATE_LOGO => [
-                'logo'
+                'logo', 'ip_address'
             ],
             self::SCENARIO_UPDATE_THUMBNAIL => [
-                'thumbnail_image'
+                'thumbnail_image', 'ip_address'
             ],
             self::SCENARIO_UPDATE_LAYOUT => [
                 'default_language',
                 'store_layout',
                 'phone_number_display',
                 'logo',
-                'thumbnail_image'
+                'thumbnail_image',
+                'ip_address'
             ],
             self::SCENARIO_UPDATE_DESIGN_LAYOUT => [
                 'logo',
@@ -650,7 +655,8 @@ class Restaurant extends ActiveRecord
                 'restaurant_thumbnail_image',
                 'phone_number_display',
                 'sitemap_require_update',
-                "custom_css"
+                "custom_css",
+                'ip_address'
             ],
             self::SCENARIO_RESET_TAP_ACCOUNT => [
                 'business_id',
@@ -694,7 +700,8 @@ class Restaurant extends ActiveRecord
                 'identification_file_back_side',
                 'identification_file_id_back_side',
                 'payment_gateway_queue_id',
-                'tap_queue_id'
+                'tap_queue_id',
+                'ip_address'
             ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
@@ -704,26 +711,26 @@ class Restaurant extends ActiveRecord
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
                 'identification_expiry_date', 'iban_certificate_file', 'iban_certificate_file_id', 'tap_merchant_status',
-                'is_tap_business_active'],
+                'is_tap_business_active', 'ip_address'],
 
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
                 'identification_file_back_side', 'restaurant_commercial_license_file', 'owner_identification_file_front_side',
-                'owner_identification_file_back_side', 'restaurant_authorized_signature_file',
+                'owner_identification_file_back_side', 'restaurant_authorized_signature_file', 'ip_address'
             ],
             self::SCENARIO_UPDATE => [
                 'country_id', 'restaurant_email_notification', 'demand_delivery', 'phone_number', 'phone_number_country_code',
                 'name', 'name_ar', 'schedule_interval', 'schedule_order', 'is_sandbox',
                 'restaurant_email', 'tagline', 'tagline_ar', 'currency_id', 'meta_description', 'meta_description_ar',
                 'owner_first_name', 'owner_last_name', 'owner_number', 'owner_email', 'owner_phone_country_code',
-                "enable_gift_message", "accept_order_247", "is_public", "currency_id"
+                "enable_gift_message", "accept_order_247", "is_public", "currency_id", 'ip_address'
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
                 'armada_api_key',
-                'mashkor_branch_id'
+                'mashkor_branch_id', 'ip_address'
             ],
             self::SCENARIO_CURRENCY => [
-                'currency_id'
+                'currency_id', 'ip_address'
             ]
         ]);
     }
@@ -2409,6 +2416,21 @@ class Restaurant extends ActiveRecord
      */
     public function beforeSave($insert)
     {
+        // Get initial IP address of requester
+        $ip = Yii::$app->request->getRemoteIP();
+
+        // Check if request is forwarded via load balancer or cloudfront on behalf of user
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $forwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+            // as "X-Forwarded-For" is usually a list of IP addresses that have routed
+            $IParray = array_values(array_filter(explode(',', $forwardedFor)));
+
+            // Get the first ip from forwarded array to get original requester
+            $ip = $IParray[0];
+        }
+
+        $this->ip_address = $ip;
 
         if ($insert && $this->referral_code != null) {
             if (!Partner::find()->where(['referral_code' => $this->referral_code])->exists())
@@ -4512,6 +4534,16 @@ class Restaurant extends ActiveRecord
     {
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
             ->andWhere(['business_location.is_deleted' => 0]);
+    }
+
+    /**
+     * @param $modelClass
+     * @return ActiveQuery
+     */
+    public function getBusinessCategory($modelClass = "\common\models\BusinessCategory")
+    {
+        return $this->hasOne($modelClass::className(), ['business_category_uuid' => 'business_category_uuid'])
+            ->via('restaurantType');
     }
 
     // /**

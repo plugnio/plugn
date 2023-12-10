@@ -8,6 +8,7 @@ use common\models\Order;
 use common\models\PaymentMethod;
 use common\models\Refund;
 use common\models\RestaurantDomainRequest;
+use common\models\RestaurantType;
 use Yii;
 use common\models\Restaurant;
 use yii\db\Expression;
@@ -490,6 +491,49 @@ class EventController extends \yii\console\Controller {
         }
     }
 
+
+    function syncStoreType() {
+
+        $query = RestaurantType::find();
+
+        $total = RestaurantType::find()
+            ->count();
+
+        $count = 0;
+
+        Console::startProgress(0, $total);
+
+        foreach($query->batch(100) as $types) {
+
+            $count += sizeof($types);
+
+            foreach ($types as $restaurantType) {
+
+                $datetime = new \DateTime($restaurantType->created_at);
+
+                $store = $restaurantType->restaurant;
+
+                $itemTypes = [];
+
+                foreach ($store->restaurantItemTypes as $restaurantItemType) {
+                    $itemTypes[] = $restaurantItemType->businessItemType->business_item_type_en;
+                }
+
+                Yii::$app->eventManager->track('Store type', [
+                    'restaurant' => $store->name,
+                    'merchant_type' => $restaurantType->merchantType? $restaurantType->merchantType->merchant_type_en: null,
+                    'business_type' => $restaurantType->businessType? $restaurantType->businessType->business_type_en: null,
+                    'business_category' => $restaurantType->businessCategory? $restaurantType->businessCategory->business_category_en: null,
+                    'itemTypes' => $itemTypes
+                ],
+                    $datetime->format('c'),
+                    $restaurantType->restaurant_uuid);
+            }
+
+            Console::updateProgress($count, $total);
+        }
+    }
+
     /**
      * sync suggestion with segment
      */
@@ -526,11 +570,15 @@ class EventController extends \yii\console\Controller {
             case "Best Selling":
                 $this->syncBestSelling();
                 break;
+            case "Store Type":
+                $this->syncStoreType();
+                break;
             default:
                 $this->stdout("Missing event name \n", Console::FG_RED, Console::BOLD);
                 //throwException("Missing event name");
         }
     }
+
 }
 
 //to sync
