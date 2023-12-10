@@ -87,6 +87,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             [['agent_auth_key'], 'string', 'max' => 32],
             [['agent_email'], 'unique'],
             [['agent_email'], 'email'],
+            [['ip_address'], 'string', 'max' => 45],
             [['tempPassword'], 'required', 'on' => 'create'],
             [['tempPassword', 'last_active_at'], 'safe'],
             [['agent_password_reset_token'], 'unique'],
@@ -100,13 +101,13 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     {
         $scenarios = parent::scenarios ();
 
-        $scenarios['updateLanguagePref'] = ['agent_language_pref'];
+        $scenarios['updateLanguagePref'] = ['agent_language_pref', 'ip_address'];
 
-        $scenarios['update-email'] = ['agent_email', 'agent_new_email'];
+        $scenarios['update-email'] = ['agent_email', 'agent_new_email', 'ip_address'];
 
-        $scenarios['verify-email'] = ['agent_email', 'agent_new_email', 'agent_email_verification', 'agent_auth_key'];
+        $scenarios['verify-email'] = ['agent_email', 'agent_new_email', 'agent_email_verification', 'agent_auth_key', 'ip_address'];
 
-        $scenarios['SCENARIO_DELETE'] = ['deleted'];
+        $scenarios['SCENARIO_DELETE'] = ['deleted', 'ip_address'];
 
         return $scenarios;
     }
@@ -164,6 +165,22 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             if ($this->tempPassword) {
                 $this->setPassword ($this->tempPassword);
             }
+
+            // Get initial IP address of requester
+            $ip = Yii::$app->request->getRemoteIP();
+
+            // Check if request is forwarded via load balancer or cloudfront on behalf of user
+            if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $forwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+                // as "X-Forwarded-For" is usually a list of IP addresses that have routed
+                $IParray = array_values(array_filter(explode(',', $forwardedFor)));
+
+                // Get the first ip from forwarded array to get original requester
+                $ip = $IParray[0];
+            }
+
+            $this->ip_address = $ip;
 
             return true;
         }

@@ -153,6 +153,7 @@ $this->params['breadcrumbs'][] = $this->title;
                               return date('d M - h:i A', strtotime($model->order_created_at));
                           }
                       ],
+                        'ip_address'
                     ],
                     'layout' => '{summary}{items}{pager}',
                     'tableOptions' => ['class' => 'table dataTable data-list-view'],

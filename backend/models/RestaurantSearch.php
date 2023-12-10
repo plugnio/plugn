@@ -32,7 +32,7 @@ class RestaurantSearch extends Restaurant
                 'restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
-                 'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders', 'noItem', 'notActive'], 'safe'],
+                 'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders', 'noItem', 'notActive', 'ip_address'], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee','version', 'total_orders'], 'number'],
          ];
@@ -125,8 +125,15 @@ class RestaurantSearch extends Restaurant
         if($this->enable_debugger)
             $query->andFilterWhere(['enable_debugger' => $this->enable_debugger]);
 
-        if($this->is_deleted)
+        if($this->is_deleted) {
             $query->andFilterWhere(['is_deleted' => $this->is_deleted]);
+        } else {
+            $query->andFilterWhere(['is_deleted' => 0]);
+        }
+
+        if($this->ip_address) {
+            $query->andFilterWhere(['restaurant.ip_address' => $this->ip_address]);
+        }
 
         if($this->notActive) {
             $query->andWhere("last_active_at IS NULL OR DATE(last_active_at) < DATE('".

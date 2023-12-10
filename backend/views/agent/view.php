@@ -56,6 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'email_notification',
             'agent_language_pref',
             'receive_weekly_stats',
+            'ip_address',
             'agent_created_at:datetime',
             'agent_updated_at:datetime',
         ],

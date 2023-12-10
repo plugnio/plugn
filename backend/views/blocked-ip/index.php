@@ -4,40 +4,37 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
+/* @var $searchModel common\models\BlockedIPSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Agents';
+$this->title = Yii::t('app', 'Blocked Ips');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="agent-index">
+<div class="blocked-ip-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Agent', ['create'], ['class' => 'btn btn-success btn-create']) ?>
+        <?= Html::a(Yii::t('app', 'Create Blocked Ip'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-        
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'agent_name',
-            'agent_email:email',
+            'ip_uuid',
             'ip_address',
-            // 'agent_auth_key',
-            // 'agent_password_hash',
-            //'agent_password_reset_token',
-            //'agent_status',
-            'last_active_at:datetime',
-            'agent_created_at',
-            'agent_updated_at',
+            'note',
+            'created_at',
+            'updated_at',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
+
+
 </div>

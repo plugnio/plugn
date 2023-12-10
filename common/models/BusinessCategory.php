@@ -7,6 +7,7 @@ use yii\behaviors\AttributeBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "business_category".
@@ -83,6 +84,10 @@ class BusinessCategory extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    public static function  arrFilter() {
+        return ArrayHelper::map(self::find()->all(), 'business_category_uuid', 'business_category_en');
     }
 
     /**

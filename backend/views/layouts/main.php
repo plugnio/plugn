@@ -110,6 +110,13 @@ AppAsset::register($this);
                 ]
             ],
             [
+                'label' => 'Security',
+                'items' => [
+                    ['label' => 'Blocked IP', 'url' => ['/blocked-ip/index']],
+                ]
+            ],
+
+            [
                 'label' => 'Settings',
                 'items' => [
                     ['label' => 'Add-ons', 'url' => ['/addon/index']],
