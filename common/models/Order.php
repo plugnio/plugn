@@ -1082,12 +1082,18 @@ class Order extends \yii\db\ActiveRecord
 
             if($store->restaurantType) {
 
-                $data = array_combine($data, [
-                    'merchant_type' => $store->restaurantType->merchantType ? $store->restaurantType->merchantType->merchant_type_en : null,
-                    'business_type' => $store->restaurantType->businessType ? $store->restaurantType->businessType->business_type_en : null,
-                    'business_category' => $store->restaurantType->businessCategory ? $store->restaurantType->businessCategory->business_category_en : null,
-                ]);
+                if ($store->restaurantType->merchantType) {
+                    $data['merchant_type'] = $store->restaurantType->merchantType->merchant_type_en;
+                }
 
+                if ($store->restaurantType->businessType) {
+                    $data['business_type'] = $store->restaurantType->businessType->business_type_en;
+                }
+
+                if ($store->restaurantType->businessCategory) {
+                    $data['business_category'] = $store->restaurantType->businessCategory->business_category_en;
+                }
+                
                 //for order in specific category
 
                 if($store->restaurantType->businessCategory)
