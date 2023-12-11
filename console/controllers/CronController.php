@@ -28,6 +28,8 @@ use yii\db\Expression;
 class CronController extends \yii\console\Controller
 {
     public function actionIndex() {
+
+
         /*Yii::$app->mailer->compose ([
             'text' => 'test',
             'message' => 'test',

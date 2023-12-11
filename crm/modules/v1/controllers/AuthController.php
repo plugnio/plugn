@@ -2,6 +2,7 @@
 
 namespace crm\modules\v1\controllers;
 
+use agent\models\Agent;
 use crm\models\Currency;
 use crm\models\Restaurant;
 use common\models\StaffAssignment;
@@ -89,6 +90,7 @@ class AuthController extends Controller {
             'resend-verification-email',
             'verify-email',
             'is-email-verified',
+            'login-auth0',
         ];
 
         return $behaviors;
@@ -110,6 +112,65 @@ class AuthController extends Controller {
         ];
 
         return $actions;
+    }
+
+    /**
+     * login with auth0 token
+     * @return array
+     */
+    public function actionLoginAuth0()
+    {
+        $accessToken = Yii::$app->request->getBodyParam('accessToken');
+
+        $response = Yii::$app->auth0->getUserInfo($accessToken);
+
+        if(!$response->isOk) {
+            return [
+                "operation" => "error",
+                "message" => "Invalid access token"
+            ];
+        }
+
+        $userInfo = $response->data;
+
+        if(!$userInfo || !$userInfo['email'])
+        {
+            return [
+                "operation" => "error",
+                "message" => "We've faced a problem creating your account, please contact us for assistance.",
+            ];
+        }
+
+        $staff = Staff::findByEmail($userInfo['email']);
+
+        /**
+         * redirect to signup page if no account
+         */
+        if(!$staff)
+        {
+            return [
+                "operation" => "error",
+                "code" => 1,
+                "message" => "Account not found"
+            ];
+        }
+
+        // Email and password are correct, check if his email has been verified
+        // If email has been verified, then allow him to log in
+        /*if ($agent->contact_email_verification != Candidate::EMAIL_VERIFIED) {
+
+            //$agent->generateOtp();
+            //$agent->save(false);
+
+            return [
+                "operation" => "error",
+                "errorType" => "email-not-verified",
+                "message" => Yii::t('candidate', "Please click the verification link sent to you by email to activate your account"),
+                "unVerifiedToken" => $this->_loginResponse($agent)
+            ];
+        }*/
+
+        return $this->_loginResponse($staff);
     }
 
     /**

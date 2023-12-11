@@ -489,7 +489,7 @@ class OrderController extends Controller
         $payment = new Payment;
         $payment->restaurant_uuid = $restaurant->restaurant_uuid;
 
-        $payment->customer_id = $order->customer->customer_id; //customer id
+        $payment->customer_id = $order->customer? $order->customer->customer_id: null; //customer id
         $payment->order_uuid = $order->order_uuid;
         $payment->payment_amount_charged = $order->total;
         $payment->payment_current_status = "Redirected to payment gateway";

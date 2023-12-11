@@ -3,6 +3,7 @@
 namespace api\modules\v1;
 
 use common\models\BlockedIp;
+use Yii;
 
 /**
  * v1 module definition class
