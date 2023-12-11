@@ -3,7 +3,7 @@
 namespace backend\controllers;
 
 use Yii;
-use common\models\BlockedIP;
+use common\models\BlockedIp;
 use common\models\BlockedIPSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -64,7 +64,7 @@ class BlockedIpController extends Controller
      */
     public function actionCreate()
     {
-        $model = new BlockedIP();
+        $model = new BlockedIp();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->ip_uuid]);
