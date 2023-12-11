@@ -1673,6 +1673,9 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
+        $this->redirect("https://dash.plugn.io", 302);
+        Yii::$app->end();
+
         $this->layout = 'login';
 
         $store = new Restaurant();

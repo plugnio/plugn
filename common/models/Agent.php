@@ -516,6 +516,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      * @inheritdoc
      */
     public static function findIdentityByUnVerifiedTokenToken($token, $modelClass = "\agent\models\AgentToken") {
+
         $token = $modelClass::find()
             ->andWhere(['token_value' => $token])
             ->with('agent')
@@ -556,7 +557,10 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
         //should not able to login, if email not verified but have valid token
 
-        if ($token->agent) {
+        //'agent_email_verification' => true,
+        //
+
+        if ($token->agent && $token->agent->agent_email_verification) {
             return $token->agent;
         }
 
