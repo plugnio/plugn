@@ -178,7 +178,7 @@ class StoreController extends BaseController
             return self::message("error", Yii::t('app', "We limiting no of store per user to 5 for now!"));
         }
 
-        if(YII_ENV != 'circle-ci') {
+        if(YII_ENV == 'prod') {
 
             $token = Yii::$app->request->getBodyParam('token');
 
