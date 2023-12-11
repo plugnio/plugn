@@ -2416,21 +2416,24 @@ class Restaurant extends ActiveRecord
      */
     public function beforeSave($insert)
     {
-        // Get initial IP address of requester
-        $ip = Yii::$app->request->getRemoteIP();
+        if(Yii::$app->request instanceof \yii\web\Request) {
 
-        // Check if request is forwarded via load balancer or cloudfront on behalf of user
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $forwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            // Get initial IP address of requester
+            $ip = Yii::$app->request->getRemoteIP();
 
-            // as "X-Forwarded-For" is usually a list of IP addresses that have routed
-            $IParray = array_values(array_filter(explode(',', $forwardedFor)));
+            // Check if request is forwarded via load balancer or cloudfront on behalf of user
+            if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $forwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'];
 
-            // Get the first ip from forwarded array to get original requester
-            $ip = $IParray[0];
+                // as "X-Forwarded-For" is usually a list of IP addresses that have routed
+                $IParray = array_values(array_filter(explode(',', $forwardedFor)));
+
+                // Get the first ip from forwarded array to get original requester
+                $ip = $IParray[0];
+            }
+
+            $this->ip_address = $ip;
         }
-
-        $this->ip_address = $ip;
 
         if ($insert && $this->referral_code != null) {
             if (!Partner::find()->where(['referral_code' => $this->referral_code])->exists())

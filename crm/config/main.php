@@ -80,11 +80,13 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'GET login' => 'login',
+                        'POST login-auth0' => 'login-auth0',
                         'PATCH update-password' => 'update-password',
                         'POST request-reset-password' => 'request-reset-password',
                         'POST update-email' => 'update-email',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
+                        'OPTIONS login-auth0' => 'options',
                         'OPTIONS update-password' => 'options',
                         'OPTIONS request-reset-password' => 'options',
                         'OPTIONS update-email' => 'options',

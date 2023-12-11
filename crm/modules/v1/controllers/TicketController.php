@@ -67,8 +67,26 @@ class TicketController extends Controller
      */
     public function actionList() {
 
+        $status = Yii::$app->request->get('status');
+        $squery = Yii::$app->request->get('query');
+
         $query = Ticket::find()
             ->orderBy('updated_at DESC');
+
+        if($status) {
+            $query->andWhere(['ticket_status' => $status]);
+        }
+
+        if($squery) {
+            $query->joinWith(['restaurant', 'staff', 'agent'])
+                ->andWhere([
+                    'OR',
+                    ['like', 'restaurant.name', $squery],
+                    ['like', 'restaurant.name_ar', $squery],
+                    ['like', 'staff.staff_name', $squery],
+                    ['like', 'agent.agent_name', $squery]
+                ]);
+        }
 
         return new ActiveDataProvider([
             'query' => $query
