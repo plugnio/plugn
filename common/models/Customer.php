@@ -209,6 +209,8 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
         }
 
         $this->ip_address = $ip;
+
+        return true;
     }
 
     public static function getTotalCustomersByWeek()
