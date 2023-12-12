@@ -575,7 +575,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function isOwner($storeUuid)
     {
-
         if ($this->isOwner == null) {
 
             $this->isOwner = AgentAssignment::find ()
@@ -586,6 +585,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                 ])
                 ->exists ();
         }
+
         return $this->isOwner;
     }
 
@@ -737,4 +737,13 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->hasOne ($modelClass::className (), ['utm_uuid' => 'utm_uuid']);
     }
+
+    /**
+     * @return query\RestaurantQuery
+     */
+    public static function find()
+    {
+        return new query\AgentQuery(get_called_class());
+    }
+
 }
