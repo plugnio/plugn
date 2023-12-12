@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\models\Agent;
 use Yii;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
@@ -49,8 +50,12 @@ class CronController extends \yii\console\Controller
 
         //adding date as older account not had email verification
 
-        $agents = Yii::$app->db->createCommand("SELECT * FROM agent where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20')")
-            ->queryAll();
+        $agents = Agent::find()
+            ->andWhere(new Expression("agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20')"))
+            ->all();
+
+            //Yii::$app->db->createCommand("SELECT * FROM agent where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20')")
+            //->queryAll();
 
         foreach ($agents as $agent) {
 
@@ -77,6 +82,8 @@ class CronController extends \yii\console\Controller
             $agent->deleted = 1;
             $agent->save(false);
         }
+
+        echo  sizeof($agents) . " agnets updated!";
     }
 
     /**
