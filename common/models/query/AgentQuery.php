@@ -20,7 +20,7 @@ class AgentQuery extends \yii\db\ActiveQuery
      */
     public function one($db = null)
     {
-        this->andWhere(['agent.deleted' => 0]);
+        $this->andWhere(['agent.deleted' => 0]);
         return parent::one ($db);
     }
 }
