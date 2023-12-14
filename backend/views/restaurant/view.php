@@ -479,7 +479,7 @@ $this->registerJs($js);
 
         if (!$model->merchant_id) {
 
-            echo Html::a('Create Merchant', ['create-an-merchant', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Create Merchant', ['create-merchant', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
