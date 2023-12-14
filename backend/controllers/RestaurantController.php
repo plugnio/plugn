@@ -358,7 +358,7 @@ class RestaurantController extends Controller {
 
         $response = $model->pollTapBusinessStatus();
 
-        Yii::$app->session->setFlash('successResponse', $response);
+        Yii::$app->session->setFlash('successResponse', json_encode($response));
 
         /*if($response["operation"] == 'error') {
             Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
