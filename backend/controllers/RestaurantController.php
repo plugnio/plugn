@@ -366,6 +366,13 @@ class RestaurantController extends Controller {
             Yii::$app->session->setFlash('successResponse', $response['message']);
         }*/
 
+        if($model->tap_merchant_status == "Active" && $model->is_tap_business_active) {
+            $model->is_tap_enable = 1;
+            $model->save(true);
+
+            $model->onTapApproved();
+        }
+
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
