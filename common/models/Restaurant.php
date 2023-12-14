@@ -2218,8 +2218,15 @@ class Restaurant extends ActiveRecord
         $businessApiResponse = Yii::$app->tapPayments->getBussiness($this);
 
         if ($businessApiResponse->isOk && $businessApiResponse->data['status'] === 'Active') {
+
            $this->is_tap_business_active = true;
+
+            self::updateAll(['is_tap_business_active' => $this->is_tap_business_active], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
         }
+
+        return $businessApiResponse->data;
     }
 
     /**

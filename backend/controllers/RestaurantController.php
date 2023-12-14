@@ -352,6 +352,38 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
+    public function actionPollTapBusinessStatus($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->pollTapBusinessStatus();
+
+        Yii::$app->session->setFlash('successResponse', $response);
+
+        /*if($response["operation"] == 'error') {
+            Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
+        } else {
+            Yii::$app->session->setFlash('successResponse', $response['message']);
+        }*/
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
+    public function actionPollTapMerchantStatus($id)
+    {
+        $model = $this->findModel($id);
+
+        $response = $model->fetchMerchant();
+
+        if($response["operation"] == 'error') {
+            Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
+        } else {
+            Yii::$app->session->setFlash('successResponse', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
+    }
+
     /**
      * remove payment gateway queue
      * @return void

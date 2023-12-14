@@ -510,6 +510,25 @@ $this->registerJs($js);
             ]). '&nbsp;&nbsp;';
         }
 
+        if($model->business_id && $model->is_tap_business_active) {
+            echo Html::a('Check Tap Business Status', ['poll-tap-business-status', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-primary btn-process-queue',
+                    'data' => [
+                        'confirm' => 'Are you sure?',
+                        'method' => 'post',
+                    ],
+                ]). '&nbsp;&nbsp;';
+        }
+
+        if($model->merchant_id && $model->tap_merchant_status != "Active") {
+            echo Html::a('Check Tap Merchant Status', ['poll-tap-merchant-status', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-primary btn-process-queue',
+                    'data' => [
+                        'confirm' => 'Are you sure?',
+                        'method' => 'post',
+                    ],
+                ]). '&nbsp;&nbsp;';
+        }
 
         ?>
 
@@ -568,6 +587,8 @@ $this->registerJs($js);
                     },
                     'format' => 'raw'
                 ],
+                'tap_merchant_status',
+                'is_tap_business_active',
                 [
                     'label' => 'is_myfatoorah_enable',
                     'value' => function ($data) {
@@ -584,6 +605,7 @@ $this->registerJs($js);
                 'developer_id',
                 'business_entity_id',
                 'merchant_id',
+
                 'authorized_signature_file_id',
                 'commercial_license_file_id',
                 'identification_file_id_front_side',
