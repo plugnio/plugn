@@ -1459,7 +1459,11 @@ class Restaurant extends ActiveRecord
             if (isset($businessApiResponse->data['entity']['operator']))
                 $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
 
-            $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
+            if($businessApiResponse->data['status'] === 'Active') {
+                $this->is_tap_business_active = 1;
+            } else {
+                $this->is_tap_business_active = 0;
+            }
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -2219,7 +2223,7 @@ class Restaurant extends ActiveRecord
 
         if ($businessApiResponse->isOk && $businessApiResponse->data['status'] === 'Active') {
 
-           $this->is_tap_business_active = true;
+           $this->is_tap_business_active = 1;
 
             self::updateAll(['is_tap_business_active' => $this->is_tap_business_active], [
                 'restaurant_uuid' => $this->restaurant_uuid
