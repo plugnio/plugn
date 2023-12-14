@@ -1448,7 +1448,8 @@ class Restaurant extends ActiveRecord
     {
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
-        if ($businessApiResponse->isOk && isset($businessApiResponse->data['entity']['operator'])) {
+        //&& isset($businessApiResponse->data['entity']['operator'])
+        if ($businessApiResponse->isOk) {
 
             //Yii::info('Create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
 
@@ -1475,6 +1476,7 @@ class Restaurant extends ActiveRecord
             ];
 
         } else {
+
             Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
 
             if (isset(Yii::$app->session->id)) {
