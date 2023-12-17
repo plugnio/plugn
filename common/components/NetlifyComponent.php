@@ -238,4 +238,35 @@ class NetlifyComponent extends Component {
 
         return $this->updateSite($store->site_id, $params);
     }
+
+    /**
+     * downgrade site to older version
+     * @param $store
+     * @return \yii\httpclient\Response
+     * @throws InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function downgradeSite($store) {
+
+        if(!$store) {
+            return false;
+        }
+
+        $params = [
+            "build_image" => "focal",
+            "repo" => [
+                "provider" => "github",
+                "id" => 70150125,
+                "force_ssl" => true,
+                "installation_id" => "11420049",
+                "repo" => "plugnio/plugn-ionic",
+                "private" => true,
+                "branch" => "master",
+                "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
+                "dir" => "www"
+            ],
+        ];
+
+        return $this->updateSite($store->site_id, $params);
+    }
 }

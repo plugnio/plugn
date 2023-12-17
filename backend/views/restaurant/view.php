@@ -279,15 +279,30 @@ $this->registerJs($js);
 
     <div id="tab-netlify" class="tab-content hidden">
 
-        <?php if ($model->site_id && $model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
-            <?=
-            Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Are you sure you want to upgrade store to latest codebase?',
-                    'method' => 'post',
-                ],
-            ])
+        <?php if ($model->site_id && $model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
+
+            //if(str_contains($model->restaurant_domain, ".plugn.store")) {
+
+            if(str_contains($model->restaurant_domain, ".plugn.site")) {
+
+                echo Html::a('Downgrade', ['downgrade', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                        'confirm' => 'Are you sure you want to downgrade store to older codebase?',
+                        'method' => 'post',
+                    ],
+                ]);
+
+            } else {
+
+                echo Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                        'confirm' => 'Are you sure you want to upgrade store to latest codebase?',
+                        'method' => 'post',
+                    ],
+                ]);
+            }
             ?>
         <?php } ?>
 

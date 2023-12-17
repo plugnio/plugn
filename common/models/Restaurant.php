@@ -2155,7 +2155,6 @@ class Restaurant extends ActiveRecord
      */
     public function enableTapGateways()
     {
-
         $subQuery = $this->getRestaurantPaymentMethods()
             ->select('payment_method_id');
 

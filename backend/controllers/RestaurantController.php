@@ -643,6 +643,63 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * downgrade store
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionDowngrade($id)
+    {
+        $store = $this->findModel($id);
+
+        if(str_contains($store->restaurant_domain, ".plugn.store"))
+        {
+            Yii::$app->session->setFlash('errorResponse', "Already using older design!");
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+        else if(str_contains($store->restaurant_domain, ".plugn.site"))
+        {
+            $store->restaurant_domain = str_replace(".plugn.site", ".plugn.store", $store->restaurant_domain);
+
+            if(!$store->save()) {
+                Yii::$app->session->setFlash('errorResponse', json_encode($store->errors));
+            }
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+        //todo: if custom domain
+
+        //$response = Yii::$app->githubComponent->mergeABranch('Merge branch master into ' . $store->store_branch_name, $store->store_branch_name,  'master');
+
+        /*$response = Yii::$app->netlifyComponent->downgradeSite($store);
+
+        if ($response->isOk)
+        {
+            $store->version = Yii::$app->params['storeVersion'];
+
+            if(!$store->site_id && isset($response->data['site_id']))
+            {
+                $store->site_id = $response->data['site_id'];
+            }
+
+            //$store->sitemap_require_update = 1;
+            $store->save(false);
+
+            Yii::$app->session->setFlash('successResponse', "Success: Store will be updated in 2-5 min!");
+        }
+        else
+        {
+            Yii::error('[Error while downgrading site]' . json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            Yii::$app->session->setFlash('errorResponse', json_encode($response->data));
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);*/
+    }
+
+    /**
      * upgrade store
      * @param $id
      * @return \yii\web\Response
