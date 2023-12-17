@@ -279,7 +279,7 @@ $this->registerJs($js);
 
     <div id="tab-netlify" class="tab-content hidden">
 
-        <?php if ($model->site_id && $model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
 
             //if(str_contains($model->restaurant_domain, ".plugn.store")) {
 
@@ -293,7 +293,7 @@ $this->registerJs($js);
                     ],
                 ]);
 
-            } else {
+            } else if($model->site_id) {
 
                 echo Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-danger',
@@ -302,8 +302,7 @@ $this->registerJs($js);
                         'method' => 'post',
                     ],
                 ]);
-            }
-            ?>
+            } ?>
         <?php } ?>
 
         <br/>

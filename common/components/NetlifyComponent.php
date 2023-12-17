@@ -2,6 +2,7 @@
 
 namespace common\components;
 
+use common\models\Restaurant;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -44,10 +45,8 @@ class NetlifyComponent extends Component {
 
     /**
      * creates a new site.
-     * @param type $name the name of the site (mysite.netlify.app)
-     * @param type $store
-     * @param type $subdomain
-     * @return type
+     * @param Restaurant $store
+     * @param string $store_branch
      */
     public function createSite($store, $store_branch = "main") {
 
@@ -56,6 +55,14 @@ class NetlifyComponent extends Component {
        // $domain = str_replace("https://", "", $store->restaurant_domain);
 
         $url = parse_url($store->restaurant_domain);
+
+        if($store_branch == "main") {
+            $repo = "plugnio/plugn-store";
+            $dir = "dist";
+        } else {
+            $repo = "plugnio/plugn-ionic";
+            $dir = "www";
+        }
 
         $siteParams = [
             "name" => $store->restaurant_uuid,
@@ -66,16 +73,17 @@ class NetlifyComponent extends Component {
                 "id" => 70150125,
                 "force_ssl" => true,
                 "installation_id" => "11420049",
-                "repo" => "plugnio/plugn-store",
+                "repo" => $repo,
                 "private" => true,
                 "branch" => $store_branch,
                 "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
-                "dir" => "dist"
+                "dir" => $dir
             ],
         ];
 
         $client = new Client();
-        $response = $client->createRequest()
+
+        return $client->createRequest()
                 ->setMethod('POST')
                 ->setUrl($createSiteEndpoint)
                 ->setFormat(Client::FORMAT_JSON)
@@ -85,8 +93,6 @@ class NetlifyComponent extends Component {
                     'User-Agent' => 'request',
                 ])
                 ->send();
-
-        return $response;
     }
 
     /**
