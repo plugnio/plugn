@@ -4,6 +4,7 @@ namespace api\modules\v2\controllers;
 
 use agent\models\Country;
 use api\models\State;
+use common\models\Area;
 use common\models\OpeningHour;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
@@ -224,9 +225,38 @@ class DeliveryZoneController extends Controller
 
         if ($area_id) //for kuwait
         {
-            $query->andWhere(['area_delivery_zone.area_id' => $area_id]);
-        } else if ($city_id) {
-            $query->andWhere(['area_delivery_zone.city_id' => $city_id]);
+            $area = Area::find()
+                ->with(['city'])
+                ->andWhere(['area_id' => $area_id])
+                ->one();
+
+            if(!$area || !$area->city) {
+                return null;
+            }
+
+            $query->andWhere([
+                'OR',
+                new Expression('area_delivery_zone.country_id="'.$area->city->country_id.'" AND area_delivery_zone.state_id IS NULL 
+                    AND area_delivery_zone.city_id IS NULL AND area_delivery_zone.area_id IS NULL'),
+                ['area_delivery_zone.area_id' => $area_id]
+            ]);
+        }
+        else if ($city_id)
+        {
+            $city = \common\models\City::find()
+                ->andWhere(['city_id' => $city_id])
+                ->one();
+
+            if(!$city) {
+                return null;
+            }
+
+            $query->andWhere([
+                'OR',
+                new Expression('area_delivery_zone.country_id="'.$city->country_id.'" AND area_delivery_zone.state_id IS NULL 
+                    AND area_delivery_zone.city_id IS NULL AND area_delivery_zone.area_id IS NULL'),
+                ['area_delivery_zone.city_id' => $city_id]
+            ]);
         }
 
         return $query->one();

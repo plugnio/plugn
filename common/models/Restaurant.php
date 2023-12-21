@@ -44,6 +44,7 @@ use yii\helpers\ArrayHelper;
  * @property string $restaurant_email
  * @property string|null $restaurant_created_at
  * @property string|null $restaurant_updated_at
+ * @property string|null $restaurant_deleted_at
  * @property string|null $business_id
  * @property string|null $business_entity_id
  * @property string|null $wallet_id
@@ -498,7 +499,7 @@ class Restaurant extends ActiveRecord
             ['restaurant_status', 'in', 'range' => [self::RESTAURANT_STATUS_OPEN, self::RESTAURANT_STATUS_BUSY, self::RESTAURANT_STATUS_CLOSED]],
             ['store_layout', 'in', 'range' => [self::STORE_LAYOUT_LIST_FULLWIDTH, self::STORE_LAYOUT_GRID_FULLWIDTH, self::STORE_LAYOUT_CATEGORY_FULLWIDTH, self::STORE_LAYOUT_LIST_HALFWIDTH, self::STORE_LAYOUT_GRID_HALFWIDTH, self::STORE_LAYOUT_CATEGORY_HALFWIDTH]],
             ['phone_number_display', 'in', 'range' => [self::PHONE_NUMBER_DISPLAY_ICON, self::PHONE_NUMBER_DISPLAY_SHOW_PHONE_NUMBER, self::PHONE_NUMBER_DISPLAY_DONT_SHOW_PHONE_NUMBER]],
-            [['restaurant_created_at', 'restaurant_updated_at', 'has_deployed', 'tap_queue_id', 'payment_gateway_queue_id'], 'safe'],
+            [['restaurant_created_at', 'restaurant_updated_at', 'restaurant_deleted_at', 'has_deployed', 'tap_queue_id', 'payment_gateway_queue_id'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
@@ -611,7 +612,7 @@ class Restaurant extends ActiveRecord
         $scenarios = parent::scenarios();
 
         return array_merge($scenarios, [
-            self::SCENARIO_DELETE => ['is_deleted', 'site_id', 'ip_address'],
+            self::SCENARIO_DELETE => ['is_deleted', 'site_id', 'ip_address', 'restaurant_deleted_at'],
             self::SCENARIO_UPDATE_BANK => ['iban', 'ip_address'],
             self::SCENARIO_TOGGLE_DEBUGGER => ['enable_debugger', 'ip_address'],
             self::SCENARIO_CONNECT_DOMAIN => ['restaurant_domain', 'ip_address'],
@@ -770,6 +771,7 @@ class Restaurant extends ActiveRecord
             'restaurant_email' => Yii::t('app', "Store's Email"),
             'restaurant_created_at' => Yii::t('app', 'Store Created At'),
             'restaurant_updated_at' => Yii::t('app', 'Store Updated At'),
+            'restaurant_deleted_at' => Yii::t('app', 'Store Deleted At'),
             'armada_api_key' => Yii::t('app', 'Armada Api Key'),
             'armada_branch_id' => Yii::t('app', 'Mashkor Branch ID'),
             'restaurant_email_notification' => Yii::t('app', 'Email notification'),
@@ -1448,7 +1450,8 @@ class Restaurant extends ActiveRecord
     {
         $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
 
-        if ($businessApiResponse->isOk && isset($businessApiResponse->data['entity']['operator'])) {
+        //&& isset($businessApiResponse->data['entity']['operator'])
+        if ($businessApiResponse->isOk) {
 
             //Yii::info('Create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
 
@@ -1458,7 +1461,11 @@ class Restaurant extends ActiveRecord
             if (isset($businessApiResponse->data['entity']['operator']))
                 $this->developer_id = $businessApiResponse->data['entity']['operator']['developer_id'];
 
-            $this->is_tap_business_active = ($businessApiResponse->data['status'] === 'Active');
+            if($businessApiResponse->data['status'] === 'Active') {
+                $this->is_tap_business_active = 1;
+            } else {
+                $this->is_tap_business_active = 0;
+            }
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -1475,6 +1482,7 @@ class Restaurant extends ActiveRecord
             ];
 
         } else {
+
             Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
 
             if (isset(Yii::$app->session->id)) {
@@ -2149,7 +2157,6 @@ class Restaurant extends ActiveRecord
      */
     public function enableTapGateways()
     {
-
         $subQuery = $this->getRestaurantPaymentMethods()
             ->select('payment_method_id');
 
@@ -2216,8 +2223,15 @@ class Restaurant extends ActiveRecord
         $businessApiResponse = Yii::$app->tapPayments->getBussiness($this);
 
         if ($businessApiResponse->isOk && $businessApiResponse->data['status'] === 'Active') {
-           $this->is_tap_business_active = true;
+
+           $this->is_tap_business_active = 1;
+
+            self::updateAll(['is_tap_business_active' => $this->is_tap_business_active], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
         }
+
+        return $businessApiResponse->data;
     }
 
     /**
@@ -2799,6 +2813,7 @@ class Restaurant extends ActiveRecord
         $this->setScenario(self::SCENARIO_DELETE);
         $this->site_id = null;
         $this->is_deleted = true;
+        $this->restaurant_deleted_at = new Expression("NOW()");
 
         if (!$this->save()) {
             return [

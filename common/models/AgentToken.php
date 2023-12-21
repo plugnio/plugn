@@ -120,6 +120,7 @@ class AgentToken extends \yii\db\ActiveRecord
      */
     public function getAgent($modelClass = "\common\models\Agent")
     {
-        return $this->hasOne($modelClass::className(), ['agent_id' => 'agent_id']);
+        return $this->hasOne($modelClass::className(), ['agent_id' => 'agent_id'])
+            ->andWhere(['deleted' => 0]);
     }
 }

@@ -73,7 +73,7 @@ class TicketController extends Controller
         $query = Ticket::find()
             ->orderBy('updated_at DESC');
 
-        if($status) {
+        if(!is_null($status)) {
             $query->andWhere(['ticket_status' => $status]);
         }
 

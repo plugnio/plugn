@@ -226,8 +226,15 @@ $this->registerJs($js);
             'restaurant_email_notification',
             'instagram_url:url',
             'iban',
-            'restaurant_created_at',
-            'restaurant_updated_at',
+            'restaurant_created_at:datetime',
+            'restaurant_updated_at:datetime',
+            [
+                'attribute' => 'restaurant_deleted_at',
+                'format' => 'datetime',
+                //'visible' => function ($data) {
+                 //   return false;//!empty($data->restaurant_deleted_at)? false: true;
+               // }
+            ],
             'platform_fee:percent',
             'warehouse_fee',
             'warehouse_delivery_charges',
@@ -279,16 +286,30 @@ $this->registerJs($js);
 
     <div id="tab-netlify" class="tab-content hidden">
 
-        <?php if ($model->site_id && $model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) { ?>
-            <?=
-            Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                    'confirm' => 'Are you sure you want to upgrade store to latest codebase?',
-                    'method' => 'post',
-                ],
-            ])
-            ?>
+        <?php if ($model->restaurant_status == Restaurant::RESTAURANT_STATUS_OPEN) {
+
+            //if(str_contains($model->restaurant_domain, ".plugn.store")) {
+
+            if(str_contains($model->restaurant_domain, ".plugn.site")) {
+
+                echo Html::a('Downgrade', ['downgrade', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                        'confirm' => 'Are you sure you want to downgrade store to older codebase?',
+                        'method' => 'post',
+                    ],
+                ]);
+
+            } else if($model->site_id) {
+
+                echo Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-danger',
+                    'data' => [
+                        'confirm' => 'Are you sure you want to upgrade store to latest codebase?',
+                        'method' => 'post',
+                    ],
+                ]);
+            } ?>
         <?php } ?>
 
         <br/>
@@ -479,7 +500,7 @@ $this->registerJs($js);
 
         if (!$model->merchant_id) {
 
-            echo Html::a('Create Merchant', ['create-an-merchant', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Create Merchant', ['create-merchant', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -510,6 +531,25 @@ $this->registerJs($js);
             ]). '&nbsp;&nbsp;';
         }
 
+        if($model->business_id && !$model->is_tap_business_active) {
+            echo Html::a('Check Tap Business Status', ['poll-tap-business-status', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-primary btn-process-queue',
+                    'data' => [
+                        'confirm' => 'Are you sure?',
+                        'method' => 'post',
+                    ],
+                ]). '&nbsp;&nbsp;';
+        }
+
+        if($model->merchant_id && $model->tap_merchant_status != "Active") {
+            echo Html::a('Check Tap Merchant Status', ['poll-tap-merchant-status', 'id' => $model->restaurant_uuid], [
+                    'class' => 'btn btn-primary btn-process-queue',
+                    'data' => [
+                        'confirm' => 'Are you sure?',
+                        'method' => 'post',
+                    ],
+                ]). '&nbsp;&nbsp;';
+        }
 
         ?>
 
@@ -568,6 +608,8 @@ $this->registerJs($js);
                     },
                     'format' => 'raw'
                 ],
+                'tap_merchant_status',
+                'is_tap_business_active',
                 [
                     'label' => 'is_myfatoorah_enable',
                     'value' => function ($data) {
@@ -584,6 +626,7 @@ $this->registerJs($js);
                 'developer_id',
                 'business_entity_id',
                 'merchant_id',
+
                 'authorized_signature_file_id',
                 'commercial_license_file_id',
                 'identification_file_id_front_side',

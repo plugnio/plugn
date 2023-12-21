@@ -53,12 +53,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $model->status,
             ],
             'agent_email_verification',
-            'email_notification',
+            'agent_number',
+            'agent_phone_country_code',
+            //'email_notification',
+            //'reminder_email',
             'agent_language_pref',
-            'receive_weekly_stats',
+            //'receive_weekly_stats',
             'ip_address',
+            'last_active_at:datetime',
+            'deleted',
             'agent_created_at:datetime',
             'agent_updated_at:datetime',
+            'agent_deleted_at:datetime'
         ],
     ]) ?>
 
