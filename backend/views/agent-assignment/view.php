@@ -73,8 +73,43 @@ $this->params['breadcrumbs'][] = $this->title;
             'assignment_agent_email:email',
             'assignment_created_at',
             'assignment_updated_at',
+
+
         ],
     ])
     ?>
+
+    <h3>Agent</h3>
+
+
+    <?= DetailView::widget([
+        'model' => $model->agent,
+        'attributes' => [
+             'agent_id',
+            'agent_name',
+            'agent_email:email',
+            [
+                'label' => 'Password',
+                'value' => '***',
+            ],
+            [
+                'label' => 'Status',
+                'value' => $model->agent->status,
+            ],
+            'agent_email_verification',
+            'agent_number',
+            'agent_phone_country_code',
+            //'email_notification',
+            //'reminder_email',
+            'agent_language_pref',
+            //'receive_weekly_stats',
+            'ip_address',
+            'last_active_at:datetime',
+            'deleted',
+            'agent_created_at:datetime',
+            'agent_updated_at:datetime',
+
+        ],
+    ]) ?>
 
 </div>
