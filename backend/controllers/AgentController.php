@@ -6,9 +6,8 @@ use agent\models\AgentAssignment;
 use backend\models\Admin;
 use backend\models\AgentAssignmentSearch;
 use Yii;
-use yii\filters\AccessControl;
+use yii\db\Expression;
 use backend\models\Agent;
-use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -175,6 +174,7 @@ class AgentController extends Controller
         $model = $this->findModel($id);
 
         $model->deleted = 1;
+        $model->agent_deleted_at = new Expression("NOW()");
 
         $model->save(false);
             //->delete();
