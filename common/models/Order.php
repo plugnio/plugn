@@ -447,6 +447,8 @@ class Order extends \yii\db\ActiveRecord
             'orderStatusInArabic',
             'restaurant',
             'orderItems',
+            'area',
+            'country',
             /*'orderItems' => function ($order) {
                 return $order->getOrderItems()
                     ->with('orderItemExtraOptions')
@@ -582,13 +584,24 @@ class Order extends \yii\db\ActiveRecord
      */
     public function validateArea($attribute)
     {
-        $model = AreaDeliveryZone::find()->where([
-            'restaurant_uuid' => $this->restaurant_uuid,
-            'area_id' => $this->area_id,
-            'delivery_zone_id' => $this->delivery_zone_id
-        ])->one();
+        $query = AreaDeliveryZone::find()
+            ->where([
+                'restaurant_uuid' => $this->restaurant_uuid,
+                'delivery_zone_id' => $this->delivery_zone_id
+            ]);
 
-        if (!$model)
+        if($this->area_id) {
+            //if delivery to whole country or delivering to selected area
+            $query->andWhere(new Expression('area_id IS NULL OR area_id="' . $this->area_id . '"'));
+        }
+
+        /*
+        TODO: validate city for outside of Kuwait order
+        if($this->city_id) {
+            $query->andWhere(['city_id' => $this->city_id]);
+        }*/
+
+        if (!$query->exists())
             $this->addError($attribute, Yii::t('app',"Store does not deliver to this delivery zone."));
     }
 

@@ -3,6 +3,7 @@
 namespace api\modules\v2\controllers;
 
 use agent\models\PaymentMethod;
+use common\models\Area;
 use common\models\PaymentFailed;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -157,13 +158,24 @@ class OrderController extends Controller
                     $order->city = $city;
                 }
 
+                $order->area_id = Yii::$app->request->getBodyParam("area_id");
+
+                if($order->area_id && !$order->city) {
+
+                    $area = Area::find()
+                        ->andWhere(['area_id' => $order->area_id])
+                        ->one();
+
+                    if($area && $area->city)
+                        $order->city = Yii::$app->language == "ar" ? $area->city['city_name_ar']: $area->city['city_name'];
+                }
+
                 $order->address_1 = Yii::$app->request->getBodyParam('address_1');
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
                 $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
 
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
                 $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
-                $order->area_id = Yii::$app->request->getBodyParam("area_id");
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
                 $order->block = Yii::$app->request->getBodyParam("block");
                 $order->street = Yii::$app->request->getBodyParam("street");
