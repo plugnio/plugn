@@ -208,6 +208,15 @@ use borales\extensions\phoneInput\PhoneInput;
     ]);
     ?>
 
+    <?=
+    $form->field($model, 'store_layout')->dropDownList(
+        [
+            1 => 'List',
+            2 => 'Grid',
+            3 => 'Category',
+        ]
+    );
+    ?>
 
     <?=
     $form->field($model, 'support_delivery')->dropDownList(
