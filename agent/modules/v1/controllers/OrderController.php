@@ -159,6 +159,7 @@ class OrderController extends BaseController
             $query->andWhere(['order_status' => Order::STATUS_DRAFT]);
         }
         $query->andWhere(['order.is_deleted' => 0]);
+
         return new ActiveDataProvider([
             'query' => $query
         ]);
@@ -451,10 +452,17 @@ class OrderController extends BaseController
             ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->count();
 
-        $latestOrder = Order::find()
+        $latestPendingOrder = Order::find()
             ->notDeleted()
             ->filterBusinessLocationIfManager($store->restaurant_uuid)
             ->andWhere(['order_status' => Order::STATUS_PENDING])
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
+            ->orderBy(['order_created_at' => SORT_DESC])
+            ->one();
+
+        $latestOrder = Order::find()
+            ->notDeleted()
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
             ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->orderBy(['order_created_at' => SORT_DESC])
             ->one();
@@ -464,6 +472,7 @@ class OrderController extends BaseController
         return [
             'totalPendingOrders' => (int)$totalPendingOrders,
             'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null,
+            'latestPendingOrderId' => $latestPendingOrder ? $latestPendingOrder->order_uuid : null,
             'totalPendingInvoices' => (int)$totalPendingInvoices
         ];
     }
