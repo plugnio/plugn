@@ -538,7 +538,7 @@ class OrderController extends BaseController
             //Deliver to Kuwait - GCC
 
             $area_delivery_zone = $store->getAreaDeliveryZones()
-                ->andWhere(['area_id' => $area_id])
+                ->andWhere(new Expression('area_id IS NULL OR area_id="' . $area_id . '"'))
                 ->one();
 
             if (!$area_delivery_zone) {
@@ -810,7 +810,7 @@ class OrderController extends BaseController
             //Deliver to Kuwait - GCC
 
             $area_delivery_zone = $order->restaurant->getAreaDeliveryZones()
-                ->andWhere(['area_id' => $area_id])
+                ->andWhere(new Expression('area_id IS NULL OR area_id="' . $area_id . '"'))
                 ->one();
 
             if (!$area_delivery_zone) {
@@ -1811,8 +1811,11 @@ class OrderController extends BaseController
             $query = AreaDeliveryZone::find()
                 ->andWhere([
                     'restaurant_uuid' => $restaurant->restaurant_uuid,
-                    'area_id' => $model->area_id
                 ]);
+
+            if($model->area_id) {
+                $query->andWhere(new Expression('area_id IS NULL OR area_id="' . $model->area_id . '"'));
+            }
 
             if($model->delivery_zone_id) {
                 $query->andWhere(['delivery_zone_id' => $model->delivery_zone_id]);
