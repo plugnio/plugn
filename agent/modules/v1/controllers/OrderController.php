@@ -1635,7 +1635,7 @@ class OrderController extends BaseController
                     "value" => function ($data) {
                         if ($data->payment_uuid)
                             return $data->payment->payment_current_status;
-                        else
+                        else if($data->paymentMethod)
                             return $data->paymentMethod->payment_method_name;
                     },
                 ],

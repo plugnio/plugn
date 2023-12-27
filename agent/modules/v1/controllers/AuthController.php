@@ -64,6 +64,15 @@ class AuthController extends Controller {
                     return null;
                 }
 
+                if(empty($password)) {
+                    Yii::$app->response->headers->set (
+                        'X-Error-Password',
+                        Yii::t('agent', 'Password not provided')
+                    );
+
+                    return null;
+                }
+
                 if ($agent->validatePassword($password)) {
                     return $agent;
                 }
