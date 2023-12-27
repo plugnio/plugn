@@ -32,14 +32,17 @@ class Module extends \yii\base\Module
             \Yii::$app->language = $lang;
         }
 
-        $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+        /*
+         * https://pogi.sentry.io/issues/4450742876/?environment=production&project=5220572&query=is%3Aunresolved&referrer=issue-stream&statsPeriod=14d&stream_index=2
+         *
+         * $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
 
         if($restaurantUuid)
         {
             Restaurant::updateAll(['last_active_at' => new Expression('NOW()')], [
                 'restaurant_uuid' => $restaurantUuid
             ]);
-        }
+        }*/
         
         if(Yii::$app->user->identity) {
             Yii::$app->eventManager->setUser(Yii::$app->user->getId(), [

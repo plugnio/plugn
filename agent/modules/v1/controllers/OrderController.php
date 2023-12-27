@@ -1232,7 +1232,7 @@ class OrderController extends BaseController
             foreach ($model->orderItems as $orderedItem) {
                 $productsList[] = [
                     'product_id' => $orderedItem->item_uuid,
-                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null,
+                    'sku' => $orderedItem->item && $orderedItem->item->sku ? $orderedItem->item->sku : null,
                     'name' => $orderedItem->item_name,
                     'price' => $orderedItem->item_price,
                     'quantity' => $orderedItem->qty,

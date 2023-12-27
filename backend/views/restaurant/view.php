@@ -49,7 +49,11 @@ $this->registerJs($js);
     <div class="alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
         <h5><i class="icon fa fa-check"></i> Success!</h5>
-        <?= (Yii::$app->session->getFlash('successResponse')) ?>
+        <?php if(is_array(Yii::$app->session->getFlash('successResponse'))) {
+            echo print_r(Yii::$app->session->getFlash('successResponse'));
+        } else {
+            echo Yii::$app->session->getFlash('successResponse');
+        } ?>
     </div>
     <?php } ?>
 
