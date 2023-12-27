@@ -756,8 +756,9 @@ DetailView::widget([
                 <?php
                 if ($model->payment) {
                     foreach($model->payment->paymentFails as $paymentFail) { ?>
-                       <pre> <?php print_r(unserialize($paymentFail->response . '')) ?></pre>
+                       <pre> <?php print_r($paymentFail->response) ?></pre>
                     <?php }
+                      // unserialize(  . '')
                 }
                 ?>
             </div>

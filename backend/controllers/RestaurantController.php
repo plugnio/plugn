@@ -590,6 +590,12 @@ class RestaurantController extends Controller {
     {
         $store = $this->findModel($id);
 
+        if(empty($store->restaurant_domain)) {
+            Yii::$app->session->setFlash('errorResponse', "Please set website domain!");
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
         if($store->site_id) {
             Yii::$app->session->setFlash('errorResponse', "Site already published!");
 

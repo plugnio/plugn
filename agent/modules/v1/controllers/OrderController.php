@@ -159,6 +159,7 @@ class OrderController extends BaseController
             $query->andWhere(['order_status' => Order::STATUS_DRAFT]);
         }
         $query->andWhere(['order.is_deleted' => 0]);
+
         return new ActiveDataProvider([
             'query' => $query
         ]);
@@ -451,10 +452,17 @@ class OrderController extends BaseController
             ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->count();
 
-        $latestOrder = Order::find()
+        $latestPendingOrder = Order::find()
             ->notDeleted()
             ->filterBusinessLocationIfManager($store->restaurant_uuid)
             ->andWhere(['order_status' => Order::STATUS_PENDING])
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
+            ->orderBy(['order_created_at' => SORT_DESC])
+            ->one();
+
+        $latestOrder = Order::find()
+            ->notDeleted()
+            ->filterBusinessLocationIfManager($store->restaurant_uuid)
             ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
             ->orderBy(['order_created_at' => SORT_DESC])
             ->one();
@@ -464,6 +472,7 @@ class OrderController extends BaseController
         return [
             'totalPendingOrders' => (int)$totalPendingOrders,
             'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null,
+            'latestPendingOrderId' => $latestPendingOrder ? $latestPendingOrder->order_uuid : null,
             'totalPendingInvoices' => (int)$totalPendingInvoices
         ];
     }
@@ -529,7 +538,7 @@ class OrderController extends BaseController
             //Deliver to Kuwait - GCC
 
             $area_delivery_zone = $store->getAreaDeliveryZones()
-                ->andWhere(['area_id' => $area_id])
+                ->andWhere(new Expression('area_id IS NULL OR area_id="' . $area_id . '"'))
                 ->one();
 
             if (!$area_delivery_zone) {
@@ -801,7 +810,7 @@ class OrderController extends BaseController
             //Deliver to Kuwait - GCC
 
             $area_delivery_zone = $order->restaurant->getAreaDeliveryZones()
-                ->andWhere(['area_id' => $area_id])
+                ->andWhere(new Expression('area_id IS NULL OR area_id="' . $area_id . '"'))
                 ->one();
 
             if (!$area_delivery_zone) {
@@ -1223,7 +1232,7 @@ class OrderController extends BaseController
             foreach ($model->orderItems as $orderedItem) {
                 $productsList[] = [
                     'product_id' => $orderedItem->item_uuid,
-                    'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null,
+                    'sku' => $orderedItem->item && $orderedItem->item->sku ? $orderedItem->item->sku : null,
                     'name' => $orderedItem->item_name,
                     'price' => $orderedItem->item_price,
                     'quantity' => $orderedItem->qty,
@@ -1626,7 +1635,7 @@ class OrderController extends BaseController
                     "value" => function ($data) {
                         if ($data->payment_uuid)
                             return $data->payment->payment_current_status;
-                        else
+                        else if($data->paymentMethod)
                             return $data->paymentMethod->payment_method_name;
                     },
                 ],
@@ -1802,8 +1811,11 @@ class OrderController extends BaseController
             $query = AreaDeliveryZone::find()
                 ->andWhere([
                     'restaurant_uuid' => $restaurant->restaurant_uuid,
-                    'area_id' => $model->area_id
                 ]);
+
+            if($model->area_id) {
+                $query->andWhere(new Expression('area_id IS NULL OR area_id="' . $model->area_id . '"'));
+            }
 
             if($model->delivery_zone_id) {
                 $query->andWhere(['delivery_zone_id' => $model->delivery_zone_id]);

@@ -841,11 +841,11 @@ class CronController extends \yii\console\Controller
 
         //remind failed build
 
-        $failed = Queue::find()->andWhere (['queue_status' => Queue::QUEUE_STATUS_FAILED])
-            ->count();
+        //$failed = Queue::find()->andWhere (['queue_status' => Queue::QUEUE_STATUS_FAILED])
+        //    ->count();
 
-        if($failed > 0)
-            Yii::error ($failed . ' Stores failed, need to publish manually');
+        //if($failed > 0)
+        //    Yii::error ($failed . ' Stores failed, need to publish manually');
 
         //alert inactive stores
 
