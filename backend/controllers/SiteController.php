@@ -87,9 +87,11 @@ class SiteController extends Controller
             ->andWhere(['invoice_status' => RestaurantInvoice::STATUS_PAID])
             ->count();
 
-        $failedInQueue = Queue::find()->andWhere ([
-            'queue_status' => Queue::QUEUE_STATUS_FAILED
-        ])->count ();
+        $failedInQueue = Queue::find()
+                
+            ->andWhere ([
+                'queue_status' => Queue::QUEUE_STATUS_FAILED
+            ])->count ();
 
         $holdInQueue = Queue::find()->andWhere ([
             'queue_status' => Queue::QUEUE_STATUS_HOLD
@@ -100,7 +102,7 @@ class SiteController extends Controller
         ])->count ();
 
         $notPublished = Restaurant::find()
-            ->andWhere(['has_deployed' => 0, 'is_deleted' => 0])
+            ->filterNotPublished()
             ->count();
 
         $failedInPaymentQueue = PaymentGatewayQueue::find()->andWhere ([
