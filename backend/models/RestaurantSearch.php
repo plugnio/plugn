@@ -110,11 +110,18 @@ class RestaurantSearch extends Restaurant
         if($this->is_myfatoorah_enable)
             $query->andFilterWhere(['is_myfatoorah_enable' => $this->is_myfatoorah_enable]);
 
-        if($this->has_not_deployed)
-            $query->andFilterWhere(['has_deployed' => false]);
+        if($this->has_not_deployed) {
+            //$query->andFilterWhere(['has_deployed' => false]);
+            $query->filterNotPublished();
+        }
 
-        if(isset($this->has_deployed))
-            $query->andFilterWhere(['has_deployed' => $this->has_deployed]);
+        if(isset($this->has_deployed)) {
+            if($this->has_deployed) {
+                $query->andFilterWhere(['has_deployed' => $this->has_deployed]);
+            } else {
+                $query->filterNotPublished();
+            }
+        }
 
         if($this->is_sandbox)
             $query->andFilterWhere(['is_sandbox'  => $this->is_sandbox]);

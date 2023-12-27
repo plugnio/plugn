@@ -88,7 +88,6 @@ class SiteController extends Controller
             ->count();
 
         $failedInQueue = Queue::find()
-                
             ->andWhere ([
                 'queue_status' => Queue::QUEUE_STATUS_FAILED
             ])->count ();

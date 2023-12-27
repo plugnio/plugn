@@ -43,7 +43,8 @@ $this->title = 'Admin dashboard';
 
     <?php if($failedInQueue > 0) { ?>
         <div class="alert alert-danger" role="alert">
-            <?= $failedInQueue ?> Store building Failed, <?= Html::a('Check it now!', ['restaurant/index', 'RestaurantSearch[has_deployed]' => 0]) ?>
+            <?= $failedInQueue ?> Store building Failed,
+            <?= Html::a('Check it now!', ['queue/index', 'QueueSearch[queue_status]' => 5]) ?>
         </div>
     <?php } ?>
 
