@@ -2569,7 +2569,14 @@ class Restaurant extends ActiveRecord
                 if (!$queue->save ())
                     Yii::error ('Queue Error:' . json_encode ($queue->errors));
             }
-
+            else
+            {
+                Restaurant::updateAll([
+                   'has_deployed' => 1,
+                ], [
+                    'restaurant_uuid' => $this->restaurant_uuid
+                ]);
+            }
         }
 
         if ($insert) {
