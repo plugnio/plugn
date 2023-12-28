@@ -47,11 +47,11 @@ class StatsController extends BaseController
 
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $numberOfOrders = $store->getOrders()
+        $itemsCount = $store->getItems()->count();
+
+        /*$numberOfOrders = $store->getOrders()
             ->activeOrders($store->restaurant_uuid)
             ->count();
-
-        $itemsCount = $store->getItems()->count();
 
         $today_orders_received = $store->getOrders()
             ->activeOrders($store->restaurant_uuid)
@@ -67,15 +67,15 @@ class StatsController extends BaseController
             ->andWhere(new Expression("date(customer_created_at) = date(NOW())"))
             ->count();
 
-        /*$today_sold_items = OrderItem::find()
+        $today_sold_items = OrderItem::find()
             ->joinWith('order')
             ->activeOrders($store->restaurant_uuid)
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
-            ->sum('order_item.qty');*/
+            ->sum('order_item.qty');
 
         $today_sold_items = $store->getSoldOrderItems()
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
-            ->sum('order_item.qty');
+            ->sum('order_item.qty');*/
 
         switch ($interval) {
             case 'last-month':
@@ -140,12 +140,12 @@ class StatsController extends BaseController
             $sold_item_data, [
                 "most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => $store->currency?$store->currency->code: null,
-                "numberOfOrders" => (int) $numberOfOrders,
+                //"numberOfOrders" => (int) $numberOfOrders,
                 "itemsCount" => (int) $itemsCount,
-                "today_customer_gained" => (int) $today_customer_gained,
-                "today_revenue_generated" => (float) $today_revenue_generated,//Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode),//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
-                "today_sold_items" => (int) $today_sold_items,
-                "today_orders_received" => (float)  $today_orders_received, //Yii::$app->formatter->asCurrency($today_orders_received, $currencyCode)//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
+                //"today_customer_gained" => (int) $today_customer_gained,
+                //"today_revenue_generated" => (float) $today_revenue_generated,//Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode),//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
+                //"today_sold_items" => (int) $today_sold_items,
+                //"today_orders_received" => (float)  $today_orders_received, //Yii::$app->formatter->asCurrency($today_orders_received, $currencyCode)//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
             ]
         );
     }

@@ -3258,7 +3258,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Customer::getDb()->cache(function ($db) {
 
-            return $this->getCustomers()
+            return Customer::find()
+                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
                 ->select(new Expression('customer_created_at, COUNT(*) as total'))
                 ->andWhere(new Expression("DATE(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
                 ->groupBy(new Expression('DAYNAME(customer_created_at)'))
@@ -3276,7 +3277,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_customer_gained = Customer::getDb()->cache(function ($db) {
 
-            return $this->getCustomers()
+            return Customer::find()
+                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
                 ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
                 ->count();
 
