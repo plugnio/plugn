@@ -3231,7 +3231,6 @@ class Restaurant extends ActiveRecord
      */
     public function saveRestaurantDeliveryArea($delivery_areas)
     {
-
         RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
 
         foreach ($delivery_areas as $area_id) {
@@ -4243,7 +4242,7 @@ class Restaurant extends ActiveRecord
         return Payment::getDb()->cache(function ($db) use ($model) {
 
             return Payment::find()
-                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                ->andWhere(['payment.restaurant_uuid' => $this->restaurant_uuid])
                 //$model->getPayments()
                 ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
                             SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
