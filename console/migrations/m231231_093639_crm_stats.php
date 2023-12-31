@@ -53,7 +53,7 @@ class m231231_093639_crm_stats extends Migration
                     $ticket->ticket_completed_at = $latestCommentByStaff->created_at;
 
                     if($oldestCommentByStaff)
-                        $ticket->resolution_time = strtotime($latestCommentByStaff->ticket_completed_at) - strtotime($oldestCommentByStaff->created_at);
+                        $ticket->resolution_time = strtotime($latestCommentByStaff->created_at) - strtotime($oldestCommentByStaff->created_at);
                 }
 
                 $ticket->save();
