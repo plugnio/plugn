@@ -17,6 +17,10 @@ use yii\helpers\ArrayHelper;
  * @property int|null $staff_id
  * @property string|null $ticket_detail
  * @property int|null $ticket_status
+ * @property string|null $ticket_started_at
+ * @property string|null $ticket_completed_at
+ * @property int|null $response_time
+ * @property int|null $resolution_time
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -48,9 +52,9 @@ class Ticket extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['agent_id', 'staff_id', 'ticket_status'], 'integer'],
+            [['agent_id', 'staff_id', 'ticket_status', 'response_time', 'resolution_time'], 'integer'],
             [['ticket_detail'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'ticket_started_at', 'ticket_completed_at'], 'safe'],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['agent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agent::className(), 'targetAttribute' => ['agent_id' => 'agent_id']],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
@@ -113,9 +117,22 @@ class Ticket extends \yii\db\ActiveRecord
             'staff_id' => Yii::t('app', 'Staff ID'),
             'ticket_detail' => Yii::t('app', 'Ticket Detail'),
             'ticket_status' => Yii::t('app', 'Ticket Status'),
+            'ticket_started_at' => Yii::t('app', 'Started At'),
+            'ticket_completed_at' => Yii::t('app', 'Completed At'),
+            'response_time' => Yii::t('app', 'Response time'),
+            'resolution_time' => Yii::t('app', 'Resolution time'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     * @param $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        return parent::beforeSave($insert);
     }
 
     /**
@@ -131,6 +148,29 @@ class Ticket extends \yii\db\ActiveRecord
 
         if($insert) {
             $this->sendTicketGeneratedMail();
+        }
+
+        if(isset($changedAttributes['ticket_status'])) {
+
+            if($this->ticket_status == self::STATUS_COMPLETED)
+            {
+                $this->ticket_completed_at = new Expression("NOW()");
+                $this->resolution_time = time() - strtotime($this->ticket_started_at);
+            }
+            else if($this->ticket_status == self::STATUS_IN_PROGRESS)
+            {
+                $this->ticket_started_at = new Expression("NOW()");
+                $this->response_time = time() - strtotime($this->created_at);
+            }
+
+            self::updateAll([
+                'ticket_completed_at' => $this->ticket_completed_at,
+                'ticket_started_at' => $this->ticket_started_at,
+                'resolution_time' => $this->resolution_time,
+                'response_time'=> $this->response_time
+            ], [
+                'ticket_uuid' => $this->ticket_uuid
+            ]);
         }
 
         $this->_moveAttachments();
@@ -288,5 +328,13 @@ class Ticket extends \yii\db\ActiveRecord
     public function getTicketComments($modelClass = "\common\models\TicketComment")
     {
         return $this->hasMany($modelClass::className(), ['ticket_uuid' => 'ticket_uuid']);
+    }
+
+    /**
+     * @return query\TicketQuery
+     */
+    public static function find()
+    {
+        return new query\TicketQuery(get_called_class());
     }
 }

@@ -63,6 +63,17 @@ return [
                         'OPTIONS change-password' => 'options',
                     ]
                 ],
+                [// StatsController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/stats',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'view',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS list' => 'options',
+                    ]
+                ],
                 [// RestaurantController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/restaurant',
