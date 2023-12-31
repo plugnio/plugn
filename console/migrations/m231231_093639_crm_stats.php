@@ -13,17 +13,25 @@ class m231231_093639_crm_stats extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('ticket', 'ticket_started_at',
-            $this->dateTime()->after('ticket_status')->null());
+        $table = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('ticket');
 
-        $this->addColumn('ticket', 'ticket_completed_at',
-            $this->dateTime()->after('ticket_started_at')->null());
+        if (!isset($table->columns['ticket_started_at'])) {
 
-        $this->addColumn('ticket', 'response_time',
-            $this->integer()->after('ticket_status')->null());
+            $this->addColumn('ticket', 'ticket_started_at',
+                $this->dateTime()->after('ticket_status')->null());
 
-        $this->addColumn('ticket', 'resolution_time',
-            $this->integer()->after('ticket_status')->null());
+            $this->addColumn('ticket', 'ticket_completed_at',
+                $this->dateTime()->after('ticket_started_at')->null());
+
+            $this->addColumn('ticket', 'response_time',
+                $this->integer()->after('ticket_status')->null());
+
+            $this->addColumn('ticket', 'resolution_time',
+                $this->integer()->after('ticket_status')->null());
+        }
 
         $query = \common\models\Ticket::find()
                 ->andWhere(['!=', 'ticket_status', \common\models\Ticket::STATUS_PENDING]);
