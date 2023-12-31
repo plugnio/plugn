@@ -1,5 +1,7 @@
 <?php
 return [
+    "Invalid captcha validation" => "التحقق من صحة كلمة التحقق غير صالح",
+    "Please click the verification link sent to you by email to activate your account" => "الرجاء الضغط على رابط التحقق المرسل إليك عبر البريد الإلكتروني لتفعيل حسابك",
     "Store created successfully" => "تم إنشاء المتجر بنجاح",
     "Please delete store(s) first to delete profile!" => "يرجى حذف المتجر (المتاجر) أولاً لحذف الملف الشخصي!",
     "Store deleted successfully" => "تم حذف المتجر بنجاح",

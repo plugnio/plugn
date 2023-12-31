@@ -45,13 +45,18 @@ class StatsController extends BaseController
         $interval = Yii::$app->request->get('interval');
         $type = Yii::$app->request->get('type');
 
+        //for js error
+        if($type == "null") {
+            $type = null;
+        }
+
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $numberOfOrders = $store->getOrders()
+        $itemsCount = $store->getItems()->count();
+
+        /*$numberOfOrders = $store->getOrders()
             ->activeOrders($store->restaurant_uuid)
             ->count();
-
-        $itemsCount = $store->getItems()->count();
 
         $today_orders_received = $store->getOrders()
             ->activeOrders($store->restaurant_uuid)
@@ -67,70 +72,100 @@ class StatsController extends BaseController
             ->andWhere(new Expression("date(customer_created_at) = date(NOW())"))
             ->count();
 
-        /*$today_sold_items = OrderItem::find()
+        $today_sold_items = OrderItem::find()
             ->joinWith('order')
             ->activeOrders($store->restaurant_uuid)
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
-            ->sum('order_item.qty');*/
+            ->sum('order_item.qty');
 
         $today_sold_items = $store->getSoldOrderItems()
             ->andWhere(new Expression("date(order_created_at) = date(NOW())"))
-            ->sum('order_item.qty');
+            ->sum('order_item.qty');*/
+
+        $customer_data = [];
+        $revenue_data = [];
+        $orders_data = [];
+        $sold_item_data = [];
 
         switch ($interval) {
             case 'last-month':
-                $customer_data = $store->getTotalCustomersByMonth();
 
-                $revenue_data = $store->getTotalRevenueByMonth();
+                if(empty($type) || $type == "customer")
+                    $customer_data = $store->getTotalCustomersByMonth();
 
-                $orders_data = $store->getTotalOrdersByMonth();
+                if(empty($type) || $type == "revenue")
+                    $revenue_data = $store->getTotalRevenueByMonth();
 
-                $sold_item_data = $store->getTotalSoldItemsByMonth();
+                if(empty($type) || $type == "order")
+                    $orders_data = $store->getTotalOrdersByMonth();
+
+                if(empty($type) || $type == "item")
+                    $sold_item_data = $store->getTotalSoldItemsByMonth();
 
                 break;
 
             case 'last-2-months':
-                $customer_data = $store->getTotalCustomersByMonths(2);
 
-                $revenue_data = $store->getTotalRevenueByMonths(2);
+                if(empty($type) || $type == "customer")
+                    $customer_data = $store->getTotalCustomersByMonths(2);
 
-                $orders_data = $store->getTotalOrdersByMonths(2);
+                if(empty($type) || $type == "revenue")
+                    $revenue_data = $store->getTotalRevenueByMonths(2);
 
-                $sold_item_data = $store->getTotalSoldItemsByMonths(2);
+                if(empty($type) || $type == "order")
+                    $orders_data = $store->getTotalOrdersByMonths(2);
+
+                if(empty($type) || $type == "item")
+                    $sold_item_data = $store->getTotalSoldItemsByMonths(2);
 
                 break; 
 
             case 'last-3-months':
-                $customer_data = $store->getTotalCustomersByMonths(3);
 
-                $revenue_data = $store->getTotalRevenueByMonths(3);
+                if(empty($type) || $type == "customer")
+                    $customer_data = $store->getTotalCustomersByMonths(3);
 
-                $orders_data = $store->getTotalOrdersByMonths(3);
+                if(empty($type) || $type == "revenue")
+                    $revenue_data = $store->getTotalRevenueByMonths(3);
 
-                $sold_item_data = $store->getTotalSoldItemsByMonths(3);
+                if(empty($type) || $type == "order")
+                    $orders_data = $store->getTotalOrdersByMonths(3);
+
+                if(empty($type) || $type == "item")
+                    $sold_item_data = $store->getTotalSoldItemsByMonths(3);
 
                 break;
 
             case 'last-5-months':
                 #https://www.pivotaltracker.com/story/show/179023519
-                $customer_data = $store->getTotalCustomersByMonths(5);
 
-                $revenue_data = $store->getTotalRevenueByMonths(5);
+                if(empty($type) || $type == "customer")
+                    $customer_data = $store->getTotalCustomersByMonths(5);
 
-                $orders_data = $store->getTotalOrdersByMonths(5);
+                if(empty($type) || $type == "revenue")
+                    $revenue_data = $store->getTotalRevenueByMonths(5);
 
-                $sold_item_data = $store->getTotalSoldItemsByMonths(5);
+                if(empty($type) || $type == "order")
+                    $orders_data = $store->getTotalOrdersByMonths(5);
+
+                if(empty($type) || $type == "item")
+                    $sold_item_data = $store->getTotalSoldItemsByMonths(5);
 
                 break;
 
             default:
-                $customer_data = $store->getTotalCustomersByWeek();
 
-                $revenue_data = $store->getTotalRevenueByWeek();
+                if(empty($type) || $type == "customer")
+                    $customer_data = $store->getTotalCustomersByWeek();
 
-                $orders_data = $store->getTotalOrdersByWeek();
+                if(empty($type) || $type == "revenue")
+                    $revenue_data = $store->getTotalRevenueByWeek();
 
-                $sold_item_data = $store->getTotalSoldItemsByWeek();
+                if(empty($type) || $type == "order")
+                    $orders_data = $store->getTotalOrdersByWeek();
+
+                if(empty($type) || $type == "item")
+                    $sold_item_data = $store->getTotalSoldItemsByWeek();
         }
 
         return array_merge (
@@ -138,15 +173,17 @@ class StatsController extends BaseController
             $revenue_data,
             $orders_data,
             $sold_item_data, [
-                "most_sold_items" => $store->getMostSoldItems(),
                 "currency_code" => $store->currency?$store->currency->code: null,
-                "numberOfOrders" => (int) $numberOfOrders,
+                //"numberOfOrders" => (int) $numberOfOrders,
                 "itemsCount" => (int) $itemsCount,
-                "today_customer_gained" => (int) $today_customer_gained,
-                "today_revenue_generated" => (float) $today_revenue_generated,//Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode),//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
-                "today_sold_items" => (int) $today_sold_items,
-                "today_orders_received" => (float)  $today_orders_received, //Yii::$app->formatter->asCurrency($today_orders_received, $currencyCode)//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
+                //"today_customer_gained" => (int) $today_customer_gained,
+                //"today_revenue_generated" => (float) $today_revenue_generated,//Yii::$app->formatter->asCurrency($today_revenue_generated, $currencyCode),//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
+                //"today_sold_items" => (int) $today_sold_items,
+                //"today_orders_received" => (float)  $today_orders_received, //Yii::$app->formatter->asCurrency($today_orders_received, $currencyCode)//, [\NumberFormatter::MIN_FRACTION_DIGITS => 3, \NumberFormatter::MAX_FRACTION_DIGITS => 3]
             ]
         );
+
+       // if(empty($type))
+       //     $data["most_sold_items"] = $store->getMostSoldItems();
     }
 }

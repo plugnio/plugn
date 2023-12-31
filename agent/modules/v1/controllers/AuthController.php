@@ -139,7 +139,7 @@ class AuthController extends Controller {
             return [
                 "operation" => "error",
                 "errorType" => "email-not-verified",
-                "message" => Yii::t('candidate',"Please click the verification link sent to you by email to activate your account"),
+                "message" => Yii::t('agent',"Please click the verification link sent to you by email to activate your account"),
                 "unVerifiedToken" => $this->_loginResponse($agent)
             ];
         }
@@ -200,7 +200,7 @@ class AuthController extends Controller {
             return [
                 "operation" => "error",
                 "errorType" => "email-not-verified",
-                "message" => Yii::t('candidate', "Please click the verification link sent to you by email to activate your account"),
+                "message" => Yii::t('agent', "Please click the verification link sent to you by email to activate your account"),
                 "unVerifiedToken" => $this->_loginResponse($agent)
             ];
         }*/
@@ -226,7 +226,7 @@ class AuthController extends Controller {
                 return [
                     "operation" => "error",
                     "code" => 0,
-                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                    "message" => Yii::t('agent', "Invalid captcha validation")
                 ];
             }
         }
@@ -318,7 +318,7 @@ class AuthController extends Controller {
                 return [
                     "operation" => "error",
                     "code" => 0,
-                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                    "message" => Yii::t('agent', "Invalid captcha validation")
                 ];
             }
         }
@@ -470,7 +470,7 @@ class AuthController extends Controller {
                 return [
                     "operation" => "error",
                     "code" => 0,
-                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                    "message" => Yii::t('agent', "Invalid captcha validation")
                 ];
             }
         }
@@ -556,7 +556,7 @@ class AuthController extends Controller {
                 return [
                     "operation" => "error",
                     "code" => 0,
-                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                    "message" => Yii::t('agent', "Invalid captcha validation")
                 ];
             }
         }
@@ -623,7 +623,7 @@ class AuthController extends Controller {
     }
 
     /**
-     * Check if candidate email already verified
+     * Check if agent email already verified
      */
     public function actionIsEmailVerified() {
 
@@ -728,7 +728,7 @@ class AuthController extends Controller {
                 return [
                     "operation" => "error",
                     "code" => 0,
-                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                    "message" => Yii::t('agent', "Invalid captcha validation")
                 ];
             }
         }

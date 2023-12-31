@@ -930,9 +930,14 @@ class Restaurant extends ActiveRecord
         }
     }
 
+    /**
+     * @param $attribute
+     * @param $params
+     * @param $validator
+     * @return bool
+     */
     public function validateDomain($attribute, $params, $validator)
     {
-
         $count = $this->getRestaurantDomainRequests()->count();
 
         if ($count > 3) {
@@ -2243,7 +2248,7 @@ class Restaurant extends ActiveRecord
         if ($payments_method) {
 
             $sotred_restaurant_payment_method = RestaurantPaymentMethod::find()
-                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                ->andWhere(['restaurant_payment_method.restaurant_uuid' => $this->restaurant_uuid])
                 ->all();
 
             foreach ($sotred_restaurant_payment_method as $restaurant_payment_method) {
@@ -3152,9 +3157,13 @@ class Restaurant extends ActiveRecord
         ];
     }
 
+    /**
+     * @return array|ActiveRecord[]
+     */
     public function getBestseller()
     {
-        return $this->getItems()
+        return \common\models\Item::find()
+            ->andWhere(['item.restaurant_uuid' => $this->restaurant_uuid])
             ->orderBy(['unit_sold' => SORT_DESC])
             ->limit(5)
             ->select(['item_name', 'item_name_ar', 'unit_sold'])
@@ -3225,7 +3234,6 @@ class Restaurant extends ActiveRecord
      */
     public function saveRestaurantDeliveryArea($delivery_areas)
     {
-
         RestaurantDelivery::deleteAll(['restaurant_uuid' => $this->restaurant_uuid]);
 
         foreach ($delivery_areas as $area_id) {
@@ -3261,7 +3269,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Customer::getDb()->cache(function ($db) {
 
-            return $this->getCustomers()
+            return Customer::find()
+                ->andWhere(['customer.restaurant_uuid' => $this->restaurant_uuid])
                 ->select(new Expression('customer_created_at, COUNT(*) as total'))
                 ->andWhere(new Expression("DATE(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
                 ->groupBy(new Expression('DAYNAME(customer_created_at)'))
@@ -3279,7 +3288,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_customer_gained = Customer::getDb()->cache(function ($db) {
 
-            return $this->getCustomers()
+            return Customer::find()
+                ->andWhere(['customer.restaurant_uuid' => $this->restaurant_uuid])
                 ->andWhere(new Expression("date(customer_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
                 ->count();
 
@@ -3327,7 +3337,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->select(new Expression('order.order_created_at, SUM(`total_price`) as total'))
                 ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
@@ -3346,7 +3357,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_revenue_generated = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
                 ->sum('total_price');
@@ -3395,7 +3407,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->select(new Expression('order_created_at, COUNT(*) as total'))
                 ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
@@ -3414,7 +3427,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_orders_received = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->andWhere(new Expression("DATE(order.order_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
                 ->count();
@@ -3452,7 +3466,10 @@ class Restaurant extends ActiveRecord
 
         $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getSoldOrderItems()
+            return OrderItem::find()
+                ->andWhere(['order_item.restaurant_uuid' => $this->restaurant_uuid])
+                ->joinWith('order', false)
+                ->activeOrders()
                 ->select('order_item_created_at, SUM(order_item.qty) as total')
                 ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
                 ->groupBy(new Expression('DAY(order_item_created_at)'))
@@ -3470,7 +3487,10 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_sold_item = Order::getDb()->cache(function ($db) {
 
-            return $this->getSoldOrderItems()
+            return OrderItem::find()
+                ->andWhere(['order_item.restaurant_uuid' => $this->restaurant_uuid])
+                ->joinWith('order', false)
+                ->activeOrders()
                 ->andWhere(new Expression("DATE(order_item_created_at) >= DATE(NOW() - INTERVAL 6 DAY)"))
                 ->sum('order_item.qty');
 
@@ -3494,6 +3514,11 @@ class Restaurant extends ActiveRecord
             ->activeOrders();
     }
 
+    /**
+     * @return array
+     * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
+     */
     public function getTotalCustomersByMonth()
     {
         $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
@@ -3517,7 +3542,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Customer::getDb()->cache(function ($db) {
 
-            return $this->getCustomers()
+            return Customer::find()
+                ->andWhere(['customer.restaurant_uuid' => $this->restaurant_uuid])
                 ->select(new Expression('customer_created_at, COUNT(*) as total'))
                 ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
                 ->groupBy(new Expression('DAY(customer_created_at)'))
@@ -3535,7 +3561,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_customer_gained = Customer::getDb()->cache(function ($db) {
 
-            return $this->getCustomers()
+            return Customer::find()
+                ->andWhere(['customer.restaurant_uuid' => $this->restaurant_uuid])
                 ->andWhere('`customer_created_at` >= (NOW() - INTERVAL 1 MONTH)')
                 ->count();
 
@@ -3570,7 +3597,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->select(new Expression('order.order_created_at, SUM(`total_price`) as total'))
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
@@ -3589,7 +3617,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_revenue_generated = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
                 ->sum('total_price');
@@ -3625,7 +3654,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->select(new Expression('order_created_at, COUNT(*) as total'))
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
@@ -3644,7 +3674,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_orders_received = Order::getDb()->cache(function ($db) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
                 ->count();
@@ -3680,7 +3711,10 @@ class Restaurant extends ActiveRecord
 
         $rows = Order::getDb()->cache(function ($db) {
 
-            return $this->getSoldOrderItems()
+            return OrderItem::find()
+                ->andWhere(['order_item.restaurant_uuid' => $this->restaurant_uuid])
+                ->joinWith('order', false)
+                ->activeOrders()
                 ->select('order_item_created_at, SUM(order_item.qty) as total')
                 ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
                 ->groupBy(new Expression('DATE(order_item_created_at)'))
@@ -3698,7 +3732,10 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_sold_item = Order::getDb()->cache(function ($db) {
 
-            return $this->getSoldOrderItems()
+            return OrderItem::find()
+                ->andWhere(['order_item.restaurant_uuid' => $this->restaurant_uuid])
+                ->joinWith('order', false)
+                ->activeOrders()
                 ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL 1 MONTH)"))
                 ->sum('order_item.qty');
 
@@ -3738,7 +3775,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Customer::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getCustomers()
+            return Customer::find()
+                ->andWhere(['customer.restaurant_uuid' => $this->restaurant_uuid])
                 ->select(new Expression('customer_created_at, COUNT(*) as total'))
                 ->andWhere('`customer_created_at` >= (NOW() - INTERVAL ' . $months . ' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
@@ -3757,7 +3795,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_customer_gained = Customer::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getCustomers()
+            return Customer::find()
+                ->andWhere(['customer.restaurant_uuid' => $this->restaurant_uuid])
                 ->andWhere('`customer_created_at` >= (NOW() - INTERVAL ' . $months . ' MONTH)')
 //            ->andWhere('DATE(`customer_created_at`) >= DATE("'.$date_start.'") AND DATE(`customer_created_at`) <= DATE("'.$date_end.'")')
                 ->count();
@@ -3798,7 +3837,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Order::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->select(new Expression('order.order_created_at, SUM(`total_price`) as total'))
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
@@ -3817,7 +3857,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_revenue_generated = Order::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
                 ->sum('total_price');
@@ -3858,7 +3899,8 @@ class Restaurant extends ActiveRecord
 
         $rows = Order::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->select(new Expression('order_created_at, COUNT(*) as total'))
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
@@ -3877,7 +3919,8 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_orders_received = Order::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getOrders()
+            return Order::find()
+                ->andWhere(['order.restaurant_uuid' => $this->restaurant_uuid])
                 ->activeOrders($this->restaurant_uuid)
                 ->andWhere(new Expression("DATE(order.order_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
                 ->count();
@@ -3918,7 +3961,10 @@ class Restaurant extends ActiveRecord
 
         $rows = OrderItem::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getSoldOrderItems()
+            return OrderItem::find()
+                ->andWhere(['order_item.restaurant_uuid' => $this->restaurant_uuid])
+                ->joinWith('order', false)
+                ->activeOrders()
                 ->select('order_item_created_at, SUM(order_item.qty) as total')
                 ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
                 ->groupBy(new Expression('MONTH(order_item_created_at)'))
@@ -3936,7 +3982,10 @@ class Restaurant extends ActiveRecord
 
         $number_of_all_sold_item = OrderItem::getDb()->cache(function ($db) use ($months) {
 
-            return $this->getSoldOrderItems()
+            return OrderItem::find()
+                ->andWhere(['order_item.restaurant_uuid' => $this->restaurant_uuid])
+                ->joinWith('order', false)
+                ->activeOrders()
                 ->andWhere(new Expression("DATE(order_item_created_at) >= (NOW() - INTERVAL " . $months . " MONTH)"))
                 ->sum('order_item.qty');
 
@@ -3957,7 +4006,8 @@ class Restaurant extends ActiveRecord
     {
         $most_sold_item_chart_data = [];
 
-        $rows = $this->getItems()
+        $rows = \common\models\Item::find()
+            ->andWhere(['item.restaurant_uuid' => $this->restaurant_uuid])
             ->orderBy(['unit_sold' => SORT_DESC])
             ->limit(5)
             ->all();
@@ -3980,7 +4030,8 @@ class Restaurant extends ActiveRecord
      */
     public function getNoOfItems($modelClass = "\common\models\Item")
     {
-        return $this->getItems($modelClass)
+        return Item::find()
+            ->andWhere(['item.restaurant_uuid' => $this->restaurant_uuid])
             ->andWhere(['item_status' => Item::ITEM_STATUS_PUBLISH])
             ->count();
     }
@@ -3990,7 +4041,6 @@ class Restaurant extends ActiveRecord
      */
     public function sendWeeklyReport()
     {
-
         //Revenue generated
         $lastWeekRevenue = $this
             ->getStoreRevenue(
@@ -4182,7 +4232,6 @@ class Restaurant extends ActiveRecord
 
     public function getCSV()
     {
-
         $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
 
         $cacheDependency = Yii::createObject([
@@ -4195,7 +4244,9 @@ class Restaurant extends ActiveRecord
 
         return Payment::getDb()->cache(function ($db) use ($model) {
 
-            return $model->getPayments()
+            return Payment::find()
+                ->andWhere(['payment.restaurant_uuid' => $this->restaurant_uuid])
+                //$model->getPayments()
                 ->select(new Expression("currency_code, SUM(payment_net_amount) as payment_net_amount, SUM(payment_gateway_fee) as payment_gateway_fees,
                             SUM(plugn_fee) as plugn_fees, SUM(partner_fee) as partner_fees"))
                 ->join('left join', 'order', '`order`.order_uuid = payment.order_uuid')
@@ -4670,9 +4721,12 @@ class Restaurant extends ActiveRecord
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * @param $modelClass
+     * @return mixed|void|null
+     */
     public function getCountryName($modelClass = "\common\models\Country")
     {
-
         $country = $this->getCountry($modelClass)->one();
 
         if ($country)

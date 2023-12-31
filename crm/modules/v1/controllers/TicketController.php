@@ -160,15 +160,19 @@ class TicketController extends Controller
         //validate access
 
         $ticket = $this->findModel($ticket_uuid);
+
         $status = Yii::$app->request->getBodyParam("status");
+
         if ($ticket->ticket_status != $status) {
             $ticket->ticket_status = $status;
-            $ticket->save(false);
+            $ticket->save();
         }
+
         $model = new TicketComment();
         $model->ticket_uuid = $ticket_uuid;
         $model->staff_id =  Yii::$app->user->getId();
         $model->ticket_comment_detail =  Yii::$app->request->getBodyParam("comment_detail");
+
         $model->attachments = ArrayHelper::getColumn(
             Yii::$app->request->getBodyParam("attachments"),
             'Key'
