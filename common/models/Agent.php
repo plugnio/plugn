@@ -29,6 +29,7 @@ use common\models\AgentToken;
  * @property string $last_active_at
  * @property string $agent_created_at
  * @property string $agent_updated_at
+ * @property string $agent_deleted_at
  *
  * @property Restaurant[] $restaurantsManaged
  * @property Restaurant[] $restaurants
@@ -79,7 +80,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ['tempPassword', 'required', 'on' => [
                 self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_AGENT]],
             [['agent_status', 'email_notification', 'reminder_email', 'receive_weekly_stats'], 'integer'],
-            [['agent_created_at', 'agent_updated_at'], 'safe'],
+            [['agent_created_at', 'agent_updated_at', 'agent_deleted_at'], 'safe'],
             [['agent_phone_country_code', 'agent_number'], 'number'],
             [['agent_number'], 'unique', 'comboNotUnique' => 'Phone no. already exist.',  'targetAttribute' => ['agent_phone_country_code', 'agent_number', 'deleted']],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
@@ -107,7 +108,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
         $scenarios['verify-email'] = ['agent_email', 'agent_new_email', 'agent_email_verification', 'agent_auth_key', 'ip_address'];
 
-        $scenarios['SCENARIO_DELETE'] = ['deleted', 'ip_address'];
+        $scenarios['SCENARIO_DELETE'] = ['deleted', 'ip_address', 'agent_deleted_at'];
 
         return $scenarios;
     }
@@ -130,7 +131,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             'agent_status' => Yii::t('app','Agent Status'),
             'email_notification' => Yii::t('app','Email Notification'),
             'agent_created_at' => Yii::t('app','Agent Created At'),
-            'agent_updated_at' => Yii::t('app','Agent Updated At')
+            'agent_updated_at' => Yii::t('app','Agent Updated At'),
+            'agent_deleted_at' => Yii::t('app','Agent Deleted At'),
         ];
     }
 

@@ -64,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'deleted',
             'agent_created_at:datetime',
             'agent_updated_at:datetime',
-
+            'agent_deleted_at:datetime'
         ],
     ]) ?>
 

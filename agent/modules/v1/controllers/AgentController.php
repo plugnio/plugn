@@ -4,6 +4,7 @@ namespace agent\modules\v1\controllers;
 
 
 use Yii;
+use yii\db\Expression;
 use yii\rest\Controller;
 
 
@@ -60,6 +61,7 @@ class AgentController extends BaseController
 
         $model->setScenario(Agent::SCENARIO_DELETE);
         $model->deleted = true;
+        $model->agent_deleted_at = new Expression("NOW()");
 
         if (!$model->save ()) {
             return [

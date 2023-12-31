@@ -230,8 +230,15 @@ $this->registerJs($js);
             'restaurant_email_notification',
             'instagram_url:url',
             'iban',
-            'restaurant_created_at',
-            'restaurant_updated_at',
+            'restaurant_created_at:datetime',
+            'restaurant_updated_at:datetime',
+            [
+                'attribute' => 'restaurant_deleted_at',
+                'format' => 'datetime',
+                //'visible' => function ($data) {
+                 //   return false;//!empty($data->restaurant_deleted_at)? false: true;
+               // }
+            ],
             'platform_fee:percent',
             'warehouse_fee',
             'warehouse_delivery_charges',
