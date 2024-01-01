@@ -2495,7 +2495,7 @@ class Restaurant extends ActiveRecord
         }
 
         if($insert) {
-            $this->enable_cod_fee = true;
+            $this->enable_cod_fee = false;
         }
 
         return parent::beforeSave($insert);
