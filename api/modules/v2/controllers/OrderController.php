@@ -483,6 +483,22 @@ class OrderController extends Controller
             $order->changeOrderStatusToPending();
             $order->sendPaymentConfirmationEmail();
 
+            //process plugn commission invoice for COD order
+
+            if(
+                $order->restaurant->platform_fee > 0 &&
+                $order->restaurant->enable_cod_fee &&
+                $order->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH
+            ) {
+                $restaurant_uuid = $order->restaurant_uuid;
+                $currency_code = $order->currency_code;
+                $amount = $order->restaurant->platform_fee * $order->total_price;
+                $order_uuid = $order->order_uuid;
+
+                \common\models\Restaurant::processPlugnCommissionInvoice(
+                    $restaurant_uuid, $currency_code, $amount, $order_uuid);
+            }
+
             Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " .
                 Yii::$app->formatter->asCurrency($order->total, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);
 
