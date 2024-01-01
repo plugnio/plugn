@@ -91,6 +91,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $commercial_license_file_id
  * @property string|null $commercial_license_file_purpose
  * @property float|null $platform_fee
+ * @property boolean $enable_cod_fee
  * @property string|null $google_analytics_id
  * @property string|null $facebook_pixil_id
  * @property string|null $google_tag_id
@@ -780,6 +781,7 @@ class Restaurant extends ActiveRecord
             'store_branch_name' => Yii::t('app', 'Github repo branch name'),
             'custom_css' => Yii::t('app', 'Custom css'),
             'platform_fee' => Yii::t('app', 'Platform fee'),
+            'enable_cod_fee' => yii::t('app', 'Enable cod fee'),
             'warehouse_fee' => Yii::t('app', 'Warehouse fee'),
             'warehouse_delivery_charges' => Yii::t('app', 'Delivery charges'),
             'company_name' => Yii::t('app', 'Company name'),
@@ -2490,6 +2492,10 @@ class Restaurant extends ActiveRecord
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
             //delete tmp files
             $this->deleteTempFiles();
+        }
+
+        if($insert) {
+            $this->enable_cod_fee = true;
         }
 
         return parent::beforeSave($insert);
@@ -4256,6 +4262,52 @@ class Restaurant extends ActiveRecord
                 ->all();
 
         }, $cacheDuration, $cacheDependency);
+    }
+
+    /**
+     * generate invoices for stores to pay as order commission / plugn fee
+     * @param $restaurant_uuid
+     * @param $currency_code
+     * @param $amount
+     * @param $order_uuid
+     * @param $payment_uuid
+     * @return void
+     */
+    public static function processPlugnCommissionInvoice(
+        $restaurant_uuid, $currency_code, $amount, $order_uuid, $payment_uuid = null) {
+
+        $invoice = RestaurantInvoice::find()
+            ->andWhere([
+                'restaurant_uuid' => $restaurant_uuid,
+                'currency_code' => $currency_code,
+                'invoice_status' => RestaurantInvoice::STATUS_UNPAID
+            ])->one();
+
+        if(!$invoice) {
+            $invoice = new RestaurantInvoice();
+            $invoice->restaurant_uuid = $restaurant_uuid;
+            $invoice->payment_uuid = $payment_uuid;
+            $invoice->amount = $amount;
+            $invoice->currency_code = $currency_code;
+        }
+        else {
+            $invoice->amount += $amount;
+        }
+
+        if(!$invoice->save()) {
+            Yii::error(print_r($invoice->errors, true));
+        }
+
+        $invoice_item = new InvoiceItem();
+        $invoice_item->invoice_uuid = $invoice->invoice_uuid;
+        $invoice_item->order_uuid = $order_uuid;
+
+        //$invoice_item->comment = $payment->order_uuid;
+        $invoice_item->total = $amount;
+
+        if(!$invoice_item->save()) {
+            Yii::error(print_r($invoice->errors, true));
+        }
     }
 
     /**

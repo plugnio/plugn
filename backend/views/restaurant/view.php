@@ -240,6 +240,7 @@ $this->registerJs($js);
                // }
             ],
             'platform_fee:percent',
+            'enable_cod_fee:boolean',
             'warehouse_fee',
             'warehouse_delivery_charges',
             [

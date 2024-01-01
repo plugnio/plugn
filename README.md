@@ -204,3 +204,4 @@ for each site
 
 https://developers.tap.company/reference/create-a-charge
 
+- make sure account on subscription finish, getting invoices for commission 

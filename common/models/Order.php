@@ -1045,6 +1045,23 @@ class Order extends \yii\db\ActiveRecord
             //$subtotal = $subtotal * $rate;
             $payment_gateway_fee = $this->payment->payment_gateway_fee * $rate;
         }
+        // if no payment (COD orders)
+        else {
+
+            $invoice_item = InvoiceItem::find()
+                ->andWhere(['order_uuid' => $this->order_uuid])
+                ->one();
+
+            if($invoice_item) {
+                $plugn_fee_kwd = ($invoice_item->total) * $rateKWD;
+                $plugn_fee = ($invoice_item->total) * $rate;
+            }
+
+            //$total_price = $total_price * $rate;
+            //$delivery_fee = $delivery_fee * $rate;
+            //$subtotal = $subtotal * $rate;
+            $payment_gateway_fee = 0;
+        }
 
         if($this->restaurant->sourceCampaign) {
 

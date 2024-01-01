@@ -541,39 +541,31 @@ class Payment extends \yii\db\ActiveRecord
 
             $invoicePaymentMethodIds = ArrayHelper::getColumn($invoicePaymentMethods, 'payment_method_id');
 
-            if ($payment->plugn_fee > 0 && in_array($payment->order->payment_method_id, $invoicePaymentMethodIds))
-            {
-                $invoice = RestaurantInvoice::find()
-                    ->andWhere([
-                        'restaurant_uuid' => $payment->restaurant_uuid,
-                        'currency_code' => $payment->order->currency_code,
-                        'invoice_status' => RestaurantInvoice::STATUS_UNPAID
-                    ])->one();
+            //or if store cod commission enabled
 
-                if(!$invoice) {
-                    $invoice = new RestaurantInvoice();
-                    $invoice->restaurant_uuid = $payment->restaurant_uuid;
-                    $invoice->payment_uuid = $payment->payment_uuid;
-                    $invoice->amount = $payment->plugn_fee;
-                    $invoice->currency_code = $payment->order->currency_code;
-                }
-                else {
-                    $invoice->amount += $payment->plugn_fee;
-                }
+            //test case: commission invoice should not generated if cod commission disabled
+            // and generated if cod commission enabled
+            //test case: mail getting send and invoice visible in dashboard app (on weekly bases)
 
-                if(!$invoice->save()) {
-                    Yii::error(print_r($invoice->errors, true));
-                }
+            // on store signup enable commission by default and show in backend
+            // so only new store or store we enable for cod commission will have invoices
+            // inform operation department for changes
 
-                $invoice_item = new InvoiceItem();
-                $invoice_item->invoice_uuid = $invoice->invoice_uuid;
-                $invoice_item->order_uuid = $payment->order_uuid;
-                //$invoice_item->comment = $payment->order_uuid;
-                $invoice_item->total = $payment->plugn_fee;
+            //for orders placed from dashboard app, we can skip plugn fees?
 
-                if(!$invoice_item->save()) {
-                    Yii::error(print_r($invoice->errors, true));
-                }
+            //if not premium store AND (not knet gateways or commission on COD enabled)
+            if (
+                $payment->plugn_fee > 0 &&
+                in_array($payment->order->payment_method_id, $invoicePaymentMethodIds)
+            ) {
+                $restaurant_uuid = $payment->restaurant_uuid;
+                $currency_code = $payment->order->currency_code;
+                $payment_uuid = $payment->payment_uuid;
+                $amount = $payment->plugn_fee;
+                $order_uuid = $payment->order_uuid;
+
+                Restaurant::processPlugnCommissionInvoice(
+                    $restaurant_uuid, $currency_code, $amount, $order_uuid, $payment_uuid);
             }
 
             Yii::info("[" . $payment->restaurant->name . ": " . $payment->customer->customer_name . " has placed an order for " .
@@ -583,6 +575,11 @@ class Payment extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);

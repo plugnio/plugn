@@ -292,6 +292,8 @@ use borales\extensions\phoneInput\PhoneInput;
 
     <?= $form->field($model, 'platform_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Platform fee']) ?>
 
+    <?= $form->field($model, 'enable_cod_fee')->checkbox(['checked' => $model->enable_cod_fee > 0,  'value' => true]) ?>
+
     <?= $form->field($model, 'warehouse_delivery_charges')->textInput([ 'maxlength' => true, 'placeholder' => 'Delivery charges']) ?>
 
     <?= $form->field($model, 'warehouse_fee')->textInput([ 'maxlength' => true, 'placeholder' => 'Warehouse fulfilment fee']) ?>

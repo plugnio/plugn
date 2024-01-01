@@ -21,9 +21,9 @@ use yii\db\Expression;
  * @property string|null $created_at
  * @property string|null $updated_at
  *
- * @property Order $orderUu
- * @property Payment $paymentUu
- * @property Restaurant $restaurantUu
+ * @property Order $order
+ * @property Payment $payment
+ * @property Restaurant $restaurant
  */
 class RestaurantInvoice extends \yii\db\ActiveRecord
 {
