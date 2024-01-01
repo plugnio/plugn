@@ -10,6 +10,7 @@ use common\models\AreaDeliveryZone;
 use common\models\Currency;
 use common\models\Payment;
 use common\models\PaymentMethod;
+use common\models\RestaurantInvoice;
 use common\models\shipping\Aramex;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -467,13 +468,20 @@ class OrderController extends BaseController
             ->orderBy(['order_created_at' => SORT_DESC])
             ->one();
 
-        $totalPendingInvoices = $store->getInvoices()->notPaid()->count();
+        $totalPendingInvoices = $store->getInvoices()
+            ->locked() //->notPaid()
+            ->count();
+
+        /*$totalDraftInvoiceAmount = $store->getInvoices()
+            ->andWhere(['invoice_status' => RestaurantInvoice::STATUS_UNPAID])
+            ->sum('amount');*/
 
         return [
             'totalPendingOrders' => (int)$totalPendingOrders,
             'latestOrderId' => $latestOrder ? $latestOrder->order_uuid : null,
             'latestPendingOrderId' => $latestPendingOrder ? $latestPendingOrder->order_uuid : null,
-            'totalPendingInvoices' => (int)$totalPendingInvoices
+            'totalPendingInvoices' => (int)$totalPendingInvoices,
+            //'$totalDraftInvoiceAmount' => $totalDraftInvoiceAmount
         ];
     }
 

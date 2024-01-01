@@ -6,6 +6,7 @@ use agent\models\Currency;
 use common\components\TapPayments;
 use common\models\InvoicePayment;
 use common\models\RestaurantInvoice;
+use Stripe\Invoice;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
@@ -33,7 +34,10 @@ class InvoiceController extends BaseController
     {
         $store = Yii::$app->accountManager->getManagedAccount();
 
-        $query = $store->getInvoices()->orderBy('created_at desc');
+        $query = $store->getInvoices()
+            //invoices will available after month end
+            ->andWhere(['!=', 'invoice_status', RestaurantInvoice::STATUS_UNPAID])
+            ->orderBy('created_at desc');
 
         return new ActiveDataProvider([
             'query' => $query

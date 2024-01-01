@@ -44,6 +44,18 @@ class CronController extends \yii\console\Controller
             ->setTo ("kathrechakrushn@gmail.com")
             //->setCc($contactEmails)
             ->send ();*/
+
+        //for unpaid invoices
+
+        $query = RestaurantInvoice::find()
+            ->mailNotSent()
+            ->notPaid();
+
+        foreach ($query->batch(100) as $invoices) {
+            foreach ($invoices as $invoice) {
+                $invoice->sendEmail();
+            }
+        }
     }
 
     public function actionFixSpam() {
