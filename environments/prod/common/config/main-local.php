@@ -22,11 +22,12 @@ return [
                 ['dsn' => 'mysql:host=plugn-main-latest-cluster.cluster-ro-c8mekjvvbygf.eu-west-2.rds.amazonaws.com;dbname=yo3an']
             ],
             // Enable Caching of Schema to Reduce SQL Queries
-            'enableSchemaCache' => true,
+            'enableSchemaCache' => false,
             // Duration of schema cache.
             'schemaCacheDuration' => 300, // 5 mnts
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
+
         ],
         'walletManager' => [
             'class' => 'common\components\WalletManager',

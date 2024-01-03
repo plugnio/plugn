@@ -485,7 +485,9 @@ class OrderController extends Controller
 
             //process plugn commission invoice for COD order
 
-            if(
+            /*
+             * https://pogi.sentry.io/issues/4789088124/?project=5220572&query=&referrer=issue-stream&statsPeriod=14d&stream_index=4
+             * if(
                 $order->restaurant->platform_fee > 0 &&
                 $order->restaurant->enable_cod_fee &&
                 $order->paymentMethod->payment_method_code == PaymentMethod::CODE_CASH
@@ -497,7 +499,7 @@ class OrderController extends Controller
 
                 \common\models\Restaurant::processPlugnCommissionInvoice(
                     $restaurant_uuid, $currency_code, $amount, $order_uuid);
-            }
+            }*/
 
             Yii::info("[" . $order->restaurant->name . ": " . $order->customer_name . " has placed an order for " .
                 Yii::$app->formatter->asCurrency($order->total, $order->currency->code, [\NumberFormatter::MAX_SIGNIFICANT_DIGITS => $order->currency->decimal_place]) . '] ' . 'Paid with ' . $order->payment_method_name, __METHOD__);

@@ -504,7 +504,7 @@ class Restaurant extends ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
-            [['is_public', 'is_deleted', 'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox'], 'boolean'],
+            [['is_public', 'is_deleted', 'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox', 'enable_cod_fee'], 'boolean'],
             [['platform_fee', 'warehouse_fee', 'warehouse_delivery_charges'], 'number'],
             [['instagram_url'], 'url'],
             [['export_orders_data_in_specific_date_range', 'export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'google_tag_id', 'google_tag_manager_id', 'tiktok_pixel_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
@@ -2494,9 +2494,9 @@ class Restaurant extends ActiveRecord
             $this->deleteTempFiles();
         }
 
-        if($insert) {
-            $this->enable_cod_fee = true;
-        }
+        /*if($insert) {
+            $this->enable_cod_fee = false;
+        }*/
 
         return parent::beforeSave($insert);
     }

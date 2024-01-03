@@ -107,6 +107,23 @@ class AgentController extends Controller
     }
 
     /**
+     * send email verification email
+     * @param $id
+     * @return void
+     * @throws NotFoundHttpException
+     */
+    public function actionSendVerificationEmail($id) {
+
+        $model = $this->findModel($id);
+
+        $model->sendVerificationEmail();
+
+        Yii::$app->session->setFlash('successResponse', "Verification mail sent!");
+
+        return $this->redirect(['view', 'id' => $model->agent_id]);
+    }
+
+    /**
      * Creates a new Agent model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed

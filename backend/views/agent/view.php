@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->agent_id], ['class' => 'btn btn-primary btn-update']) ?>
+
         <?= Html::a('Delete', ['delete', 'id' => $model->agent_id], [
             'class' => 'btn btn-danger btn-delete',
             'data' => [
@@ -27,7 +28,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
 
-
         <?= Html::a('Remove Store Assignments', ['delete-assignments', 'id' => $model->agent_id], [
             'class' => 'btn btn-danger btn-delete',
             'data' => [
@@ -35,6 +35,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+
+        <?php if(!$model->agent_email_verification) {
+            echo Html::a('Send verification email', ['send-verification-email', 'id' => $model->agent_id], [
+                'class' => 'btn btn-danger'
+            ]);
+
+            if($model->agent_auth_key) {
+                $verifyLink = Yii::$app->params['newDashboardAppUrl'] . '/verify-email/' . urlencode($model->agent_email) . '/' . $model->agent_auth_key;
+
+                echo "<h5>Verification link</h5>" . Html::a($verifyLink, $verifyLink);
+            }
+        }?>
 
     </p>
 
