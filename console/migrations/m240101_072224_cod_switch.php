@@ -17,7 +17,7 @@ class m240101_072224_cod_switch extends Migration
 
         //update cod fee to disabled for existing store
 
-        \common\models\Restaurant::updateAll(['enable_cod_fee' => 0]);
+        \common\models\Restaurant::updateAll(['enable_cod_fee' => false]);
     }
 
     /**
