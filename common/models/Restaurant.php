@@ -2494,9 +2494,9 @@ class Restaurant extends ActiveRecord
             $this->deleteTempFiles();
         }
 
-        if($insert) {
+        /*if($insert) {
             $this->enable_cod_fee = false;
-        }
+        }*/
 
         return parent::beforeSave($insert);
     }
