@@ -95,7 +95,8 @@ class CategoryController extends BaseController
         $category_image = Yii::$app->request->getBodyParam('category_image');
 
         if ($category_image) {
-            $model->updateImage($category_image);
+            $imageUrl = Yii::$app->temporaryBucketResourceManager->getUrl($category_image);
+            $model->updateImage($imageUrl);
         }
 
         if (!$model->save()) {
@@ -139,7 +140,8 @@ class CategoryController extends BaseController
         $category_image = Yii::$app->request->getBodyParam('category_image');
 
         if ($model->category_image != $category_image) {
-            $model->updateImage($category_image);
+            $imageUrl = Yii::$app->temporaryBucketResourceManager->getUrl($category_image);
+            $model->updateImage($imageUrl);
         }
 
         if (!$model->save()) {
