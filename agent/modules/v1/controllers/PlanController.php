@@ -9,8 +9,8 @@ use common\components\TapPayments;
 use agent\models\Plan;
 use agent\models\Subscription;
 use agent\models\SubscriptionPayment;
+use yii\db\Expression;
 use yii\helpers\Url;
-use yii\rest\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Cookie;
@@ -382,12 +382,34 @@ class PlanController extends BaseController
 
         $code = Yii::$app->request->get('currency');
 
-        if(!$code)
-            $code = "KWD";
+        if(!$code) {
 
-        return PlanPrice::find()
+            $result = Yii::$app->ipstack->locate();
+
+            $code = $result->currency->code;
+        }
+
+        if(!$code || $code == "KWD") {
+            $plan = Plan::find()
+                ->andWhere(new Expression("price > 0"))
+                ->one();
+
+            return [
+                "price" => $plan->price . ' ' . $code
+            ];
+        }
+
+        $model = PlanPrice::find()
             ->andWhere(['plan_id' => 2, 'currency' => $code])
             ->one();
+
+        /*$price = Yii::$app->formatter->asCurrency($model->price, $currency->code, [
+            \NumberFormatter::MAX_FRACTION_DIGITS => $currency->decimal_place
+        ]);*/
+
+        return [
+            "price" => $model->price . ' ' . $code
+        ];
     }
 
     /**

@@ -15,7 +15,8 @@ class Ipstack {
 //    public $cacheDuration = 1 * 60 * 60; //1 hours
     public $accessKey;
 
-    public function locate() {
+    public function locate($populateData = true) {
+
         // Get initial IP address of requester
         $ip = Yii::$app->request->getRemoteIP();
 
@@ -51,37 +52,40 @@ class Ipstack {
 
         $result = \GuzzleHttp\json_decode($responseObj->getBody()->getContents());
 
-        //Fix: https://www.pivotaltracker.com/story/show/165662472
+        if($populateData) {
 
-        if (!isset($result->city)) {
-            if ($result->region_name)
-                $result->city = $result->region_name;
-            else if ($result->location && $result->location->capital)
-                $result->city = $result->location->capital;
-            else
-                $result->city = $result->continent_name;
-        }
+            // save latest records from our table
 
-        // save latest records from our table
+            if (isset($result->currency->code)) {
 
-        if (isset($result->currency->code)) {
+                $currency = Currency::find()
+                    ->where(['code' => $result->currency->code])
+                    ->one();
 
-            $currency = Currency::find()
-                ->where(['code' => $result->currency->code])
-                ->one();
-
-            if($currency) {
-                $result->currency = $currency;
+                if($currency) {
+                    $result->currency = $currency;
+                }
             }
-        }
 
-        if (isset($result->country_code)) {
+            //Fix: https://www.pivotaltracker.com/story/show/165662472
 
-            $country = Country::find()
-                ->where(['iso' => $result->country_code])
-                ->one();
+            if (!isset($result->city)) {
+                if ($result->region_name)
+                    $result->city = $result->region_name;
+                else if ($result->location && $result->location->capital)
+                    $result->city = $result->location->capital;
+                else
+                    $result->city = $result->continent_name;
+            }
 
-            $result->country = $country;
+            if (isset($result->country_code)) {
+
+                $country = Country::find()
+                    ->where(['iso' => $result->country_code])
+                    ->one();
+
+                $result->country = $country;
+            }
         }
 
         return $result;
