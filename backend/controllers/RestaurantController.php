@@ -664,7 +664,8 @@ class RestaurantController extends Controller {
 
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
-        else if(str_contains($store->restaurant_domain, ".plugn.site"))
+        else
+        //if(str_contains($store->restaurant_domain, ".plugn.site"))
         {
             $store->restaurant_domain = str_replace(".plugn.site", ".plugn.store", $store->restaurant_domain);
 

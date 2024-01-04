@@ -418,6 +418,7 @@ class StoreController extends BaseController
         else if(str_contains($store->restaurant_domain, ".plugn.store"))
         {
             $store->restaurant_domain = str_replace(".plugn.store", ".plugn.site", $store->restaurant_domain);
+            $store->version = Yii::$app->params['storeVersion'];
 
             if(!$store->save()) {
                 return self::message("error",$store->errors);
