@@ -328,7 +328,15 @@ $this->registerJs($js);
                 'site_id',
                 'store_branch_name',
                 'has_deployed',
-                'restaurant_domain',
+                [
+                    'attribute' => 'restaurant_domain',
+                    'format' => 'raw',
+                    'value' => function($data) {
+                        return Html::a($data->restaurant_domain, $data->restaurant_domain, [
+                            "target" => "_blank"
+                        ]);
+                    }
+                ],
             ]
         ]); ?>
 
