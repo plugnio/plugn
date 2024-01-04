@@ -6,9 +6,11 @@ use agent\models\RestaurantPaymentMethod;
 use backend\components\ChartWidget;
 use backend\models\Admin;
 use backend\models\CountrySearch;
+use common\models\BusinessCategory;
 use common\models\Payment;
 use common\models\Restaurant;
 use common\models\RestaurantDomainRequest;
+use common\models\RestaurantType;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -41,7 +43,7 @@ class StatsController extends Controller
                 'rules' => [
                     [
                         'actions' => ['index', 'graph', 'store-retention', 'graph-fees', 'graph-stores', 'graph-orders',
-                            'customer-funnel', 'sales', 'payment-gateways', 'graph-customers', 'countries', 'domain', 'clear-cache'],
+                            'customer-funnel', 'sales', 'graph-category', 'payment-gateways', 'graph-customers', 'countries', 'domain', 'clear-cache'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -707,6 +709,48 @@ class StatsController extends Controller
             "categories" => $categories,
             "seriesData" => $seriesData
         ];
+    }
+
+    public function actionGraphCategory() {
+
+        $bs = BusinessCategory::find()
+            ->asArray()
+            ->all();
+
+        $categories = [];
+        $seriesData = [];
+        $orderSeriesData = [];
+
+        foreach ($bs as $bcategory) {
+            $categories[] = $bcategory['business_category_en'];
+            $seriesData[] = (int) Restaurant::find()
+                ->joinWith(['restaurantType'])
+                ->andWhere(['is_deleted' => 0, 'business_category_uuid' => $bcategory['business_category_uuid']])
+                ->count();
+            $orderSeriesData[] = (int) Order::find()
+                ->joinWith(['restaurantType'])
+                ->filterCompleted()
+                ->andWhere(['business_category_uuid' => $bcategory['business_category_uuid']])
+                ->count();
+        }
+
+        $categories[] = "Not categorized";
+        $seriesData[] = (int) Restaurant::find()
+            ->joinWith(['restaurantType'])
+            ->andWhere(['is_deleted' => 0])
+            ->andWhere(new Expression("business_category_uuid IS NULL"))
+            ->count();
+        $orderSeriesData[] = (int) Order::find()
+            ->joinWith(['restaurantType'])
+            ->filterCompleted()
+            ->andWhere(new Expression("business_category_uuid IS NULL"))
+            ->count();
+
+        return $this->render('category', [
+            "categories" => $categories,
+            "seriesData" => $seriesData,
+            "orderSeriesData" => $orderSeriesData
+        ]);
     }
 
     public function actionClearCache() {
