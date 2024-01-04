@@ -2356,6 +2356,15 @@ failed: the order has failed to find a driver */
     }
 
     /**
+     * @param $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurantType($modelClass = "\common\models\RestaurantType")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[Currency]].
      *
      * @return \yii\db\ActiveQuery
