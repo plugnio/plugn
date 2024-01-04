@@ -76,7 +76,8 @@ class PlanPriceController extends Controller
         $model = new PlanPrice();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->plan_price_id]);
+            return $this->redirect(['plan/view', 'id' => $model->plan_id]);
+            //return $this->redirect(['view', 'id' => $model->plan_price_id]);
         }
 
         return $this->render('create', [
@@ -96,7 +97,7 @@ class PlanPriceController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->plan_price_id]);
+            return $this->redirect(['plan/view', 'id' => $model->plan_id]);
         }
 
         return $this->render('update', [
