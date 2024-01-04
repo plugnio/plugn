@@ -11,6 +11,14 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+        /*'cache' => [
+            'class' => 'yii\redis\Cache',
+            'redis' => [
+                'hostname' => 'localhost',
+                'port' => 6379,
+                'database' => 0,
+            ]
+        ],*/
         'formatter' => [
         'thousandSeparator' => ',',
         'decimalSeparator' => '.',

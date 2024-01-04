@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use agent\models\Currency;
+use common\models\PlanPrice;
 use Yii;
 use common\components\TapPayments;
 use agent\models\Plan;
@@ -21,7 +22,7 @@ class PlanController extends BaseController
         $behaviors = parent::behaviors();
 
         // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
-        $behaviors['authenticator']['except'] = ['options', 'callback', 'payment-webhook'];
+        $behaviors['authenticator']['except'] = ['options', 'callback', 'payment-webhook', 'price'];
 
         return $behaviors;
     }
@@ -33,7 +34,7 @@ class PlanController extends BaseController
     {
         parent::beforeAction ($action);
 
-        if(in_array($action->id, ['payment-webhook', 'options', 'callback'])) {
+        if(in_array($action->id, ['payment-webhook', 'options', 'callback', 'price'])) {
             return true;
         }
 
@@ -372,6 +373,21 @@ class PlanController extends BaseController
                 ];
             }
         }
+    }
+
+    /**
+     * @return array|\yii\db\ActiveRecord|null
+     */
+    public function actionPrice() {
+
+        $code = Yii::$app->request->get('currency');
+
+        if(!$code)
+            $code = "KWD";
+
+        return PlanPrice::find()
+            ->andWhere(['plan_id' => 2, 'currency' => $code])
+            ->one();
     }
 
     /**

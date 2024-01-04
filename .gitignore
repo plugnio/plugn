@@ -64,3 +64,4 @@ phpunit.phar
 
 composer.lock
 
+dump.rdb

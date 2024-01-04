@@ -794,6 +794,7 @@ return [
                    'controller' => 'v1/plan',
                    'patterns' => [
                        'GET callback' => 'callback',
+                       'GET price' => 'price',
                        'GET <id>' => 'view',
                        'POST confirm' => 'confirm',
                        'POST payment-webhook' => 'payment-webhook',
