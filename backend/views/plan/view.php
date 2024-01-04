@@ -47,7 +47,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'created_at',
             //'updated_at',
 
-            //['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{update}',
+                'buttons' => [
+                    'update' => function ($url, $model) {
+                        return  Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['plan-price/update', 'id' => $model->plan_price_id], [
+                            //'class' => 'btn btn-success'
+                           // 'class' => 'glyphicon glyphicon-pencil'
+                        ]);
+                    },
+                ],
+            ],
+
         ],
     ]); ?>
 
