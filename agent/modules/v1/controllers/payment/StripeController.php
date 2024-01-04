@@ -48,7 +48,8 @@ class StripeController extends BaseController
 
             $currency = $currency_code? Currency::findOne(['code' => $currency_code]): $store->currency;
 
-            $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id, $currency);
+            $subscription = \agent\models\SubscriptionPayment::initPayment($plan_id, $paymentMethod->payment_method_id,
+                $currency);
 
             if(isset($subscription['message'])) {
                 return $subscription;
@@ -83,10 +84,11 @@ class StripeController extends BaseController
             $payment->payment_gateway_transaction_id = $paymentIntent->id;
             $payment->save(false);
 
+            //* pow(10, $currency->decimal_place)
             return [
                 'operation' => 'success',
                 "currency_code" => $currency->code,
-                "amount" => $payment->payment_amount_charged * pow(10, $currency->decimal_place),
+                "amount" => $payment->payment_amount_charged,
                 'clientSecret' => $paymentIntent->client_secret,
                 "stripePublishableKey" => $stripePublishableKey,
                 'success_url' => Url::to(['payment/stripe/callback', 'intent_id' => $paymentIntent->id], true),
