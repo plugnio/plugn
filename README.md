@@ -205,3 +205,7 @@ for each site
 https://developers.tap.company/reference/create-a-charge
 
 - make sure account on subscription finish, getting invoices for commission 
+
+Experience with Redis or ElasticCache as cache component (as file cache throwing warnings)
+
+https://www.yiiframework.com/extension/yiisoft/yii2-redis/doc/api/2.0/yii-redis-cache
