@@ -630,9 +630,15 @@ $this->registerJs($js);
                     },
                     'format' => 'raw'
                 ],
+
                 'tap_queue_id',
+
                 'identification_file_front_side',
                 'identification_file_back_side',
+                'commercial_license_file',
+                'authorized_signature_file',
+                'iban_certificate_file',
+
                 'vendor_sector',
                 'supplierCode',
                 'business_id',
@@ -650,8 +656,7 @@ $this->registerJs($js);
                 'license_number',
                 'not_for_profit',
                 'authorized_signature_file_purpose',
-                'authorized_signature_file_id',
-                'authorized_signature_file',
+
                 'authorized_signature_title',
                 'authorized_signature_expiry_date',
                 'authorized_signature_issuing_date',
@@ -669,7 +674,7 @@ $this->registerJs($js);
                 'identification_file_purpose',
                 'commercial_license_issuing_date',
                 'commercial_license_expiry_date',
-                'commercial_license_file',
+
                 'commercial_license_file_purpose',
             ]
         ]); ?>
