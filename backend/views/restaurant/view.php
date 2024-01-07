@@ -567,6 +567,26 @@ $this->registerJs($js);
         ?>
 
         <?=
+        Html::a('Force Create Tap Account', ['force-create-tap-account', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to force tap account creation? This will remove current tap account details.',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+
+        <?=
+        Html::a('Remove tap credential detail', ['reset-tap-credentials', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to remove details for this store? This will not remove actual tap account.',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+
+        <?=
         Html::a('Remove tap account detail', ['reset-tap', 'id' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger btn-process-queue',
             'data' => [
