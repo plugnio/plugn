@@ -140,5 +140,8 @@ return [
         'eventManager' => [
             'class' => 'common\components\EventManager',
         ],
+        'jwt' => [
+            'class' => 'common\components\JWT'
+        ],
     ],
 ];

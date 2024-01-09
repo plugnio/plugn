@@ -62,6 +62,8 @@ return [
                         'POST update-email' => 'update-email',
                         'POST resend-verification-email' => 'resend-verification-email',
                         'POST verify-email' => 'verify-email',
+                        'POST login-by-apple' => 'login-by-apple',
+                        'POST login-by-google' => 'login-by-google',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
                         'OPTIONS locate' => 'options',
@@ -73,7 +75,9 @@ return [
                         'OPTIONS update-email' => 'options',
                         'OPTIONS resend-verification-email' => 'options',
                         'OPTIONS verify-email' => 'options',
-                        'OPTIONS signup-step-one' => 'options'
+                        'OPTIONS signup-step-one' => 'options',
+                        'OPTIONS login-by-apple' => 'options',
+                        'OPTIONS login-by-google' => 'options'
                     ]
                 ],
                 [// AgentController

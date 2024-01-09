@@ -99,7 +99,9 @@ class AuthController extends Controller {
             'verify-email',
             'is-email-verified',
             'login-auth0',
-            'locate'
+            'locate',
+            'login-by-apple',
+            'login-by-google'
         ];
 
         return $behaviors;
@@ -160,7 +162,7 @@ class AuthController extends Controller {
         if(!$response->isOk) {
             return [
                 "operation" => "error",
-                "message" => "Invalid access token"
+                "message" => Yii::t('agent',"Invalid access token")
             ];
         }
 
@@ -170,7 +172,7 @@ class AuthController extends Controller {
         {
             return [
                 "operation" => "error",
-                "message" => "We've faced a problem creating your account, please contact us for assistance.",
+                "message" => Yii::t('agent',"We've faced a problem creating your account, please contact us for assistance.")
             ];
         }
 
@@ -186,7 +188,7 @@ class AuthController extends Controller {
             return [
                 "operation" => "error",
                 "code" => 1,
-                "message" => "Account not found"
+                "message" => Yii::t('agent',"Account not found")
             ];
         }
 
@@ -206,6 +208,93 @@ class AuthController extends Controller {
         }*/
 
         return $this->_loginResponse($agent);
+    }
+
+    /**
+     * Sign up with google login
+     */
+    public function actionLoginByGoogle() {
+
+        $token = Yii::$app->request->getBodyParam("idToken");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" . $token);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = json_decode(curl_exec($ch));
+
+        if (empty($response->email)) {
+            return [
+                'operation' => 'error',
+                "code" => 1,
+                'message' => Yii::t('agent',"Invalid access token")
+            ];
+        }
+
+        $model = Agent::find()
+            ->andWhere(['agent_email' => $response->email])
+            ->one();
+
+
+        if (!$model) {
+            return [
+                "operation" => "error",
+                "code" => 1,
+                "message" => Yii::t('agent',"Account not found")
+            ];
+        }
+
+        return $this->_loginResponse($model);
+    }
+
+    /**
+     *
+     * Sign up with apple login
+     */
+    public function actionLoginByApple() {
+
+        try {
+
+            $jwt = Yii::$app->request->getBodyParam("identityToken");
+
+            //will throw error on invalid token
+
+            $payload = Yii::$app->jwt->decode($jwt);
+
+        } catch(\ErrorException $e) {
+
+            return [
+                'operation' => 'error',
+                'message' => $e->getMessage()
+            ];
+
+        }
+
+        if(empty($payload->email)) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('agent',"Invalid access token")
+            ];
+        }
+
+        $email = $payload->email;
+
+        //$familyName = Yii::$app->request->getBodyParam("familyName");
+        //$givenName = Yii::$app->request->getBodyParam("givenName");
+
+        $model = Agent::find()
+            ->andWhere(['agent_email' => $email])
+            ->one();
+
+
+        if (!$model) {
+            return [
+                "operation" => "error",
+                "code" => 1,
+                "message" => Yii::t('agent',"Account not found")
+            ];
+        }
+
+        return $this->_loginResponse($model);
     }
 
     /**
