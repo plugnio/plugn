@@ -328,7 +328,15 @@ $this->registerJs($js);
                 'site_id',
                 'store_branch_name',
                 'has_deployed',
-                'restaurant_domain',
+                [
+                    'attribute' => 'restaurant_domain',
+                    'format' => 'raw',
+                    'value' => function($data) {
+                        return Html::a($data->restaurant_domain, $data->restaurant_domain, [
+                            "target" => "_blank"
+                        ]);
+                    }
+                ],
             ]
         ]); ?>
 
@@ -559,6 +567,26 @@ $this->registerJs($js);
         ?>
 
         <?=
+        Html::a('Force Create Tap Account', ['force-create-tap-account', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to force tap account creation? This will remove current tap account details.',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+
+        <?=
+        Html::a('Remove tap credential detail', ['reset-tap-credentials', 'id' => $model->restaurant_uuid], [
+            'class' => 'btn btn-danger btn-process-queue',
+            'data' => [
+                'confirm' => 'Are you sure you want to remove details for this store? This will not remove actual tap account.',
+                'method' => 'post',
+            ],
+        ])
+        ?>
+
+        <?=
         Html::a('Remove tap account detail', ['reset-tap', 'id' => $model->restaurant_uuid], [
             'class' => 'btn btn-danger btn-process-queue',
             'data' => [
@@ -622,9 +650,15 @@ $this->registerJs($js);
                     },
                     'format' => 'raw'
                 ],
+
                 'tap_queue_id',
+
                 'identification_file_front_side',
                 'identification_file_back_side',
+                'commercial_license_file',
+                'authorized_signature_file',
+                'iban_certificate_file',
+
                 'vendor_sector',
                 'supplierCode',
                 'business_id',
@@ -642,8 +676,7 @@ $this->registerJs($js);
                 'license_number',
                 'not_for_profit',
                 'authorized_signature_file_purpose',
-                'authorized_signature_file_id',
-                'authorized_signature_file',
+
                 'authorized_signature_title',
                 'authorized_signature_expiry_date',
                 'authorized_signature_issuing_date',
@@ -661,7 +694,7 @@ $this->registerJs($js);
                 'identification_file_purpose',
                 'commercial_license_issuing_date',
                 'commercial_license_expiry_date',
-                'commercial_license_file',
+
                 'commercial_license_file_purpose',
             ]
         ]); ?>

@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use backend\models\Admin;
+use common\models\Currency;
 use Yii;
 use common\models\Plan;
 use common\models\PlanSearch;
@@ -118,6 +119,48 @@ class PlanController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * update price
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws \yii\db\Exception
+     */
+    public function actionUpdatePrice($id)
+    {
+        $model = $this->findModel($id);
+
+        $currencies = \agent\models\Currency::find()
+            ->all();
+
+        $kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+        $amountInUSD = $model->price / $kwdCurrency->rate;
+
+        $data = [];
+
+        foreach ($currencies as $currency)
+        {
+            $amount = $currency->code == "KWD"? $model->price:
+                round($amountInUSD * $currency->rate, $currency->decimal_place);
+
+            $data[] = [
+                $model->plan_id,
+                $currency->code,
+                $amount,
+                date('Y-m-d H:i:s'),
+                date('Y-m-d H:i:s'),
+            ];
+        }
+
+        PlanPrice::deleteAll();
+
+        Yii::$app->db->createCommand()->batchInsert('plan_price',
+            ['plan_id', 'currency', 'price', "created_at", "updated_at"], $data)->execute();
+
+        return $this->redirect(['view', 'id' => $model->plan_id]);
     }
 
     /**

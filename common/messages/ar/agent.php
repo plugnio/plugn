@@ -1,5 +1,7 @@
 <?php
 return [
+    "Invalid access token" => "تصريح الدخول غير صالح",
+    "We've faced a problem creating your account, please contact us for assistance." => "لقد واجهنا مشكلة في إنشاء حسابك، يرجى الاتصال بنا للحصول على المساعدة.",
     "Invalid captcha validation" => "التحقق من صحة كلمة التحقق غير صالح",
     "Please click the verification link sent to you by email to activate your account" => "الرجاء الضغط على رابط التحقق المرسل إليك عبر البريد الإلكتروني لتفعيل حسابك",
     "Store created successfully" => "تم إنشاء المتجر بنجاح",

@@ -1397,7 +1397,7 @@ class Restaurant extends ActiveRecord
     /**
      * Create an account for vendor on tap
      */
-    public function createTapAccount()
+    public function createTapAccount($forceCreate = false)
     {
         //Upload documents file on our server before we create an account on tap we gonaa delete them
 
@@ -1412,7 +1412,7 @@ class Restaurant extends ActiveRecord
 
         //Create a business for a vendor on Tap if not already exists
 
-        if (!$this->business_id || !$this->business_entity_id || !$this->developer_id) {
+        if ($forceCreate || (!$this->business_id || !$this->business_entity_id || !$this->developer_id)) {
 
             $response = $this->createBusiness();
 
@@ -1423,7 +1423,7 @@ class Restaurant extends ActiveRecord
 
         //Create a merchant on Tap if not already added
 
-        if (!$this->merchant_id || !$this->wallet_id) {
+        if ($forceCreate || (!$this->merchant_id || !$this->wallet_id)) {
 
             $response = $this->createMerchant();
 

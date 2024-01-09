@@ -215,6 +215,10 @@ class Category extends \yii\db\ActiveRecord
     {
         $filename = Yii::$app->security->generateRandomString ();
 
+        if($imageURL && !str_contains($imageURL, "https://")) {
+            $imageURL = Yii::$app->temporaryBucketResourceManager->getUrl($imageURL);
+        }
+
         try {
             //Delete old category image
 

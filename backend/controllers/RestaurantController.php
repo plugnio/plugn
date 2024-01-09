@@ -151,6 +151,61 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionForceCreateTapAccount($id)
+    {
+        $store = $this->findModel($id);
+
+        $response = $store->createTapAccount(true);
+
+        if($response["operation"] == 'error') {
+            Yii::$app->session->addFlash('error', print_r($response['message'], true));
+        } else {
+            Yii::$app->session->addFlash('success', $response['message']);
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
+
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionResetTapCredentials($id)
+    {
+        $store = $this->findModel($id);
+
+        $store->setScenario(Restaurant::SCENARIO_RESET_TAP_ACCOUNT);
+
+        $store->business_id = null;
+        $store->business_entity_id = null;
+        $store->wallet_id = null;
+        $store->merchant_id = null;
+
+        $store->operator_id = null;
+        $store->live_api_key = null;
+        $store->test_api_key = null;
+        $store->developer_id = null;
+
+        $store->live_public_key = null;
+        $store->test_public_key = null;
+
+        if(!$store->save()) {
+            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors));
+        }
+        else
+        {
+            Yii::$app->session->setFlash('successResponse', 'Tap account credential removed.');
+        }
+
+        return $this->redirect(['view', 'id' => $id]);
+    }
+
     public function actionResetTap($id)
     {
         $store = $this->findModel($id);
@@ -161,12 +216,20 @@ class RestaurantController extends Controller {
         $store->business_entity_id = null;
         $store->wallet_id = null;
         $store->merchant_id = null;
-        $store->tap_merchant_status = null;
-        $store->operator_id = null;
 
+        $store->operator_id = null;
         $store->live_api_key = null;
         $store->test_api_key = null;
+        $store->developer_id = null;
+
+        $store->live_public_key = null;
+        $store->test_public_key = null;
+
+
+
         $store->license_number = null;
+
+        $store->tap_merchant_status = null;
 
         $store->authorized_signature_issuing_date = null;
         $store->authorized_signature_expiry_date = null;
@@ -184,7 +247,7 @@ class RestaurantController extends Controller {
         //$store->identification_title = null;
         //$store->identification_file_purpose = null;
         $store->restaurant_email_notification = null;
-        $store->developer_id = null;
+
 
         $store->commercial_license_issuing_date = null;
         $store->commercial_license_expiry_date = null;
@@ -193,8 +256,7 @@ class RestaurantController extends Controller {
         $store->commercial_license_file_id = null;
         //$store->commercial_license_file_purpose = null;
 
-        $store->live_public_key = null;
-        $store->test_public_key = null;
+
 
         $store->is_tap_enable = null;
         $store->is_tap_created = null;
@@ -664,7 +726,8 @@ class RestaurantController extends Controller {
 
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
-        else if(str_contains($store->restaurant_domain, ".plugn.site"))
+        else
+        //if(str_contains($store->restaurant_domain, ".plugn.site"))
         {
             $store->restaurant_domain = str_replace(".plugn.site", ".plugn.store", $store->restaurant_domain);
 

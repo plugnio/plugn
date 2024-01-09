@@ -25,6 +25,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+
+        <?= Html::a('Update Plan Prices', ['update-price', 'id' => $model->plan_id], [
+            'class' => 'btn btn-danger btn-delete',
+            'data' => [
+                'confirm' => 'Are you sure you want to update prices?',
+                'method' => 'post',
+            ],
+        ]) ?>
     </p>
 
     <?= DetailView::widget([
