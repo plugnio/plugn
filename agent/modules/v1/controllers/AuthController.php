@@ -984,6 +984,7 @@ class AuthController extends Controller {
             "agent_new_email" => $agent->agent_new_email,
             "language_pref" => $agent->agent_language_pref,
             "role" =>  $assignment? (int) $assignment->role: null,
+            "created_at" => strtotime($agent->agent_created_at),
             "selectedStore" => $selectedStore,
             "stores" => $stores
         ];
