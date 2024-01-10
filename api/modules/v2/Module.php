@@ -6,6 +6,7 @@ use common\models\BlockedIp;
 use common\models\Restaurant;
 use Yii;
 use yii\web\Response;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * v2 module definition class
@@ -48,7 +49,13 @@ class Module extends \yii\base\Module
 
         $authHeader = Yii::$app->request->getHeaders()->get('Authorization');
         if ($authHeader !== null && preg_match('/^Bearer\s+(.*?)$/', $authHeader, $matches)) {
-            Yii::$app->user->loginByAccessToken($matches[1]);
+            $identity = Yii::$app->user->loginByAccessToken($matches[1]);
+
+            if(!$identity) {
+
+                //throw new UnauthorizedHttpException("Invalid token");
+
+            }
         }
 
         $lang = \Yii::$app->request->headers->get('language');
