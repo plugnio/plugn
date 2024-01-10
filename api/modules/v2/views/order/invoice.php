@@ -12,7 +12,7 @@
 
                             <!--
                             <img *ngIf="order.armada_qr_code_link" [src]="order.armada_qr_code_link" width="100" height="100"></img>
-                              -->
+-->
 
                             <?php if(!$order->restaurant->logo) { ?>
                                 <img src="<?= $defaultLogo ?>"></img>
