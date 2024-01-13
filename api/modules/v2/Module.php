@@ -25,6 +25,8 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
+        header('Access-Control-Allow-Origin: *');
+
         /*$store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
         if($store_id) {
@@ -95,7 +97,6 @@ class Module extends \yii\base\Module
         $isBlocked = BlockedIp::find()->andWhere(['ip_address' => $ip])->exists();
 
         if($isBlocked) {
-            header('Access-Control-Allow-Origin: *');
             throw new \yii\web\HttpException(403, 'ILLEGAL USAGE');
         }
     }
