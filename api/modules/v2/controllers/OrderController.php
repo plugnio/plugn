@@ -53,6 +53,8 @@ class OrderController extends Controller
             ],
         ];
 
+
+
         return $behaviors;
     }
 
@@ -996,8 +998,6 @@ class OrderController extends Controller
         $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
         $fontData = $defaultFontConfig['fontdata'];
 
-        //echo  __DIR__ . '/../../../web/fonts/Nunito';
-        //die();
         $pdf = new Pdf([
             'options' => [
                 'defaultheaderline' => 0,  //for header
@@ -1028,7 +1028,7 @@ class OrderController extends Controller
             // portrait orientation
             'orientation' => Pdf::ORIENT_PORTRAIT,
             // stream to browser inline
-            'destination' => Pdf::DEST_FILE,
+            'destination' => Pdf::DEST_DOWNLOAD,
             // your html content input
             'content' => $content,
             // format content from your own css file if needed or use the
@@ -1047,10 +1047,7 @@ class OrderController extends Controller
         ]);
 
         header('Access-Control-Allow-Origin: *');
-
-        $file = $pdf->render();
-
-        return Yii::$app->response->sendFile($file, 'Invoide-' . $id . '.png');
+        return $pdf->render();
     }
 
     /**

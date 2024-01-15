@@ -6,6 +6,7 @@ use common\models\BlockedIp;
 use common\models\Restaurant;
 use Yii;
 use yii\web\Response;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * v2 module definition class
@@ -23,6 +24,8 @@ class Module extends \yii\base\Module
     public function init()
     {
         parent::init();
+
+        header('Access-Control-Allow-Origin: *');
 
         /*$store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
@@ -48,7 +51,13 @@ class Module extends \yii\base\Module
 
         $authHeader = Yii::$app->request->getHeaders()->get('Authorization');
         if ($authHeader !== null && preg_match('/^Bearer\s+(.*?)$/', $authHeader, $matches)) {
-            Yii::$app->user->loginByAccessToken($matches[1]);
+            $identity = Yii::$app->user->loginByAccessToken($matches[1]);
+
+            if(!$identity) {
+
+                //throw new UnauthorizedHttpException("Invalid token");
+
+            }
         }
 
         $lang = \Yii::$app->request->headers->get('language');
@@ -88,7 +97,6 @@ class Module extends \yii\base\Module
         $isBlocked = BlockedIp::find()->andWhere(['ip_address' => $ip])->exists();
 
         if($isBlocked) {
-            header('Access-Control-Allow-Origin: *');
             throw new \yii\web\HttpException(403, 'ILLEGAL USAGE');
         }
     }
