@@ -54,6 +54,16 @@ return [
             'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
+                [ // PingController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/ping',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'test',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                    ]
+                ],
                 [ // BlogController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/blog',
