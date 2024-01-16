@@ -72,15 +72,32 @@ class DeliveryZoneController extends Controller
      */
     public function actionListOfCountries($restaurant_uuid)
     {
+        $keyword = Yii::$app->request->get("keyword");
+        $onlyCountries = Yii::$app->request->get("onlyCountries");
+
         $store = $this->findStore($restaurant_uuid);
 
         $subQuery = $store->getDeliveryZones()
             ->select('delivery_zone.country_id')
             ->distinct();
 
-        $countries = Country::find()
-            ->andWhere(['IN', 'country.country_id', $subQuery])
+        $query = Country::find()
+            ->andWhere(['IN', 'country.country_id', $subQuery]);
+
+        if($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'country_name', $keyword],
+                ['like', 'country_name_ar', $keyword],
+            ]);
+        }
+
+        $countries = $query
             ->all();
+
+        if($onlyCountries) {
+            return $countries;
+        }
 
         $data = [];
 
@@ -114,7 +131,6 @@ class DeliveryZoneController extends Controller
      */
     public function actionListPickupLocations($restaurant_uuid)
     {
-
         if ($store = Restaurant::findOne($restaurant_uuid)) {
 
             $pickupLocations = $store->getPickupBusinessLocations()->asArray()->all();
@@ -141,7 +157,6 @@ class DeliveryZoneController extends Controller
      */
     public function actionGetDeliveryZone($restaurant_uuid, $delivery_zone_id)
     {
-
 
         $area_id = Yii::$app->request->get("area_id");
 
