@@ -25,6 +25,9 @@ return [
           'enableSession' => false,
           'loginUrl' => null
         ],
+        'eventManager' => [
+            'class' => 'agent\components\EventManager',
+        ],
         'request' => [
             'enableCookieValidation' => false,
             // Accept and parse JSON Requests

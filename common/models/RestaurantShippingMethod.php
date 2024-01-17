@@ -57,6 +57,35 @@ class RestaurantShippingMethod extends \yii\db\ActiveRecord
     }
 
     /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if(YII_ENV == 'prod') {
+
+            $this->restaurant->getShippingMethods();
+
+            $methods = ShippingMethod::find()->all();
+
+            $props = [];
+
+            foreach ($methods as $method) {
+                $props[strtolower($method->name_en) + "_enabled"] = $this->restaurant->getRestaurantShippingMethods()
+                    ->andWhere(['shipping_method_id ' => $method->shipping_method_id])
+                    ->exists();
+            }
+
+            $props["number_of_shipping_partners"] = $this->restaurant->getRestaurantShippingMethods()->count();
+
+            Yii::$app->eventManager->track("Shipping Settings Updated", $props);
+        }
+    }
+
+    /**
      * Gets query for [[Restaurant]].
      *
      * @return \yii\db\ActiveQuery

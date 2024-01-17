@@ -129,11 +129,18 @@ class BusinessLocation extends \yii\db\ActiveRecord
                 'business_location_id' => $this->business_location_id,
                 'restaurant_uuid' => $this->restaurant_uuid,
             ]);
-
-
-
         }
 
+        if(YII_ENV == 'prod' && $insert) {
+            $props = [
+                "location_name" => $this->business_location_name,
+                "vat_details_added" => $this->business_location_tax > 0,
+                "pickup_enabled" => $this->support_pick_up,
+                "delivery_zone_count" => $this->getDeliveryZones()->count()
+            ];
+
+            Yii::$app->eventManager->track("Business Location Added", $props);
+        }
     }
 
     /**
