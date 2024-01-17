@@ -151,6 +151,13 @@ class StaffController extends BaseController {
             $model->inviteAgent();
         }
 
+        if (YII_ENV == 'prod') {
+            Yii::$app->eventManager->track('Staff Added', [
+                "name" => $agent->agent_name,
+                "role" => $model->role
+            ]);
+        }
+
         return [
             "operation" => "success",
             "message" => Yii::t('agent',"Staff created successfully"),
@@ -237,6 +244,13 @@ class StaffController extends BaseController {
                     "message" => Yii::t('agent',"We've faced a problem deleting Staff")
                 ];
             }
+        }
+
+        if (YII_ENV == 'prod') {
+            Yii::$app->eventManager->track('Staff Removed', [
+                "name" => $model->agent->agent_name,
+                "role" => $model->role
+            ]);
         }
 
         return [
