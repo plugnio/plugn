@@ -100,6 +100,26 @@ class DeliveryZone extends \yii\db\ActiveRecord
         }
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+
+        if(YII_ENV == 'prod' && $insert) {
+            $props = [
+                "country" => $this->country_id,
+                "delivery_to_whole_country" => $this->deliver_whole_country,
+                "delivery_time_minutes" => $this->delivery_time,
+                "delivery_fee" => $this->delivery_fee,
+                "delivery_fee_currency" => $this->restaurant->currency ? $this->restaurant->currency->code: null,
+                "min_charge_on_each_order" => $this->min_charge,
+                "min_charge_on_each_order_currency" => $this->restaurant->currency ? $this->restaurant->currency->code: null,
+            ];
+
+            Yii::$app->eventManager->track("Delivery Zone Added", $props);
+        }
+    }
+
     /**
      * @inheritdoc
      */
