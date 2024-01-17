@@ -5,7 +5,6 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\db\Expression;
-use yii\rest\Controller;
 
 
 class AgentController extends BaseController
@@ -68,6 +67,12 @@ class AgentController extends BaseController
                 "operation" => "error",
                 "message" => $model->errors
             ];
+        }
+
+        if (YII_ENV == 'prod') {
+            Yii::$app->eventManager->track('Profile Deleted', [
+                "profile_status" => "Deleted",
+            ]);
         }
 
         return [

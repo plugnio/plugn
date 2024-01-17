@@ -114,6 +114,15 @@ class WebLink extends \yii\db\ActiveRecord
       $store_web_link_model->web_link_id = $this->web_link_id;
       $store_web_link_model->save(false);
 
+        if (YII_ENV == 'prod') {
+            Yii::$app->eventManager->track('Web Link Added', [
+                "web_link_type" => $this->web_link_type,
+                "title_engilish" => $this->web_link_title,
+                "title_arabic" => $this->web_link_title_ar,
+                "web_link_url" => $this->url,
+            ]);
+        }
+
       return  true;
     }
 
