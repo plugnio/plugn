@@ -1263,8 +1263,16 @@ class StoreController extends BaseController
         return $model->deleteSite ();
     }
 
+    /**
+     * close store
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionDeactivate()
     {
+        //todo: prompt for reason value in dashboard app
+        $reason = Yii::$app->request->getBodyParam("reason");
+
         $model = $this->findModel();
 
         $model->setScenario(Restaurant::SCENARIO_UPDATE_STATUS);
@@ -1276,6 +1284,13 @@ class StoreController extends BaseController
                 "operation" => "error",
                 "message" => $model->errors
             ];
+        }
+
+        if (YII_ENV == 'prod') {
+            Yii::$app->eventManager->track('Store Deactivated', [
+                "reason" => $reason,
+                "store_status" => Restaurant::RESTAURANT_STATUS_CLOSED
+            ]);
         }
 
         return self::message("success", "Status changed successfully");

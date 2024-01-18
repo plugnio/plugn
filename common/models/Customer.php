@@ -188,6 +188,25 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
         ];
     }
 
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (YII_ENV == 'prod') {
+            Yii::$app->eventManager->track('Customer Account Created', [
+                "customer_name" => $this->customer_name,
+                "customer_email" => $this->customer_email,
+                "customer_phone_number" => $this->customer_phone_number,
+                "customer_id" => $this->customer_id
+            ]);
+        }
+    }
+
     public function beforeSave($insert)
     {
         if(!parent::beforeSave($insert)) {

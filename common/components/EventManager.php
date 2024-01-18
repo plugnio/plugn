@@ -114,6 +114,12 @@ class EventManager extends Component
      */
     public function track($event, $eventData, $timestamp = null, $userId = null)
     {
+        //if login and userId not provided
+
+        if(is_null($userId) && isset(Yii::$app->user) && !Yii::$app->user->isGuest) {
+            $userId = Yii::$app->user->getId();
+        }
+
         if($this->_client) {
             
             $mixpanelData = $eventData;
@@ -138,12 +144,6 @@ class EventManager extends Component
                 'properties' => $eventData,
                 'timestamp' => $timestamp
             ];
-
-            //if login and userId not provided
-
-            if(is_null($userId) && isset(Yii::$app->user) && !Yii::$app->user->isGuest) {
-                $userId = Yii::$app->user->getId();
-            }
 
             if(!$userId) {
                 $userId = "anonymous";
