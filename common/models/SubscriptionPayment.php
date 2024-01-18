@@ -283,6 +283,8 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      */
     public static function onPaymentCaptured($paymentRecord) {
 
+        $subscription =$paymentRecord->subscription;
+
         if(YII_ENV == 'prod')
         {
             //Send event to Segment
@@ -290,7 +292,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             $kwdCurrency = Currency::findOne(['code' => 'KWD']);
 
             $rate = 1 / $kwdCurrency->rate;// to USD
-            
+
             Yii::$app->eventManager->track('Premium Plan Purchase',  [
                     'order_id' => $paymentRecord->payment_uuid,
                     'payment_amount_charged' => $paymentRecord->payment_amount_charged,
@@ -298,6 +300,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                     'value' => ( $paymentRecord->payment_amount_charged * $rate),
                     'paymentMethod' => $paymentRecord->payment_mode,
                     'currency' => 'USD',
+                    'company_plan' => $subscription->plan->name,
                     'restaurant_uuid' => $paymentRecord->restaurant_uuid
                 ],
                 null, 
@@ -310,7 +313,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
         Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and',
             ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);
 
-        $subscription =$paymentRecord->subscription;
+
         $subscription->subscription_status = Subscription::STATUS_ACTIVE;
 
         $valid_for =  $subscription->plan->valid_for;

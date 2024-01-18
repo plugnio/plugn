@@ -1220,6 +1220,27 @@ class OrderController extends Controller
             ];
         }
 
+        if (YII_ENV == 'prod') {
+
+            $shipping_partner = "";
+
+            if($model->armada_tracking_link) {
+                $shipping_partner = "Armada";
+            } else if($model->aramex_shipment_id) {
+                $shipping_partner = "Aramex";
+            } else if($model->mashkor_order_status) {
+                $shipping_partner = "Mashkor";
+            }
+
+            Yii::$app->eventManager->track('Order Tracked', [
+                "order_uuid" => $model->order_uuid,
+                "shipping_partner" => $shipping_partner
+            ],
+                null,
+                $model->restaurant_uuid
+            );
+        }
+
         unset($model['armada_qr_code_link']);
         unset($model['armada_delivery_code']);
         unset($model['mashkor_order_number']);

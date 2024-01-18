@@ -594,6 +594,18 @@ class AuthController extends Controller {
      */
     private function _loginResponse($customer, $new_user = 0) {
 
+        if(YII_ENV == 'prod')
+        {
+            $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
+
+            Yii::$app->eventManager->track('Customer Logged In',  [
+                "login_method" => "Email"
+            ],
+                null,
+                $store_id
+            );
+        }
+
         // Return Customer access token if everything valid
 
         $accessToken = $customer->accessToken->token_value;

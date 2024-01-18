@@ -1207,6 +1207,31 @@ class StoreController extends BaseController
         if($model->site_id)
             Yii::$app->netlifyComponent->upgradeSite($model);
 
+        if (YII_ENV == 'prod') {
+
+            $props =  [
+                "google_analytics_id" => !empty($model->google_analytics_id),
+                "google_tag_id" => !empty($model->google_tag_id),
+                "google_tag_manager_id" => !empty($model->google_tag_manager_id),
+                "tiktok_pixel_id" => !empty($model->tiktok_pixel_id),
+                "facebook_pixel_id" => !empty($model->facebook_pixel_id),
+                "snapchat_pixel_id" => !empty($model->snapchat_pixel_id),
+            ];
+
+            $props["integrations_enabled"] = [];
+
+            foreach ($props as $key => $prop) {
+                if($key) {
+                    $props["integrations_enabled"][] = explode("_", $key)[0];
+                }
+            }
+
+            Yii::$app->eventManager->track('Integrations Updated', $props,
+                null,
+                $model->restaurant_uuid
+            );
+        }
+
         return self::message("success","Analytics integration updated successfully");
     }
 

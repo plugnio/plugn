@@ -2682,6 +2682,8 @@ class Restaurant extends ActiveRecord
             $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
             $model->save(false);*/
         }
+
+
     }
 
     public function setupStore($agent)
@@ -2781,7 +2783,7 @@ class Restaurant extends ActiveRecord
                 "status" => $this->restaurant_status
             ],
                 null,
-                $agent->agent_id
+                $this->restaurant_uuid
             );
 
             /**
