@@ -393,7 +393,7 @@ class Item extends \yii\db\ActiveRecord
 
                 $count = Item::find()
                     ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
-                    ->one();
+                    ->count();
 
                 if($count == 1) {
                     Yii::$app->eventManager->track('Store Setup Step Complete', [
