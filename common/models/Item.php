@@ -388,7 +388,20 @@ class Item extends \yii\db\ActiveRecord
                 }
 
                 Yii::$app->eventManager->track('Item Added', $props);
-                
+
+                //check if first product
+
+                $count = Item::find()
+                    ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                    ->one();
+
+                if($count == 1) {
+                    Yii::$app->eventManager->track('Store Setup Step Complete', [
+                        'step_name' => "Item Added",
+                        'step_number' => 2
+                    ]);
+                }
+
             } else {
                 Yii::$app->eventManager->track('Item Updated', $props);
             }

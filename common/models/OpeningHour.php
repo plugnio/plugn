@@ -18,7 +18,6 @@ use Yii;
  */
 class OpeningHour extends \yii\db\ActiveRecord
 {
-
     //Values for `day_of_week`
     const DAY_OF_WEEK_SUNDAY = 0;
     const DAY_OF_WEEK_MONDAY = 1;
@@ -29,7 +28,6 @@ class OpeningHour extends \yii\db\ActiveRecord
     const DAY_OF_WEEK_SATURDAY = 6;
 
     public $open_24_hrs;
-
 
     /**
      * these are flags that are used by the form to dictate how the loop will handle each item

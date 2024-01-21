@@ -209,3 +209,8 @@ https://developers.tap.company/reference/create-a-charge
 Experience with Redis or ElasticCache as cache component (as file cache throwing warnings)
 
 https://www.yiiframework.com/extension/yiisoft/yii2-redis/doc/api/2.0/yii-redis-cache
+
+# event list 
+
+https://docs.google.com/spreadsheets/d/14wzSPWjGcJ8h77SxmjiKSxc4rkJiYNITeIISvvRNNnE/edit#gid=1641519238
+

@@ -104,7 +104,6 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-
         if(YII_ENV == 'prod' && $insert) {
             $props = [
                 "country" => $this->country_id,
@@ -117,6 +116,20 @@ class DeliveryZone extends \yii\db\ActiveRecord
             ];
 
             Yii::$app->eventManager->track("Delivery Zone Added", $props);
+
+
+            //if first delivery zone with no pickup option enabled before
+
+            $count  = self::find()
+                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                ->count();
+
+            if($count == 1 && !$this->businessLocation->support_pick_up) {
+                Yii::$app->eventManager->track('Store Setup Step Complete', [
+                    'step_name' => "Shipping",
+                    'step_number' => 3
+                ]);
+            }
         }
     }
 

@@ -140,6 +140,19 @@ class BusinessLocation extends \yii\db\ActiveRecord
             ];
 
             Yii::$app->eventManager->track("Business Location Added", $props);
+
+            //if first business location
+
+            $count  = self::find()
+                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                ->count();
+
+            if($count == 1 && $this->support_pick_up) {
+                Yii::$app->eventManager->track('Store Setup Step Complete', [
+                    'step_name' => "Shipping",
+                    'step_number' => 3
+                ]);
+            }
         }
     }
 
