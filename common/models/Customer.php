@@ -203,7 +203,7 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
                 "customer_email" => $this->customer_email,
                 "customer_phone_number" => $this->customer_phone_number,
                 "customer_id" => $this->customer_id
-            ]);
+            ], null, $this->restaurant_uuid);
         }
     }
 

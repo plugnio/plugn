@@ -126,7 +126,7 @@ class RestaurantPage extends \yii\db\ActiveRecord
                     "page_title" => $this->title,
                     "page_title_arabic" => $this->title_ar,
                     "sort_number" => $this->sort_number
-                ]);
+                ], null, $this->restaurant_uuid);
         }
     }
 

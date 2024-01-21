@@ -918,7 +918,7 @@ class CronController extends \yii\console\Controller
                 ];
             }
 
-            Yii::$app->eventManager->track('Best Selling',  $items);
+            Yii::$app->eventManager->track('Best Selling',  $items);//, null, $item->restaurant_uuid
 
             //inactive stores
 

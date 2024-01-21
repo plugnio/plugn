@@ -70,9 +70,11 @@ class AgentController extends BaseController
         }
 
         if (YII_ENV == 'prod') {
+            $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+
             Yii::$app->eventManager->track('Profile Deleted', [
                 "profile_status" => "Deleted",
-            ]);
+            ], null, $restaurantUuid);
         }
 
         return [

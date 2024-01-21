@@ -187,7 +187,7 @@ class Voucher extends \yii\db\ActiveRecord {
                 "minimum_order_amount" => $this->minimum_order_amount
             ];
 
-             Yii::$app->eventManager->track("Voucher Added", $props); 
+             Yii::$app->eventManager->track("Voucher Added", $props, null, $this->restaurant_uuid);
         }
     }
 

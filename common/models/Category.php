@@ -136,14 +136,14 @@ class Category extends \yii\db\ActiveRecord
 
                 Yii::$app->eventManager->track('Category Added', $props,
                     null,
-                    Yii::$app->user->getId()
+                    $this->restaurant_uuid
                 );
             }
             else
             {
                 Yii::$app->eventManager->track('Category Updated', $props,
                     null,
-                    Yii::$app->user->getId()
+                    $this->restaurant_uuid
                 );
             }
         }

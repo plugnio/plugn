@@ -139,7 +139,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
                 "delivery_zone_count" => $this->getDeliveryZones()->count()
             ];
 
-            Yii::$app->eventManager->track("Business Location Added", $props);
+            Yii::$app->eventManager->track("Business Location Added", $props, null, $this->restaurant_uuid);
 
             //if first business location
 
@@ -151,7 +151,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
                 Yii::$app->eventManager->track('Store Setup Step Complete', [
                     'step_name' => "Shipping",
                     'step_number' => 3
-                ]);
+                ], null, $this->restaurant_uuid);
             }
         }
     }

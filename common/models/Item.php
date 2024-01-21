@@ -384,10 +384,10 @@ class Item extends \yii\db\ActiveRecord
             if($insert) {
 
                 if ($this->item_status == self::ITEM_STATUS_PUBLISH) {
-                    Yii::$app->eventManager->track("Item Published", $props);
+                    Yii::$app->eventManager->track("Item Published", $props, null, $this->restaurant_uuid);
                 }
 
-                Yii::$app->eventManager->track('Item Added', $props);
+                Yii::$app->eventManager->track('Item Added', $props, null, $this->restaurant_uuid);
 
                 //check if first product
 
@@ -399,11 +399,11 @@ class Item extends \yii\db\ActiveRecord
                     Yii::$app->eventManager->track('Store Setup Step Complete', [
                         'step_name' => "Item Added",
                         'step_number' => 2
-                    ]);
+                    ], null, $this->restaurant_uuid);
                 }
 
             } else {
-                Yii::$app->eventManager->track('Item Updated', $props);
+                Yii::$app->eventManager->track('Item Updated', $props, null, $this->restaurant_uuid);
             }
         }
 
@@ -422,7 +422,7 @@ class Item extends \yii\db\ActiveRecord
                 "previous_stock" => $this->stock_qty,
                 "updated_stock" => $this->stock_qty + $qty
             ];
-            Yii::$app->eventManager->track("Inventory Updated", $props);
+            Yii::$app->eventManager->track("Inventory Updated", $props, null, $this->restaurant_uuid);
         }
 
         if ($this->track_quantity)
@@ -450,7 +450,7 @@ class Item extends \yii\db\ActiveRecord
                 "previous_stock" => $this->stock_qty,
                 "updated_stock" => $this->stock_qty - $qty
             ];
-            Yii::$app->eventManager->track("Inventory Updated", $props);
+            Yii::$app->eventManager->track("Inventory Updated", $props, null, $this->restaurant_uuid);
         }
 
         if ($this->track_quantity)

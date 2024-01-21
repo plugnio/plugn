@@ -155,7 +155,7 @@ class OpeningHoursController extends BaseController
         }
 
         if (YII_ENV == 'prod') {
-            Yii::$app->eventManager->track("Opening Hours Updated", $props);
+            Yii::$app->eventManager->track("Opening Hours Updated", $props, null, $store->restaurant_uuid);
         }
 
         return [

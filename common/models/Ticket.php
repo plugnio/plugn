@@ -158,7 +158,7 @@ class Ticket extends \yii\db\ActiveRecord
                     'number_of_attachments' => sizeof($this->attachments)
                 ],
                     null,
-                    Yii::$app->user->getId()
+                    $this->restaurant_uuid
                 );
             }
         }
@@ -179,7 +179,7 @@ class Ticket extends \yii\db\ActiveRecord
                         'number_of_attachments' => $this->getAttachments()->count()
                     ],
                         null,
-                        Yii::$app->user->getId()
+                        $this->restaurant_uuid
                     );
                 }
             }
@@ -197,7 +197,7 @@ class Ticket extends \yii\db\ActiveRecord
                         'number_of_attachments' => $this->getAttachments()->count()
                     ],
                         null,
-                        Yii::$app->user->getId()
+                        $this->restaurant_uuid
                     );
                 }
             }

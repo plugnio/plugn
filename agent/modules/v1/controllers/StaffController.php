@@ -155,7 +155,7 @@ class StaffController extends BaseController {
             Yii::$app->eventManager->track('Staff Added', [
                 "name" => $agent->agent_name,
                 "role" => $model->role
-            ]);
+            ], null, $store->restaurant_uuid);
         }
 
         return [
@@ -230,6 +230,7 @@ class StaffController extends BaseController {
     public function actionDelete($assignment_id, $store_uuid = null)
     {
         $this->ownerCheck();
+
         $model =  $this->findModel($assignment_id);
 
         if (!$model->delete()) {
@@ -250,7 +251,7 @@ class StaffController extends BaseController {
             Yii::$app->eventManager->track('Staff Removed', [
                 "name" => $model->agent->agent_name,
                 "role" => $model->role
-            ]);
+            ], null, $model->restaurant_uuid);
         }
 
         return [
