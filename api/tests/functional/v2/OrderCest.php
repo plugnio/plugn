@@ -6,6 +6,8 @@ use api\models\Order;
 use api\models\Restaurant;
 use Codeception\Util\HttpCode;
 use api\tests\FunctionalTester;
+use common\fixtures\CountryFixture;
+use common\fixtures\DeliveryZoneFixture;
 use common\models\Payment;
 
 
@@ -17,7 +19,9 @@ class OrderCest
         return [
             'items' => \common\fixtures\ItemFixture::className(),
             'orders' => \common\fixtures\OrderFixture::className(),
+            'countries' => CountryFixture::className(),
             'restaurants' => \common\fixtures\RestaurantFixture::className(),
+            'deliveryZones' => DeliveryZoneFixture::className(),
             'restaurantPaymentMethods' => \common\fixtures\RestaurantPaymentMethodFixture::className(),
             'restaurantBranches' => \common\fixtures\RestaurantBranchFixture::className(),
             'restaurantLocations' => \common\fixtures\BusinessLocationFixture::className(),
