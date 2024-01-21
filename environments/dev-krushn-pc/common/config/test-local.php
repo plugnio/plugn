@@ -6,5 +6,9 @@ return [
             'username' => 'root',
             'password' => '',
         ],
+        'tapPayments' => [
+            'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
+            "destinationId" => null
+        ],
     ],
 ];

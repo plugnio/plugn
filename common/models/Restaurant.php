@@ -2912,7 +2912,6 @@ class Restaurant extends ActiveRecord
 
     public function isOpen($asap = null)
     {
-
         //always open
 
         if ($this->accept_order_247)
