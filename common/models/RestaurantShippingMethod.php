@@ -81,7 +81,7 @@ class RestaurantShippingMethod extends \yii\db\ActiveRecord
 
             $props["number_of_shipping_partners"] = $this->restaurant->getRestaurantShippingMethods()->count();
 
-            Yii::$app->eventManager->track("Shipping Settings Updated", $props);
+            Yii::$app->eventManager->track("Shipping Settings Updated", $props, null, $this->restaurant_uuid);
         }
     }
 

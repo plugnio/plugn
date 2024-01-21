@@ -1315,7 +1315,7 @@ class StoreController extends BaseController
             Yii::$app->eventManager->track('Store Deactivated', [
                 "reason" => $reason,
                 "store_status" => Restaurant::RESTAURANT_STATUS_CLOSED
-            ]);
+            ], null, $model->restaurant_uuid);
         }
 
         return self::message("success", "Status changed successfully");
@@ -1348,6 +1348,7 @@ class StoreController extends BaseController
         }
 
         if (YII_ENV == 'prod') {
+
             Yii::$app->eventManager->track('Email Opened', $model->attributes);
         }
 

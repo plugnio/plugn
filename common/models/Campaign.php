@@ -186,7 +186,7 @@ class Campaign extends \yii\db\ActiveRecord
                 "content" => $this->utm_content
             ];
 
-            Yii::$app->eventManager->track("Campaign Created", $props);
+            Yii::$app->eventManager->track("Campaign Created", $props, null, $this->restaurant_uuid);
         }
     }
 

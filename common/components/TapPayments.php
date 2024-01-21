@@ -134,7 +134,16 @@ class TapPayments extends Component
     public function init()
     {
         // Fields required by default
-        $requiredAttributes = ['gatewayToUse', 'plugnLiveApiKey', 'plugnTestApiKey','destinationId'];
+        $requiredAttributes = ['gatewayToUse'];
+
+        //as we not have desitnation for Testing in dev
+
+        if ($this->gatewayToUse == self::USE_LIVE_GATEWAY) {
+            $requiredAttributes[] = 'destinationId';
+            $requiredAttributes[] = 'plugnLiveApiKey';
+        } else {
+            $requiredAttributes[] = 'plugnTestApiKey';
+        }
 
         // Process Validation
         foreach ($requiredAttributes as $attribute) {
@@ -617,7 +626,7 @@ class TapPayments extends Component
             ]
         ];
 
-        if($platform_fee > 0) {
+        if($this->destinationId && $platform_fee > 0) {
           
           if($gateway == static::GATEWAY_KNET) {
 
@@ -666,7 +675,7 @@ class TapPayments extends Component
 
            array_push($chargeParams['destinations']['destination'], $destination);
 
-         } else if ($platform_fee == 0 && ($warehouse_fee > 0 || ($warehouse_delivery_charges > 0  && $country_name != null && $country_name == 'Kuwait'))) {
+         } else if ($this->destinationId && $platform_fee == 0 && ($warehouse_fee > 0 || ($warehouse_delivery_charges > 0  && $country_name != null && $country_name == 'Kuwait'))) {
 
            $charge_amount = 0;
 

@@ -116,7 +116,7 @@ class EventController extends \yii\console\Controller {
             ];
         }
 
-        Yii::$app->eventManager->track('Best Selling',  $items);
+        Yii::$app->eventManager->track('Best Selling',  $items);//null, $item->restaurant_uuid
     }
 
     public function syncItemPublished() {
@@ -238,7 +238,7 @@ class EventController extends \yii\console\Controller {
                         'store_url' => $store->restaurant_domain
                     ],
                     $datetime->format('c'),
-                    $agent->agent_id
+                    $store->restaurant_uuid
                 );                
             }
 

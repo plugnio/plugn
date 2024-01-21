@@ -182,7 +182,7 @@ class CurrencyController extends BaseController {
                 "currency_active" => $currencies
             ];
 
-            Yii::$app->eventManager->track("Currency Activated", $props);
+            Yii::$app->eventManager->track("Currency Activated", $props, null, $store->restaurant_uuid);
         }
 
         return [

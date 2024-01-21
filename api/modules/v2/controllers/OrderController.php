@@ -588,6 +588,13 @@ class OrderController extends Controller
                 $order->restaurant->is_sandbox
             );
 
+            $source = Yii::$app->request->getBodyParam('source');
+
+            if(!$source) {
+                $source = $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ?
+                    $payment->payment_token : $order->paymentMethod->source_id;
+            }
+
             $response = Yii::$app->tapPayments->createCharge(
                 $order->currency->code,
                 "Order placed from: " . $order->customer_name, // Description
@@ -601,8 +608,7 @@ class OrderController extends Controller
                 $order->restaurant->platform_fee,
                 Url::to(['order/callback'], true),
                 Url::to(['order/payment-webhook'], true),
-                $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ?
-                    $payment->payment_token : $order->paymentMethod->source_id,
+                $source,
                 $order->restaurant->warehouse_fee,
                 $order->restaurant->warehouse_delivery_charges,
                 $order->area_id ? $order->area->country->country_name : '',

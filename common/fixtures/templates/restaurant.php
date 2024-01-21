@@ -29,7 +29,7 @@ return [
     'merchant_id' => $index + 1,
     'operator_id' => $index + 1,
     'live_api_key' => $faker->md5,
-    'test_api_key' => $faker->md5,
+    'test_api_key' => "sk_test_XKokBfNWv6FIYuTMg5sLPjhJ",// $faker->md5,
     'business_type' => null,
     'vendor_sector' => $faker->word,
     'license_number' => $faker->word,
@@ -65,7 +65,7 @@ return [
     'commercial_license_file' => null,
     'commercial_license_file_id' => null,
     'commercial_license_file_purpose' => null,
-    'platform_fee' => $faker->numberBetween (100, 1000),
+    'platform_fee' => $faker->numberBetween (0, 0.10),
     'google_analytics_id' => $faker->md5,
     'facebook_pixil_id' => $faker->md5,
     'show_opening_hours' => 1,
@@ -74,7 +74,7 @@ return [
     'schedule_interval' => 1,
     'mashkor_branch_id' => $faker->md5,
     'live_public_key' => $faker->md5,
-    'test_public_key' => $faker->md5,
+    'test_public_key' => "pk_test_EtHFV4BuPQokJT6jiROls87Y",// $faker->md5,
     'site_id' => $index + 1,
     'company_name' => $faker->company,
     'is_tap_enable' => 1,
@@ -86,7 +86,7 @@ return [
     'hide_request_driver_button' => 0,
     'version' => 2,
     'sitemap_require_update' => 1,
-    'warehouse_fee' => $faker->numberBetween (10, 100),
+    'warehouse_fee' => $faker->numberBetween (0, 0.10),
     'snapchat_pixil_id' => $faker->md5,
     'retention_email_sent' => 1,
     'enable_gift_message' => 1,
@@ -95,9 +95,7 @@ return [
     'annual_revenue' => $this->numberBetween (100, 10000),
     'warehouse_delivery_charges' => $faker->numberBetween (10, 100),
     'payment_gateway_queue_id' => $index + 1,
-    'snapchat_pixil_id' => $index + 1,
-    'retention_email_sent' => 1,
-    'enable_gift_message' => 1,
-    'referral_code' => $faker->text(6)
+    'referral_code' => $faker->text(6),
+    'accept_order_247' => 1
 ];
 

@@ -107,6 +107,7 @@ class WebLink extends \yii\db\ActiveRecord
     * @param type $changedAttributes
     */
     public function afterSave($insert, $changedAttributes) {
+
       parent::afterSave($insert, $changedAttributes);
 
       $store_web_link_model = new StoreWebLink();
@@ -120,7 +121,7 @@ class WebLink extends \yii\db\ActiveRecord
                 "title_engilish" => $this->web_link_title,
                 "title_arabic" => $this->web_link_title_ar,
                 "web_link_url" => $this->url,
-            ]);
+            ], null, $this->restaurant_uuid);
         }
 
       return  true;

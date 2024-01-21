@@ -115,7 +115,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
                 "min_charge_on_each_order_currency" => $this->restaurant->currency ? $this->restaurant->currency->code: null,
             ];
 
-            Yii::$app->eventManager->track("Delivery Zone Added", $props);
+            Yii::$app->eventManager->track("Delivery Zone Added", $props, null, $this->restaurant_uuid);
 
 
             //if first delivery zone with no pickup option enabled before
@@ -128,7 +128,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
                 Yii::$app->eventManager->track('Store Setup Step Complete', [
                     'step_name' => "Shipping",
                     'step_number' => 3
-                ]);
+                ], null, $this->restaurant_uuid);
             }
         }
     }

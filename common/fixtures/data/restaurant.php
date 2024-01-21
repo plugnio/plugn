@@ -4,7 +4,7 @@ return [
     'restaurant0' => [
         'restaurant_uuid' => 1,
         'country_id' => 1,
-        'currency_id' => 1,
+        'currency_id' => 81,
         'name' => 'voluptatibus',
         'name_ar' => 'aliquid',
         'tagline' => 'Repudiandae voluptatibus error rerum minus.',
@@ -27,7 +27,7 @@ return [
         'merchant_id' => 1,
         'operator_id' => 1,
         'live_api_key' => 'b81122499a182f5e0170358e55a7a6a8',
-        'test_api_key' => '1e96f9cfeaf6cfa2fedc81c9bd638f6a',
+        'test_api_key' => 'sk_test_XKokBfNWv6FIYuTMg5sLPjhJ',//sk_test_p07NquMX4HgwLT8mycdJnZv5
         'business_type' => null,
         'vendor_sector' => 'quaerat',
         'license_number' => 'in',
@@ -63,7 +63,7 @@ return [
         'commercial_license_file' => null,
         'commercial_license_file_id' => null,
         'commercial_license_file_purpose' => null,
-        'platform_fee' => 321,
+        'platform_fee' => 0.05,
         'google_analytics_id' => 'a4ce1324a28d7e2072fef2a0833183b0',
         'facebook_pixil_id' => 'cbf592a39ffdd351d2f4f3e492a0e8d7',
         'show_opening_hours' => 1,
@@ -72,7 +72,7 @@ return [
         'schedule_interval' => 1,
         'mashkor_branch_id' => 'b4e1e4b61fba22f15eb6c1440f7b7329',
         'live_public_key' => 'e600293b502f7f67451bbc886ac2e58f',
-        'test_public_key' => 'c80b6c88d9b1896fd1d1228ce396a189',
+        'test_public_key' => 'pk_test_EtHFV4BuPQokJT6jiROls87Y',
         'site_id' => 1,
         'company_name' => 'Bednar, Wehner and Huels',
         'is_tap_enable' => 1,
@@ -84,10 +84,10 @@ return [
         'hide_request_driver_button' => 0,
         'version' => 2,
         'sitemap_require_update' => 1,
-        'warehouse_fee' => 98,
+        'warehouse_fee' => 0.05,
         'snapchat_pixil_id' => 'b12def24a3a9c42c0dffbad871d99297',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant1' => [
         'restaurant_uuid' => 2,
@@ -172,10 +172,11 @@ return [
         'hide_request_driver_button' => 0,
         'version' => 2,
         'sitemap_require_update' => 1,
-        'warehouse_fee' => 88,
+        'warehouse_fee' => 1,
         'snapchat_pixil_id' => '280acc76795d554153d0153569f9d02a',
         'retention_email_sent' => 1,
         'enable_gift_message' => 1,
+        'accept_order_247' => 1
     ],
     'restaurant2' => [
         'restaurant_uuid' => 3,
@@ -264,6 +265,7 @@ return [
         'snapchat_pixil_id' => 'a27563d9352e24ef7d26c5976dd8a003',
         'retention_email_sent' => 1,
         'enable_gift_message' => 1,
+        'accept_order_247' => 1
     ],
     'restaurant3' => [
         'restaurant_uuid' => 4,
@@ -352,6 +354,7 @@ return [
         'snapchat_pixil_id' => '21f2ca44a82e5251a329c5fa1faf1b16',
         'retention_email_sent' => 1,
         'enable_gift_message' => 1,
+        'accept_order_247' => 1
     ],
     'restaurant4' => [
         'restaurant_uuid' => 5,
@@ -439,7 +442,7 @@ return [
         'warehouse_fee' => 40,
         'snapchat_pixil_id' => 'a7550833507849092d6f9cab18a9f7c6',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant5' => [
         'restaurant_uuid' => 6,
@@ -527,7 +530,7 @@ return [
         'warehouse_fee' => 53,
         'snapchat_pixil_id' => 'ea3e7bd8715fe22759a7333eba374b9f',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant6' => [
         'restaurant_uuid' => 7,
@@ -615,7 +618,7 @@ return [
         'warehouse_fee' => 88,
         'snapchat_pixil_id' => '04d9b4040d24364cb7f85b9f3326cd60',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant7' => [
         'restaurant_uuid' => 8,
@@ -703,7 +706,7 @@ return [
         'warehouse_fee' => 56,
         'snapchat_pixil_id' => '917bbe2a562cdb3906c73b45532f7d92',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant8' => [
         'restaurant_uuid' => 9,
@@ -791,7 +794,7 @@ return [
         'warehouse_fee' => 77,
         'snapchat_pixil_id' => '4667ff813e297b4cea575fb9aca39da1',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant9' => [
         'restaurant_uuid' => 10,
@@ -879,7 +882,7 @@ return [
         'warehouse_fee' => 15,
         'snapchat_pixil_id' => 'cdc6c68673b82504e44a474161902c94',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant10' => [
         'restaurant_uuid' => 11,
@@ -967,7 +970,7 @@ return [
         'warehouse_fee' => 53,
         'snapchat_pixil_id' => '53daf0e85a5053f13de343dc55b5efc2',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant11' => [
         'restaurant_uuid' => 12,
@@ -1055,7 +1058,7 @@ return [
         'warehouse_fee' => 50,
         'snapchat_pixil_id' => '2e31c4878d6463fae53525324045a617',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant12' => [
         'restaurant_uuid' => 13,
@@ -1143,7 +1146,7 @@ return [
         'warehouse_fee' => 75,
         'snapchat_pixil_id' => '6e9067f88e3aeb263d696a96425b25f7',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant13' => [
         'restaurant_uuid' => 14,
@@ -1231,7 +1234,7 @@ return [
         'warehouse_fee' => 93,
         'snapchat_pixil_id' => 'cf740cf752bf4354aa423a527cb0b1df',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant14' => [
         'restaurant_uuid' => 15,
@@ -1319,7 +1322,7 @@ return [
         'warehouse_fee' => 70,
         'snapchat_pixil_id' => '7e18ccd5baf1448431b60b50a83c19cf',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant15' => [
         'restaurant_uuid' => 16,
@@ -1407,7 +1410,7 @@ return [
         'warehouse_fee' => 26,
         'snapchat_pixil_id' => 'b18ea5ab9ce3e1d6fa517149779e9cd1',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant16' => [
         'restaurant_uuid' => 17,
@@ -1495,7 +1498,7 @@ return [
         'warehouse_fee' => 77,
         'snapchat_pixil_id' => 'b2b7766189497735fc815af471d324d4',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant17' => [
         'restaurant_uuid' => 18,
@@ -1583,7 +1586,7 @@ return [
         'warehouse_fee' => 57,
         'snapchat_pixil_id' => '3a4e1dfce8c25ea92d1318ce46c769bc',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant18' => [
         'restaurant_uuid' => 19,
@@ -1671,7 +1674,7 @@ return [
         'warehouse_fee' => 48,
         'snapchat_pixil_id' => '51b314f3d41f9345146a112aca1e5942',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant19' => [
         'restaurant_uuid' => 20,
@@ -1759,7 +1762,7 @@ return [
         'warehouse_fee' => 65,
         'snapchat_pixil_id' => 'd410c6dc3bd7c9142a553c8b51a7ad48',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant20' => [
         'restaurant_uuid' => 21,
@@ -1847,7 +1850,7 @@ return [
         'warehouse_fee' => 90,
         'snapchat_pixil_id' => 'db8db5ac017cf59402acb730516f25f8',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant21' => [
         'restaurant_uuid' => 22,
@@ -1935,7 +1938,7 @@ return [
         'warehouse_fee' => 20,
         'snapchat_pixil_id' => '4c0b5f857739fb70b0adff76124b8048',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant22' => [
         'restaurant_uuid' => 23,
@@ -2023,7 +2026,7 @@ return [
         'warehouse_fee' => 67,
         'snapchat_pixil_id' => '4689d60698608e3b6c468ef62db4da92',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant23' => [
         'restaurant_uuid' => 24,
@@ -2111,7 +2114,7 @@ return [
         'warehouse_fee' => 91,
         'snapchat_pixil_id' => '6dd16b429728764f758a90af6705be11',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant24' => [
         'restaurant_uuid' => 25,
@@ -2199,7 +2202,7 @@ return [
         'warehouse_fee' => 16,
         'snapchat_pixil_id' => '2ba2d766f65fd08e4a18e40f4e1f49cf',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant25' => [
         'restaurant_uuid' => 26,
@@ -2287,7 +2290,7 @@ return [
         'warehouse_fee' => 70,
         'snapchat_pixil_id' => '13af5d0a9331559e06342aa7c98bb3fa',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant26' => [
         'restaurant_uuid' => 27,
@@ -2375,7 +2378,7 @@ return [
         'warehouse_fee' => 37,
         'snapchat_pixil_id' => '4322c3560cd2afe039ff2cd7c1d0ed76',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant27' => [
         'restaurant_uuid' => 28,
@@ -2463,7 +2466,7 @@ return [
         'warehouse_fee' => 60,
         'snapchat_pixil_id' => '264ffabb20cc82723c90ce28cc617124',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant28' => [
         'restaurant_uuid' => 29,
@@ -2551,7 +2554,7 @@ return [
         'warehouse_fee' => 19,
         'snapchat_pixil_id' => '0ecdb9c8d22492a2c065eb9198de6251',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant29' => [
         'restaurant_uuid' => 30,
@@ -2639,7 +2642,7 @@ return [
         'warehouse_fee' => 81,
         'snapchat_pixil_id' => '21ea63df6b724da0b2f95913fe790cf8',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant30' => [
         'restaurant_uuid' => 31,
@@ -2727,7 +2730,7 @@ return [
         'warehouse_fee' => 33,
         'snapchat_pixil_id' => '9a722e789d6af6799ce27a929e1f7a93',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant31' => [
         'restaurant_uuid' => 32,
@@ -2815,7 +2818,7 @@ return [
         'warehouse_fee' => 89,
         'snapchat_pixil_id' => '4290d8f91c43c6c21745c8d3a99eb00b',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant32' => [
         'restaurant_uuid' => 33,
@@ -2903,7 +2906,7 @@ return [
         'warehouse_fee' => 23,
         'snapchat_pixil_id' => '6d639a5ad4b573850b9f80f094c4feef',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant33' => [
         'restaurant_uuid' => 34,
@@ -2991,7 +2994,7 @@ return [
         'warehouse_fee' => 57,
         'snapchat_pixil_id' => '9ee1c04acf289d5b9a7af12011770fec',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant34' => [
         'restaurant_uuid' => 35,
@@ -3079,7 +3082,7 @@ return [
         'warehouse_fee' => 62,
         'snapchat_pixil_id' => '70c76685eee9e3a96df4d1fef800572e',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant35' => [
         'restaurant_uuid' => 36,
@@ -3167,7 +3170,7 @@ return [
         'warehouse_fee' => 13,
         'snapchat_pixil_id' => '346711a641457e3cd4bdb31c9d1e9bbb',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant36' => [
         'restaurant_uuid' => 37,
@@ -3255,7 +3258,7 @@ return [
         'warehouse_fee' => 71,
         'snapchat_pixil_id' => '6e8891501f061574e701f47ecd47146b',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant37' => [
         'restaurant_uuid' => 38,
@@ -3343,7 +3346,7 @@ return [
         'warehouse_fee' => 66,
         'snapchat_pixil_id' => '6ed97f563ab366a50cc00255d8464cef',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant38' => [
         'restaurant_uuid' => 39,
@@ -3431,7 +3434,7 @@ return [
         'warehouse_fee' => 77,
         'snapchat_pixil_id' => '53f3d8c2743d750e69263928745db10f',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant39' => [
         'restaurant_uuid' => 40,
@@ -3519,7 +3522,7 @@ return [
         'warehouse_fee' => 44,
         'snapchat_pixil_id' => 'b7ee7d01e54b9fb11df4b3eeae536696',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant40' => [
         'restaurant_uuid' => 41,
@@ -3607,7 +3610,7 @@ return [
         'warehouse_fee' => 47,
         'snapchat_pixil_id' => '3778a185d896b9973a5f0566422cfea8',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant41' => [
         'restaurant_uuid' => 42,
@@ -3695,7 +3698,7 @@ return [
         'warehouse_fee' => 61,
         'snapchat_pixil_id' => '3e4a2755d80e4c79165d3eca6394791f',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant42' => [
         'restaurant_uuid' => 43,
@@ -3783,7 +3786,7 @@ return [
         'warehouse_fee' => 49,
         'snapchat_pixil_id' => '616cf0fe0acafc0fa12a05d0b690e055',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant43' => [
         'restaurant_uuid' => 44,
@@ -3871,7 +3874,7 @@ return [
         'warehouse_fee' => 81,
         'snapchat_pixil_id' => '8df4458d86d7e4779ccbd5ad81d14d89',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant44' => [
         'restaurant_uuid' => 45,
@@ -3959,7 +3962,7 @@ return [
         'warehouse_fee' => 92,
         'snapchat_pixil_id' => '600d8a6628bae05b0d2a2ae8635941de',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant45' => [
         'restaurant_uuid' => 46,
@@ -4047,7 +4050,7 @@ return [
         'warehouse_fee' => 62,
         'snapchat_pixil_id' => 'c767413c6013acb93fde0e9431e9cd60',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant46' => [
         'restaurant_uuid' => 47,
@@ -4135,7 +4138,7 @@ return [
         'warehouse_fee' => 19,
         'snapchat_pixil_id' => '243e886461a15195f7c5c033d06bc2a6',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant47' => [
         'restaurant_uuid' => 48,
@@ -4223,7 +4226,7 @@ return [
         'warehouse_fee' => 84,
         'snapchat_pixil_id' => '665fba4e1d011556a759def4fac4deab',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant48' => [
         'restaurant_uuid' => 49,
@@ -4311,7 +4314,7 @@ return [
         'warehouse_fee' => 15,
         'snapchat_pixil_id' => '3fe3ca784bf369471a8c8bdb6d8ee8ca',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
     'restaurant49' => [
         'restaurant_uuid' => 50,
@@ -4399,6 +4402,6 @@ return [
         'warehouse_fee' => 63,
         'snapchat_pixil_id' => '1c72bb37333e7250246cb06736df4c72',
         'retention_email_sent' => 1,
-        'enable_gift_message' => 1,
+         'accept_order_247' => 1, 'enable_gift_message' => 1,
     ],
 ];

@@ -213,13 +213,15 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         }
 
         if (YII_ENV == 'prod') {
+            $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+
             Yii::$app->eventManager->track('Profile Updated', [
                 "email_notification" => $this->email_notification,
                 "reminder_email_order_acceptance" => $this->reminder_email,
                 "weekly_stats_email" => $this->receive_weekly_stats,
                 "user_name" => $this->agent_name,
                 "email" => $this->agent_email
-            ]);
+            ], null, $restaurantUuid);
         }
     }
 
