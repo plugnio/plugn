@@ -1639,7 +1639,8 @@ class Order extends \yii\db\ActiveRecord
                 $this->currency_code = $this->restaurant->currency->code;
             }
 
-            $this->store_currency_code = $this->restaurant->currency->code;
+            $this->store_currency_code = $this->restaurant->currency?
+                $this->restaurant->currency->code: "KWD";
 
             //$this->save(false);
         }
