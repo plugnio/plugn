@@ -66,6 +66,84 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
     }
 
     /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return bool
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if(YII_ENV == 'prod')
+        {
+            $isCODEnabled = RestaurantPaymentMethod::find()
+                ->joinWith(['paymentMethod'])
+                ->andWhere([
+                    'restaurant_payment_method.restaurant_uuid' => $this->restaurant_uuid,
+                    'payment_method_code' => PaymentMethod::CODE_CASH
+                ])
+                ->exists();
+
+            $isFreeCheckoutnabled = RestaurantPaymentMethod::find()
+                ->joinWith(['paymentMethod'])
+                ->andWhere([
+                    'restaurant_payment_method.restaurant_uuid' => $this->restaurant_uuid,
+                    'payment_method_code' => PaymentMethod::CODE_FREE_CHECKOUT
+                ])
+                ->exists();
+
+            $isStripeEnabled = RestaurantPaymentMethod::find()
+                ->joinWith(['paymentMethod'])
+                ->andWhere([
+                    'restaurant_payment_method.restaurant_uuid' => $this->restaurant_uuid,
+                    'payment_method_code' => PaymentMethod::CODE_STRIPE
+                ])
+                ->exists();
+
+            $isMoyasarEnabled = RestaurantPaymentMethod::find()
+                ->joinWith(['paymentMethod'])
+                ->andWhere([
+                    'restaurant_payment_method.restaurant_uuid' => $this->restaurant_uuid,
+                    'payment_method_code' => PaymentMethod::CODE_MOYASAR
+                ])
+                ->exists();
+
+            Yii::$app->eventManager->track('Payment Method Added',  [
+                "tap_payment_enabled" => $this->restaurant->is_tap_enable,
+                "tap_plugn_commission" => $this->restaurant->platform_fee,
+
+                "moyasar_payment_enabled" => $isMoyasarEnabled,
+                "moyasr_plugn_commission" => $this->restaurant->platform_fee,
+
+                "stripe_payment_enabled" => $isStripeEnabled,
+                "stripe_plugn_commission" => $this->restaurant->platform_fee,
+
+                "cod_enabled" => $isCODEnabled,
+
+                "free_checkout_enabled" => $isFreeCheckoutnabled,
+            ],
+                null,
+                $this->restaurant_uuid
+            );
+
+            //check if first product
+
+            $count = self::find()
+                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                ->one();
+
+            if($count == 1) {
+                Yii::$app->eventManager->track('Store Setup Step Complete', [
+                    'step_name' => "Payment Method Added",
+                    'step_number' => 4
+                ], null, $this->restaurant_uuid);
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Gets query for [[PaymentMethod]].
      *
      * @return \yii\db\ActiveQuery

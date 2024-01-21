@@ -366,11 +366,13 @@ class AuthController extends Controller {
                     'email' => $agent->agent_email,
                     "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
                     "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
+                    "profile_status" => "Active"
                 ],
                 null,
                 $agent->agent_id
             );
         }
+
 
         if($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED)
         {

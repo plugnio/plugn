@@ -35,9 +35,10 @@ return [
              * https://pogi-public-anyone-can-upload-24hr-expiry.s3.amazonaws.com/folderName/fileName.jpg
              */
         ],
-        
+
         'tapPayments' => [
             'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
+            "destinationId" => null
         ],
         'armadaDelivery' => [
             'keyToUse' => \common\components\ArmadaDelivery::USE_TEST_KEY,

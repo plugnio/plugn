@@ -169,6 +169,28 @@ class Campaign extends \yii\db\ActiveRecord
     }
 
     /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (YII_ENV == 'prod' && $insert) {
+            $props = [
+                "source" => $this->utm_source,
+                "medium" => $this->utm_medium,
+                "campaign" => $this->utm_campaign,
+                "term" => $this->utm_term,
+                "content" => $this->utm_content
+            ];
+
+            Yii::$app->eventManager->track("Campaign Created", $props, null, $this->restaurant_uuid);
+        }
+    }
+
+    /**
      * Gets query for [[RestaurantByCampaigns]].
      *
      * @return \yii\db\ActiveQuery
@@ -178,6 +200,10 @@ class Campaign extends \yii\db\ActiveRecord
         return $this->hasMany($modelClass::className(), ['utm_uuid' => 'utm_uuid']);
     }
 
+    /**
+     * @param $modelClass
+     * @return \yii\db\ActiveQuery
+     */
     public function getAgents($modelClass = "\common\models\Agent")
     {
         return $this->hasMany($modelClass::className(), ['agent_id' => 'agent_id']);

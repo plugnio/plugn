@@ -1089,6 +1089,7 @@ class Order extends \yii\db\ActiveRecord
                 "store" => $store->name,
                 "customer_name" => $this->customer_name,
                 "customer_email" => $this->customer_email,
+                "customer_phone_number" => $this->customer_phone_number,
                 "customer_id" => $this->customer_id,
                 "country" => $this->country_name,
                 'checkout_id' => $this->order_uuid,
@@ -1108,6 +1109,21 @@ class Order extends \yii\db\ActiveRecord
                 'coupon' => $this->voucher && $this->voucher->code ? $this->voucher->code : null,
                 'products' => $productsList ? $productsList : null,
                 'storeItemTypes' => $itemTypes,
+                "order_mode" => $this->order_mode,
+                "area_name" => $this->area_name,
+                "unit_type" => $this->unit_type,
+                "house_no" => $this->house_number,
+                "floor" => $this->floor,
+                "address_line_1" => $this->address_1,
+                "address_line_2" => $this->address_2,
+                "building_no" => $this->house_number,
+                "block" => $this->block,
+                "street" => $this->street,
+                "avenue" => $this->avenue,
+                "postal_code" => $this->postalcode,
+                "special_direction" => $this->special_directions,
+                "expected_at" => $this->estimated_time_of_arrival,
+                "store_order_count" => $this->restaurant->total_orders,
             ];
 
             if($store->restaurantType) {
@@ -1623,7 +1639,8 @@ class Order extends \yii\db\ActiveRecord
                 $this->currency_code = $this->restaurant->currency->code;
             }
 
-            $this->store_currency_code = $this->restaurant->currency->code;
+            $this->store_currency_code = $this->restaurant->currency?
+                $this->restaurant->currency->code: "KWD";
 
             //$this->save(false);
         }
@@ -1651,6 +1668,33 @@ class Order extends \yii\db\ActiveRecord
                     $customerVoucher->voucher_id = $this->voucher_id;
                     $customerVoucher->save();
                 }
+            }
+        }
+
+        if (
+            $this->scenario == self::SCENARIO_UPDATE_STATUS &&
+            isset($changedAttributes['order_status']) && $this->order_status == self::STATUS_COMPLETE
+        ) {
+
+            if (YII_ENV == 'prod') {
+
+                $shipping_partner = "";
+
+                if($this->armada_tracking_link) {
+                    $shipping_partner = "Armada";
+                } else if($this->aramex_shipment_id) {
+                    $shipping_partner = "Aramex";
+                } else if($this->mashkor_order_status) {
+                    $shipping_partner = "Mashkor";
+                }
+
+                Yii::$app->eventManager->track('Order Delivered', [
+                    "order_uuid" => $this->order_uuid,
+                    "shipping_partner" => $shipping_partner
+                ],
+                    null,
+                    $this->restaurant_uuid
+                );
             }
         }
 
@@ -1682,6 +1726,27 @@ en route: the order has been picked up from the merchant and is being delivered 
 complete: the order has been successfully delivered
 canceled: the order has been canceled from the merchant
 failed: the order has failed to find a driver */
+
+            if (YII_ENV == 'prod') {
+
+                $shipping_partner = "";
+
+                if($this->armada_tracking_link) {
+                    $shipping_partner = "Armada";
+                } else if($this->aramex_shipment_id) {
+                    $shipping_partner = "Aramex";
+                } else if($this->mashkor_order_status) {
+                    $shipping_partner = "Mashkor";
+                }
+
+                Yii::$app->eventManager->track('Order Cancelled', [
+                    "order_uuid" => $this->order_uuid,
+                    "shipping_partner" => $shipping_partner
+                ],
+                    null,
+                    $this->restaurant_uuid
+                );
+            }
         }
 
         //Send SMS To customer

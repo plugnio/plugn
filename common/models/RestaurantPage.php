@@ -116,6 +116,20 @@ class RestaurantPage extends \yii\db\ActiveRecord
         ];
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if($insert && YII_ENV == 'prod') {
+
+                Yii::$app->eventManager->track('Store Pages Added', [
+                    "page_title" => $this->title,
+                    "page_title_arabic" => $this->title_ar,
+                    "sort_number" => $this->sort_number
+                ], null, $this->restaurant_uuid);
+        }
+    }
+
     /**
      * Gets query for [[CreatedBy]].
      *

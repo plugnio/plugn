@@ -16,7 +16,7 @@ class OpeningHoursController extends BaseController
      */
     private function ownerCheck()
     {
-        if(!Yii::$app->accountManager->isOwner()) {
+        if (!Yii::$app->accountManager->isOwner()) {
             throw new \yii\web\BadRequestHttpException(
                 Yii::t('agent', 'You are not allowed to view discounts. Please contact with store owner')
             );
@@ -35,11 +35,11 @@ class OpeningHoursController extends BaseController
      */
     public function actionList($store_uuid = null)
     {
-         $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        $query = OpeningHour::find ()
-            ->andWhere (['restaurant_uuid' => $store->restaurant_uuid])
-            ->orderBy (['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC]);
+        $query = OpeningHour::find()
+            ->andWhere(['restaurant_uuid' => $store->restaurant_uuid])
+            ->orderBy(['day_of_week' => SORT_ASC, 'open_at' => SORT_ASC]);
 
         return new ActiveDataProvider([
             'query' => $query
@@ -54,10 +54,10 @@ class OpeningHoursController extends BaseController
     public function actionCreate($store_uuid = null)
     {
 //        $this->ownerCheck();
-        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
-        $opening_hours = Yii::$app->request->getBodyParam ("opening_hours");
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
+        $opening_hours = Yii::$app->request->getBodyParam("opening_hours");
 
-        if (is_array ($opening_hours) && sizeof ($opening_hours) > 0) {
+        if (is_array($opening_hours) && sizeof($opening_hours) > 0) {
 
             foreach ($opening_hours as $key => $opening_hour) {
 
@@ -65,8 +65,8 @@ class OpeningHoursController extends BaseController
                 $model->restaurant_uuid = $store->restaurant_uuid;
 
                 $model->day_of_week = $opening_hour['day_of_week'];
-                $model->open_at = date('H:i:s', strtotime ($opening_hour['open_at']));
-                $model->close_at = date('H:i:s', strtotime ($opening_hour['close_at']));
+                $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
+                $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
 
                 /*if (strtotime ($opening_hour['close_at']) <= strtotime ($opening_hour['open_at']) ) {
                     return [
@@ -75,7 +75,7 @@ class OpeningHoursController extends BaseController
                     ];
                 }*/
 
-                if (!$model->save ()) {
+                if (!$model->save()) {
                     if (isset($model->errors)) {
                         return [
                             "operation" => "error",
@@ -84,14 +84,14 @@ class OpeningHoursController extends BaseController
                     } else {
                         return [
                             "operation" => "error",
-                            "message" => Yii::t ('agent', "We've faced a problem adding the Opening Hour")
+                            "message" => Yii::t('agent', "We've faced a problem adding the Opening Hour")
                         ];
                     }
                 }
             }
             return [
                 "operation" => "success",
-                "message" => Yii::t ('agent', "Opening Hour created successfully")
+                "message" => Yii::t('agent', "Opening Hour created successfully")
             ];
         }
     }
@@ -103,27 +103,29 @@ class OpeningHoursController extends BaseController
     public function actionUpdate($day_of_week)
     {
 //        $this->ownerCheck();
-        $opening_hours = Yii::$app->request->getBodyParam ("opening_hours");
+        $opening_hours = Yii::$app->request->getBodyParam("opening_hours");
 
         //validate
 
-        $store = Yii::$app->accountManager->getManagedAccount ();
+        $store = Yii::$app->accountManager->getManagedAccount();
 
         //remove old
 
-        OpeningHour::deleteAll ([
+        OpeningHour::deleteAll([
             'day_of_week' => $day_of_week,
             'restaurant_uuid' => $store->restaurant_uuid
         ]);
 
+        $props = [];
+
         //add new timeslots
         foreach ($opening_hours as $key => $opening_hour) {
 
-             $model = new OpeningHour;
-             $model->restaurant_uuid = $store->restaurant_uuid;
-             $model->day_of_week = $day_of_week;
-             $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
-             $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
+            $model = new OpeningHour;
+            $model->restaurant_uuid = $store->restaurant_uuid;
+            $model->day_of_week = $day_of_week;
+            $model->open_at = date('H:i:s', strtotime($opening_hour['open_at']));
+            $model->close_at = date('H:i:s', strtotime($opening_hour['close_at']));
 
             /*if (strtotime ($opening_hour['close_at']) <= strtotime ($opening_hour['open_at']) ) {
                 return [
@@ -132,24 +134,34 @@ class OpeningHoursController extends BaseController
                 ];
             }*/
 
-             if (!$model->save ()) {
-                 if (isset($model->errors)) {
-                     return [
-                         "operation" => "error",
-                         "message" => $model->errors
-                     ];
-                 } else {
-                     return [
-                         "operation" => "error",
-                         "message" => Yii::t ('agent', "We've faced a problem updating the Opening Hour")
-                     ];
-                 }
-             }
+            if (!$model->save()) {
+                if (isset($model->errors)) {
+                    return [
+                        "operation" => "error",
+                        "message" => $model->errors
+                    ];
+                } else {
+                    return [
+                        "operation" => "error",
+                        "message" => Yii::t('agent', "We've faced a problem updating the Opening Hour")
+                    ];
+                }
+            }
+
+            $props[] = [$model->getDayOfWeek() => [
+                "open_time" => $model->open_at,
+                "close_time" => $model->close_at
+            ]];
         }
-         return [
-             "operation" => "success",
-             "message" => Yii::t ('agent', "Opening Hour updated successfully")
-         ];
+
+        if (YII_ENV == 'prod') {
+            Yii::$app->eventManager->track("Opening Hours Updated", $props, null, $store->restaurant_uuid);
+        }
+
+        return [
+            "operation" => "success",
+            "message" => Yii::t('agent', "Opening Hour updated successfully")
+        ];
     }
 
     /**
@@ -161,9 +173,9 @@ class OpeningHoursController extends BaseController
     public function actionDetail($store_uuid = null, $day_of_week)
     {
 //        $this->ownerCheck();
-        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        if (($model = OpeningHour::find ()->where (['day_of_week' => $day_of_week, 'restaurant_uuid' => $store->restaurant_uuid])) !== null) {
+        if (($model = OpeningHour::find()->where(['day_of_week' => $day_of_week, 'restaurant_uuid' => $store->restaurant_uuid])) !== null) {
 
             return new ActiveDataProvider([
                 'query' => $model
@@ -182,8 +194,8 @@ class OpeningHoursController extends BaseController
     public function actionDelete($opening_hour_id, $store_uuid = null)
     {
         $this->ownerCheck();
-        $model = $this->findModel ($opening_hour_id, $store_uuid);
-        if (!$model->delete ()) {
+        $model = $this->findModel($opening_hour_id, $store_uuid);
+        if (!$model->delete()) {
             if (isset($model->errors)) {
                 return [
                     "operation" => "error",
@@ -192,14 +204,14 @@ class OpeningHoursController extends BaseController
             } else {
                 return [
                     "operation" => "error",
-                    "message" => Yii::t ('agent', "We've faced a problem deleting opening hours")
+                    "message" => Yii::t('agent', "We've faced a problem deleting opening hours")
                 ];
             }
         }
 
         return [
             "operation" => "success",
-            "message" => Yii::t ('agent', "Opening Hour deleted successfully")
+            "message" => Yii::t('agent', "Opening Hour deleted successfully")
         ];
     }
 
@@ -212,13 +224,13 @@ class OpeningHoursController extends BaseController
      */
     protected function findModel($opening_hour_id, $store_uuid = null)
     {
-        $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
+        $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
 
-        $model = OpeningHour::find ()
-            ->where ([
+        $model = OpeningHour::find()
+            ->where([
                 'opening_hour_id' => $opening_hour_id,
                 'restaurant_uuid' => $store->restaurant_uuid
-            ])->one ();
+            ])->one();
 
         if ($model !== null) {
             return $model;

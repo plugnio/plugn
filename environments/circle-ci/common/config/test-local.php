@@ -8,5 +8,9 @@ return [
             'password' => 'passw0rd',
             'charset' => 'utf8',
         ],
+        'tapPayments' => [
+            'gatewayToUse' => \common\components\TapPayments::USE_TEST_GATEWAY,
+            "destinationId" => null
+        ],
     ],
 ];

@@ -119,6 +119,36 @@ class Category extends \yii\db\ActiveRecord
                 $this->deleteCategoryImage ($changedAttributes['category_image']);
             }
         }
+
+        if(YII_ENV == 'prod') {
+
+            $props = [
+                "category_id" => $this->category_id,
+                "category_name_english" => $this->title,
+                "category_name_arabic" => $this->title_ar,
+                "category_subtitle_english" => $this->subtitle,
+                "category_subtitle_arabic" => $this->subtitle_ar,
+                "meta_tag_description_english" => $this->category_meta_description,
+                "meta_tag_description_arabic" => $this->category_meta_description_ar,
+            ];
+            
+            if($insert) {
+
+                Yii::$app->eventManager->track('Category Added', $props,
+                    null,
+                    $this->restaurant_uuid
+                );
+            }
+            else
+            {
+                Yii::$app->eventManager->track('Category Updated', $props,
+                    null,
+                    $this->restaurant_uuid
+                );
+            }
+        }
+        
+
     }
 
     /**

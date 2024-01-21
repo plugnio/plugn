@@ -588,6 +588,13 @@ class OrderController extends Controller
                 $order->restaurant->is_sandbox
             );
 
+            $source = Yii::$app->request->getBodyParam('source');
+
+            if(!$source) {
+                $source = $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ?
+                    $payment->payment_token : $order->paymentMethod->source_id;
+            }
+
             $response = Yii::$app->tapPayments->createCharge(
                 $order->currency->code,
                 "Order placed from: " . $order->customer_name, // Description
@@ -601,8 +608,7 @@ class OrderController extends Controller
                 $order->restaurant->platform_fee,
                 Url::to(['order/callback'], true),
                 Url::to(['order/payment-webhook'], true),
-                $order->paymentMethod->source_id == TapPayments::GATEWAY_VISA_MASTERCARD && $payment->payment_token ?
-                    $payment->payment_token : $order->paymentMethod->source_id,
+                $source,
                 $order->restaurant->warehouse_fee,
                 $order->restaurant->warehouse_delivery_charges,
                 $order->area_id ? $order->area->country->country_name : '',
@@ -1218,6 +1224,27 @@ class OrderController extends Controller
                 'operation' => 'error',
                 'message' => 'Invalid order uuid'
             ];
+        }
+
+        if (YII_ENV == 'prod') {
+
+            $shipping_partner = "";
+
+            if($model->armada_tracking_link) {
+                $shipping_partner = "Armada";
+            } else if($model->aramex_shipment_id) {
+                $shipping_partner = "Aramex";
+            } else if($model->mashkor_order_status) {
+                $shipping_partner = "Mashkor";
+            }
+
+            Yii::$app->eventManager->track('Order Tracked', [
+                "order_uuid" => $model->order_uuid,
+                "shipping_partner" => $shipping_partner
+            ],
+                null,
+                $model->restaurant_uuid
+            );
         }
 
         unset($model['armada_qr_code_link']);

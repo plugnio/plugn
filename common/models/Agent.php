@@ -7,7 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\web\IdentityInterface;
 use yii\db\ActiveQuery;
-use common\models\AgentToken;
+
 
 /**
  * This is the model class for table "agent".
@@ -200,7 +200,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         parent::afterSave ($insert, $changedAttributes);
 
         if (
-            !$insert && $this->agent_password_hash &&
+            !$insert &&
+            $this->agent_password_hash &&
             isset($changedAttributes['agent_password_hash'])
         ) {
             $this->sendPasswordUpdatedEmail ();
@@ -209,6 +210,18 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         if($insert && $this->campaign) {
             $this->campaign->no_of_signups++;
             $this->campaign->save(false);
+        }
+
+        if (YII_ENV == 'prod') {
+            $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+
+            Yii::$app->eventManager->track('Profile Updated', [
+                "email_notification" => $this->email_notification,
+                "reminder_email_order_acceptance" => $this->reminder_email,
+                "weekly_stats_email" => $this->receive_weekly_stats,
+                "user_name" => $this->agent_name,
+                "email" => $this->agent_email
+            ], null, $restaurantUuid);
         }
     }
 

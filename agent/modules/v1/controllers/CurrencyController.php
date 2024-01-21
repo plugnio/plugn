@@ -176,6 +176,15 @@ class CurrencyController extends BaseController {
 
         $transaction->commit();
 
+        if (YII_ENV == 'prod') {
+
+            $props = [
+                "currency_active" => $currencies
+            ];
+
+            Yii::$app->eventManager->track("Currency Activated", $props, null, $store->restaurant_uuid);
+        }
+
         return [
             'operation' => 'success',
             'message' => Yii::t('agent', 'Currencies updated successfully'),

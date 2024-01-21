@@ -2682,6 +2682,8 @@ class Restaurant extends ActiveRecord
             $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
             $model->save(false);*/
         }
+
+
     }
 
     public function setupStore($agent)
@@ -2767,6 +2769,7 @@ class Restaurant extends ActiveRecord
             $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
 
             Yii::$app->eventManager->track('Store Created', [
+                "restaurant_uuid" => $this->restaurant_uuid,
                 'first_name' => trim($firstname),
                 'last_name' => trim($lastname),
                 'store_name' => $this->name,
@@ -2776,9 +2779,11 @@ class Restaurant extends ActiveRecord
                 "country" => $this->country ? $this->country->country_name : null,
                 "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign : null,
                 "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium : null,
+                "currency" => $this->currency? $this->currency->code: null,
+                "status" => $this->restaurant_status
             ],
                 null,
-                $agent->agent_id
+                $this->restaurant_uuid
             );
 
             /**
@@ -2907,7 +2912,6 @@ class Restaurant extends ActiveRecord
 
     public function isOpen($asap = null)
     {
-
         //always open
 
         if ($this->accept_order_247)

@@ -162,7 +162,32 @@ class Voucher extends \yii\db\ActiveRecord {
           if($this->discount_type == self::DISCOUNT_TYPE_FREE_DELIVERY)
             $this->discount_amount  = null;
 
-            return true;
+          return true;
+        }
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if(YII_ENV == 'prod') {
+            $props = [
+                "code" => $this->code,
+                "voucher_description_english" => $this->description,
+                "voucher_description_arabic" => $this->description_ar,
+                "discount_type" => $this->discount_type,
+                "discount_amount_percentage" => $this->discount_type == self::DISCOUNT_TYPE_PERCENTAGE ? $this->discount_amount: null,
+                "discount_amount" => $this->discount_type == self::DISCOUNT_TYPE_AMOUNT ? $this->discount_amount: null,
+                "discount_items_excluded" => $this->exclude_discounted_items,
+                "is_public" => $this->is_public,
+                "start_date" => $this->valid_from,
+                "end_date" => $this->valid_until,
+                "max_redemptions" => $this->max_redemption,
+                "limit_per_customer" => $this->limit_per_customer,
+                "minimum_order_amount" => $this->minimum_order_amount
+            ];
+
+             Yii::$app->eventManager->track("Voucher Added", $props, null, $this->restaurant_uuid);
         }
     }
 
