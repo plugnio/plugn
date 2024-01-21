@@ -2,11 +2,13 @@
 namespace api\tests\v2;
 
 use agent\models\PaymentMethod;
+use api\components\Currency;
 use api\models\Order;
 use api\models\Restaurant;
 use Codeception\Util\HttpCode;
 use api\tests\FunctionalTester;
 use common\fixtures\CountryFixture;
+use common\fixtures\CurrencyFixture;
 use common\fixtures\DeliveryZoneFixture;
 use common\models\Payment;
 
@@ -15,11 +17,14 @@ class OrderCest
 {
     public $store;
 
+    public $currency;
+
     public function _fixtures() {
         return [
             'items' => \common\fixtures\ItemFixture::className(),
             'orders' => \common\fixtures\OrderFixture::className(),
             'countries' => CountryFixture::className(),
+            'currency' => CurrencyFixture::className(),
             'restaurants' => \common\fixtures\RestaurantFixture::className(),
             'deliveryZones' => DeliveryZoneFixture::className(),
             'restaurantPaymentMethods' => \common\fixtures\RestaurantPaymentMethodFixture::className(),
@@ -30,9 +35,19 @@ class OrderCest
 
     public function _before(FunctionalTester $I) {
 
-        $this->store = Restaurant::find()->one();
+        $this->store = Restaurant::find()
+            ->with(['currency'])
+            ->one();
+
+        \Yii::info($this->store->currency_id);
+
+        $this->currency = \common\models\Currency::find()
+            ->andWhere(['currency_id' => $this->store->currency_id])
+            ->one();
 
         $I->haveHttpHeader('Store-Id', $this->store->restaurant_uuid);
+        $I->haveHttpHeader('Currency', $this->currency->code);
+        $I->haveHttpHeader('Language', "ar");
     }
 
     public function _after(FunctionalTester $I) {
