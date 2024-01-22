@@ -962,6 +962,72 @@ class StoreController extends BaseController
     }
 
     /**
+     * enable Upayment
+     * @param $id
+     * @return array
+     */
+    public function actionEnableUpayment($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPECODE_UPAYMENT])
+            ->exists();
+
+        if ($payment_method) {
+            return self::message("error",'UPayment already enabled');
+        }
+
+        $codPaymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPECODE_UPAYMENT])
+            ->one();
+
+        if(!$codPaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+        }
+
+        $payments_method = new RestaurantPaymentMethod();
+        $payments_method->payment_method_id = $codPaymentMethod->payment_method_id;
+        $payments_method->restaurant_uuid = $model->restaurant_uuid;
+
+        if (!$payments_method->save()) {
+            return self::message("error", $payments_method->getErrors());
+        }
+
+        return self::message("success","UPayment enabled successfully");
+    }
+
+    /**
+     *  Disable Upayment
+     */
+    public function actionDisableUpayment($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_UPAYMENT])
+            ->one();
+
+        if (!$payment_method) {
+            throw new BadRequestHttpException('The requested record does not exist.');
+        }
+
+        if (!$payment_method->delete()) {
+            return self::message("error", $payment_method->getErrors());
+        }
+
+        Setting::deleteAll([
+            'restaurant_uuid' => $model->restaurant_uuid,
+            'code' => PaymentMethod::CODE_UPAYMENT
+        ]);
+
+        return self::message("success", "UPayment disabled successfully");
+    }
+
+
+    /**
      *  Enable Free Checkout
      */
     public function actionEnableFreeCheckout($id = null)
