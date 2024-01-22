@@ -130,7 +130,7 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
 
             $count = self::find()
                 ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
-                ->one();
+                ->count();
 
             if($count == 1) {
                 Yii::$app->eventManager->track('Store Setup Step Complete', [
