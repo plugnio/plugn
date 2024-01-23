@@ -27,6 +27,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
     const CODE_KNET = 'kn';
     const CODE_MOYASAR = "Moyasar";
     const CODE_STRIPE = "Stripe";
+    const CODE_UPAYMENT = "UPayment";
 
     /**
      * {@inheritdoc}

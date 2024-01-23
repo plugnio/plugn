@@ -712,6 +712,9 @@ return [
                         'POST enable-moyasar/<id>' => 'enable-moyasar',
                         'POST disable-moyasar/<id>' => 'disable-moyasar',
 
+                        'POST enable-upayment' => 'enable-upayment',
+                        'POST disable-upayment' => 'disable-upayment',
+
                         'POST enable-stripe' => 'enable-stripe',
                         'POST disable-stripe' => 'disable-stripe',
                         'POST enable-stripe/<id>' => 'enable-stripe',
@@ -757,6 +760,8 @@ return [
                         'OPTIONS disable-moyasar' => 'options',
                         'OPTIONS enable-moyasar/<id>' => 'options',
                         'OPTIONS disable-moyasar/<id>' => 'options',
+                        'OPTIONS enable-upayment/<id>' => 'options',
+                        'OPTIONS disable-upayment/<id>' => 'options',
                         'OPTIONS create' => 'options',
                         'OPTIONS enable-stripe' => 'options',
                         'OPTIONS disable-stripe' => 'options',

@@ -11,9 +11,12 @@ use Yii;
  * @property string $item_uuid
  * @property int|null $min_qty
  * @property int|null $max_qty
+ * @property boolean $is_required
  * @property string|null $option_name
  * @property string|null $option_name_ar
  * @property number|null $option_price
+ * @property number|null $option_type
+ * @property number|null $sort_number
  *
  * @property ExtraOption[] $extraOptions
  * @property Item $item
@@ -122,6 +125,10 @@ class Option extends \yii\db\ActiveRecord {
             }
 
             return $model->max_qty;
+        };
+
+        $fields['is_required'] = function($model) {
+            return (bool) $model->is_required;
         };
 
         return $fields;

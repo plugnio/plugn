@@ -29,9 +29,43 @@ class PaymentMethodController extends BaseController
             return $this->_configMoyasar($model, $store, $code);
         } else if($code == "Stripe") {
             return $this->_configStripe($model, $store, $code);
+        } else if($code == "UPayment") {
+            return $this->_configUPayment($model, $store, $code);
+        }
+    }
+
+    private function _configUPayment($model, $store, $code) {
+
+        $model->payment_upayment_api_key = Yii::$app->request->getBodyParam('payment_upayment_api_key');
+
+        if ($model->save())
+        {
+            $payment_method = $store->getRestaurantPaymentMethods()
+                ->joinWith('paymentMethod')
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_UPAYMENT])
+                ->exists();
+
+            if (!$payment_method) {
+
+                $upayPaymentMethod = PaymentMethod::find()
+                    ->andWhere(['payment_method_code' => PaymentMethod::CODE_UPAYMENT])
+                    ->one();
+
+                $payments_method = new RestaurantPaymentMethod();
+                $payments_method->payment_method_id = $upayPaymentMethod->payment_method_id;
+                $payments_method->restaurant_uuid = $store->restaurant_uuid;
+
+                if (!$payments_method->save()) {
+                    return self::message("error", $payments_method->getErrors());
+                }
+            }
+
+            return self::message('success', "Extension $code updated.");
         }
 
+        return self::message('error', $model->errors);
     }
+
 
     private function _configStripe($model, $store, $code) {
 
