@@ -135,8 +135,12 @@ class ItemController extends BaseController
 
                 if(isset($option['option_type']) && in_array($option['option_type'], [2, '2'])) {
 
-                    if($option['is_required'])
+                    if($option['is_required']) {
                         $min_qty = 1;
+                    } else {
+                        //https://bawescompany.atlassian.net/browse/ENG-414
+                        $min_qty = 0;
+                    }
 
                     $max_qty = 1;
                 }
