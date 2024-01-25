@@ -297,8 +297,6 @@ class AddonController extends BaseController
 
             if($paymentRecord->payment_current_status == 'CAPTURED')
             {
-                if(YII_ENV == 'prod') {
-                    
                     //Send event to Segment
                     
                     $kwdCurrency = Currency::findOne(['code' => 'KWD']);
@@ -317,7 +315,6 @@ class AddonController extends BaseController
                         null, 
                         $paymentRecord->restaurant_uuid
                     );
-                }
 
                 $model = new RestaurantAddon();
                 $model->addon_uuid = $paymentRecord->addon_uuid;

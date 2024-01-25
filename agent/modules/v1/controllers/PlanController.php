@@ -343,8 +343,6 @@ class PlanController extends BaseController
                     }
                 }
 
-                if(YII_ENV == 'prod') {
-                    
                     //Send event to Segment
                     
                     $kwdCurrency = Currency::findOne(['code' => 'KWD']);
@@ -363,7 +361,6 @@ class PlanController extends BaseController
                         null,
                         $paymentRecord->restaurant_uuid
                     );
-                }
             }
 
             if($paymentRecord){

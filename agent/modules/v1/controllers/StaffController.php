@@ -151,12 +151,10 @@ class StaffController extends BaseController {
             $model->inviteAgent();
         }
 
-        if (YII_ENV == 'prod') {
             Yii::$app->eventManager->track('Staff Added', [
                 "name" => $agent->agent_name,
                 "role" => $model->role
             ], null, $store->restaurant_uuid);
-        }
 
         return [
             "operation" => "success",
@@ -247,12 +245,10 @@ class StaffController extends BaseController {
             }
         }
 
-        if (YII_ENV == 'prod') {
             Yii::$app->eventManager->track('Staff Removed', [
                 "name" => $model->agent->agent_name,
                 "role" => $model->role
             ], null, $model->restaurant_uuid);
-        }
 
         return [
             "operation" => "success",

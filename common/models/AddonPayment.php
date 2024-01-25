@@ -198,7 +198,6 @@ class AddonPayment extends \yii\db\ActiveRecord
             // Net amount after deducting gateway fee
             $paymentRecord->payment_net_amount = $paymentRecord->payment_amount_charged - $paymentRecord->payment_gateway_fee;
 
-            if(YII_ENV == 'prod') {
                 //Send event to Segment
                 
                 $kwdCurrency = Currency::findOne(['code' => 'KWD']);
@@ -217,7 +216,6 @@ class AddonPayment extends \yii\db\ActiveRecord
                     null, 
                     $paymentRecord->restaurant_uuid
                 );
-            }
 
 
         } else {

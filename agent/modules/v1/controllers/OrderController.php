@@ -1195,8 +1195,6 @@ class OrderController extends BaseController
             }
         }
 
-        if (YII_ENV == 'prod') {
-
             $plugn_fee = 0;
             $payment_gateway_fee = 0;
             $plugn_fee_kwd = 0;
@@ -1278,7 +1276,6 @@ class OrderController extends BaseController
             Yii::$app->eventManager->track('Order Status Updated', $data,
                 null,
                 $model->restaurant_uuid);
-        }
 
         return [
             "operation" => "success",

@@ -100,7 +100,7 @@ class RestaurantType extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        /*if($insert && YII_ENV == 'prod') {
+        /*if($insert) {
 
             Yii::$app->eventManager->track('Store Type', [
                 'merchant_type' => $this->merchantType ? $this->merchantType->merchant_type_en : null,

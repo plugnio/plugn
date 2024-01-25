@@ -104,7 +104,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if(YII_ENV == 'prod' && $insert) {
+        if($insert) {
             $props = [
                 "country" => $this->country_id,
                 "delivery_to_whole_country" => $this->deliver_whole_country,

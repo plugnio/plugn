@@ -149,8 +149,6 @@ class Ticket extends \yii\db\ActiveRecord
         if($insert) {
             $this->sendTicketGeneratedMail();
 
-            if(YII_ENV == 'prod') {
-
                 Yii::$app->eventManager->track('Ticket Added', [
                     'ticket_id' => $this->ticket_uuid,
                     'store_id' => $this->restaurant_uuid,
@@ -160,7 +158,6 @@ class Ticket extends \yii\db\ActiveRecord
                     null,
                     $this->restaurant_uuid
                 );
-            }
         }
 
         if(isset($changedAttributes['ticket_status'])) {
@@ -169,8 +166,6 @@ class Ticket extends \yii\db\ActiveRecord
             {
                 $this->ticket_completed_at = new Expression("NOW()");
                 $this->resolution_time = time() - strtotime($this->ticket_started_at);
-
-                if(YII_ENV == 'prod') {
 
                     Yii::$app->eventManager->track('Ticket Resolved', [
                         'ticket_id' => $this->ticket_uuid,
@@ -181,14 +176,11 @@ class Ticket extends \yii\db\ActiveRecord
                         null,
                         $this->restaurant_uuid
                     );
-                }
             }
             else if($this->ticket_status == self::STATUS_IN_PROGRESS)
             {
                 $this->ticket_started_at = new Expression("NOW()");
                 $this->response_time = time() - strtotime($this->created_at);
-
-                if(YII_ENV == 'prod') {
 
                     Yii::$app->eventManager->track('Ticket Started', [
                         'ticket_id' => $this->ticket_uuid,
@@ -199,7 +191,6 @@ class Ticket extends \yii\db\ActiveRecord
                         null,
                         $this->restaurant_uuid
                     );
-                }
             }
 
             self::updateAll([

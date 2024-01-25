@@ -696,14 +696,11 @@ class TapPayments extends Component
 
          //for debug
 
-        if (YII_ENV == 'prod') {
-             
             Yii::$app->eventManager->track(
                 'Tap Charge Attempt', 
                 $chargeParams, 
                 null, 
                 'Tap Payments');
-        }
 
         $client = new Client();
 

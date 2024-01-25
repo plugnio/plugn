@@ -178,8 +178,6 @@ class StoreController extends BaseController
             return self::message("error", Yii::t('app', "We limiting no of store per user to 5 for now!"));
         }
 
-        if(YII_ENV == 'prod') {
-
             $token = Yii::$app->request->getBodyParam('token');
 
             $response = Yii::$app->reCaptcha->verify($token);
@@ -191,7 +189,6 @@ class StoreController extends BaseController
                     "message" => Yii::t('candidate', "Invalid captcha validation")
                 ];
             }
-        }
 
         $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
 
@@ -314,16 +311,12 @@ class StoreController extends BaseController
         //todo: response validation
 
         if($purchase) {//&& strpos($domain, '.plugn.') == -1
- 
-            if(YII_ENV == 'prod') {
 
                 Yii::$app->eventManager->track('Domain Requests', [
                         "domain" =>  $domain
                     ],
                     null,
                     $store->restaurant_uuid);
-            }
-
  
             return $store->notifyDomainRequest($old_domain);
         }
@@ -1273,8 +1266,6 @@ class StoreController extends BaseController
         if($model->site_id)
             Yii::$app->netlifyComponent->upgradeSite($model);
 
-        if (YII_ENV == 'prod') {
-
             $props =  [
                 "google_analytics_id" => !empty($model->google_analytics_id),
                 "google_tag_id" => !empty($model->google_tag_id),
@@ -1296,7 +1287,6 @@ class StoreController extends BaseController
                 null,
                 $model->restaurant_uuid
             );
-        }
 
         return self::message("success","Analytics integration updated successfully");
     }
@@ -1377,12 +1367,10 @@ class StoreController extends BaseController
             ];
         }
 
-        if (YII_ENV == 'prod') {
             Yii::$app->eventManager->track('Store Deactivated', [
                 "reason" => $reason,
                 "store_status" => Restaurant::RESTAURANT_STATUS_CLOSED
             ], null, $model->restaurant_uuid);
-        }
 
         return self::message("success", "Status changed successfully");
     }
@@ -1413,10 +1401,7 @@ class StoreController extends BaseController
             throw new \yii\web\ServerErrorHttpException('file access failed: permission deny');
         }
 
-        if (YII_ENV == 'prod') {
-
             Yii::$app->eventManager->track('Email Opened', $model->attributes);
-        }
 
         return $response->send();
     }

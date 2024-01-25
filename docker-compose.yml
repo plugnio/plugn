@@ -40,6 +40,9 @@ services:
     environment:
       - PMA_HOST=localhost
       - PMA_PORT=3306
+      - PMA_USER=root
+      - PMA_PASSWORD=12345
+      - UPLOAD_LIMIT=102400k
     depends_on:
       - "mysql"
  

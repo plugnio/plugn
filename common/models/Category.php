@@ -120,8 +120,6 @@ class Category extends \yii\db\ActiveRecord
             }
         }
 
-        if(YII_ENV == 'prod') {
-
             $props = [
                 "category_id" => $this->category_id,
                 "category_name_english" => $this->title,
@@ -146,7 +144,6 @@ class Category extends \yii\db\ActiveRecord
                     $this->restaurant_uuid
                 );
             }
-        }
         
 
     }

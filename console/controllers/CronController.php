@@ -614,8 +614,6 @@ class CronController extends \yii\console\Controller
                 }
             }
 
-            if(YII_ENV == 'prod') {
-
                 $rate = 1;//default rate
 
                 if(isset($refund->order->currency)) {
@@ -629,7 +627,7 @@ class CronController extends \yii\console\Controller
                     ]),
                     null,
                     $refund->restaurant_uuid);
-            }
+
         }
 
        // $this->stdout("No refund requests available \n", Console::FG_RED, Console::BOLD);
@@ -898,8 +896,6 @@ class CronController extends \yii\console\Controller
 
         //send today's bestselling
 
-        if(YII_ENV == 'prod')
-        {
             $query = Item::find()
                 ->orderBy (['unit_sold' => SORT_DESC])
                 ->limit (5);
@@ -936,7 +932,7 @@ class CronController extends \yii\console\Controller
             ];
 
             Yii::$app->eventManager->track('Inactive stores',  $data);
-        }
+
     }
 
     /**

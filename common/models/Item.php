@@ -349,8 +349,6 @@ class Item extends \yii\db\ActiveRecord
             }
         }
 
-        if(YII_ENV == 'prod')
-        {
             //Send event to Segment
             $props = [
                 'item_uuid' => $this->item_uuid,
@@ -405,7 +403,6 @@ class Item extends \yii\db\ActiveRecord
             } else {
                 Yii::$app->eventManager->track('Item Updated', $props, null, $this->restaurant_uuid);
             }
-        }
 
         return true;
     }
@@ -416,7 +413,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function increaseStockQty($qty)
     {
-        if(YII_ENV == 'prod' && $this->track_quantity) {
+        if($this->track_quantity) {
             $props = [
                 "item_uuid" => $this->item_uuid,
                 "previous_stock" => $this->stock_qty,
@@ -444,7 +441,7 @@ class Item extends \yii\db\ActiveRecord
      */
     public function decreaseStockQty($qty)
     {
-        if(YII_ENV == 'prod' && $this->track_quantity) {
+        if($this->track_quantity) {
             $props = [
                 "item_uuid" => $this->item_uuid,
                 "previous_stock" => $this->stock_qty,

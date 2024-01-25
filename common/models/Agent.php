@@ -212,7 +212,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             $this->campaign->save(false);
         }
 
-        if (YII_ENV == 'prod') {
             $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
 
             Yii::$app->eventManager->track('Profile Updated', [
@@ -222,7 +221,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                 "user_name" => $this->agent_name,
                 "email" => $this->agent_email
             ], null, $restaurantUuid);
-        }
     }
 
     /**
@@ -678,8 +676,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
         \Yii::info ("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
 
-        if (YII_ENV == 'prod') {
-
             $full_name = explode (' ', $this->agent_name);
             $firstname = $full_name[0];
             $lastname = array_key_exists (1, $full_name) ? $full_name[1] : null;
@@ -715,7 +711,6 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                 null,
                 $this->agent_id
             );*/
-        }
 
         return [
             'operation' => 'success'

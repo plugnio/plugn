@@ -16,18 +16,9 @@ class EventManager extends \common\components\EventManager
      */
     public function track($event, $eventData, $timestamp = null, $userId = null)
     {
-        $language = Yii::$app->request->headers->get('Language');
-
-        $eventData = array_merge($eventData, [
-            "company_id" => "BAWES",
-            "language" => $language,
-            "channel" => "Backend",
-            "do_not_disturb" => null,
-        ]);
+        $store_id = Yii::$app->request->headers->get('Store-Id');
 
         if(!Yii::$app->user->isGuest) {
-
-            $eventData["store_id"] = Yii::$app->request->headers->get('Store-Id');
 
             $assignment = AgentAssignment::find()
                 ->andWhere(['restaurant_uuid' => $eventData["store_id"], "agent_id" => Yii::$app->user->getId()])
@@ -37,6 +28,6 @@ class EventManager extends \common\components\EventManager
                 $eventData["role"] = $assignment->role;
         }
 
-        parent::track($event, $eventData, $timestamp, $userId);
+        parent::track($event, $eventData, $timestamp, $store_id);
     }
 }

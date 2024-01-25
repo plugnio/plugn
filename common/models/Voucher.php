@@ -170,7 +170,7 @@ class Voucher extends \yii\db\ActiveRecord {
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if(YII_ENV == 'prod') {
+
             $props = [
                 "code" => $this->code,
                 "voucher_description_english" => $this->description,
@@ -188,7 +188,7 @@ class Voucher extends \yii\db\ActiveRecord {
             ];
 
              Yii::$app->eventManager->track("Voucher Added", $props, null, $this->restaurant_uuid);
-        }
+
     }
 
     /**

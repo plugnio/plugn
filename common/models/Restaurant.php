@@ -2762,8 +2762,6 @@ class Restaurant extends ActiveRecord
 
         Yii::info("[New Store Signup] " . $this->name . " has just joined Plugn", __METHOD__);
 
-        if (YII_ENV == 'prod') {
-
             $full_name = explode(' ', $agent->agent_name);
             $firstname = $full_name[0];
             $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
@@ -2814,7 +2812,7 @@ class Restaurant extends ActiveRecord
             //Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/oeap6qy/oeap6qy", $store->attributes + $agent->attributes);
 
             //Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/3784096/366cqik",  $store->attributes + $agent->attributes);
-        }
+
 
         return [
             "operation" => "success",
@@ -2851,8 +2849,6 @@ class Restaurant extends ActiveRecord
 
         Yii::info($this->name . ' Store deleted by user #' . $this->restaurant_uuid);
 
-        if(YII_ENV == 'prod')
-        {
             Yii::$app->eventManager->track('Account deleted',  [
                     'store_name' => $this->name,
                     'phone_number' => $this->owner_phone_country_code . $this->owner_number,
@@ -2864,7 +2860,6 @@ class Restaurant extends ActiveRecord
                 null,
                 $this->restaurant_uuid
             );
-        }
 
         return [
             'message' => Yii::t('agent', "Store deleted successfully"),
