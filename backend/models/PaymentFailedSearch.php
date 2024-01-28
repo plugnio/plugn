@@ -83,11 +83,11 @@ class PaymentFailedSearch extends PaymentFailed
 
         if($this->restaurantUuid) {
             $query->joinWith(['order'])
-                ->andWhere(['restaurant_uuid' => $this->restaurantUuid]);
+                ->andWhere(['order.restaurant_uuid' => $this->restaurantUuid]);
         }
 
         if($this->restaurantName) {
-            $query->andWhere(['like', 'name', $this->restaurantName]);
+            $query->andWhere(['like', 'restaurant.name', $this->restaurantName]);
         }
 
         $query->andFilterWhere(['like', 'payment_failed_uuid', $this->payment_failed_uuid])
