@@ -10,6 +10,12 @@ $this->title = $model->payment_failed_uuid;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Payment Faileds'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+function isSerialized($data) {
+    $unserializedData = @unserialize($data);
+    return ($unserializedData !== false || $data === 'b:0;');
+}
+
 ?>
 <div class="payment-failed-view">
 
@@ -33,7 +39,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'payment_uuid',
             'order_uuid',
             'customer_id',
-            'response:ntext',
+            [
+                'attribute' => 'response',
+                "format" => "raw",
+                'value' => function ($model) {
+                    if (isSerialized($model->response)) {
+                        return unserialize($model->response);
+                    } else {
+                        return $model->response;
+                    }
+                }
+            ],
             'created_at',
             'updated_at',
         ],

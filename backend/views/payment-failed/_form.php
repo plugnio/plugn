@@ -19,7 +19,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'customer_id')->textInput() ?>
 
     <?= $form->field($model, 'response')->textarea(['rows' => 6]) ?>
- 
+
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>

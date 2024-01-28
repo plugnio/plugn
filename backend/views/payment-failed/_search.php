@@ -15,15 +15,21 @@ use yii\widgets\ActiveForm;
         'method' => 'get',
     ]); ?>
 
-    <?= $form->field($model, 'payment_failed_uuid') ?>
 
-    <?= $form->field($model, 'payment_uuid') ?>
+    <div class="grid">
+        <div class="row">
+            <div class="col-md-3">
+                <?= $form->field($model, 'restaurantUuid') ?>
+            </div>
+            <div class="col-md-3">
+                <?= $form->field($model, 'customer_id') ?>
+            </div>
+            <div class="col-md-3">
+                <?= $form->field($model, 'response') ?>
+            </div>
 
-    <?= $form->field($model, 'order_uuid') ?>
-
-    <?= $form->field($model, 'customer_id') ?>
-
-    <?= $form->field($model, 'response') ?>
+        </div>
+    </div>
 
     <?php // echo $form->field($model, 'created_at') ?>
 
@@ -31,7 +37,7 @@ use yii\widgets\ActiveForm;
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
+       <!--  <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>-->
     </div>
 
     <?php ActiveForm::end(); ?>

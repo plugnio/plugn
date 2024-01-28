@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a(Yii::t('app', 'Create Payment Failed'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -60,14 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 }
             ],
-            /*[
-                    'attribute' => 'restaurantUuid',
-                    'value' => function ($model) {
-                        if($model->order)
-                            return $model->order->restaurant_uuid;
-                    }
-            ],*/
-            'response:ntext',
+            //'response:ntext',
             //'created_at',
             //'updated_at',
 
