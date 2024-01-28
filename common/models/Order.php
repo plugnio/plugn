@@ -437,6 +437,23 @@ class Order extends \yii\db\ActiveRecord
     //
     // }
 
+    public function fields() {
+        return array_merge(parent::fields(), [
+            'delivery_fee' => function ($order) {
+                return (float) $order->delivery_fee;
+            },
+            'subtotal' => function ($order) {
+                return (float) $order->subtotal;
+            },
+            'tax' => function ($order) {
+                return (float) $order->tax;
+            },
+            'total_price' => function ($order) {
+                return (float) $order->total_price;
+            }
+        ]);
+    }
+
     /**
      * @inheritdoc
      */
