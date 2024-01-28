@@ -425,6 +425,9 @@ class OrderController extends Controller
 
         if ($order_uuid) {
             $order = $this->findModel($order_uuid);
+
+            //todo: update order
+
         } else {
             $response = $this->actionInitOrder($id);
 
