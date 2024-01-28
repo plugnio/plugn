@@ -44,10 +44,13 @@ function isSerialized($data) {
                 "format" => "raw",
                 'value' => function ($model) {
                     if (isSerialized($model->response)) {
-                        return unserialize($model->response);
-                    } else {
-                        return $model->response;
+                        try {
+                            return print_r(unserialize($model->response), true);
+                        } catch (Exception $e) {
+                        }
                     }
+
+                    return $model->response;
                 }
             ],
             'created_at',
