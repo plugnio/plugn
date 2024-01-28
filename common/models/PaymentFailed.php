@@ -113,4 +113,15 @@ class PaymentFailed extends \yii\db\ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['order_uuid' => 'order_uuid']);
     }
+
+    /**
+     * Gets query for [[Restaurant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant($modelClass = "\common\models\Restaurant")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via('order');
+    }
 }
