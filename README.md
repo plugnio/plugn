@@ -214,3 +214,6 @@ https://www.yiiframework.com/extension/yiisoft/yii2-redis/doc/api/2.0/yii-redis-
 
 https://docs.google.com/spreadsheets/d/14wzSPWjGcJ8h77SxmjiKSxc4rkJiYNITeIISvvRNNnE/edit#gid=1641519238
 
+# Plugn issue
+
+integrations@tap.company

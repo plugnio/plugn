@@ -817,6 +817,31 @@ class CronController extends \yii\console\Controller
         return self::EXIT_CODE_NORMAL;
     }
 
+    /**
+     * @return void
+     */
+    public function actionHour() {
+
+        //pollTapStatus, as they said it will take 1 day to approve docs, if someone do checkout before that, they might
+        // need to process refund etc,... so better enable checkout once accounts approved ... once payout enabled
+
+        $query = Restaurant::find()
+            ->andWhere(['!=', 'restaurant.is_deleted', 1])
+            /*->andWhere([
+                'OR',
+                ['is_tap_business_active' => false],
+                ['!=', 'tap_merchant_status', 'Active']
+            ])*/
+            ->andWhere(['tap_merchant_status', 'New Pending Approval'])
+            ->andWhere(['is_tap_created' => true]);
+
+        foreach ($query->batch() as $stores) {
+            foreach ($stores as $store) {
+                $store->pollTapStatus();
+            }
+        }
+    }
+
     public function actionMinute() {
 
         $campaigns = VendorCampaign::find()
@@ -875,24 +900,6 @@ class CronController extends \yii\console\Controller
         foreach ($query->batch() as $stores) {
             foreach ($stores as $store) {
                 $store->deleteSite();
-            }
-        }
-
-        //pollTapStatus, as they said it will take 1 day to approve docs, if someone do checkout before that, they might
-        // need to process refund etc,... so better enable checkout once accounts approved ... once payout enabled
-
-        $query = Restaurant::find()
-            ->andWhere(['!=', 'restaurant.is_deleted', 1])
-            ->andWhere([
-                'OR',
-                ['is_tap_business_active' => false],
-                ['!=', 'tap_merchant_status', 'Active']
-            ])
-            ->andWhere(['is_tap_created' => true]);
-
-        foreach ($query->batch() as $stores) {
-            foreach ($stores as $store) {
-                $store->pollTapStatus();
             }
         }
 
