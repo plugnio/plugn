@@ -36,9 +36,39 @@ function isSerialized($data) {
         'model' => $model,
         'attributes' => [
             'payment_failed_uuid',
-            'payment_uuid',
-            'order_uuid',
+
+            [
+                'attribute' => 'payment_uuid',
+                "format" => "raw",
+                'value' => function ($model) {
+
+                    return Html::a($model->payment_uuid, \yii\helpers\Url::to(['payment/view', 'id' => $model->payment_uuid]), [
+                        "target" => "_blank"
+                    ]);
+                }
+            ],
+
+            [
+                'attribute' => 'order_uuid',
+                "format" => "raw",
+                'value' => function ($model) {
+                    return Html::a($model->order_uuid, \yii\helpers\Url::to(['order/view', 'id' => $model->order_uuid]), [
+                        "target" => "_blank"
+                    ]);
+                }
+            ],
             'customer_id',
+            [
+                'attribute' => 'restaurantName',
+                "format" => "raw",
+                'value' => function ($model) {
+                    if($model->restaurant) {
+                        return Html::a($model->restaurant->name, \yii\helpers\Url::to(['restaurant/view', 'id' => $model->order->restaurant_uuid]), [
+                            "target" => "_blank"
+                        ]);
+                    }
+                }
+            ],
             [
                 'attribute' => 'response',
                 "format" => "raw",
