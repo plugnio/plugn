@@ -18,10 +18,10 @@ class EventManager extends \common\components\EventManager
     {
         $store_id = Yii::$app->request->headers->get('Store-Id');
 
-        if(!Yii::$app->user->isGuest) {
+        if(!Yii::$app->user->isGuest && $store_id) {
 
             $assignment = AgentAssignment::find()
-                ->andWhere(['restaurant_uuid' => $eventData["store_id"], "agent_id" => Yii::$app->user->getId()])
+                ->andWhere(['restaurant_uuid' => $store_id, "agent_id" => Yii::$app->user->getId()])
                 ->one();
 
             if($assignment)
