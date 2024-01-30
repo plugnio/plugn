@@ -442,7 +442,7 @@ class RestaurantController extends Controller {
     {
         $model = $this->findModel($id);
 
-        $response = $model->fetchMerchant();
+        $response = $model->fetchMerchant(false);
 
         if($response["operation"] == 'error') {
             Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));

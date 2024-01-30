@@ -1579,7 +1579,7 @@ class Restaurant extends ActiveRecord
      * fetch merchant details and set api keys
      * @return array|string[]
      */
-    public function fetchMerchant() {
+    public function fetchMerchant($notifyVendor = true) {
 
         $merchantApiResponse = Yii::$app->tapPayments->fetchMerchant(
             $this->merchant_id
@@ -1661,7 +1661,7 @@ class Restaurant extends ActiveRecord
             if ($this->is_tap_created) {
 
                 if ($this->is_tap_enable) {
-                    $this->onTapApproved();
+                    $this->onTapApproved($notifyVendor);
                // } else {
                 //    $this->onTapCreated();
                 }
@@ -2166,9 +2166,11 @@ class Restaurant extends ActiveRecord
             . $this->iban_certificate_file;
     }
 
-    public function onTapApproved()
+    public function onTapApproved($notifyVendor = true)
     {
-        $this->notifyTapApproved();
+        if($notifyVendor) {
+            $this->notifyTapApproved();
+        }
 
         $this->enableTapGateways();
     }
