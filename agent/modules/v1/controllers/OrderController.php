@@ -1212,7 +1212,7 @@ class OrderController extends BaseController
 
             $rate = 1 / $model->restaurant->currency->rate;// to USD
 
-            if ($model->payment_uuid) {
+            if ($model->payment_uuid && $model->payment) {
 
                 $plugn_fee_kwd = ($model->payment->plugn_fee + $model->payment->partner_fee) * $rateKWD;
 

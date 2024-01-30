@@ -1089,7 +1089,7 @@ class Order extends \yii\db\ActiveRecord
             ]);
         }
 
-        if (!$this->is_sandbox) {
+
 
             $order_total = $this->total_price * $rate;
 
@@ -1185,6 +1185,8 @@ class Order extends \yii\db\ActiveRecord
                 null, 
                 $this->restaurant_uuid);
 
+            //todo: should able to run this in dev too
+        if (!$this->is_sandbox) {
             Yii::$app->walletManager->addEntry([
                 'amount' => $plugn_fee_kwd,
                 'data' => 'Plugn: Commission for Order #'. $this->order_uuid,//$plugn_fee

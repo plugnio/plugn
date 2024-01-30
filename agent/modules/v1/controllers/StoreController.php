@@ -179,6 +179,8 @@ class StoreController extends BaseController
             return self::message("error", Yii::t('app', "We limiting no of store per user to 5 for now!"));
         }
 
+        if (YII_ENV == 'prod') {
+
             $token = Yii::$app->request->getBodyParam('token');
 
             $response = Yii::$app->reCaptcha->verify($token);
@@ -190,6 +192,7 @@ class StoreController extends BaseController
                     "message" => Yii::t('candidate', "Invalid captcha validation")
                 ];
             }
+        }
 
         $utm_id = Yii::$app->request->getBodyParam('utm_uuid');
 
