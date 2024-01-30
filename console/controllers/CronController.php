@@ -852,7 +852,7 @@ class CronController extends \yii\console\Controller
                 ['is_tap_business_active' => false],
                 ['!=', 'tap_merchant_status', 'Active']
             ])*/
-            ->andWhere(['tap_merchant_status', 'New Pending Approval'])
+            ->andWhere(['tap_merchant_status' => 'New Pending Approval'])
             ->andWhere(['is_tap_created' => true]);
 
         foreach ($query->batch() as $stores) {
