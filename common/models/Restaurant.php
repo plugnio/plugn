@@ -1662,14 +1662,23 @@ class Restaurant extends ActiveRecord
 
                 if ($this->is_tap_enable) {
                     $this->onTapApproved($notifyVendor);
-               // } else {
-                //    $this->onTapCreated();
+                } else {
+                    //$this->onTapCreated();
+
+                    //remove tap payment methods
+
+                    $paymentMethods = $this->getRestaurantPaymentMethods()->all();
+
+                    foreach ($paymentMethods as $paymentMethod) {
+                        $paymentMethod->delete();
+                    }
                 }
             }
 
             return [
                 "operation" => 'success',
-                "message" => "Account created successfully!"
+                "tap_merchant_status" => $this->tap_merchant_status,
+                "message" => "Merchant status is: " . $merchantApiResponse->data['status']
             ];
 
         } else {
@@ -2177,7 +2186,6 @@ class Restaurant extends ActiveRecord
 
     public function notifyTapApproved()
     {
-
         $paymentGateway = 'Tap Payments';
 
         $subject = 'Your ' . $paymentGateway . ' account data has been approved';
@@ -2190,6 +2198,31 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
+            ->setSubject($subject);
+
+        try {
+            $mailer->send();
+        } catch (Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
+    }
+
+    public function notifyTapRejected($status)
+    {
+        $paymentGateway = 'Tap Payment';
+
+        $subject = 'Your ' . $paymentGateway . ' account status is ' . $status;
+
+        $mailer = Yii::$app->mailer->compose([
+            'html' => 'agent/tap-rejected',
+        ], [
+            'store' => $this,
+            'status' => $status,
+            'paymentGateway' => $paymentGateway,
+        ])
+            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo([$this->restaurant_email])
+            ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setSubject($subject);
 
         try {

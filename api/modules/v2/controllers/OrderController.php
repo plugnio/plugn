@@ -656,6 +656,16 @@ class OrderController extends Controller
                 $paymentFailed->response = print_r($responseContent->errors, true);
                 $paymentFailed->save();
 
+                if(in_array($responseContent->errors[0]->code, [1242, 1243])) {
+
+                    $response = $restaurant->fetchMerchant();
+
+                    if (isset($response['tap_merchant_status']) && $response['tap_merchant_status'] != "Active") {
+                        //notify vendor
+                        $restaurant->notifyTapRejected($response['tap_merchant_status']);
+                    }
+                }
+
                 return [
                     'operation' => 'error',
                     'message' => $errorMessage,

@@ -438,6 +438,11 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $model->restaurant_uuid]);
     }
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionPollTapMerchantStatus($id)
     {
         $model = $this->findModel($id);
