@@ -182,6 +182,12 @@ class RestaurantController extends Controller {
 
         $store->setScenario(Restaurant::SCENARIO_RESET_TAP_ACCOUNT);
 
+        $store->is_tap_enable = false;
+        $store->is_tap_created = false;
+
+        $store->tap_merchant_status = null;
+        $store->is_tap_business_active = false;
+
         $store->business_id = null;
         $store->business_entity_id = null;
         $store->wallet_id = null;
@@ -224,7 +230,6 @@ class RestaurantController extends Controller {
 
         $store->live_public_key = null;
         $store->test_public_key = null;
-
 
 
         $store->license_number = null;
