@@ -422,6 +422,9 @@ class OrderController extends Controller
 
         if ($order_uuid) {
             $order = $this->findModel($order_uuid);
+
+            //todo: update order
+
         } else {
             $response = $this->actionInitOrder($id);
 
@@ -649,6 +652,16 @@ class OrderController extends Controller
                 $paymentFailed->order_uuid = $order->order_uuid;
                 $paymentFailed->response = print_r($responseContent->errors, true);
                 $paymentFailed->save();
+
+                if(in_array($responseContent->errors[0]->code, [1242, 1243])) {
+
+                    $response = $restaurant->fetchMerchant();
+
+                    if (isset($response['tap_merchant_status']) && $response['tap_merchant_status'] != "Active") {
+                        //notify vendor
+                        $restaurant->notifyTapRejected($response['tap_merchant_status']);
+                    }
+                }
 
                 return [
                     'operation' => 'error',

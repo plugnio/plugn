@@ -90,6 +90,7 @@ AppAsset::register($this);
                     ['label' => 'Payment gateway Queue', 'url' => ['/payment-gateway-queue/index']],
                     ['label' => 'Refund', 'url' => ['/refund/index']],
                     ['label' => 'Payment', 'url' => ['/payment/index']],
+                    ['label' => 'Failed Payment', 'url' => ['/payment-failed/index']],
                     ['label' => 'Subscription Payment', 'url' => ['/subscription-payment/index']],
                 ]
             ],

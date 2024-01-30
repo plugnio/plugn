@@ -416,6 +416,18 @@ class OrderItem extends \yii\db\ActiveRecord {
         }
     }
 
+    public function fields()
+    {
+        return array_merge(parent::fields(), [
+            'item_price' => function ($order) {
+                return (float)$order->item_price;
+            },
+            'item_unit_price' => function ($order) {
+                return (float)$order->item_unit_price;
+            }
+        ]);
+    }
+
     /**
      * @return string[]
      */

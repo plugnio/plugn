@@ -1164,7 +1164,6 @@ class Restaurant extends ActiveRecord
      */
     public function createMyFatoorahAccount()
     {
-
         //Create  supplier for a vendor on MyFatoorah
         Yii::$app->myFatoorahPayment->setApiKeys($this->currency->code);
 
@@ -1180,7 +1179,7 @@ class Restaurant extends ActiveRecord
 
             if ($this->supplierCode) {
                 $this->is_myfatoorah_enable = 1;
-                $this->is_tap_enable = 0;
+                //$this->is_tap_enable = 0;
             } else {
                 $this->is_myfatoorah_enable = 0;
             }
@@ -1449,6 +1448,8 @@ class Restaurant extends ActiveRecord
             $this->onTapCreated();
         }
 
+        Yii::info($this->name . " has just created TAP account", __METHOD__);
+
         return [
             "operation" => 'success',
             "message" => "Account created successfully!"
@@ -1507,6 +1508,9 @@ class Restaurant extends ActiveRecord
         }
     }
 
+    /**
+     * @return array|string[]
+     */
     public function createMerchant()
     {
         $merchantApiResponse = Yii::$app->tapPayments->createMerchantAccount(
@@ -1523,7 +1527,26 @@ class Restaurant extends ActiveRecord
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
 
-            $this->tap_merchant_status = $merchantApiResponse->data['status'];
+            //todo: check status on merchant create api, should be "New Pending Approval"
+
+            /*if($this->country && $this->country->iso == "SA") {
+                if (
+                    $merchantApiResponse->data['is_acceptance_allowed'] &&
+                    $merchantApiResponse->data['is_payout_allowed']
+                ) {
+                    $this->tap_merchant_status = $merchantApiResponse->data['status'];
+                } else if(!$merchantApiResponse->data['is_acceptance_allowed']) {
+                    $this->tap_merchant_status = "Acceptance not allowed";
+                } else {
+                    $this->tap_merchant_status = "Payout not allowed";
+                }
+            } else {
+                $this->tap_merchant_status = $merchantApiResponse->data['status'];
+            }*/
+
+            // setting manually as detail vs create api showing different status,
+            // create showing Active but detail showing "New Pending Approval"
+            $this->tap_merchant_status = "New Pending Approval";
 
             self::updateAll([
                 'merchant_id' => $this->merchant_id,
@@ -1558,28 +1581,43 @@ class Restaurant extends ActiveRecord
      * fetch merchant details and set api keys
      * @return array|string[]
      */
-    public function fetchMerchant() {
+    public function fetchMerchant($notifyVendor = true) {
 
-        $operatorApiResponse = Yii::$app->tapPayments->fetchMerchant(
+        $merchantApiResponse = Yii::$app->tapPayments->fetchMerchant(
             $this->merchant_id
         );
 
-        if ($operatorApiResponse->isOk && isset($operatorApiResponse->data['operator'])) {
+        if ($merchantApiResponse->isOk && isset($merchantApiResponse->data['operator'])) {
 
-            $this->tap_merchant_status = $operatorApiResponse->data['status'];
+            if($this->country && $this->country->iso == "SA") {
+                if (
+                    $merchantApiResponse->data['is_acceptance_allowed'] &&
+                    $merchantApiResponse->data['is_payout_allowed']
+                ) {
+                    $this->tap_merchant_status = $merchantApiResponse->data['status'];
+                } else if(!$merchantApiResponse->data['is_acceptance_allowed']) {
+                    $this->tap_merchant_status = "Acceptance not allowed";
+                } else {
+                    $this->tap_merchant_status = "Payout not allowed";
+                }
+            } else {
+                $this->tap_merchant_status = $merchantApiResponse->data['status'];
+            }
+
+            //todo: notify vendor + show to admin + slack if status not active
 
             if(!$this->wallet_id)
-                $this->wallet_id = $operatorApiResponse->data['operator']['wallet_id'];
+                $this->wallet_id = $merchantApiResponse->data['operator']['wallet_id'];
 
-            $this->developer_id = $operatorApiResponse->data['operator']['developer_id'];
+            $this->developer_id = $merchantApiResponse->data['operator']['developer_id'];
 
-            $this->operator_id = $operatorApiResponse->data['operator']['id'];
-            $this->test_api_key = $operatorApiResponse->data['operator']['api_credentials']['test']['secret'];
-            $this->test_public_key = $operatorApiResponse->data['operator']['api_credentials']['test']['public'];
+            $this->operator_id = $merchantApiResponse->data['operator']['id'];
+            $this->test_api_key = $merchantApiResponse->data['operator']['api_credentials']['test']['secret'];
+            $this->test_public_key = $merchantApiResponse->data['operator']['api_credentials']['test']['public'];
 
-            if (array_key_exists('live', $operatorApiResponse->data['operator']['api_credentials'])) {
-                $this->live_api_key = $operatorApiResponse->data['operator']['api_credentials']['live']['secret'];
-                $this->live_public_key = $operatorApiResponse->data['operator']['api_credentials']['live']['public'];
+            if (array_key_exists('live', $merchantApiResponse->data['operator']['api_credentials'])) {
+                $this->live_api_key = $merchantApiResponse->data['operator']['api_credentials']['live']['secret'];
+                $this->live_public_key = $merchantApiResponse->data['operator']['api_credentials']['live']['public'];
             }
 
             //sandbox mode will give only test api keys
@@ -1599,9 +1637,9 @@ class Restaurant extends ActiveRecord
                 $this->tap_merchant_status == "Active"
             ) {
                 $this->is_tap_enable = 1;
+            } else {
+                $this->is_tap_enable = 0;
             }
-
-            Yii::info($this->name . " has just created TAP account", __METHOD__);
 
             self::updateAll([
                 'tap_merchant_status' => $this->tap_merchant_status,
@@ -1625,25 +1663,34 @@ class Restaurant extends ActiveRecord
             if ($this->is_tap_created) {
 
                 if ($this->is_tap_enable) {
-                    $this->onTapApproved();
-               // } else {
-                //    $this->onTapCreated();
+                    $this->onTapApproved($notifyVendor);
+                } else {
+                    //$this->onTapCreated();
+
+                    //remove tap payment methods
+
+                    $paymentMethods = $this->getRestaurantPaymentMethods()->all();
+
+                    foreach ($paymentMethods as $paymentMethod) {
+                        $paymentMethod->delete();
+                    }
                 }
             }
 
             return [
                 "operation" => 'success',
-                "message" => "Account created successfully!"
+                "tap_merchant_status" => $this->tap_merchant_status,
+                "message" => "Merchant status is: " . $merchantApiResponse->data['status']
             ];
 
         } else {
 
-            Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
+            Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
 
             if (isset(Yii::$app->session->id))
-                Yii::$app->session->setFlash('errorResponse', json_encode($operatorApiResponse->data));
+                Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
 
-            $this->addError('operator_id', json_encode($operatorApiResponse->data));
+            $this->addError('operator_id', json_encode($merchantApiResponse->data));
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -1664,11 +1711,14 @@ class Restaurant extends ActiveRecord
 
             return [
                 "operation" => 'error',
-                "message" => $operatorApiResponse->data
+                "message" => $merchantApiResponse->data
             ];
         }
     }
 
+    /**
+     * @return array|string[]
+     */
     public function createAnOperator()
     {
         $operatorApiResponse = Yii::$app->tapPayments->createAnOperator(
@@ -1703,8 +1753,6 @@ class Restaurant extends ActiveRecord
             if ($this->is_tap_created && $this->is_tap_business_active && $this->tap_merchant_status == "Active") {
                 $this->is_tap_enable = 1;
             }
-
-            Yii::info($this->name . " has just created TAP account", __METHOD__);
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -2129,16 +2177,17 @@ class Restaurant extends ActiveRecord
             . $this->iban_certificate_file;
     }
 
-    public function onTapApproved()
+    public function onTapApproved($notifyVendor = true)
     {
-        $this->notifyTapApproved();
+        if($notifyVendor) {
+            $this->notifyTapApproved();
+        }
 
         $this->enableTapGateways();
     }
 
     public function notifyTapApproved()
     {
-
         $paymentGateway = 'Tap Payments';
 
         $subject = 'Your ' . $paymentGateway . ' account data has been approved';
@@ -2151,6 +2200,31 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
+            ->setSubject($subject);
+
+        try {
+            $mailer->send();
+        } catch (Swift_TransportException $e) {
+            Yii::error($e->getMessage(), "email");
+        }
+    }
+
+    public function notifyTapRejected($status)
+    {
+        $paymentGateway = 'Tap Payment';
+
+        $subject = 'Your ' . $paymentGateway . ' account status is ' . $status;
+
+        $mailer = Yii::$app->mailer->compose([
+            'html' => 'agent/tap-rejected',
+        ], [
+            'store' => $this,
+            'status' => $status,
+            'paymentGateway' => $paymentGateway,
+        ])
+            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setTo([$this->restaurant_email])
+            ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setSubject($subject);
 
         try {
@@ -2216,6 +2290,9 @@ class Restaurant extends ActiveRecord
         }
     }
 
+    /**
+     * @return void
+     */
     public function pollTapStatus()
     {
         if(!$this->is_tap_business_active) {
