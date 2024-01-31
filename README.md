@@ -216,4 +216,10 @@ https://docs.google.com/spreadsheets/d/14wzSPWjGcJ8h77SxmjiKSxc4rkJiYNITeIISvvRN
 
 # Plugn issue
 
-integrations@tap.company
+integrations@tap.company 
+
+## TODO 
+- ability to create multiple business accounts? and assign to stores? 
+- ability to manage merchants 
+- ability to manage documents
+https://developers.tap.company/reference/files

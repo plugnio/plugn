@@ -554,7 +554,7 @@ $restaurant = Restaurant::find()->where(['restaurant_uuid' => $this->params['res
       $segmentScript = '';
       $storeConversionParams = '';
 
-      if(Yii::$app->user->identity && YII_ENV == 'prod'){
+      if(Yii::$app->user->identity){
 
         $full_name = explode(' ', Yii::$app->user->identity->agent_name);
 

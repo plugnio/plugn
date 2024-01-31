@@ -21,6 +21,7 @@ class WalletManager
      */
     public function addEntry($data) {
         $client = new Client();
+        
         $response = $client->createRequest()
             ->setMethod('POST')
             ->setUrl($this->apiEndpoint . '/balance/add-wallet-entry')

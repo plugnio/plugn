@@ -400,13 +400,10 @@ class OrderController extends Controller
             'restaurant_uuid' => $restaurant->restaurant_uuid
         ]);
 
-        if(YII_ENV == 'prod') {
-
             Yii::$app->eventManager->track('Order Initiated', $order->attributes,
                 null,
                 $restaurant->restaurant_uuid
             );
-        }
 
         return [
             'operation' => 'success',
@@ -1239,8 +1236,6 @@ class OrderController extends Controller
             ];
         }
 
-        if (YII_ENV == 'prod') {
-
             $shipping_partner = "";
 
             if($model->armada_tracking_link) {
@@ -1258,7 +1253,6 @@ class OrderController extends Controller
                 null,
                 $model->restaurant_uuid
             );
-        }
 
         unset($model['armada_qr_code_link']);
         unset($model['armada_delivery_code']);

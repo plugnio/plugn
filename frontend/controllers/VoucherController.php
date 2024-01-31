@@ -91,10 +91,7 @@ class VoucherController extends Controller
                 }
             }
 
-
-              if($model->save()){
-
-              if(YII_ENV == 'prod') {
+              if($model->save()) {
 
                  $discount_amount = $model->discount_amount;
 
@@ -114,7 +111,6 @@ class VoucherController extends Controller
                       ],
                       null, 
                       $storeUuid);
-                }
 
                 return $this->redirect(['index',  'storeUuid' => $storeUuid]);
 

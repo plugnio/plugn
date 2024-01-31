@@ -984,8 +984,6 @@ class RestaurantController extends Controller {
 
             //todo: send mixpanel event
 
-            if(YII_ENV == 'prod') {
-
                 $itemTypes = [];
 
                 foreach ($model->restaurantItemTypes as $restaurantItemType) {
@@ -1001,7 +999,6 @@ class RestaurantController extends Controller {
                     ],
                     null,
                     $model->restaurant_uuid);
-            }
 
             return $this->redirect(['view', 'id' => $model->restaurant_uuid, 'tab' => 'restaurantType']);
         }

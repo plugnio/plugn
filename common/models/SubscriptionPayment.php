@@ -285,8 +285,6 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         $subscription =$paymentRecord->subscription;
 
-        if(YII_ENV == 'prod')
-        {
             //Send event to Segment
            
             $kwdCurrency = Currency::findOne(['code' => 'KWD']);
@@ -308,7 +306,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             );//paymentRecord->currency->rate
 
             //todo: ability to subscribe in multiple languages 
-        }
+
 
         Subscription::updateAll(['subscription_status' => Subscription::STATUS_INACTIVE], ['and',
             ['subscription_status' => Subscription::STATUS_ACTIVE], ['restaurant_uuid' => $paymentRecord->restaurant_uuid]]);

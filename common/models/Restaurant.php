@@ -137,7 +137,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $last_active_at
  * @property string|null $last_order_at
  * @property number $total_orders
- *
+ * @property boolean $enable_guest_checkout
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -203,7 +203,7 @@ class Restaurant extends ActiveRecord
     const SCENARIO_UPDATE = 'update';
     const SCENARIO_UPDATE_LOGO = 'update-logo';
     const SCENARIO_UPDATE_THUMBNAIL = 'update-thumbnail';
-    const SCENARIO_UPDATE_LAYOUT = 'layout';
+
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
     const SCENARIO_CURRENCY = 'currency';
@@ -599,6 +599,7 @@ class Restaurant extends ActiveRecord
             [['referral_code'], 'string', 'max' => 6],
             [['referral_code'], 'default', 'value' => null],
             ['restaurant_email', 'email'],
+            [['enable_guest_checkout'], 'boolean'],
             [['restaurant_uuid', 'restaurant_domain', 'name', 'owner_email'], 'unique'],
             [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
@@ -642,22 +643,18 @@ class Restaurant extends ActiveRecord
             self::SCENARIO_UPDATE_THUMBNAIL => [
                 'thumbnail_image', 'ip_address'
             ],
-            self::SCENARIO_UPDATE_LAYOUT => [
-                'default_language',
-                'store_layout',
-                'phone_number_display',
-                'logo',
-                'thumbnail_image',
-                'ip_address'
-            ],
             self::SCENARIO_UPDATE_DESIGN_LAYOUT => [
                 'logo',
                 'thumbnail_image',
                 'restaurant_logo',
                 'restaurant_thumbnail_image',
-                'phone_number_display',
-                'sitemap_require_update',
+
                 "custom_css",
+                "default_language",
+                "store_layout",
+                'phone_number_display',
+
+                'sitemap_require_update',
                 'ip_address'
             ],
             self::SCENARIO_RESET_TAP_ACCOUNT => [
@@ -725,7 +722,7 @@ class Restaurant extends ActiveRecord
                 'name', 'name_ar', 'schedule_interval', 'schedule_order', 'is_sandbox',
                 'restaurant_email', 'tagline', 'tagline_ar', 'currency_id', 'meta_description', 'meta_description_ar',
                 'owner_first_name', 'owner_last_name', 'owner_number', 'owner_email', 'owner_phone_country_code',
-                "enable_gift_message", "accept_order_247", "is_public", "currency_id", 'ip_address'
+                "enable_gift_message", "accept_order_247", "is_public", "currency_id", 'ip_address', 'enable_guest_checkout'
             ],
             self::SCENARIO_UPDATE_DELIVERY => [
                 'armada_api_key',
@@ -832,6 +829,7 @@ class Restaurant extends ActiveRecord
             'is_public' => Yii::t('app', 'Is Public?'),
             'is_deleted' => Yii::t('app', 'Is Deleted?'),
             'is_under_maintenance' => Yii::t('app', 'Is Under Maintenance?'),
+            'enable_guest_checkout' => Yii::t('app', 'Enable Guest Checkout'),
         ];
     }
 
@@ -2359,7 +2357,7 @@ class Restaurant extends ActiveRecord
      * Upload restaurant's logo  to cloudinary
      * @param type $imageURL
      */
-    public function uploadLogo($imageURL)
+    public function uploadLogo($imageURL, $saveInDb = true)
     {
         if($imageURL && !str_contains($imageURL, "https://")) {
             $imageURL = Yii::$app->temporaryBucketResourceManager->getUrl($imageURL);
@@ -2375,7 +2373,11 @@ class Restaurant extends ActiveRecord
             }
 
             if (!$imageURL) {
-                return true;
+                return [
+                    "operation" => "error",
+                    "message" => "Image not provided"
+                ];
+                //return true;
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
@@ -2388,16 +2390,33 @@ class Restaurant extends ActiveRecord
             if ($result || count($result) > 0) {
                 //todo: refactor
                 $this->logo = basename($result['url']);
-                $this->save();
+
+                if($saveInDb) {
+                    if(!$this->save()) {
+                        Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($this->errors));
+
+                        return [
+                            "operation" => "error",
+                            "message" => $this->getErrors()
+                        ];
+                    }
+                }
             }
 
             if (!str_contains($imageURL, 'amazonaws.com'))
                 unlink($imageURL);
 
-            return true;
+            return [
+                "operation" => "success",
+            ];
 
         } catch (Error $err) {
             Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($err));
+
+            return [
+                "operation" => "error",
+                "message" => $err
+            ];
         }
     }
 
@@ -2446,7 +2465,7 @@ class Restaurant extends ActiveRecord
      * Upload thumbnailImage  to cloudinary
      * @param type $imageURL
      */
-    public function uploadThumbnailImage($imageURL)
+    public function uploadThumbnailImage($imageURL, $saveInDb = true)
     {
         $filename = Yii::$app->security->generateRandomString();
 
@@ -2462,7 +2481,10 @@ class Restaurant extends ActiveRecord
             }
 
             if (!$imageURL) {
-                return true;
+                return [
+                    "operation" => "error",
+                    "message" => "Image not provided"
+                ];
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
@@ -2474,16 +2496,34 @@ class Restaurant extends ActiveRecord
             if ($result || count($result) > 0) {
                 //todo: refactor
                 $this->thumbnail_image = basename($result['url']);
-                $this->save();
+
+                if($saveInDb) {
+                    if(!$this->save()) {
+                        Yii::error("Error when uploading thumbnail to Cloudinry: " . json_encode($this->errors));
+
+                        return [
+                            "operation" => "error",
+                            "message" => $this->getErrors()
+                        ];
+                    }
+                }
             }
 
             if (!str_contains($imageURL, 'amazonaws.com'))
                 unlink($imageURL);
 
-            return true;
+            return [
+                "operation" => "success",
+            ];
 
         } catch (Error $err) {
+
             Yii::error("Error when uploading thumbnail photos to Cloudinry: " . json_encode($err));
+
+            return [
+                "operation" => "error",
+                "message" => $err
+            ];
         }
     }
 
@@ -2839,8 +2879,6 @@ class Restaurant extends ActiveRecord
 
         Yii::info("[New Store Signup] " . $this->name . " has just joined Plugn", __METHOD__);
 
-        if (YII_ENV == 'prod') {
-
             $full_name = explode(' ', $agent->agent_name);
             $firstname = $full_name[0];
             $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
@@ -2891,7 +2929,7 @@ class Restaurant extends ActiveRecord
             //Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/oeap6qy/oeap6qy", $store->attributes + $agent->attributes);
 
             //Yii::$app->zapier->webhook("https://hooks.zapier.com/hooks/catch/3784096/366cqik",  $store->attributes + $agent->attributes);
-        }
+
 
         return [
             "operation" => "success",
@@ -2928,8 +2966,6 @@ class Restaurant extends ActiveRecord
 
         Yii::info($this->name . ' Store deleted by user #' . $this->restaurant_uuid);
 
-        if(YII_ENV == 'prod')
-        {
             Yii::$app->eventManager->track('Account deleted',  [
                     'store_name' => $this->name,
                     'phone_number' => $this->owner_phone_country_code . $this->owner_number,
@@ -2941,7 +2977,6 @@ class Restaurant extends ActiveRecord
                 null,
                 $this->restaurant_uuid
             );
-        }
 
         return [
             'message' => Yii::t('agent', "Store deleted successfully"),

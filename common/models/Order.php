@@ -1089,7 +1089,7 @@ class Order extends \yii\db\ActiveRecord
             ]);
         }
 
-        if (YII_ENV == 'prod' && !$this->is_sandbox) {
+
 
             $order_total = $this->total_price * $rate;
 
@@ -1185,6 +1185,8 @@ class Order extends \yii\db\ActiveRecord
                 null, 
                 $this->restaurant_uuid);
 
+            //todo: should able to run this in dev too
+        if (!$this->is_sandbox) {
             Yii::$app->walletManager->addEntry([
                 'amount' => $plugn_fee_kwd,
                 'data' => 'Plugn: Commission for Order #'. $this->order_uuid,//$plugn_fee
@@ -1693,8 +1695,6 @@ class Order extends \yii\db\ActiveRecord
             isset($changedAttributes['order_status']) && $this->order_status == self::STATUS_COMPLETE
         ) {
 
-            if (YII_ENV == 'prod') {
-
                 $shipping_partner = "";
 
                 if($this->armada_tracking_link) {
@@ -1712,7 +1712,6 @@ class Order extends \yii\db\ActiveRecord
                     null,
                     $this->restaurant_uuid
                 );
-            }
         }
 
         /**
@@ -1744,8 +1743,6 @@ complete: the order has been successfully delivered
 canceled: the order has been canceled from the merchant
 failed: the order has failed to find a driver */
 
-            if (YII_ENV == 'prod') {
-
                 $shipping_partner = "";
 
                 if($this->armada_tracking_link) {
@@ -1763,7 +1760,6 @@ failed: the order has failed to find a driver */
                     null,
                     $this->restaurant_uuid
                 );
-            }
         }
 
         //Send SMS To customer

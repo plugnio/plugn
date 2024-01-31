@@ -25,14 +25,28 @@ $this->params['breadcrumbs'][] = 'Update';
                 ]); ?>
                 </div>
 
+                <h4>Production</h4>
+
                 <div class="form-group">
                     <?= Html::label('Segment Key', 'Segment-Key', ['class' => 'control-label']) ?>
                     <?= Html::textInput('Segment-Key', $settings['Segment-Key'], ['class' => 'form-control']); ?>
                 </div>
 
                 <div class="form-group">
-                <?= Html::label('Segment Key for Wallet', 'Segment-Key-Wallet', ['class' => 'control-label']) ?>
-                <?= Html::textInput('Segment-Key-Wallet', $settings['Segment-Key-Wallet'], ['class' => 'form-control']); ?>
+                    <?= Html::label('Segment Key for Wallet', 'Segment-Key-Wallet', ['class' => 'control-label']) ?>
+                    <?= Html::textInput('Segment-Key-Wallet', $settings['Segment-Key-Wallet'], ['class' => 'form-control']); ?>
+                </div>
+
+                <h4>Development</h4>
+
+                <div class="form-group">
+                    <?= Html::label('Segment Key', 'Test-Segment-Key', ['class' => 'control-label']) ?>
+                    <?= Html::textInput('Segment-Key', $settings['Test-Segment-Key'], ['class' => 'form-control']); ?>
+                </div>
+
+                <div class="form-group">
+                <?= Html::label('Segment Key for Wallet', 'Test-Segment-Key-Wallet', ['class' => 'control-label']) ?>
+                <?= Html::textInput('Segment-Key-Wallet', $settings['Test-Segment-Key-Wallet'], ['class' => 'form-control']); ?>
                 </div>
 
             </div>
@@ -50,10 +64,20 @@ $this->params['breadcrumbs'][] = 'Update';
                 ]); ?>
                 </div>
 
+                <h4>Production</h4>
+
                 <div class="form-group">
-                <?= Html::label('Mixpanel Key', 'Mixpanel-Key', ['class' => 'control-label']) ?>
-                <?= Html::textInput('Mixpanel-Key', $settings['Mixpanel-Key'], ['class' => 'form-control']); ?>
+                    <?= Html::label('Mixpanel Key', 'Mixpanel-Key', ['class' => 'control-label']) ?>
+                    <?= Html::textInput('Mixpanel-Key', $settings['Mixpanel-Key'], ['class' => 'form-control']); ?>
                 </div>
+
+                <h4>Development</h4>
+
+                <div class="form-group">
+                    <?= Html::label('Mixpanel Key', 'Test-Mixpanel-Key', ['class' => 'control-label']) ?>
+                    <?= Html::textInput('Mixpanel-Key', $settings['Test-Mixpanel-Key'], ['class' => 'form-control']); ?>
+                </div>
+
             </div>
         </div>
 

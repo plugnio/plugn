@@ -74,8 +74,6 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if(YII_ENV == 'prod')
-        {
             $isCODEnabled = RestaurantPaymentMethod::find()
                 ->joinWith(['paymentMethod'])
                 ->andWhere([
@@ -138,7 +136,6 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
                     'step_number' => 4
                 ], null, $this->restaurant_uuid);
             }
-        }
 
         return true;
     }

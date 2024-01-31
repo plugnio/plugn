@@ -177,7 +177,7 @@ class Campaign extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if (YII_ENV == 'prod' && $insert) {
+        if ($insert) {
             $props = [
                 "source" => $this->utm_source,
                 "medium" => $this->utm_medium,

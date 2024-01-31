@@ -146,6 +146,10 @@ class AuthController extends Controller {
             ];
         }
 
+        Yii::$app->eventManager->track('Log In', [
+            "login_method" => "Email"
+        ]);
+
         return $this->_loginResponse($agent);
     }
 
@@ -207,6 +211,10 @@ class AuthController extends Controller {
             ];
         }*/
 
+        Yii::$app->eventManager->track('Log In', [
+            "login_method" => "Auth0"
+        ]);
+
         return $this->_loginResponse($agent);
     }
 
@@ -242,6 +250,10 @@ class AuthController extends Controller {
                 "message" => Yii::t('agent',"Account not found")
             ];
         }
+
+        Yii::$app->eventManager->track('Log In', [
+            "login_method" => "Google"
+        ]);
 
         return $this->_loginResponse($model);
     }
@@ -293,6 +305,10 @@ class AuthController extends Controller {
                 "message" => Yii::t('agent',"Account not found")
             ];
         }
+
+        Yii::$app->eventManager->track('Log In', [
+            "login_method" => "Apple"
+        ]);
 
         return $this->_loginResponse($model);
     }
@@ -355,24 +371,20 @@ class AuthController extends Controller {
             ];
 
             Yii::$app->auth0->createUser($param);
-
-            $full_name = explode(' ', $agent->agent_name);
-            $firstname = $full_name[0];
-            $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
-
-            Yii::$app->eventManager->track('Agent Signup', [
-                    'first_name' => trim($firstname),
-                    'last_name' => trim($lastname),
-                    'email' => $agent->agent_email,
-                    "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
-                    "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
-                    "profile_status" => "Active"
-                ],
-                null,
-                $agent->agent_id
-            );
         }
 
+        $full_name = explode(' ', $agent->agent_name);
+        $firstname = $full_name[0];
+        $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+
+        Yii::$app->eventManager->track('Agent Signup', [
+            'first_name' => trim($firstname),
+            'last_name' => trim($lastname),
+            'email' => $agent->agent_email,
+            "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
+            "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
+            "profile_status" => "Active"
+        ]);
 
         if($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED)
         {
@@ -465,8 +477,6 @@ class AuthController extends Controller {
                 ];
             }
 
-        if (YII_ENV == 'prod') {
-
             $full_name = explode(' ', $agent->agent_name);
             $firstname = $full_name[0];
             $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
@@ -481,11 +491,7 @@ class AuthController extends Controller {
                 "country" => $store->country ? $store->country->country_name : null,
                 "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
                 "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
-            ],
-                null,
-                $agent->agent_id
-            );
-        }
+            ]);
 
             if (!$store->save()) {
                 return [

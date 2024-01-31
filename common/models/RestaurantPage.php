@@ -120,7 +120,7 @@ class RestaurantPage extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if($insert && YII_ENV == 'prod') {
+        if($insert) {
 
                 Yii::$app->eventManager->track('Store Pages Added', [
                     "page_title" => $this->title,

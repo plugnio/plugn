@@ -476,8 +476,6 @@ class SiteController extends Controller
                        ->send();
                 }
 
-                if(YII_ENV == 'prod') {
-                
                     $kwdCurrency = Currency::findOne(['code' => 'KWD']);
 
                     $rate = 1 / $kwdCurrency->rate;// to USD
@@ -493,7 +491,7 @@ class SiteController extends Controller
                         ],
                         null, 
                         $paymentRecord->restaurant_uuid);
-                }
+
             }
 
             if($paymentRecord) {
@@ -1797,7 +1795,7 @@ class SiteController extends Controller
 
             \Yii::info("[New Store Signup] " . $store->name . " has just joined Plugn", __METHOD__);
 
-            if (YII_ENV == 'prod') {
+
                 $full_name = explode(' ', $agent->agent_name);
                 $firstname = $full_name[0];
                 $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
@@ -1816,7 +1814,7 @@ class SiteController extends Controller
                     $store->restaurant_uuid);
 
                 Yii::$app->session->setFlash('storeCreated');
-            }
+
 
             /*$model = new LoginForm();
             $model->email = $agent->agent_email;

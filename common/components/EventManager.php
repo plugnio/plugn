@@ -62,15 +62,24 @@ class EventManager extends Component
 
         if($this->mixpanelStatus) {
 
-            $this->key = Yii::$app->config->get('Mixpanel-Key');
+            if (YII_ENV == 'prod') {
+                $this->key = Yii::$app->config->get('Mixpanel-Key');
+            } else {
+                $this->key = Yii::$app->config->get('Test-Mixpanel-Key');
+            }
 
             $this->_client = \Mixpanel::getInstance($this->key);
         }
 
         if($this->segmentStatus) {
 
-            $this->segmentKey = Yii::$app->config->get('Segment-Key');
-            $this->walletSegmentKey = Yii::$app->config->get('Segment-Key-Wallet');
+            if (YII_ENV == 'prod') {
+                $this->segmentKey = Yii::$app->config->get('Segment-Key');
+                $this->walletSegmentKey = Yii::$app->config->get('Segment-Key-Wallet');
+            } else {
+                $this->segmentKey = Yii::$app->config->get('Test-Segment-Key');
+                $this->walletSegmentKey = Yii::$app->config->get('Test-Segment-Key-Wallet');
+            }
 
             if($this->segmentKey)
                 \Segment::init($this->segmentKey);
@@ -112,11 +121,27 @@ class EventManager extends Component
      * todo: userId not passing in mixpanel?
      * register event 
      */
-    public function track($event, $eventData, $timestamp = null, $userId = null)
+    public function track($event, $eventData, $timestamp = null, $storeId = null)
     {
+        $language = Yii::$app->language == "ar"? "ar": "en";
+
+        $eventData = array_merge($eventData, [
+            "company_id" => $storeId,
+            "store_id" => $storeId,
+            "language" => $language,
+            "channel" => "Backend",
+            "do_not_disturb" => null,
+        ]);
+
         //if login and userId not provided
 
-        if(is_null($userId) && isset(Yii::$app->user) && !Yii::$app->user->isGuest) {
+        /*if(is_null($userId) && isset(Yii::$app->user) && !Yii::$app->user->isGuest) {
+            $userId = Yii::$app->user->getId();
+        }*/
+
+        if (empty(Yii::$app->user) || Yii::$app->user->isGuest) {
+            $userId = $storeId;
+        } else {
             $userId = Yii::$app->user->getId();
         }
 

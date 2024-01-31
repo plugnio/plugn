@@ -131,7 +131,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
             ]);
         }
 
-        if(YII_ENV == 'prod' && $insert) {
+        if($insert) {
             $props = [
                 "location_name" => $this->business_location_name,
                 "vat_details_added" => $this->business_location_tax > 0,

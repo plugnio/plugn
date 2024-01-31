@@ -123,6 +123,7 @@ class StoreController extends BaseController
 
         $store->setScenario(Restaurant::SCENARIO_UPDATE);
 
+        $store->enable_guest_checkout = Yii::$app->request->getBodyParam('enable_guest_checkout');
         $store->is_sandbox = Yii::$app->request->getBodyParam('is_sandbox');
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');
@@ -178,7 +179,7 @@ class StoreController extends BaseController
             return self::message("error", Yii::t('app', "We limiting no of store per user to 5 for now!"));
         }
 
-        if(YII_ENV == 'prod') {
+        if (YII_ENV == 'prod') {
 
             $token = Yii::$app->request->getBodyParam('token');
 
@@ -293,7 +294,7 @@ class StoreController extends BaseController
         $domain = Yii::$app->request->getBodyParam('domain');
         $purchase = Yii::$app->request->getBodyParam('purchase');
 
-        $store = Yii::$app->accountManager->getManagedAccount();
+        $store = $this->findModel();// Yii::$app->accountManager->getManagedAccount();
 
         if ($store->restaurant_domain == $domain) {
             return self::message("error",'New domain can not be same as old domain');
@@ -314,16 +315,12 @@ class StoreController extends BaseController
         //todo: response validation
 
         if($purchase) {//&& strpos($domain, '.plugn.') == -1
- 
-            if(YII_ENV == 'prod') {
 
                 Yii::$app->eventManager->track('Domain Requests', [
                         "domain" =>  $domain
                     ],
                     null,
                     $store->restaurant_uuid);
-            }
-
  
             return $store->notifyDomainRequest($old_domain);
         }
@@ -1102,9 +1099,9 @@ class StoreController extends BaseController
         $logo = Yii::$app->request->getBodyParam('logo');
         $thumbnail_image = Yii::$app->request->getBodyParam('thumbnail_image');
 
-        $model = Yii::$app->accountManager->getManagedAccount();
+        $model = $this->findModel();// Yii::$app->accountManager->getManagedAccount();
 
-        $model->setScenario(Restaurant::SCENARIO_UPDATE_LAYOUT);
+        $model->setScenario(Restaurant::SCENARIO_UPDATE_DESIGN_LAYOUT);
 
         //restaurant
 
@@ -1114,21 +1111,29 @@ class StoreController extends BaseController
         $model->store_layout = Yii::$app->request->getBodyParam('store_layout');
         $model->phone_number_display = Yii::$app->request->getBodyParam('phone_number_display');
 
-        if(!$model->validate()) {
+        /*if(!$model->validate()) {
             return [
                 'operation' => 'error',
                 'message' => $model->getErrors()
             ];
-        }
+        }*/
 
         $transaction = Yii::$app->db->beginTransaction ();
 
         if($model->logo != $logo) {
-            $model->uploadLogo($logo);
+            $response = $model->uploadLogo($logo, false);
+
+            if($response['operation'] != "success") {
+                return $response;
+            }
         }
 
         if($model->thumbnail_image != $thumbnail_image) {
-            $model->uploadThumbnailImage($thumbnail_image);
+            $response = $model->uploadThumbnailImage($thumbnail_image, false);
+
+            if($response['operation'] != "success") {
+                return $response;
+            }
         }
 
         if(!$model->save()) {
@@ -1159,6 +1164,8 @@ class StoreController extends BaseController
             $restaurantTheme->light = $themeData['light'];
             $restaurantTheme->medium = $themeData['medium'];
             $restaurantTheme->dark = $themeData['dark'];
+        } else {
+            $restaurantTheme->primary = Yii::$app->request->getBodyParam('primary');
         }
 
         if(!$restaurantTheme->save()) {
@@ -1273,8 +1280,6 @@ class StoreController extends BaseController
         if($model->site_id)
             Yii::$app->netlifyComponent->upgradeSite($model);
 
-        if (YII_ENV == 'prod') {
-
             $props =  [
                 "google_analytics_id" => !empty($model->google_analytics_id),
                 "google_tag_id" => !empty($model->google_tag_id),
@@ -1296,7 +1301,6 @@ class StoreController extends BaseController
                 null,
                 $model->restaurant_uuid
             );
-        }
 
         return self::message("success","Analytics integration updated successfully");
     }
@@ -1377,12 +1381,10 @@ class StoreController extends BaseController
             ];
         }
 
-        if (YII_ENV == 'prod') {
             Yii::$app->eventManager->track('Store Deactivated', [
                 "reason" => $reason,
                 "store_status" => Restaurant::RESTAURANT_STATUS_CLOSED
             ], null, $model->restaurant_uuid);
-        }
 
         return self::message("success", "Status changed successfully");
     }
@@ -1413,10 +1415,7 @@ class StoreController extends BaseController
             throw new \yii\web\ServerErrorHttpException('file access failed: permission deny');
         }
 
-        if (YII_ENV == 'prod') {
-
             Yii::$app->eventManager->track('Email Opened', $model->attributes);
-        }
 
         return $response->send();
     }
