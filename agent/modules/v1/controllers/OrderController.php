@@ -1648,7 +1648,7 @@ class OrderController extends BaseController
                     'attribute' => 'Voucher Code',
                     "format" => "raw",
                     "value" => function ($data) {
-                        if ($data->voucher_id)
+                        if ($data->voucher_id && !empty($data->voucher))
                             return $data->voucher->code;
                         else
                             return '';
