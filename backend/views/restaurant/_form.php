@@ -214,6 +214,9 @@ use borales\extensions\phoneInput\PhoneInput;
             1 => 'List',
             2 => 'Grid',
             3 => 'Category',
+            4 => 'List - Half',
+            5 => 'Grid - Half',
+            6 => 'Category - Half',
         ]
     );
     ?>

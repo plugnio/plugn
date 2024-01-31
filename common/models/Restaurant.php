@@ -203,7 +203,7 @@ class Restaurant extends ActiveRecord
     const SCENARIO_UPDATE = 'update';
     const SCENARIO_UPDATE_LOGO = 'update-logo';
     const SCENARIO_UPDATE_THUMBNAIL = 'update-thumbnail';
-    const SCENARIO_UPDATE_LAYOUT = 'layout';
+
     const SCENARIO_UPDATE_ANALYTICS = 'update_analytics';
     const SCENARIO_UPDATE_DELIVERY = 'update_delivery';
     const SCENARIO_CURRENCY = 'currency';
@@ -643,22 +643,18 @@ class Restaurant extends ActiveRecord
             self::SCENARIO_UPDATE_THUMBNAIL => [
                 'thumbnail_image', 'ip_address'
             ],
-            self::SCENARIO_UPDATE_LAYOUT => [
-                'default_language',
-                'store_layout',
-                'phone_number_display',
-                'logo',
-                'thumbnail_image',
-                'ip_address'
-            ],
             self::SCENARIO_UPDATE_DESIGN_LAYOUT => [
                 'logo',
                 'thumbnail_image',
                 'restaurant_logo',
                 'restaurant_thumbnail_image',
-                'phone_number_display',
-                'sitemap_require_update',
+
                 "custom_css",
+                "default_language",
+                "store_layout",
+                'phone_number_display',
+
+                'sitemap_require_update',
                 'ip_address'
             ],
             self::SCENARIO_RESET_TAP_ACCOUNT => [
@@ -2361,7 +2357,7 @@ class Restaurant extends ActiveRecord
      * Upload restaurant's logo  to cloudinary
      * @param type $imageURL
      */
-    public function uploadLogo($imageURL)
+    public function uploadLogo($imageURL, $saveInDb = true)
     {
         if($imageURL && !str_contains($imageURL, "https://")) {
             $imageURL = Yii::$app->temporaryBucketResourceManager->getUrl($imageURL);
@@ -2377,7 +2373,11 @@ class Restaurant extends ActiveRecord
             }
 
             if (!$imageURL) {
-                return true;
+                return [
+                    "operation" => "error",
+                    "message" => "Image not provided"
+                ];
+                //return true;
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
@@ -2390,16 +2390,33 @@ class Restaurant extends ActiveRecord
             if ($result || count($result) > 0) {
                 //todo: refactor
                 $this->logo = basename($result['url']);
-                $this->save();
+
+                if($saveInDb) {
+                    if(!$this->save()) {
+                        Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($this->errors));
+
+                        return [
+                            "operation" => "error",
+                            "message" => $this->getErrors()
+                        ];
+                    }
+                }
             }
 
             if (!str_contains($imageURL, 'amazonaws.com'))
                 unlink($imageURL);
 
-            return true;
+            return [
+                "operation" => "success",
+            ];
 
         } catch (Error $err) {
             Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($err));
+
+            return [
+                "operation" => "error",
+                "message" => $err
+            ];
         }
     }
 
@@ -2448,7 +2465,7 @@ class Restaurant extends ActiveRecord
      * Upload thumbnailImage  to cloudinary
      * @param type $imageURL
      */
-    public function uploadThumbnailImage($imageURL)
+    public function uploadThumbnailImage($imageURL, $saveInDb = true)
     {
         $filename = Yii::$app->security->generateRandomString();
 
@@ -2464,7 +2481,10 @@ class Restaurant extends ActiveRecord
             }
 
             if (!$imageURL) {
-                return true;
+                return [
+                    "operation" => "error",
+                    "message" => "Image not provided"
+                ];
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
@@ -2476,16 +2496,34 @@ class Restaurant extends ActiveRecord
             if ($result || count($result) > 0) {
                 //todo: refactor
                 $this->thumbnail_image = basename($result['url']);
-                $this->save();
+
+                if($saveInDb) {
+                    if(!$this->save()) {
+                        Yii::error("Error when uploading thumbnail to Cloudinry: " . json_encode($this->errors));
+
+                        return [
+                            "operation" => "error",
+                            "message" => $this->getErrors()
+                        ];
+                    }
+                }
             }
 
             if (!str_contains($imageURL, 'amazonaws.com'))
                 unlink($imageURL);
 
-            return true;
+            return [
+                "operation" => "success",
+            ];
 
         } catch (Error $err) {
+
             Yii::error("Error when uploading thumbnail photos to Cloudinry: " . json_encode($err));
+
+            return [
+                "operation" => "error",
+                "message" => $err
+            ];
         }
     }
 
