@@ -224,11 +224,11 @@ class TapPayments extends Component
      * @param type $restaurant
      * @return type
      */
-    public function createBussiness($restaurant)
+    public function createBusiness($restaurant)
     {
-        $bussinessEndpoint = $this->apiEndpoint . "/business";
+        $businessEndpoint = $this->apiEndpoint . "/business";
 
-        $bussinessParams = [
+        $businessParams = [
             "name" => [
                 "en" => $restaurant->company_name. ' - Plugn @'. date('Y-m-d H:m:s'),
                 "ar" => $restaurant->name_ar. ' - Plugn @'. date('Y-m-d H:m:s')
@@ -244,13 +244,42 @@ class TapPayments extends Component
                 "country" => $restaurant->country->iso,
                 "documents" => [],
                 "bank_account" => [
-                    "iban" => $restaurant->iban
-                ]
+                    "iban" => $restaurant->iban,
+                    "swift_code" => $restaurant->swift_code,
+                    "account_number" => $restaurant->account_number
+                ],
+                "tax_number" => $restaurant->tax_number,
+                "license" => [
+                    "type" => $restaurant->license_type,
+                    "number" => $restaurant->license_number,
+                ],
+                "not_for_profit" => (bool) $restaurant->not_for_profit,
             ],
             "contact_person" => [
+                "nationality" => $restaurant->owner_nationality,
+                "date_of_birth" =>$restaurant->owner_date_of_birth? date('Y-m-d', strtotime($restaurant->owner_date_of_birth)): null,
+                "is_authorized" => true,
                 "name" => [
+                    "title" => $restaurant->owner_name_title,
                     "first" => $restaurant->owner_first_name,
+                    "middle" => $restaurant->owner_middle_name,
                     "last" => $restaurant->owner_last_name
+                ],
+                "authorization" => [
+                    "name" => [
+                        "title" => $restaurant->owner_name_title,
+                        "first" => $restaurant->owner_first_name,
+                        "middle" => $restaurant->owner_middle_name,
+                        "last" => $restaurant->owner_last_name
+                    ],
+                    "type" => "identity_document",
+                    "issuing_country" => $restaurant->country->iso,
+                    //"issuing_date"=> "2012-03-03",
+                    //"expiry_date"=> "2020-03-03",
+                    "files"=> [
+                        $restaurant->identification_file_id_front_side,
+                        $restaurant->identification_file_id_back_side,
+                    ]
                 ],
                 "contact_info" => [
                     "primary" => [
@@ -282,13 +311,42 @@ class TapPayments extends Component
                     "website" => $restaurant->restaurant_domain,
                     "sector" => [
                         $restaurant->vendor_sector
+                    ],
+                    /*"social" => [
+                        "https://add.cc"
+                    ],*/
+                    "content" => [
+                        "tag_line" => [
+                            "en" => $restaurant->tagline,
+					        "ar" =>  $restaurant->tagline_ar
+				        ],
+				        "about" => [
+                            "en" => $restaurant->meta_description,
+                            "ar" => $restaurant->meta_description_ar,
+                        ]
                     ]
-                ]
+			    ]
             ],
             "metadata" =>  [
               "mtd" => "Plugn Platform"
             ]
         ];
+
+        $restaurant_billing_address = $restaurant->getRestaurantBillingAddress->one();
+
+        if ($restaurant_billing_address) {
+            $businessParams["billing_address"] = [
+                "recipient_name" => $restaurant_billing_address->recipient_name,
+                "address_1" => $restaurant_billing_address->address_1,
+                "address_2" => $restaurant_billing_address->address_2,
+                "po_box" => $restaurant_billing_address->po_box,
+                "district"=> $restaurant_billing_address->district,
+                "city"=> $restaurant_billing_address->city,
+                "state"=> $restaurant_billing_address->state,
+                "zip_code"=> $restaurant_billing_address->zip_code,
+                "country"=> $restaurant_billing_address->country->iso,
+            ];
+        }
 
         if (
             $restaurant->iban_certificate_file_id
@@ -304,7 +362,7 @@ class TapPayments extends Component
                 ]
             ];
 
-            array_push($bussinessParams['entity']['documents'], $ibanDocument);
+            array_push($businessParams['entity']['documents'], $ibanDocument);
         }
 
         if (
@@ -322,7 +380,7 @@ class TapPayments extends Component
                 ]
             ];
 
-            array_push($bussinessParams['entity']['documents'], $authorizedSignatureDocument);
+            array_push($businessParams['entity']['documents'], $authorizedSignatureDocument);
 
             $commercialLicenseDocument = [
                 "type" => "Commercial License",
@@ -335,11 +393,11 @@ class TapPayments extends Component
                 ]
             ];
 
-            array_push($bussinessParams['entity']['documents'], $commercialLicenseDocument);
+            array_push($businessParams['entity']['documents'], $commercialLicenseDocument);
 
-            $bussinessParams['entity']['is_licensed'] = 'true';
+            $businessParams['entity']['is_licensed'] = 'true';
         } else {
-            $bussinessParams['entity']['is_licensed'] = 'false';
+            $businessParams['entity']['is_licensed'] = 'false';
         }
 
         $client = new Client();
@@ -351,8 +409,8 @@ class TapPayments extends Component
 
         $response = $client->createRequest()
                 ->setMethod('POST')
-                ->setUrl($bussinessEndpoint)
-                ->setData($bussinessParams)
+                ->setUrl($businessEndpoint)
+                ->setData($businessParams)
                 ->addHeaders($headers)
                 ->send();
 
@@ -360,9 +418,9 @@ class TapPayments extends Component
             $log = new ApiLog;
             $log->restaurant_uuid = $restaurant->restaurant_uuid;
             $log->method = "POST";
-            $log->endpoint = $bussinessEndpoint;
+            $log->endpoint = $businessEndpoint;
             $log->request_headers = print_r($headers, true);
-            $log->request_body = print_r($bussinessParams, true);
+            $log->request_body = print_r($businessParams, true);
             $log->response_headers = print_r($response->headers, true);
             $log->response_body = print_r($response->data, true);
             $log->save();
@@ -378,15 +436,15 @@ class TapPayments extends Component
      * @throws InvalidConfigException
      * @throws \yii\httpclient\Exception
      */
-    public function getBussiness($restaurant)
+    public function getBusiness($restaurant)
     {
-        $bussinessEndpoint = $this->apiEndpoint . "/business/" . $restaurant->business_id;
+        $businessEndpoint = $this->apiEndpoint . "/business/" . $restaurant->business_id;
 
         $client = new Client();
 
         return $client->createRequest()
             ->setMethod('GET')
-            ->setUrl($bussinessEndpoint)
+            ->setUrl($businessEndpoint)
             ->addHeaders([
                 'authorization' => 'Bearer ' . $this->plugnScretApiKey,
                 'content-type' => 'application/json',
@@ -439,6 +497,12 @@ class TapPayments extends Component
             "charge_currenices" => [
                 $currency
             ]
+            /*
+             * "brand_id": "brd_p0TwK322103Il27234M9h207",
+                "branch_id": "brc_oETwK322103Om1s23Oa9R301",
+                "wallet_id": "wal_vlTwK4822102vK0s23Up9M562",
+                "settlement_by": "Bank"
+             */
         ];
 
         $client = new Client();
@@ -627,7 +691,7 @@ class TapPayments extends Component
         ];
 
         if($this->destinationId && $platform_fee > 0) {
-          
+
           if($gateway == static::GATEWAY_KNET) {
 
             //if greater than 10KD
@@ -644,21 +708,21 @@ class TapPayments extends Component
             else if ($this->minChargeAmount >= $amount) {
                $platform_fee = 0.100;
             }
-          } 
-          else if($gateway == static::GATEWAY_BENEFIT) 
+          }
+          else if($gateway == static::GATEWAY_BENEFIT)
           {
               $platform_fee = $amount *  ($platform_fee  - $this->benefitGatewayFee );
           }
-          else 
+          else
           {
              $platform_fee = $amount *  ($platform_fee  - $this->creditcardGatewayFeePercentage);
           }
 
-           if($warehouse_fee > 0) 
+           if($warehouse_fee > 0)
            {
              $charge_amount = $warehouse_fee + $platform_fee;
            }
-           else 
+           else
            {
                $charge_amount = $platform_fee;
            }
@@ -697,9 +761,9 @@ class TapPayments extends Component
          //for debug
 
             Yii::$app->eventManager->track(
-                'Tap Charge Attempt', 
-                $chargeParams, 
-                null, 
+                'Tap Charge Attempt',
+                $chargeParams,
+                null,
                 'Tap Payments');
 
         $client = new Client();
@@ -889,7 +953,7 @@ class TapPayments extends Component
             ->setMethod('GET')
             ->setUrl($this->apiEndpoint . "/destination/" . $destination_id)
             ->addHeaders([
-                'authorization' => 'Bearer ' . $this->plugnScretApiKey, 
+                'authorization' => 'Bearer ' . $this->plugnScretApiKey,
                 'content-type' => 'application/json',
             ])
             ->send();

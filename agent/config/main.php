@@ -582,6 +582,25 @@ return [
                         'OPTIONS <web_link_id>' => 'options',
                     ]
                 ],
+                [// RestaurantBillingAddressController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/restaurant-billing-address',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'PATCH <rba_uuid>/<store_uuid>' => 'update',
+                        'PATCH <rba_uuid>' => 'update',
+                        'DELETE <rba_uuid>/<store_uuid>' => 'delete',
+                        'DELETE <rba_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS <rba_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS <rba_uuid>' => 'options',
+                    ]
+                ],
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
@@ -703,6 +722,9 @@ return [
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
                         'POST enable-payment-method/<id>/<paymentMethodId>' => 'enable-payment-method',
                         'POST create-tap-account/<id>' => 'create-tap-account',
+                        'POST upload-docs/<id>' => 'upload-docs',
+                        'POST update-business-details/<id>' => 'update-business-details',
+
                         'POST enable-online-payment/<id>' => 'enable-online-payment',
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
@@ -750,6 +772,8 @@ return [
                         'DELETE' => 'delete',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS upload-docs/<id>' => 'options',
+                        'OPTIONS update-business-details/<id>' => 'options',
                         'OPTIONS log-email-campaign/<id>' => 'options',
                         'OPTIONS deactivate' => 'options',
                         'OPTIONS remove-store' => 'options',

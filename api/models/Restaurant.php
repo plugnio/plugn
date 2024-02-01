@@ -79,10 +79,16 @@ class Restaurant extends \common\models\Restaurant {
       unset($fields['identification_file_purpose']);
       unset($fields['restaurant_created_at']);
       unset($fields['restaurant_updated_at']);
+
+      unset($fields['owner_nationality']);
+      unset($fields['owner_date_of_birth']);
+      unset($fields['swift_code']);
+      unset($fields['account_number']);
+      unset($fields['restaurant_updated_at']);
+
       unset($fields['referral_code']);
       //unset($fields['live_public_key']);
 
       return $fields;
   }
-
 }

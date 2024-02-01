@@ -138,6 +138,14 @@ use yii\helpers\ArrayHelper;
  * @property string|null $last_order_at
  * @property number $total_orders
  * @property boolean $enable_guest_checkout
+ * @property string $owner_name_title
+ * @property string $owner_middle_name
+ * @property string $owner_nationality
+ * @property string $owner_date_of_birth
+ * @property string $tax_number
+ * @property string $swift_code
+ * @property string $account_number
+ *
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -438,12 +446,14 @@ class Restaurant extends ActiveRecord
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
 
-            [['meta_title', 'meta_title_ar', 'meta_description', 'meta_description_ar'], 'string'],
+            [['meta_title', 'meta_title_ar', 'meta_description', 'meta_description_ar', "owner_name_title", "owner_middle_name", "owner_nationality", "tax_number",  "swift_code", "account_number"], 'string'],
 
-            [['authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
+            [["owner_date_of_birth"], "date"],
+
+            [['authorized_signature_file'], 'required'],
+    /*, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
                 return $model->business_type == 'corp';
-            }],
-
+            }*/
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [['identification_file_id_back_side', 'identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file', 'iban_certificate_file_id', 'logo_file_id'], 'safe', 'on' => [
                 self::SCENARIO_CREATE_TAP_ACCOUNT,
@@ -3082,6 +3092,7 @@ class Restaurant extends ActiveRecord
             'categories',
             'restaurantPages',
             'paymentGatewayQueue',
+            'storeBillingAddress',
             'restaurantShippingMethods',
             'restaurantDomainRequests',
             'openingHours' => function ($restaurant) {
@@ -4427,6 +4438,16 @@ class Restaurant extends ActiveRecord
     }
 
     /**
+     * Gets query for [[StoreBillingAddress]].
+     *
+     * @return ActiveQuery
+     */
+    public function getStoreBillingAddress($modelClass = "\common\models\RestaurantBillingAddress")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[Payments]].
      *
      * @return ActiveQuery
@@ -4455,6 +4476,16 @@ class Restaurant extends ActiveRecord
             ->via('agentAssignments', function ($query) {
                 return $query->andWhere(['agent_assignment.role' => AgentAssignment::AGENT_ROLE_OWNER]);
             });
+    }
+
+    /**
+     * Gets query for [[RestaurantBillingAddress]].
+     *
+     * @return ActiveQuery
+     */
+    public function getRestaurantBillingAddress($modelClass = "\common\models\RestaurantBillingAddress")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**
