@@ -78,11 +78,18 @@ return [
             'viewPath' => '@common/mail',
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.elasticemail.com',
+                'username' => 'support@plugn.io',
+                'password' => 'CD006D3ED0C5BD796D1D2C77B111CC24AF9E',
+                'port' => '2525',
+                'encryption' => 'tls'
+                /*
+                'class' => 'Swift_SmtpTransport',
                 'host' => 'email-smtp.eu-west-1.amazonaws.com',
                 'username' => 'AKIAWMITDJRKTH5HBB2O',
                 'password' => 'BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ',
                 'port' => '587',
-                'encryption' => 'tls',
+                'encryption' => 'tls',*/
             ],
             /*
             'transport' => [
