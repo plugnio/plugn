@@ -498,7 +498,7 @@ $this->registerJs($js);
 
         //Create a business for a vendor on Tap if not already exists
 
-        if (!$model->merchant_id && (!$model->business_id || !$model->business_entity_id)) {//|| !$model->developer_id
+        //if (!$model->merchant_id && (!$model->business_id || !$model->business_entity_id)) {//|| !$model->developer_id
 
             echo Html::a('Create Business', ['create-business', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
@@ -507,11 +507,11 @@ $this->registerJs($js);
                     'method' => 'post',
                 ],
             ]). '&nbsp;&nbsp;';
-        }
+        //}
 
         //Create a merchant on Tap if not already added
 
-        if (!$model->merchant_id) {
+        //if (!$model->merchant_id) {
 
             echo Html::a('Create Merchant', ['create-merchant', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
@@ -520,7 +520,7 @@ $this->registerJs($js);
                     'method' => 'post',
                 ],
             ]). '&nbsp;&nbsp;';
-        }
+        //}
 
         if ($model->merchant_id && !$model->operator_id) {
 
@@ -533,7 +533,7 @@ $this->registerJs($js);
             ]). '&nbsp;&nbsp;';
         }
 
-        if ($model->wallet_id && $model->developer_id && !$model->operator_id) {
+        //if ($model->wallet_id && $model->developer_id && !$model->operator_id) {
 
             echo Html::a('Create An Operator', ['create-an-operator', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
@@ -542,9 +542,9 @@ $this->registerJs($js);
                     'method' => 'post',
                 ],
             ]). '&nbsp;&nbsp;';
-        }
+       // }
 
-        if($model->business_id ) {///&& !$model->is_tap_business_active
+       // if($model->business_id ) {///&& !$model->is_tap_business_active
             echo Html::a('Check Tap Business Status', ['poll-tap-business-status', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-primary btn-process-queue',
                     'data' => [
@@ -552,9 +552,9 @@ $this->registerJs($js);
                         'method' => 'post',
                     ],
                 ]). '&nbsp;&nbsp;';
-        }
+       // }
 
-        if($model->merchant_id) { //&& $model->tap_merchant_status != "Active"
+        //if($model->merchant_id) { //&& $model->tap_merchant_status != "Active"
             echo Html::a('Check Tap Merchant Status', ['poll-tap-merchant-status', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-primary btn-process-queue',
                     'data' => [
@@ -562,7 +562,7 @@ $this->registerJs($js);
                         'method' => 'post',
                     ],
                 ]). '&nbsp;&nbsp;';
-        }
+      //  }
 
         ?>
 
