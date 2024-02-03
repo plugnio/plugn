@@ -1368,6 +1368,7 @@ class Order extends \yii\db\ActiveRecord
                 //allowing 11 order per day for customer
 
                 if ($count > 10) {
+                    Yii::error("too may order from same ip");
                     return $this->addError('ip_address', "Too many order");
                 }
             }

@@ -194,6 +194,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                         ->count();
 
                     if ($count > 1) {
+                        Yii::error("too may agent signup from same ip");
                         return $this->addError('ip_address', "Too many requests");
                     }
                 }
