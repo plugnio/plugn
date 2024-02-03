@@ -658,11 +658,13 @@ class AuthController extends Controller {
             }
         }
 
-        $agent = Agent::find()->andWhere([
-            'OR',
-            ['agent_email' => $emailInput],
-            ['agent_new_email' => $emailInput],
-        ])->one();
+        $agent = Agent::find()
+            ->andWhere(['deleted' => 0])
+            ->andWhere([
+                'OR',
+                ['agent_email' => $emailInput],
+                ['agent_new_email' => $emailInput],
+            ])->one();
 
         $errors = false;
         $errorCode = null; //error code

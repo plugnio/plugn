@@ -24,7 +24,7 @@ class PasswordResetRequestForm extends Model {
             ['email', 'exist',
                 'targetClass' => '\common\models\Agent',
                 'targetAttribute' => 'agent_email',
-                'filter' => ['agent_status' => Agent::STATUS_ACTIVE],
+                'filter' => ['agent_status' => Agent::STATUS_ACTIVE, 'deleted' => 0],
                 'message' => 'There is no agent with this email address.'
             ],
         ];
