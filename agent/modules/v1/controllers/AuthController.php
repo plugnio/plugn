@@ -324,7 +324,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
@@ -414,7 +414,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
@@ -560,7 +560,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
@@ -646,7 +646,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
@@ -818,7 +818,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
