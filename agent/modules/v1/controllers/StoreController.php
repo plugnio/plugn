@@ -566,6 +566,11 @@ class StoreController extends BaseController
         $model->owner_middle_name = Yii::$app->request->getBodyParam('owner_middle_name');
         $model->owner_nationality = Yii::$app->request->getBodyParam('owner_nationality');
         $model->owner_date_of_birth = Yii::$app->request->getBodyParam('owner_date_of_birth');
+
+        if($model->owner_date_of_birth) {
+            $model->owner_date_of_birth = date('Y-m-d', strtotime($model->owner_date_of_birth));
+        }
+
         $model->tax_number = Yii::$app->request->getBodyParam('tax_number');
         $model->swift_code = Yii::$app->request->getBodyParam('swift_code');
         $model->account_number = Yii::$app->request->getBodyParam('account_number');
@@ -677,6 +682,11 @@ class StoreController extends BaseController
                 return self::message("error",$model->errors);
             }
 
+            if (!$model->save()) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
+
             $transaction->commit();
 
             return self::message("success", "Documents uploaded successfully!");
@@ -696,8 +706,6 @@ class StoreController extends BaseController
      */
     public function actionCreateTapAccount($id = null)
     {
-        $model = $this->findModel($id);
-
         $response = $this->actionUpdateBusinessDetails($id);
 
         if ($response['operation'] != "success") {
@@ -710,19 +718,51 @@ class StoreController extends BaseController
             return $response;
         }
 
+        $response = $this->actionCreateTapQueue($id);
+
+        if ($response['operation'] != "success") {
+            return $response;
+        }
+
+        return self::message("success", "Your request has been successfully submitted");
+    }
+
+    /**
+     * create tap queue
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionCreateTapQueue($id = null) {
+
+        $model = $this->findModel($id);
+
+        //check if already in Queue
+
+        $payment_gateway_queue = PaymentGatewayQueue::find()
+            ->andWhere(['restaurant_uuid' => $model->restaurant_uuid, "queue_status" => PaymentGatewayQueue::QUEUE_STATUS_PENDING])
+            ->one();
+
+        if($payment_gateway_queue) {
+            return self::message("success", "Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
+        }
+
         $payment_gateway_queue = new PaymentGatewayQueue;
         $payment_gateway_queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
         $payment_gateway_queue->restaurant_uuid = $model->restaurant_uuid;
         $payment_gateway_queue->payment_gateway =  'tap';
 
         if (!$payment_gateway_queue->save()) {
-            return self::message("error",$model->errors);
+            return self::message("error", $model->errors);
         }
 
         $model->payment_gateway_queue_id = $payment_gateway_queue->payment_gateway_queue_id;
-        $model->save(false);
 
-        return self::message("success", "Your request has been successfully submitted");
+        if(!$model->save(false)) {
+            return self::message("error", $model->errors);
+        }
+
+        return self::message("success", "Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
     }
 
     /**
@@ -760,7 +800,9 @@ class StoreController extends BaseController
             }
         }
 
-        $creditCard = $model->getRestaurantPaymentMethods()->where(['payment_method_id' => 2])->one();
+        $creditCard = $model->getRestaurantPaymentMethods()
+            ->where(['payment_method_id' => 2])
+            ->one();
 
         if (!$creditCard) {
 
@@ -785,6 +827,7 @@ class StoreController extends BaseController
         }
 
         $transaction->commit();
+
         return self::message("success","Online payments enabled successfully");
     }
 

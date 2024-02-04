@@ -8,10 +8,10 @@ return [
     'name' => 'Plugn',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
-        'cache' => [
+        /*'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        /*'cache' => [
+        'cache' => [
             'class' => 'yii\redis\Cache',
             'redis' => [
                 'hostname' => 'localhost',
@@ -88,13 +88,13 @@ return [
         'accountManager' => [//Component for agent to manage Restaurant
             'class' => 'common\components\AccountManager',
         ],
-       /* 'tapPayments' => [
+        'tapPayments' => [
             'class' => 'common\components\TapPayments',
             'gatewayToUse' => \common\components\TapPayments::USE_LIVE_GATEWAY,
             'plugnLiveApiKey' => "sk_live_k31q5ActS9shuYgwa8LZ746X",
             'plugnTestApiKey' => "sk_test_p07NquMX4HgwLT8mycdJnZv5",
             'destinationId' => "2663705",
-        ],*/
+        ],
         'myFatoorahPayment' => [
             'class' => 'common\components\MyFatoorahPayment',
             'gatewayToUse' => \common\components\MyFatoorahPayment::USE_LIVE_GATEWAY,

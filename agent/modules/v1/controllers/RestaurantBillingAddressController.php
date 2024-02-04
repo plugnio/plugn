@@ -2,6 +2,7 @@
 
 namespace agent\modules\v1\controllers;
 
+use Yii;
 use common\models\RestaurantBillingAddress;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
@@ -23,9 +24,9 @@ class RestaurantBillingAddressController extends BaseController
         $query = RestaurantBillingAddress::find ();
 
         if ($keyword) {
-            $query->where (['like', 'url', $keyword]);
-            $query->orWhere (['like', 'web_link_title', $keyword]);
-            $query->orWhere (['like', 'web_link_title_ar', $keyword]);
+            $query->where (['like', 'recipient_name', $keyword]);
+            $query->orWhere (['like', 'address_1', $keyword]);
+            $query->orWhere (['like', 'address_2', $keyword]);
         }
 
         $query->andWhere (['restaurant_uuid' => $store->restaurant_uuid]);
@@ -67,7 +68,7 @@ class RestaurantBillingAddressController extends BaseController
         return [
             "operation" => "success",
             "message" => Yii::t('agent', "Restaurant Billing Address created successfully"),
-            "model" => RestaurantBillingAddress::findOne ($model->web_link_id)
+            "model" => RestaurantBillingAddress::findOne ($model->rba_uuid)
         ];
     }
 
