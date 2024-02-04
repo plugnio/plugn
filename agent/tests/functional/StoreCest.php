@@ -194,6 +194,10 @@ class StoreCest
             'default_language' => 'en',
             'store_layout' => Restaurant::STORE_LAYOUT_GRID_FULLWIDTH,
             'phone_number_display' => 1,
+            'primary' => "#fff",
+            "logo" => $this->store->logo,
+            "thumbnail_image"=> $this->store->thumbnail_image,
+            "custom_css" => $this->store->custom_css,
             'restaurantTheme' => [
                 'primary' => "#fff",
                 'secondary' => "#fff",

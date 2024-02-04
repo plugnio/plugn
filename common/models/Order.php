@@ -1341,6 +1341,38 @@ class Order extends \yii\db\ActiveRecord
 
         if($insert)
         {
+            if(Yii::$app->request instanceof \yii\web\Request) {
+
+                // Get initial IP address of requester
+                $ip = Yii::$app->request->getRemoteIP();
+
+                // Check if request is forwarded via load balancer or cloudfront on behalf of user
+                if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                    $forwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+                    // as "X-Forwarded-For" is usually a list of IP addresses that have routed
+                    $IParray = array_values(array_filter(explode(',', $forwardedFor)));
+
+                    // Get the first ip from forwarded array to get original requester
+                    $ip = $IParray[0];
+                }
+
+                $this->ip_address = $ip;
+
+                $count = self::find()
+                    ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                    ->andWhere(['ip_address' => $this->ip_address])
+                    ->andWhere("DATE(order_created_at) = DATE('" . date('Y-m-d') . "')")
+                    ->count();
+
+                //allowing 11 order per day for customer
+
+                if ($count > 10) {
+                    Yii::error("too may order from same ip");
+                    return $this->addError('ip_address', "Too many order");
+                }
+            }
+
             $this->is_sandbox = $this->restaurant->is_sandbox;
 
             if($this->order_mode == Order::ORDER_MODE_DELIVERY) {//&& $this->delivery_zone_id

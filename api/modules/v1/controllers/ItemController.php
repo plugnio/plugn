@@ -10,7 +10,7 @@ use api\models\Category;
 use api\models\Restaurant;
 use common\models\ItemImage;
 
-class ItemController extends Controller {
+class ItemController extends BaseController {
 
     public function behaviors() {
         $behaviors = parent::behaviors();

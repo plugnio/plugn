@@ -24,7 +24,7 @@ use yii\helpers\Url;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
-class OrderController extends Controller {
+class OrderController extends BaseController {
 
     public function behaviors() {
         $behaviors = parent::behaviors();

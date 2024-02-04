@@ -6,7 +6,7 @@ use Yii;
 use common\models\RestaurantPage;
 use yii\rest\Controller;
 
-class PageController extends Controller
+class PageController extends BaseController
 {
     public function behaviors() {
         $behaviors = parent::behaviors();

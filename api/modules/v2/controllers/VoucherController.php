@@ -9,7 +9,7 @@ use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
-class VoucherController extends Controller
+class VoucherController extends BaseController
 {
     public function behaviors()
     {

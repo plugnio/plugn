@@ -18,7 +18,7 @@ use agent\models\PasswordResetRequestForm;
  * Auth controller provides the initial access token that is required for further requests
  * It initially authorizes via Http Basic Auth using a base64 encoded username and password
  */
-class AuthController extends Controller {
+class AuthController extends BaseController {
 
     public function behaviors() {
 
@@ -324,7 +324,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
@@ -414,7 +414,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
@@ -560,7 +560,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
@@ -646,7 +646,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {
@@ -658,11 +658,13 @@ class AuthController extends Controller {
             }
         }
 
-        $agent = Agent::find()->andWhere([
-            'OR',
-            ['agent_email' => $emailInput],
-            ['agent_new_email' => $emailInput],
-        ])->one();
+        $agent = Agent::find()
+            ->andWhere(['deleted' => 0])
+            ->andWhere([
+                'OR',
+                ['agent_email' => $emailInput],
+                ['agent_new_email' => $emailInput],
+            ])->one();
 
         $errors = false;
         $errorCode = null; //error code
@@ -818,7 +820,7 @@ class AuthController extends Controller {
 
         //TODO: make token as required field once we update android app
 
-        if($token && YII_ENV == 'prod') {
+        if(YII_ENV == 'prod') {
             $response = Yii::$app->reCaptcha->verify($token);
 
             if (!$response->data || !$response->data['success']) {

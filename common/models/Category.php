@@ -183,6 +183,8 @@ class Category extends \yii\db\ActiveRecord
     public function extraFields()
     {
         return [
+            //items,items.options,items.itemImage
+
             'noOfItems' => function($data) {
                 return $data->getCategoryItems()->count();
             }

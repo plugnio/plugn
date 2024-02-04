@@ -22,7 +22,7 @@ use common\models\AreaDeliveryZone;
 use common\models\DeliveryZone;
 use yii\web\NotFoundHttpException;
 
-class DeliveryZoneController extends Controller
+class DeliveryZoneController extends BaseController
 {
     public function behaviors()
     {

@@ -4917,7 +4917,8 @@ class Restaurant extends ActiveRecord
      */
     public function getCategories($modelClass = "\common\models\Category")
     {
-        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->orderBy('sort_number, category_id');
     }
 
     /**

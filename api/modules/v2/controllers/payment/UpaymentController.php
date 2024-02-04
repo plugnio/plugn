@@ -11,7 +11,7 @@ use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
-class UpaymentController extends Controller
+class UpaymentController extends BaseController
 {
     public function behaviors()
     {

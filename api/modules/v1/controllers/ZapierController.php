@@ -16,7 +16,7 @@ use yii\helpers\Url;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
-class ZapierController extends Controller {
+class ZapierController extends BaseController {
 
   public function behaviors() {
       $behaviors = parent::behaviors();

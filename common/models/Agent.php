@@ -185,6 +185,19 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                 }
 
                 $this->ip_address = $ip;
+
+                if ($insert) {
+
+                    $count = Agent::find()
+                        ->andWhere(['ip_address' => $this->ip_address])
+                        ->andWhere("DATE(agent_created_at) = DATE('".date('Y-m-d')."')")
+                        ->count();
+
+                    if ($count > 1) {
+                        Yii::error("too may agent signup from same ip");
+                        return $this->addError('ip_address', "Too many requests");
+                    }
+                }
             }
 
             return true;
@@ -249,6 +262,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     public static function verifyEmail($email, $code) {
 
         $model = self::find()
+            ->andWhere(['deleted' => 0])
             ->andWhere([
                 'OR',
                 ['agent_new_email' => $email],

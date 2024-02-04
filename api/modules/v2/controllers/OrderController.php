@@ -26,7 +26,7 @@ use yii\web\ForbiddenHttpException;
 use yii\web\UnauthorizedHttpException;
 
 
-class OrderController extends Controller
+class OrderController extends BaseController
 {
     public function behaviors()
     {
