@@ -104,8 +104,10 @@ class EventManager extends Component
             $ip = "192.168.0.1";
         }
 
-        if($this->_client)
+        if($this->_client) {
+            $this->_client->identify($id);
             $this->_client->people->set($id, $data, $ip, $ignore_time = false);
+        }
 
         if($this->segmentKey) {
             \Segment::identify([
@@ -129,9 +131,12 @@ class EventManager extends Component
             "company_id" => $storeId,
             "store_id" => $storeId,
             "language" => $language,
-            "channel" => "Backend",
             "do_not_disturb" => null,
         ]);
+
+        if(empty($eventData["channel"])) {
+            $eventData["channel"] = "Backend";
+        }
 
         //if login and userId not provided
 
@@ -143,6 +148,14 @@ class EventManager extends Component
             $userId = $storeId;
         } else {
             $userId = Yii::$app->user->getId();
+
+            /*if($this->_client) {
+                $this->_client->identify($userId);
+                $this->_client->people->set($userId, [
+                    'name' => trim(Yii::$app->user->identity->agent_name),
+                    'email' => Yii::$app->user->identity->agent_email,
+                ]);
+            }*/
         }
 
         if($this->_client) {

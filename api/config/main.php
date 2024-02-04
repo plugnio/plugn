@@ -30,6 +30,9 @@ return [
             'enableSession' => false,
             'loginUrl' => null
         ],
+        'eventManager' => [
+            'class' => 'api\components\EventManager',
+        ],
         'request' => [
             'enableCookieValidation' => false,
             // Accept and parse JSON Requests

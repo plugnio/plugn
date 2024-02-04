@@ -76,7 +76,7 @@ class BaseController extends Controller
                 'name' => trim(Yii::$app->user->identity->agent_name),
                 'email' => Yii::$app->user->identity->agent_email,
             ]);
-        }
+        } 
 
         return true;
     }
