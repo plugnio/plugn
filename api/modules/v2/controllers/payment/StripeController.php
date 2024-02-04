@@ -13,7 +13,7 @@ use yii\web\Cookie;
 use yii\web\NotFoundHttpException;
 
 
-class StripeController extends Controller
+class StripeController extends BaseController
 {
     public function behaviors()
     {

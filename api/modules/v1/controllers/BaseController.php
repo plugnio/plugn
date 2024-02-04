@@ -1,11 +1,10 @@
 <?php
 
-namespace agent\modules\v1\controllers;
+namespace api\modules\v1\controllers;
 
 use Yii;
-use common\models\Agent;
-use yii\db\Expression;
 use yii\rest\Controller;
+
 
 class BaseController extends Controller
 {
@@ -73,27 +72,11 @@ class BaseController extends Controller
 
         if(Yii::$app->user->identity) {
             Yii::$app->eventManager->setUser(Yii::$app->user->getId(), [
-                'name' => trim(Yii::$app->user->identity->agent_name),
-                'email' => Yii::$app->user->identity->agent_email,
+                'name' => trim(Yii::$app->user->identity->customer_name),
+                'email' => Yii::$app->user->identity->customer_email,
             ]);
         }
 
         return true;
-    }
-
-    /**
-     * @param \yii\base\Action $action
-     * @param mixed $result
-     * @return mixed
-     */
-    public function afterAction($action, $result)
-    {
-        if(!Yii::$app->user->isGuest) {
-            Agent::updateAll(['last_active_at' => new Expression('NOW()')], [
-                'agent_id' => Yii::$app->user->getId()
-            ]);
-        }
-
-        return parent::afterAction($action, $result);
     }
 }

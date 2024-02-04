@@ -9,7 +9,7 @@ use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
 
-class AddressController extends Controller
+class AddressController extends BaseController
 {
     public function behaviors()
     {

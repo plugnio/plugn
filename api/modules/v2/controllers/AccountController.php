@@ -7,7 +7,7 @@ use Yii;
 use yii\rest\Controller;
 
 
-class AccountController extends Controller
+class AccountController extends BaseController
 {
     public function behaviors()
     {

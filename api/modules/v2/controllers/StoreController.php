@@ -13,7 +13,7 @@ use common\models\DeliveryZone;
 use yii\web\NotFoundHttpException;
 
 
-class StoreController extends Controller
+class StoreController extends BaseController
 {
     public function behaviors()
     {

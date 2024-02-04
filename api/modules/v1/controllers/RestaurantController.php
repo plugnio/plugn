@@ -12,7 +12,7 @@ use common\models\RestaurantTheme;
 use common\models\OpeningHour;
 use common\models\RestaurantDelivery;
 
-class RestaurantController extends Controller {
+class RestaurantController extends BaseController {
 
     public function behaviors() {
         $behaviors = parent::behaviors();
