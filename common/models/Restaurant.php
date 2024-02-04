@@ -448,7 +448,7 @@ class Restaurant extends ActiveRecord
 
             [['meta_title', 'meta_title_ar', 'meta_description', 'meta_description_ar', "owner_name_title", "owner_middle_name", "owner_nationality", "tax_number",  "swift_code", "account_number"], 'string'],
 
-            [["owner_date_of_birth"], "date"],
+            [["owner_date_of_birth"], "string"],
 
             [['authorized_signature_file'], 'required'],
     /*, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
@@ -710,7 +710,8 @@ class Restaurant extends ActiveRecord
                 'identification_file_id_back_side',
                 'payment_gateway_queue_id',
                 'tap_queue_id',
-                'ip_address'
+                'ip_address',
+                "owner_name_title", "owner_middle_name", "owner_nationality", "owner_date_of_birth", "tax_number", "swift_code", "account_number",
             ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
@@ -720,7 +721,8 @@ class Restaurant extends ActiveRecord
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
                 'identification_expiry_date', 'iban_certificate_file', 'iban_certificate_file_id', 'tap_merchant_status',
-                'is_tap_business_active', 'ip_address'],
+                'is_tap_business_active', 'ip_address', "owner_name_title", "owner_middle_name", "owner_nationality",
+                "owner_date_of_birth", "tax_number", "swift_code", "account_number"],
 
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',

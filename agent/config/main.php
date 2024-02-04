@@ -722,6 +722,7 @@ return [
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
                         'POST enable-payment-method/<id>/<paymentMethodId>' => 'enable-payment-method',
                         'POST create-tap-account/<id>' => 'create-tap-account',
+                        'POST create-tap-queue/<id>' => 'create-tap-queue',
                         'POST upload-docs/<id>' => 'upload-docs',
                         'POST update-business-details/<id>' => 'update-business-details',
 
@@ -801,6 +802,7 @@ return [
                         'OPTIONS view-payment-methods/<id>' => 'options',
                         'OPTIONS view-shipping-methods' => 'options',
                         'OPTIONS create-tap-account/<id>' => 'options',
+                        'OPTIONS create-tap-queue/<id>' => 'options',
                         'OPTIONS enable-online-payment/<id>' => 'options',
                         'OPTIONS disable-online-payment/<id>' => 'options',
                         'OPTIONS enable-cod/<id>' => 'options',
