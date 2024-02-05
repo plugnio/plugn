@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use common\models\ItemVariant;
+use common\models\ItemVariantImage;
 use common\models\ItemVariantOption;
 use common\models\ItemVideo;
 use Yii;
@@ -799,6 +800,57 @@ class ItemController extends BaseController
         return [
             "operation" => "success",
             "message" => "Item image deleted successfully"
+        ];
+    }
+
+    /**
+     * @param $id
+     * @return array|string[]
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionDeleteVariantImage($id, $image)
+    {
+        $restaurant = Yii::$app->accountManager->getManagedAccount();
+
+        $model = ItemVariantImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
+
+        if(!$model) {
+            return [
+                "operation" => "error",
+                "message" => "We've faced a problem deleting the item"
+            ];
+        }
+
+        //check ownership
+
+        $exists = $restaurant->getItems()->andWhere(['item_uuid' => $model->item_uuid])->exists();
+
+        if(!$exists) {
+            return [
+                "operation" => "error",
+                "message" => "We've faced a problem deleting the item"
+            ];
+        }
+
+        if (!$model->delete()) {
+            if (isset($model->errors)) {
+                return [
+                    "operation" => "error",
+                    "message" => $model->errors
+                ];
+            } else {
+                return [
+                    "operation" => "error",
+                    "message" => "We've faced a problem deleting the item"
+                ];
+            }
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "Item variant image deleted successfully"
         ];
     }
 

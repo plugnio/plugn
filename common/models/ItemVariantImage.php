@@ -117,6 +117,17 @@ class ItemVariantImage extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Restaurant]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRestaurant($model = 'common\models\Restaurant')
+    {
+        return $this->hasOne($model::className(), ['restaurant_uuid' => 'restaurant_uuid'])
+            ->via('item');
+    }
+
+    /**
      * Gets query for [[ItemUu]].
      *
      * @return \yii\db\ActiveQuery
