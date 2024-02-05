@@ -497,7 +497,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function getItemImage($modelClass = "\common\models\ItemImage")
     {
-        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid'])
+            ->orderBy("sort_number");
     }
 
     /**
@@ -507,7 +508,8 @@ class OrderItem extends \yii\db\ActiveRecord {
      */
     public function getItemVariantImage($modelClass = "\common\models\ItemVariantImage")
     {
-        return $this->hasOne($modelClass::className(), ['item_variant_uuid' => 'item_variant_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_variant_uuid' => 'item_variant_uuid'])
+            ->orderBy("sort_number");
     }
 
     /**

@@ -24,7 +24,7 @@ use yii\db\Expression;
  * @property string|null $created_at
  * @property string|null $updated_at
  *
- * @property Item $itemUu
+ * @property Item $item
  * @property ItemVariantOption[] $itemVariantOptions
  */
 class ItemVariant extends \yii\db\ActiveRecord
@@ -130,6 +130,19 @@ class ItemVariant extends \yii\db\ActiveRecord
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return false|void
+     * @throws \yii\base\Exception
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
         $itemVariantImageIds = [];
 
         foreach ($this->images as $img) {
@@ -152,38 +165,38 @@ class ItemVariant extends \yii\db\ActiveRecord
                 continue;
             }
 
-                try {
-                    $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
+            try {
+                $url = Yii::$app->temporaryBucketResourceManager->getUrl($img['product_file_name']);
 
-                    $filename = Yii::$app->security->generateRandomString();
+                $filename = Yii::$app->security->generateRandomString();
 
-                    $data[] = $result = Yii::$app->cloudinaryManager->upload(
-                        $url,
-                        [
-                            'public_id' => "restaurants/" . $this->item->restaurant_uuid . "/items/" . $filename
-                        ]
-                    );
+                $data[] = $result = Yii::$app->cloudinaryManager->upload(
+                    $url,
+                    [
+                        'public_id' => "restaurants/" . $this->item->restaurant_uuid . "/items/" . $filename
+                    ]
+                );
 
-                    $item_image_model = new ItemVariantImage();
-                    $item_image_model->item_uuid = $this->item_uuid;
-                    $item_image_model->item_variant_uuid = $this->item_variant_uuid;
-                    $item_image_model->product_file_name = basename($result['url']);
-                    $item_image_model->sort_number = isset($img['sort_number'])? $img['sort_number']: 0;
+                $item_image_model = new ItemVariantImage();
+                $item_image_model->item_uuid = $this->item_uuid;
+                $item_image_model->item_variant_uuid = $this->item_variant_uuid;
+                $item_image_model->product_file_name = basename($result['url']);
+                $item_image_model->sort_number = isset($img['sort_number'])? $img['sort_number']: 0;
 
-                    if(!$item_image_model->save(false))
-                    {
-                        Yii::error("Error when uploading item's image to Cloudinry " . json_encode($this->images));
-                    }
-
-                    $itemVariantImageIds[] = $item_image_model->item_variant_image_uuid;
-
-                } catch (\Cloudinary\Error $err) {
-                    Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($this->images));
-
-                    //todo: notify vendor?
-
-                    return false;
+                if(!$item_image_model->save(false))
+                {
+                    Yii::error("Error when uploading item's image to Cloudinry " . json_encode($this->images));
                 }
+
+                $itemVariantImageIds[] = $item_image_model->item_variant_image_uuid;
+
+            } catch (\Cloudinary\Error $err) {
+                Yii::error("Error when uploading item's image to Cloudinry: imagesPath Value " . json_encode($this->images));
+
+                //todo: notify vendor?
+
+                return false;
+            }
         }
 
         //remove deleted/extra images
@@ -193,8 +206,6 @@ class ItemVariant extends \yii\db\ActiveRecord
             ['item_variant_uuid' => $this->item_variant_uuid],
             ['NOT IN', 'item_variant_image_uuid', $itemVariantImageIds]
         ]);
-
-        return true;
     }
 
     /**
