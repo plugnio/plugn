@@ -76,8 +76,8 @@ return [
         'temporaryBucketResourceManager' => [
             'class' => 'common\components\S3ResourceManager',
             'region' => 'eu-west-2', // Bucket based in London
-            'key' => 'AKIAJXOMRCDE65WKBPUA',
-            'secret' => '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',
+            'key' => 'AKIAWMITDJRKVN5ODY2X',
+            'secret' => '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',
             'bucket' => 'plugn-public-anyone-can-upload-24hr-expiry'
             /**
              * You can access the Temporary bucket with:
