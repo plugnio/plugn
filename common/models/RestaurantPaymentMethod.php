@@ -135,6 +135,8 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
                     'step_name' => "Payment Method Added",
                     'step_number' => 4
                 ], null, $this->restaurant_uuid);
+
+                $this->restaurant->checkOnboardCompleted();
             }
 
         return true;

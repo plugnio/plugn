@@ -1,6 +1,7 @@
 <?php 
 namespace common\components;
 
+use agent\models\AgentAssignment;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -125,6 +126,9 @@ class EventManager extends Component
      */
     public function track($event, $eventData, $timestamp = null, $storeId = null)
     {
+        if(!$storeId)
+            $storeId = Yii::$app->request->headers->get('Store-Id');
+
         $language = Yii::$app->language == "ar"? "ar": "en";
 
         $eventData = array_merge($eventData, [
@@ -133,6 +137,30 @@ class EventManager extends Component
             "language" => $language,
             "do_not_disturb" => null,
         ]);
+
+        //if login
+
+        if(!Yii::$app->user->isGuest) {
+
+            //if agent login
+
+            if(isset(Yii::$app->user->identity->agent_name)) {
+
+                $assignment = AgentAssignment::find()
+                    ->andWhere(['restaurant_uuid' => $storeId, "agent_id" => Yii::$app->user->getId()])
+                    ->one();
+
+                if ($assignment)
+                    $eventData["role"] = $assignment->role;
+
+                $eventData["channel"] = "Dashboard Web App";
+            }
+            //if customer login
+            else if(isset(Yii::$app->user->identity->customer_id))
+            {
+                $eventData["channel"] = "Store Web App";
+            }
+        }
 
         if(empty($eventData["channel"])) {
             $eventData["channel"] = "Backend";
@@ -169,10 +197,14 @@ class EventManager extends Component
                 ], $eventData);
             }
 
-            if($userId)
+            if($userId) {
                 $mixpanelData['$distinct_id'] = $userId;
-
+                $mixpanelData['$user_id'] = $userId;
+            }
             $this->_client->track($event, $mixpanelData);
+
+            //to fix order
+            $this->_client->flush();
         }
         
         if($this->segmentKey) {
@@ -194,6 +226,8 @@ class EventManager extends Component
             }
 
             \Segment::track($data);
+
+            \Segment::flush();
         }
     }
 

@@ -1081,6 +1081,35 @@ class Restaurant extends ActiveRecord
         return self::message("success", "Congratulations you have successfully changed your domain name");
     }
 
+    public function checkOnboardCompleted()
+    {
+        $itemCount = \common\models\Item::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+            ->count();
+
+        $pmCount = RestaurantPaymentMethod::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+            ->count();
+
+        /*$blCount  = BusinessLocation::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+            ->count();*/
+
+        $supportPickUp = BusinessLocation::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid, 'support_pick_up' => 1])
+            ->count();
+
+        $dzCount = DeliveryZone::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+            ->count();
+
+        if($itemCount > 0 && $pmCount > 0 && ($supportPickUp || $dzCount > 0)) {
+            Yii::$app->eventManager->track('Onboard Complete', [
+                'step_name' => "Item Added",
+            ], null, $this->restaurant_uuid);
+        }
+    }
+
     /**
      * Get Agent Assignment Records
      * @return ActiveQuery
@@ -2811,13 +2840,10 @@ class Restaurant extends ActiveRecord
             $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
             $model->save(false);*/
         }
-
-
     }
 
     public function setupStore($agent)
     {
-
         //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
 
         $category = new Category();

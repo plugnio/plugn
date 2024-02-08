@@ -350,14 +350,20 @@ class Item extends \yii\db\ActiveRecord
         }
 
             //Send event to Segment
+
+            $images = (int)$this->getItemImages->count();
+            $vImages =(int) $this->getVariantImages->count();
+
+            $category = $this->getCategory()->one();
+
             $props = [
                 'item_uuid' => $this->item_uuid,
                 'item_name' => $this->item_name,
                 'item_name_ar' => $this->item_name_ar,
                 'item_type' => $this->item_type,
-                "number_of_media" => "",
-                "category_id" =>  "",
-                "category_name" => "",
+                "number_of_media" => $images + $vImages,
+                "category_id" =>  $category? $category->category_id: null,
+                "category_name" => $category? $category->title: null,
                 "product_name_english" => $this->item_name,
                 "product_name_arabic" => $this->item_name_ar,
                 "product_description_length_english" => $this->item_description,
@@ -398,6 +404,8 @@ class Item extends \yii\db\ActiveRecord
                         'step_name' => "Item Added",
                         'step_number' => 2
                     ], null, $this->restaurant_uuid);
+
+                    $this->restaurant->checkOnboardCompleted();
                 }
 
             } else {
