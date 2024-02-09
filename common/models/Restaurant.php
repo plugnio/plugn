@@ -2220,7 +2220,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
-            ->setCc([Yii::$app->params['noReplyEmail'] => 'Plugn'])
+            ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setSubject($subject);
 
         try {
