@@ -1089,8 +1089,6 @@ class Order extends \yii\db\ActiveRecord
             ]);
         }
 
-
-
             $order_total = $this->total_price * $rate;
 
             $store = $this->restaurant;

@@ -298,6 +298,9 @@ class ItemController extends BaseController
 
         $transaction->commit();
 
+        //send events to mixpanel
+        $model->trackEvents(true);
+
         return [
             "operation" => "success",
             "message" => Yii::t('agent', "Item created successfully"),
