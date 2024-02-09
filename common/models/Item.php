@@ -349,10 +349,12 @@ class Item extends \yii\db\ActiveRecord
             }
         }
 
-            //Send event to Segment
+        //Send event to Segment
 
-            $images = (int)$this->getItemImages->count();
-            $vImages =(int) $this->getVariantImages->count();
+        if ($this->scenario != self::SCENARIO_UPDATE_STOCK) {
+
+            $images = (int)$this->getItemImages()->count();
+            $vImages = (int)$this->getVariantImages()->count();
 
             $category = $this->getCategory()->one();
 
@@ -362,16 +364,16 @@ class Item extends \yii\db\ActiveRecord
                 'item_name_ar' => $this->item_name_ar,
                 'item_type' => $this->item_type,
                 "number_of_media" => $images + $vImages,
-                "category_id" =>  $category? $category->category_id: null,
-                "category_name" => $category? $category->title: null,
+                "category_id" => $category ? $category->category_id : null,
+                "category_name" => $category ? $category->title : null,
                 "product_name_english" => $this->item_name,
                 "product_name_arabic" => $this->item_name_ar,
                 "product_description_length_english" => $this->item_description,
                 "product_description_length_arabic" => $this->item_description_ar,
                 "sort_number" => $this->sort_number,
-                "preparation_time_minutes" => $this->prep_time_unit == "min" ? $this->prep_time: null,
-                "preparation_time_hours" => $this->prep_time_unit == "hrs" ? $this->prep_time: null,
-                "preparation_time_days" => $this->prep_time_unit == "day" ? $this->prep_time: null,
+                "preparation_time_minutes" => $this->prep_time_unit == "min" ? $this->prep_time : null,
+                "preparation_time_hours" => $this->prep_time_unit == "hrs" ? $this->prep_time : null,
+                "preparation_time_days" => $this->prep_time_unit == "day" ? $this->prep_time : null,
                 "seo_page_title_english" => $this->item_meta_title,
                 "seo_page_title_arabic" => $this->item_meta_title_ar,
                 "meta_tag_description_length_english" => strlen($this->item_meta_description),
@@ -385,7 +387,7 @@ class Item extends \yii\db\ActiveRecord
                 "variant_applicable" => $this->item_type == self::TYPE_CONFIGURABLE,
             ];
 
-            if($insert) {
+            if ($insert) {
 
                 if ($this->item_status == self::ITEM_STATUS_PUBLISH) {
                     Yii::$app->eventManager->track("Item Published", $props, null, $this->restaurant_uuid);
@@ -399,7 +401,7 @@ class Item extends \yii\db\ActiveRecord
                     ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
                     ->count();
 
-                if($count == 1) {
+                if ($count == 1) {
                     Yii::$app->eventManager->track('Store Setup Step Complete', [
                         'step_name' => "Item Added",
                         'step_number' => 2
@@ -411,6 +413,7 @@ class Item extends \yii\db\ActiveRecord
             } else {
                 Yii::$app->eventManager->track('Item Updated', $props, null, $this->restaurant_uuid);
             }
+        }
 
         return true;
     }
@@ -658,7 +661,20 @@ class Item extends \yii\db\ActiveRecord
             ->orderBy('sort_number');
     }
 
+    /**
+     * @param $model
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVariantImages($model = 'common\models\ItemVariantImage')
+    {
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid'])
+            ->orderBy('sort_number');
+    }
 
+    /**
+     * @param $model
+     * @return \yii\db\ActiveQuery
+     */
     public function getItemImage($model = 'common\models\ItemImage')
     {
         return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid'])
