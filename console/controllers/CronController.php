@@ -31,20 +31,16 @@ class CronController extends \yii\console\Controller
     public function actionIndex() {
 
         //UPDATE agent SET deleted=1 where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20');
-
-        //delete agent
-
-
-        /*Yii::$app->mailer->compose ([
+        /*
+        Yii::$app->mailer->compose ([
             'text' => 'test',
-            'message' => 'test',
+            'message' => 'test'
         ])
-            ->setFrom ([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setFrom (["no-reply@mail.plugn.site" => \Yii::$app->params['appName']])
             ->setSubject ('Test email')
             ->setTo ("kathrechakrushn@gmail.com")
             //->setCc($contactEmails)
             ->send ();*/
-
     }
 
     public function actionFixSpam() {
@@ -76,7 +72,8 @@ class CronController extends \yii\console\Controller
                   //  $assignment->delete();
                 }
                 else{
-                    Yii::info($store->name . " having " + $count + ' assignments');
+                    $msg = $store->name . " having " . $count . "assignments";
+                    Yii::info($msg);
                 }
             }
 
