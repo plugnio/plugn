@@ -330,9 +330,9 @@ class AddonController extends BaseController
                         'addon' => $paymentRecord->addon,
                         'store' => $paymentRecord->restaurant,
                     ])
-                        ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                         ->setTo([$agent->agent_email])
-                        ->setBcc(\Yii::$app->params['supportEmail'])
+                        ->setBcc(\Yii::$app->params['noReplyEmail'])
                         ->setSubject('Thank you for your purchase');
 
                     try {

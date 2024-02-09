@@ -994,7 +994,7 @@ class Restaurant extends ActiveRecord
             'new_domain' => $this->restaurant_domain,
             'old_domain' => $old_domain
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
             ->setTo(Yii::$app->params['adminEmail'])
             ->setSubject('[Plugn] Agent updated DN');
 
@@ -1040,7 +1040,7 @@ class Restaurant extends ActiveRecord
             'new_domain' => $this->restaurant_domain,
             'old_domain' => $old_domain
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
             //->setTo(Yii::$app->params['adminEmail'])
             ->setSubject('Store Domain Updated');
 
@@ -1084,7 +1084,7 @@ class Restaurant extends ActiveRecord
         $mailer = Yii::$app->mailer->compose([
             'html' => 'store/in-active'
         ])
-            ->setFrom([Yii::$app->params['supportEmail']])
+            ->setFrom([Yii::$app->params['noReplyEmail']])
             ->setSubject("We miss you!");
 
         $agents = $this->getAgentAssignments()
@@ -1129,7 +1129,7 @@ class Restaurant extends ActiveRecord
 
         $mailer = Yii::$app->mailer->compose()
             ->setHtmlBody($html)
-            ->setFrom([Yii::$app->params['supportEmail']])
+            ->setFrom([Yii::$app->params['noReplyEmail']])
             ->setSubject($campaign->template->subject);
 
         $agents = $this->getAgentAssignments()
@@ -1380,7 +1380,7 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => 'MyFatoorah',
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
             ->setSubject($subject);
 
@@ -2194,7 +2194,7 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => $paymentGateway,
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
             ->setSubject($subject);
 
@@ -2218,9 +2218,9 @@ class Restaurant extends ActiveRecord
             'status' => $status,
             'paymentGateway' => $paymentGateway,
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
-            ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setCc([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setSubject($subject);
 
         try {
@@ -2275,7 +2275,7 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => 'Tap',
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
             ->setSubject($subject);
 
@@ -4266,7 +4266,7 @@ class Restaurant extends ActiveRecord
                         'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
                         'thisWeekCustomerGained' => $thisWeekCustomerGained,
                     ])
-                        ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+                        ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
                         ->setTo([$agentAssignment->agent->agent_email])
                         ->setSubject('Weekly Store Summary');
 

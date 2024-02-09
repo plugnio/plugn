@@ -133,7 +133,7 @@ class CronController extends \yii\console\Controller
                         ], [
                             'store' => $restaurant,
                         ])
-                            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                            ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                             ->setTo([$restaurant->restaurant_email])
                             ->setSubject('Your store ' . $restaurant->name . ' is now ready');
 
@@ -181,7 +181,7 @@ class CronController extends \yii\console\Controller
                 ], [
                     'store' => $store
                 ])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                    ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
                     ->setSubject('Is there anything we can help with?');
 
@@ -223,7 +223,7 @@ class CronController extends \yii\console\Controller
                 ], [
                     'store' => $store
                 ])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                    ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                     ->setTo($agent->agent_email)
                     ->setSubject('Is there anything we can help with?');
 
@@ -266,7 +266,7 @@ class CronController extends \yii\console\Controller
                         'plan' => $subscription->plan->name,
                         'agent_name' => $agent->agent_name,
                     ])
-                        ->setFrom([\Yii::$app->params['supportEmail']])
+                        ->setFrom([\Yii::$app->params['noReplyEmail']])
                         ->setTo($agent->agent_email)
                         ->setBcc(\Yii::$app->params['supportEmail'])
                         ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan');
@@ -314,7 +314,7 @@ class CronController extends \yii\console\Controller
                     'plan' => $subscription->plan->name,
                     'agent_name' => $agent->agent_name,
                 ])
-                    ->setFrom([\Yii::$app->params['supportEmail']])
+                    ->setFrom([\Yii::$app->params['noReplyEmail']])
                     ->setTo($agent->agent_email)
                     ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Your Subscription is Expiring');
@@ -791,7 +791,7 @@ class CronController extends \yii\console\Controller
                             'order' => $order,
                             'agent_name' => $agentAssignment->agent->agent_name
                         ])
-                            ->setFrom([\Yii::$app->params['supportEmail'] => $order->restaurant->name])
+                            ->setFrom([\Yii::$app->params['noReplyEmail'] => $order->restaurant->name])
                             ->setTo($agentAssignment->agent->agent_email)
                             ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name);
 

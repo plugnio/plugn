@@ -250,7 +250,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ], [
                 'agent' => $this
             ])
-            ->setFrom ([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
             ->setTo ($this->agent_email)
             ->setSubject (Yii::t ('agent', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
             ->send ();
@@ -351,7 +351,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             'agent' => $this,
             'email' => $email
         ])
-            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
             ->setTo($email)
             ->setSubject('Please confirm your email address');
 

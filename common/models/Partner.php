@@ -306,7 +306,7 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                          "model" => $model,
                          "password" => $password
                ])
-               ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+               ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                ->setTo([$model->partner_email])
                ->setBcc(\Yii::$app->params['supportEmail'])
                ->setSubject('Your account password has been reset');
