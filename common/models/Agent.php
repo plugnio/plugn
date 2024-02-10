@@ -195,6 +195,14 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
                     if ($count > 1) {
                         Yii::error("too may agent signup from same ip");
+
+                        //block ip
+
+                        $biModel = new BlockedIp();
+                        $biModel->ip_address = $this->ip_address;
+                        $biModel->note = "Too many agent signups from same ip";
+                        $biModel->save(false);
+
                         return $this->addError('ip_address', "Too many requests");
                     }
                 }

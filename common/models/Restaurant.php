@@ -2571,6 +2571,28 @@ class Restaurant extends ActiveRecord
             }
 
             $this->ip_address = $ip;
+
+            if ($insert) {
+
+                $count = self::find()
+                    ->andWhere(['ip_address' => $this->ip_address])
+                    ->andWhere("DATE(restaurant_created_at) = DATE('".date('Y-m-d')."')")
+                    ->count();
+
+                if ($count > 4) {
+
+                    Yii::error("too many store registration from same ip");
+
+                    //block ip
+
+                    $biModel = new BlockedIp();
+                    $biModel->ip_address = $this->ip_address;
+                    $biModel->note = "Too many store registration from same ip";
+                    $biModel->save(false);
+
+                    return $this->addError('ip_address', "Too many store registration");
+                }
+            }
         }
 
         if ($insert && $this->referral_code != null) {

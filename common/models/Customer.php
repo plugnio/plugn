@@ -229,6 +229,29 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             }
 
             $this->ip_address = $ip;
+
+            if ($insert) {
+
+                $count = self::find()
+                    ->andWhere(['ip_address' => $this->ip_address])
+                    ->andWhere("DATE(customer_created_at) = DATE('".date('Y-m-d')."')")
+                    ->count();
+
+                //considering there can be multiple users from same ip for different stores in single day
+
+                if ($count > 10) {
+                    Yii::error("too may customer signup from same ip");
+
+                    //block ip
+
+                    $biModel = new BlockedIp();
+                    $biModel->ip_address = $this->ip_address;
+                    $biModel->note = "Too many customer signups from same ip";
+                    $biModel->save(false);
+
+                    return $this->addError('ip_address', "Too many requests");
+                }
+            }
         }
 
         return true;
