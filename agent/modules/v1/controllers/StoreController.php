@@ -6,6 +6,7 @@ use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
 use common\models\RestaurantByCampaign;
+use common\models\RestaurantUpload;
 use common\models\Setting;
 use common\models\VendorCampaign;
 use Yii;
@@ -1172,6 +1173,39 @@ class StoreController extends BaseController
         }
 
         return self::message("success","Free checkout disabled successfully");
+    }
+
+    /**
+     * @return void
+     */
+    public function actionUploadAppleDomainAssociation()
+    {
+        $store = $this->findModel();
+
+        //apple domain association
+
+        $upload = $store->getRestaurantUploads()
+            ->andWhere(['filename' => "apple-developer-merchantid-domain-association"])
+            ->one();
+
+        if(!$upload)
+            $upload = new RestaurantUpload;
+
+        $upload->restaurant_uuid = $store->restaurant_uuid;
+        $upload->content = Yii::$app->request->getBodyParam("content");
+        $upload->path =  ".well-known";
+        $upload->filename = "apple-developer-merchantid-domain-association";
+        $upload->created_by = Yii::$app->user->getId();
+
+        if (!$upload->save()) {
+            return self::message("error", $upload->getErrors());
+        }
+
+        return [
+            "operation" => 'success',
+            "message" => "File uploaded.",
+            "restaurantUploads" => $store->getRestaurantUploads()->all()
+        ];
     }
 
     /**

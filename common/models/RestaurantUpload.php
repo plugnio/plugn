@@ -117,10 +117,28 @@ class RestaurantUpload extends \yii\db\ActiveRecord
             )
         ) {
             if($this->restaurant->site_id)
-                Yii::$app->netlifyComponent->upgradeSite($this->restaurant->site_id);
+                Yii::$app->netlifyComponent->upgradeSite($this->restaurant);
+
+            //if using new theme
+
+            $this->_moveToS3();
         }
 
         return true;
+    }
+
+    /**
+     * save to s3
+     * @return void
+     */
+    private function _moveToS3() {
+
+        $domain = str_replace(["www", "https://", "http://", "/"], "", $this->restaurant->restaurant_domain);
+
+        $file_s3_path = "files/" . $domain . "/" . $this->path . "/" . $this->filename;
+            //"/.well-known/apple-developer-merchantid-domain-association";
+
+        Yii::$app->resourceManager->saveContent($file_s3_path, $this->content);
     }
 
     /**

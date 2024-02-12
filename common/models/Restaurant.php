@@ -1081,6 +1081,9 @@ class Restaurant extends ActiveRecord
         return self::message("success", "Congratulations you have successfully changed your domain name");
     }
 
+    /**
+     * @return void
+     */
     public function checkOnboardCompleted()
     {
         $itemCount = \common\models\Item::find()

@@ -717,6 +717,7 @@ return [
                         'GET view-shipping-methods' => 'view-shipping-methods',
                         'GET log-email-campaign/<id>' => 'log-email-campaign',
 
+                        'POST upload-apple-domain-association' => "upload-apple-domain-association",
                         'POST' => 'update',
                         'POST upgrade' => 'upgrade',
                         'POST create' => 'create',
@@ -774,6 +775,7 @@ return [
                         'DELETE remove-gateway-queue' => 'remove-gateway-queue',
                         'DELETE' => 'delete',
                         // OPTIONS VERBS
+                        'OPTIONS upload-apple-domain-association' => "options",
                         'OPTIONS' => 'options',
                         'OPTIONS upload-docs/<id>' => 'options',
                         'OPTIONS update-business-details/<id>' => 'options',
