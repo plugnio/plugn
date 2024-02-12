@@ -84,7 +84,7 @@ class TapQueue extends \yii\db\ActiveRecord
                         ], [
                             'store' => $this->restaurant,
                         ])
-                            ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                            ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                             ->setTo([$agent->agent_email])
                             ->setSubject('Your TAP Payments account has been approved');
 

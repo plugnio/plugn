@@ -1006,7 +1006,7 @@ class Restaurant extends ActiveRecord
             'new_domain' => $this->restaurant_domain,
             'old_domain' => $old_domain
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
             ->setTo(Yii::$app->params['adminEmail'])
             ->setSubject('[Plugn] Agent updated DN');
 
@@ -1052,7 +1052,7 @@ class Restaurant extends ActiveRecord
             'new_domain' => $this->restaurant_domain,
             'old_domain' => $old_domain
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
             //->setTo(Yii::$app->params['adminEmail'])
             ->setSubject('Store Domain Updated');
 
@@ -1125,7 +1125,7 @@ class Restaurant extends ActiveRecord
         $mailer = Yii::$app->mailer->compose([
             'html' => 'store/in-active'
         ])
-            ->setFrom([Yii::$app->params['supportEmail']])
+            ->setFrom([Yii::$app->params['noReplyEmail']])
             ->setSubject("We miss you!");
 
         $agents = $this->getAgentAssignments()
@@ -1170,7 +1170,7 @@ class Restaurant extends ActiveRecord
 
         $mailer = Yii::$app->mailer->compose()
             ->setHtmlBody($html)
-            ->setFrom([Yii::$app->params['supportEmail']])
+            ->setFrom([Yii::$app->params['noReplyEmail']])
             ->setSubject($campaign->template->subject);
 
         $agents = $this->getAgentAssignments()
@@ -1421,7 +1421,7 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => 'MyFatoorah',
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
             ->setSubject($subject);
 
@@ -2235,7 +2235,7 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => $paymentGateway,
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
             ->setSubject($subject);
 
@@ -2259,7 +2259,7 @@ class Restaurant extends ActiveRecord
             'status' => $status,
             'paymentGateway' => $paymentGateway,
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
             ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setSubject($subject);
@@ -2316,7 +2316,7 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => 'Tap',
         ])
-            ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
             ->setTo([$this->restaurant_email])
             ->setSubject($subject);
 
@@ -2612,6 +2612,28 @@ class Restaurant extends ActiveRecord
             }
 
             $this->ip_address = $ip;
+
+            if ($insert) {
+
+                $count = self::find()
+                    ->andWhere(['ip_address' => $this->ip_address])
+                    ->andWhere("DATE(restaurant_created_at) = DATE('".date('Y-m-d')."')")
+                    ->count();
+
+                if ($count > 4) {
+
+                    Yii::error("too many store registration from same ip");
+
+                    //block ip
+
+                    $biModel = new BlockedIp();
+                    $biModel->ip_address = $this->ip_address;
+                    $biModel->note = "Too many store registration from same ip";
+                    $biModel->save(false);
+
+                    return $this->addError('ip_address', "Too many store registration");
+                }
+            }
         }
 
         if ($insert && $this->referral_code != null) {
@@ -4305,7 +4327,7 @@ class Restaurant extends ActiveRecord
                         'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
                         'thisWeekCustomerGained' => $thisWeekCustomerGained,
                     ])
-                        ->setFrom([Yii::$app->params['supportEmail'] => 'Plugn'])
+                        ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
                         ->setTo([$agentAssignment->agent->agent_email])
                         ->setSubject('Weekly Store Summary');
 

@@ -244,7 +244,7 @@ class AddonPayment extends \yii\db\ActiveRecord
                     'addon' => $paymentRecord->addon,
                     'store' => $paymentRecord->restaurant,
                 ])
-                    ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                    ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                     ->setTo([$agent->agent_email])
                     ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Thank you for your purchase');

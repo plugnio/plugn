@@ -195,6 +195,14 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
                     if ($count > 1) {
                         Yii::error("too may agent signup from same ip");
+
+                        //block ip
+
+                        $biModel = new BlockedIp();
+                        $biModel->ip_address = $this->ip_address;
+                        $biModel->note = "Too many agent signups from same ip";
+                        $biModel->save(false);
+
                         return $this->addError('ip_address', "Too many requests");
                     }
                 }
@@ -250,7 +258,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ], [
                 'agent' => $this
             ])
-            ->setFrom ([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
             ->setTo ($this->agent_email)
             ->setSubject (Yii::t ('agent', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
             ->send ();
@@ -351,7 +359,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             'agent' => $this,
             'email' => $email
         ])
-            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
             ->setTo($email)
             ->setSubject('Please confirm your email address');
 

@@ -106,11 +106,18 @@ return [
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.elasticemail.com',
+                'username' => 'no-reply@mail.plugn.site',
+                'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
+                'port' => '2525',
+                'encryption' => 'tls'
+                /*
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.elasticemail.com',
                 'username' => 'support@plugn.io',
                 'password' => 'CD006D3ED0C5BD796D1D2C77B111CC24AF9E',
                 'port' => '2525',
                 'encryption' => 'tls'
-                /*
+
                'class' => 'Swift_SmtpTransport',
                'host' => 'email-smtp.eu-west-1.amazonaws.com',
                'username' => 'AKIAWMITDJRKVNB2AFUL',//AKIAWMITDJRKTH5HBB2O //AKIAWMITDJRKTQGXUQT3

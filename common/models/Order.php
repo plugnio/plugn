@@ -820,7 +820,7 @@ class Order extends \yii\db\ActiveRecord
 
         if($host && $username && $password && $port && $encryption)
         {
-            $fromEmail = $this->restaurant->restaurant_email? $this->restaurant->restaurant_email: \Yii::$app->params['supportEmail'];
+            $fromEmail = $this->restaurant->restaurant_email? $this->restaurant->restaurant_email: \Yii::$app->params['noReplyEmail'];
 
             \Yii::$app->mailer->setTransport([
                 'class' => 'Swift_SmtpTransport',
@@ -833,7 +833,7 @@ class Order extends \yii\db\ActiveRecord
         }
         else
         {
-            $fromEmail = \Yii::$app->params['supportEmail'];
+            $fromEmail = \Yii::$app->params['noReplyEmail'];
         }
 
         if ($this->customer_email) {
@@ -1367,6 +1367,14 @@ class Order extends \yii\db\ActiveRecord
 
                 if ($count > 10) {
                     Yii::error("too may order from same ip");
+
+                    //block ip
+
+                    $biModel = new BlockedIp();
+                    $biModel->ip_address = $this->ip_address;
+                    $biModel->note = "Too many customer signups from same ip";
+                    $biModel->save(false);
+
                     return $this->addError('ip_address', "Too many order");
                 }
             }

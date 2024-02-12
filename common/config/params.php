@@ -4,6 +4,7 @@ return [
     'appName' => 'Plugn',
     'adminEmail' => 'contact@plugn.io',
     'supportEmail' => 'support@plugn.io',
+    'noReplyEmail' => 'no-reply@mail.plugn.site',
     // 'senderEmail' => 'noreply@example.com',
     // 'senderName' => 'Example.com mailer',
     'user.passwordResetTokenExpire' => 3600,

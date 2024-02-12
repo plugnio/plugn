@@ -209,7 +209,7 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
         ], [
             'invoice' => $this
         ])
-            ->setFrom(\Yii::$app->params['supportEmail'])//[$fromEmail => $this->restaurant->name]
+            ->setFrom(\Yii::$app->params['noReplyEmail'])//[$fromEmail => $this->restaurant->name]
             ->setTo($emails[0])
             ->setCc(array_slice($emails, 1))
             ->setSubject('Invoice #' . $this->invoice_number . ' for Plugn commission | ' . $this->restaurant->name)

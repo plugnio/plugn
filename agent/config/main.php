@@ -845,12 +845,14 @@ return [
                    'patterns' => [
                        'GET callback' => 'callback',
                        'GET price' => 'price',
+                       'GET apple-pay-params/<id>' => "apple-pay-params",
                        'GET <id>' => 'view',
                        'POST confirm' => 'confirm',
                        'POST payment-webhook' => 'payment-webhook',
                        'PATCH payment-webhook' => 'payment-webhook',
                        // OPTIONS VERBS
-                       'OPTIONS <id>' => 'options'
+                       'OPTIONS <id>' => 'options',
+                       'OPTIONS apple-pay-params/<id>' => "options",
                    ]
                ],
                 [ // RestaurantPaymentMethod
