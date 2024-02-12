@@ -65,6 +65,65 @@ class PlanController extends BaseController
     }
 
     /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionApplePayParams($id) {
+
+        //$currency_code = Yii::$app->request->getBodyParam ('currency');
+
+        $store = Yii::$app->accountManager->getManagedAccount(null, false);
+
+        $plan = $this->findModel ($id);
+
+        $currency = $store->currency ? $store->currency: Currency::findOne(['code' => "KWD"]);
+        //$currency_code? Currency::findOne(['code' => $currency_code]): $store->currency;
+
+        if($currency && $currency->code != "KWD") {
+
+            $kwdCurrency = \agent\models\Currency::find()
+                ->andWhere(['code' => "KWD"])
+                ->one();
+
+            if($store->custom_subscription_price > 0)
+            {
+                $planPriceUSD = $store->custom_subscription_price / $kwdCurrency->rate;
+
+                $payment_amount_charged = round($planPriceUSD * $currency->rate, $currency->decimal_place);
+            }
+            else
+            {
+                $planPrice = $plan->getPlanPrices()
+                    ->andWhere(['currency' => $currency->code])
+                    ->one();
+
+                $payment_amount_charged = round($planPrice->price, $currency->decimal_place);
+            }
+        }
+        else
+        {
+            $payment_amount_charged = $store->custom_subscription_price > 0 ? $store->custom_subscription_price : $plan->price;
+        }
+
+        $user = Yii::$app->user->identity;
+
+        return [
+            //"public_key" => YII_ENV == "prod" ? $store->live_public_key: $store->test_public_key,
+            //"merchant_id" => $store->merchant_id,
+
+            "public_key" => YII_ENV == "prod" ? "pk_live_OtvCjd7hgqT6JWb3Z8yIrmcG" : "pk_test_nIRT3cC2zDy9NpeSxiZ0Vlj4",
+            "merchant_id" => Yii::$app->tapPayments->destinationId,// "2663705",
+            "currency" => $currency->code,
+            "amount" => $payment_amount_charged,
+            "agent_name" => $user->agent_name,
+            "agent_number" => $user->agent_number,
+            "agent_phone_country_code" => $user->agent_phone_country_code,
+            "agent_email" => $user->agent_email,
+        ];
+    }
+
+    /**
      * confirm plan for current store
      * @param $id
      * @return array|string[]
@@ -75,6 +134,7 @@ class PlanController extends BaseController
 
         $plan_id = Yii::$app->request->getBodyParam ('plan_id');
         $payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
+        $source = Yii::$app->request->getBodyParam ('source');
 
         $response = SubscriptionPayment::initPayment($plan_id, $payment_method_id);
 
@@ -93,6 +153,9 @@ class PlanController extends BaseController
             $subscription->payment->is_sandbox
         );
 
+        if(!$source)
+            $source = $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
+
         $response = Yii::$app->tapPayments->createCharge (
             "KWD",
             "Upgrade $store->name's plan to " . $subscription->plan->name, // Description
@@ -106,7 +169,7 @@ class PlanController extends BaseController
             0, //Comission
             Url::to (['plans/callback'], true),
             Url::to(['plans/payment-webhook'], true),
-            $subscription->payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
+            $source,
             0,
             0,
             ''
