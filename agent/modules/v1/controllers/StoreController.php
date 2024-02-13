@@ -1201,6 +1201,20 @@ class StoreController extends BaseController
             return self::message("error", $upload->getErrors());
         }
 
+        //add apple pay in store if not already
+
+        $paymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_APPLE_PAY])
+            ->one();
+
+        $rpm = new RestaurantPaymentMethod();
+        $rpm->restaurant_uuid = $store->restaurant_uuid;
+        $rpm->payment_method_id = $paymentMethod->payment_method_id;
+
+        if(!$rpm->save()) {
+            return self::message("error", $rpm->getErrors());
+        }
+
         return [
             "operation" => 'success',
             "message" => "File uploaded.",

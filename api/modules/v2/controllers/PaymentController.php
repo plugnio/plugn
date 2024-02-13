@@ -139,7 +139,8 @@ class PaymentController extends BaseController
                     [
                         PaymentMethod::CODE_MOYASAR,
                         PaymentMethod::CODE_STRIPE,
-                        PaymentMethod::CODE_UPAYMENT
+                        PaymentMethod::CODE_UPAYMENT,
+                        PaymentMethod::CODE_APPLE_PAY
                     ]
                 ]
             ]);

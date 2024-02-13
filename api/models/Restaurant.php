@@ -30,7 +30,7 @@ class Restaurant extends \common\models\Restaurant {
       unset($fields['business_id']);
       unset($fields['business_entity_id']);
       unset($fields['wallet_id']);
-      unset($fields['merchant_id']);
+      //unset($fields['merchant_id']);
       unset($fields['operator_id']);
       unset($fields['supplierCode']);
       unset($fields['live_api_key']);
