@@ -349,62 +349,83 @@ class Item extends \yii\db\ActiveRecord
             }
         }
 
-            //Send event to Segment
-            $props = [
-                'item_uuid' => $this->item_uuid,
-                'item_name' => $this->item_name,
-                'item_name_ar' => $this->item_name_ar,
-                'item_type' => $this->item_type,
-                "number_of_media" => "",
-                "category_id" =>  "",
-                "category_name" => "",
-                "product_name_english" => $this->item_name,
-                "product_name_arabic" => $this->item_name_ar,
-                "product_description_length_english" => $this->item_description,
-                "product_description_length_arabic" => $this->item_description_ar,
-                "sort_number" => $this->sort_number,
-                "preparation_time_minutes" => $this->prep_time_unit == "min" ? $this->prep_time: null,
-                "preparation_time_hours" => $this->prep_time_unit == "hrs" ? $this->prep_time: null,
-                "preparation_time_days" => $this->prep_time_unit == "day" ? $this->prep_time: null,
-                "seo_page_title_english" => $this->item_meta_title,
-                "seo_page_title_arabic" => $this->item_meta_title_ar,
-                "meta_tag_description_length_english" => strlen($this->item_meta_description),
-                "meta_tag_description_length_arabic" => strlen($this->item_meta_description_ar),
-                "sku_id" => $this->sku,
-                "barcode_id" => $this->barcode,
-                "quantity_tracked" => $this->track_quantity,
-                "stock_quantity" => $this->stock_qty,
-                "is_physical_product" => $this->shipping,
-                "number_of_options" => $this->getOptions()->count(),
-                "variant_applicable" => $this->item_type == self::TYPE_CONFIGURABLE,
-            ];
+        //Send event to Segment
 
-            if($insert) {
+        //not firing on insert as it will not have all data yet
 
-                if ($this->item_status == self::ITEM_STATUS_PUBLISH) {
-                    Yii::$app->eventManager->track("Item Published", $props, null, $this->restaurant_uuid);
-                }
-
-                Yii::$app->eventManager->track('Item Added', $props, null, $this->restaurant_uuid);
-
-                //check if first product
-
-                $count = Item::find()
-                    ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
-                    ->count();
-
-                if($count == 1) {
-                    Yii::$app->eventManager->track('Store Setup Step Complete', [
-                        'step_name' => "Item Added",
-                        'step_number' => 2
-                    ], null, $this->restaurant_uuid);
-                }
-
-            } else {
-                Yii::$app->eventManager->track('Item Updated', $props, null, $this->restaurant_uuid);
-            }
+        if (!$insert && $this->scenario != self::SCENARIO_UPDATE_STOCK) {
+            $this->trackEvents($insert);
+        }
 
         return true;
+    }
+
+    /**
+     * @param $insert
+     * @return void
+     */
+    public function trackEvents($insert) {
+
+        $images = (int)$this->getItemImages()->count();
+        $vImages = (int)$this->getVariantImages()->count();
+
+        $category = $this->getCategory()->one();
+
+        $props = [
+            'item_uuid' => $this->item_uuid,
+            'item_name' => $this->item_name,
+            'item_name_ar' => $this->item_name_ar,
+            'item_type' => $this->item_type,
+            "number_of_media" => $images + $vImages,
+            "category_id" => $category ? $category->category_id : null,
+            "category_name" => $category ? $category->title : null,
+            "product_name_english" => $this->item_name,
+            "product_name_arabic" => $this->item_name_ar,
+            "product_description_length_english" => $this->item_description,
+            "product_description_length_arabic" => $this->item_description_ar,
+            "sort_number" => $this->sort_number,
+            "preparation_time_minutes" => $this->prep_time_unit == "min" ? $this->prep_time : null,
+            "preparation_time_hours" => $this->prep_time_unit == "hrs" ? $this->prep_time : null,
+            "preparation_time_days" => $this->prep_time_unit == "day" ? $this->prep_time : null,
+            "seo_page_title_english" => $this->item_meta_title,
+            "seo_page_title_arabic" => $this->item_meta_title_ar,
+            "meta_tag_description_length_english" => strlen($this->item_meta_description),
+            "meta_tag_description_length_arabic" => strlen($this->item_meta_description_ar),
+            "sku_id" => $this->sku,
+            "barcode_id" => $this->barcode,
+            "quantity_tracked" => $this->track_quantity,
+            "stock_quantity" => $this->stock_qty,
+            "is_physical_product" => $this->shipping,
+            "number_of_options" => $this->getOptions()->count(),
+            "variant_applicable" => $this->item_type == self::TYPE_CONFIGURABLE,
+        ];
+
+        if ($insert) {
+
+            if ($this->item_status == self::ITEM_STATUS_PUBLISH) {
+                Yii::$app->eventManager->track("Item Published", $props, null, $this->restaurant_uuid);
+            }
+
+            Yii::$app->eventManager->track('Item Added', $props, null, $this->restaurant_uuid);
+
+            //check if first product
+
+            $count = Item::find()
+                ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+                ->count();
+
+            if ($count == 1) {
+                Yii::$app->eventManager->track('Store Setup Step Complete', [
+                    'step_name' => "Item Added",
+                    'step_number' => 2
+                ], null, $this->restaurant_uuid);
+
+                $this->restaurant->checkOnboardCompleted();
+            }
+
+        } else {
+            Yii::$app->eventManager->track('Item Updated', $props, null, $this->restaurant_uuid);
+        }
     }
 
     /**
@@ -650,7 +671,20 @@ class Item extends \yii\db\ActiveRecord
             ->orderBy('sort_number');
     }
 
+    /**
+     * @param $model
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVariantImages($model = 'common\models\ItemVariantImage')
+    {
+        return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid'])
+            ->orderBy('sort_number');
+    }
 
+    /**
+     * @param $model
+     * @return \yii\db\ActiveQuery
+     */
     public function getItemImage($model = 'common\models\ItemImage')
     {
         return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid'])

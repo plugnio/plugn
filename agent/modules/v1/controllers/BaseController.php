@@ -67,7 +67,18 @@ class BaseController extends Controller
      */
     public function beforeAction($action)
     {
-        return parent::beforeAction($action);
+        if(!parent::beforeAction($action)) {
+            return false;
+        }
+
+        if(Yii::$app->user->identity) {
+            Yii::$app->eventManager->setUser(Yii::$app->user->getId(), [
+                'name' => trim(Yii::$app->user->identity->agent_name),
+                'email' => Yii::$app->user->identity->agent_email,
+            ]);
+        } 
+
+        return true;
     }
 
     /**

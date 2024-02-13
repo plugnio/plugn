@@ -13,7 +13,7 @@ use api\models\Restaurant;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
-class PaymentController extends Controller
+class PaymentController extends BaseController
 {
 
     public function behaviors()
@@ -139,7 +139,8 @@ class PaymentController extends Controller
                     [
                         PaymentMethod::CODE_MOYASAR,
                         PaymentMethod::CODE_STRIPE,
-                        PaymentMethod::CODE_UPAYMENT
+                        PaymentMethod::CODE_UPAYMENT,
+                        PaymentMethod::CODE_APPLE_PAY
                     ]
                 ]
             ]);

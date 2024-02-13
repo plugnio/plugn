@@ -109,6 +109,26 @@ class S3ResourceManager extends Component {
     }
 
     /**
+     * @param $key
+     * @param $content
+     * @param $options
+     * @param $content_type
+     * @return \Aws\Result
+     */
+    public function saveContent($key, $content, $options = [], $content_type = null) {
+
+        $options = ArrayHelper::merge([
+            'Bucket' => $this->bucket,
+            'Key' => $key,
+            'Body' => $content,
+            'ACL' => 'public-read', // default to ACL public read
+            'ContentType' => $content_type,
+        ], $options);
+
+        return $this->getClient()->putObject($options);
+    }
+
+    /**
      * Creates a copy of a file from old key to new key
      * @param string $oldFile old file name / path that you wish to copy
      * @param string $newFile target destination for file name / path

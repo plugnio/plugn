@@ -223,3 +223,6 @@ integrations@tap.company
 - ability to manage merchants 
 - ability to manage documents
 https://developers.tap.company/reference/files
+
+
+https://stripe.com/docs/payments/payment-methods/pmd-registration

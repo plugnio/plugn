@@ -138,6 +138,14 @@ use yii\helpers\ArrayHelper;
  * @property string|null $last_order_at
  * @property number $total_orders
  * @property boolean $enable_guest_checkout
+ * @property string $owner_name_title
+ * @property string $owner_middle_name
+ * @property string $owner_nationality
+ * @property string $owner_date_of_birth
+ * @property string $tax_number
+ * @property string $swift_code
+ * @property string $account_number
+ *
  * @property AgentAssignment[] $agentAssignments
  * @property AreaDeliveryZone[] $areaDeliveryZones
  * @property BankDiscount[] $bankDiscounts
@@ -438,12 +446,14 @@ class Restaurant extends ActiveRecord
                 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT
             ],
 
-            [['meta_title', 'meta_title_ar', 'meta_description', 'meta_description_ar'], 'string'],
+            [['meta_title', 'meta_title_ar', 'meta_description', 'meta_description_ar', "owner_name_title", "owner_middle_name", "owner_nationality", "tax_number",  "swift_code", "account_number"], 'string'],
 
-            [['authorized_signature_file'], 'required', 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
+            [["owner_date_of_birth"], "string"],
+
+            [['authorized_signature_file'], 'required'],
+    /*, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
                 return $model->business_type == 'corp';
-            }],
-
+            }*/
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [['identification_file_id_back_side', 'identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file', 'iban_certificate_file_id', 'logo_file_id'], 'safe', 'on' => [
                 self::SCENARIO_CREATE_TAP_ACCOUNT,
@@ -700,7 +710,8 @@ class Restaurant extends ActiveRecord
                 'identification_file_id_back_side',
                 'payment_gateway_queue_id',
                 'tap_queue_id',
-                'ip_address'
+                'ip_address',
+                "owner_name_title", "owner_middle_name", "owner_nationality", "owner_date_of_birth", "tax_number", "swift_code", "account_number",
             ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
@@ -710,7 +721,8 @@ class Restaurant extends ActiveRecord
                 'iban', 'authorized_signature_issuing_date', 'authorized_signature_expiry_date',
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
                 'identification_expiry_date', 'iban_certificate_file', 'iban_certificate_file_id', 'tap_merchant_status',
-                'is_tap_business_active', 'ip_address'],
+                'is_tap_business_active', 'ip_address', "owner_name_title", "owner_middle_name", "owner_nationality",
+                "owner_date_of_birth", "tax_number", "swift_code", "account_number"],
 
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
@@ -1067,6 +1079,38 @@ class Restaurant extends ActiveRecord
         }
 
         return self::message("success", "Congratulations you have successfully changed your domain name");
+    }
+
+    /**
+     * @return void
+     */
+    public function checkOnboardCompleted()
+    {
+        $itemCount = \common\models\Item::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+            ->count();
+
+        $pmCount = RestaurantPaymentMethod::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+            ->count();
+
+        /*$blCount  = BusinessLocation::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+            ->count();*/
+
+        $supportPickUp = BusinessLocation::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid, 'support_pick_up' => 1])
+            ->count();
+
+        $dzCount = DeliveryZone::find()
+            ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
+            ->count();
+
+        if($itemCount > 0 && $pmCount > 0 && ($supportPickUp || $dzCount > 0)) {
+            Yii::$app->eventManager->track('Onboard Complete', [
+                'step_name' => "Item Added",
+            ], null, $this->restaurant_uuid);
+        }
     }
 
     /**
@@ -2821,13 +2865,10 @@ class Restaurant extends ActiveRecord
             $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
             $model->save(false);*/
         }
-
-
     }
 
     public function setupStore($agent)
     {
-
         //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
 
         $category = new Category();
@@ -3104,6 +3145,7 @@ class Restaurant extends ActiveRecord
             'categories',
             'restaurantPages',
             'paymentGatewayQueue',
+            'storeBillingAddress',
             'restaurantShippingMethods',
             'restaurantDomainRequests',
             'openingHours' => function ($restaurant) {
@@ -4449,6 +4491,16 @@ class Restaurant extends ActiveRecord
     }
 
     /**
+     * Gets query for [[StoreBillingAddress]].
+     *
+     * @return ActiveQuery
+     */
+    public function getStoreBillingAddress($modelClass = "\common\models\RestaurantBillingAddress")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[Payments]].
      *
      * @return ActiveQuery
@@ -4477,6 +4529,16 @@ class Restaurant extends ActiveRecord
             ->via('agentAssignments', function ($query) {
                 return $query->andWhere(['agent_assignment.role' => AgentAssignment::AGENT_ROLE_OWNER]);
             });
+    }
+
+    /**
+     * Gets query for [[RestaurantBillingAddress]].
+     *
+     * @return ActiveQuery
+     */
+    public function getRestaurantBillingAddress($modelClass = "\common\models\RestaurantBillingAddress")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
     /**

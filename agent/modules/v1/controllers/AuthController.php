@@ -18,7 +18,7 @@ use agent\models\PasswordResetRequestForm;
  * Auth controller provides the initial access token that is required for further requests
  * It initially authorizes via Http Basic Auth using a base64 encoded username and password
  */
-class AuthController extends Controller {
+class AuthController extends BaseController {
 
     public function behaviors() {
 
@@ -147,7 +147,7 @@ class AuthController extends Controller {
         }
 
         Yii::$app->eventManager->track('Log In', [
-            "login_method" => "Email"
+            "login_method" => "Email",
         ]);
 
         return $this->_loginResponse($agent);
@@ -377,13 +377,19 @@ class AuthController extends Controller {
         $firstname = $full_name[0];
         $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
 
+        Yii::$app->eventManager->setUser($agent->agent_id, [
+            'name' => trim($agent->agent_name),
+            'email' => $agent->agent_email,
+        ]);
+
         Yii::$app->eventManager->track('Agent Signup', [
             'first_name' => trim($firstname),
             'last_name' => trim($lastname),
             'email' => $agent->agent_email,
             "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
             "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
-            "profile_status" => "Active"
+            "profile_status" => "Active",
+            "user_id" => $agent->agent_id
         ]);
 
         if($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED)

@@ -152,6 +152,8 @@ class BusinessLocation extends \yii\db\ActiveRecord
                     'step_name' => "Shipping",
                     'step_number' => 3
                 ], null, $this->restaurant_uuid);
+
+                $this->restaurant->checkOnboardCompleted();
             }
         }
     }

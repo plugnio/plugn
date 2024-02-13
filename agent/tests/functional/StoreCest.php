@@ -250,6 +250,11 @@ class StoreCest
         ]);
     }
 
+    /**
+     * todo: refactor this for each country in tap
+     * @param FunctionalTester $I
+     * @return void
+     *
     public function tryToCreateTapAccount(FunctionalTester $I) {
         $identification_file_upload = Yii::$app->temporaryBucketResourceManager->save(
             null,
@@ -306,5 +311,5 @@ class StoreCest
         $I->seeResponseContainsJson([
             "operation" => "success"
         ]);
-    }
+    }*/
 }

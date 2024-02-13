@@ -106,7 +106,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
 
         if($insert) {
             $props = [
-                "country" => $this->country_id,
+                "country" => $this->country? $this->country->country_name: null,
                 "delivery_to_whole_country" => $this->deliver_whole_country,
                 "delivery_time_minutes" => $this->delivery_time,
                 "delivery_fee" => $this->delivery_fee,
@@ -129,6 +129,8 @@ class DeliveryZone extends \yii\db\ActiveRecord
                     'step_name' => "Shipping",
                     'step_number' => 3
                 ], null, $this->restaurant_uuid);
+
+                $this->restaurant->checkOnboardCompleted();
             }
         }
     }

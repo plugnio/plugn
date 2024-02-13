@@ -1,7 +1,6 @@
 <?php
-namespace agent\components;
+namespace api\components;
 
-use agent\models\AgentAssignment;
 use Yii;
 
 
@@ -11,6 +10,7 @@ class EventManager extends \common\components\EventManager
      * @param $event
      * @param $eventData
      * @param $timestamp
+     * @param $userId
      * @return void
      */
     public function track($event, $eventData, $timestamp = null, $store_id = null)
@@ -18,17 +18,7 @@ class EventManager extends \common\components\EventManager
         if(!$store_id)
             $store_id = Yii::$app->request->headers->get('Store-Id');
 
-        if(!Yii::$app->user->isGuest && $store_id) {
-
-            $assignment = AgentAssignment::find()
-                ->andWhere(['restaurant_uuid' => $store_id, "agent_id" => Yii::$app->user->getId()])
-                ->one();
-
-            if($assignment)
-                $eventData["role"] = $assignment->role;
-        }
-
-        $eventData["channel"] = "Dashboard Web App";
+        $eventData["channel"] = "Store Web App";
 
         parent::track($event, $eventData, $timestamp, $store_id);
     }

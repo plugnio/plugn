@@ -582,6 +582,25 @@ return [
                         'OPTIONS <web_link_id>' => 'options',
                     ]
                 ],
+                [// RestaurantBillingAddressController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/restaurant-billing-address',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'POST create' => 'create',
+                        'PATCH <rba_uuid>/<store_uuid>' => 'update',
+                        'PATCH <rba_uuid>' => 'update',
+                        'DELETE <rba_uuid>/<store_uuid>' => 'delete',
+                        'DELETE <rba_uuid>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS create' => 'options',
+                        'OPTIONS detail' => 'options',
+                        'OPTIONS <rba_uuid>/<store_uuid>' => 'options',
+                        'OPTIONS <rba_uuid>' => 'options',
+                    ]
+                ],
                 [// ItemController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/item',
@@ -698,6 +717,7 @@ return [
                         'GET view-shipping-methods' => 'view-shipping-methods',
                         'GET log-email-campaign/<id>' => 'log-email-campaign',
 
+                        'POST upload-apple-domain-association' => "upload-apple-domain-association",
                         'POST' => 'update',
                         'POST upgrade' => 'upgrade',
                         'POST create' => 'create',
@@ -705,6 +725,10 @@ return [
                         'POST disable-payment-method/<id>/<paymentMethodId>' => 'disable-payment-method',
                         'POST enable-payment-method/<id>/<paymentMethodId>' => 'enable-payment-method',
                         'POST create-tap-account/<id>' => 'create-tap-account',
+                        'POST create-tap-queue/<id>' => 'create-tap-queue',
+                        'POST upload-docs/<id>' => 'upload-docs',
+                        'POST update-business-details/<id>' => 'update-business-details',
+
                         'POST enable-online-payment/<id>' => 'enable-online-payment',
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
@@ -751,7 +775,10 @@ return [
                         'DELETE remove-gateway-queue' => 'remove-gateway-queue',
                         'DELETE' => 'delete',
                         // OPTIONS VERBS
+                        'OPTIONS upload-apple-domain-association' => "options",
                         'OPTIONS' => 'options',
+                        'OPTIONS upload-docs/<id>' => 'options',
+                        'OPTIONS update-business-details/<id>' => 'options',
                         'OPTIONS log-email-campaign/<id>' => 'options',
                         'OPTIONS deactivate' => 'options',
                         'OPTIONS remove-store' => 'options',
@@ -779,6 +806,7 @@ return [
                         'OPTIONS view-payment-methods/<id>' => 'options',
                         'OPTIONS view-shipping-methods' => 'options',
                         'OPTIONS create-tap-account/<id>' => 'options',
+                        'OPTIONS create-tap-queue/<id>' => 'options',
                         'OPTIONS enable-online-payment/<id>' => 'options',
                         'OPTIONS disable-online-payment/<id>' => 'options',
                         'OPTIONS enable-cod/<id>' => 'options',
@@ -819,12 +847,14 @@ return [
                    'patterns' => [
                        'GET callback' => 'callback',
                        'GET price' => 'price',
+                       'GET apple-pay-params/<id>' => "apple-pay-params",
                        'GET <id>' => 'view',
                        'POST confirm' => 'confirm',
                        'POST payment-webhook' => 'payment-webhook',
                        'PATCH payment-webhook' => 'payment-webhook',
                        // OPTIONS VERBS
-                       'OPTIONS <id>' => 'options'
+                       'OPTIONS <id>' => 'options',
+                       'OPTIONS apple-pay-params/<id>' => "options",
                    ]
                ],
                 [ // RestaurantPaymentMethod

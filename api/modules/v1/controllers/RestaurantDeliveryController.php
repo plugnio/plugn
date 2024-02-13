@@ -8,7 +8,7 @@ use yii\data\ActiveDataProvider;
 use common\models\City;
 use common\models\RestaurantDelivery;
 
-class RestaurantDeliveryController extends Controller {
+class RestaurantDeliveryController extends BaseController {
 
     public function behaviors() {
         $behaviors = parent::behaviors();

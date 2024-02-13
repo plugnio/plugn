@@ -7,7 +7,7 @@ use common\models\Blog;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
-class BlogController extends Controller
+class BlogController extends BaseController
 {
     public function behaviors() {
         $behaviors = parent::behaviors();

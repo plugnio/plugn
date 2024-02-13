@@ -1,6 +1,7 @@
 <?php 
 namespace common\components;
 
+use agent\models\AgentAssignment;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -104,8 +105,10 @@ class EventManager extends Component
             $ip = "192.168.0.1";
         }
 
-        if($this->_client)
+        if($this->_client) {
+            $this->_client->identify($id);
             $this->_client->people->set($id, $data, $ip, $ignore_time = false);
+        }
 
         if($this->segmentKey) {
             \Segment::identify([
@@ -123,15 +126,45 @@ class EventManager extends Component
      */
     public function track($event, $eventData, $timestamp = null, $storeId = null)
     {
+        if(!$storeId)
+            $storeId = Yii::$app->request->headers->get('Store-Id');
+
         $language = Yii::$app->language == "ar"? "ar": "en";
 
         $eventData = array_merge($eventData, [
             "company_id" => $storeId,
             "store_id" => $storeId,
             "language" => $language,
-            "channel" => "Backend",
             "do_not_disturb" => null,
         ]);
+
+        //if login
+
+        if(!Yii::$app->user->isGuest) {
+
+            //if agent login
+
+            if(isset(Yii::$app->user->identity->agent_name)) {
+
+                $assignment = AgentAssignment::find()
+                    ->andWhere(['restaurant_uuid' => $storeId, "agent_id" => Yii::$app->user->getId()])
+                    ->one();
+
+                if ($assignment)
+                    $eventData["role"] = $assignment->role;
+
+                $eventData["channel"] = "Dashboard Web App";
+            }
+            //if customer login
+            else if(isset(Yii::$app->user->identity->customer_id))
+            {
+                $eventData["channel"] = "Store Web App";
+            }
+        }
+
+        if(empty($eventData["channel"])) {
+            $eventData["channel"] = "Backend";
+        }
 
         //if login and userId not provided
 
@@ -143,6 +176,14 @@ class EventManager extends Component
             $userId = $storeId;
         } else {
             $userId = Yii::$app->user->getId();
+
+            /*if($this->_client) {
+                $this->_client->identify($userId);
+                $this->_client->people->set($userId, [
+                    'name' => trim(Yii::$app->user->identity->agent_name),
+                    'email' => Yii::$app->user->identity->agent_email,
+                ]);
+            }*/
         }
 
         if($this->_client) {
@@ -156,10 +197,14 @@ class EventManager extends Component
                 ], $eventData);
             }
 
-            if($userId)
+            if($userId) {
                 $mixpanelData['$distinct_id'] = $userId;
-
+                $mixpanelData['$user_id'] = $userId;
+            }
             $this->_client->track($event, $mixpanelData);
+
+            //to fix order
+            $this->_client->flush();
         }
         
         if($this->segmentKey) {
@@ -181,6 +226,8 @@ class EventManager extends Component
             }
 
             \Segment::track($data);
+
+            \Segment::flush();
         }
     }
 

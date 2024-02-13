@@ -10,7 +10,7 @@ use common\models\PaymentMethod;
 use api\models\Payment;
 use api\models\Restaurant;
 
-class PaymentController extends Controller {
+class PaymentController extends BaseController {
 
     public function behaviors() {
         $behaviors = parent::behaviors();

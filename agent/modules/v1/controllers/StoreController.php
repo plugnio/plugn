@@ -6,6 +6,7 @@ use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
 use common\models\RestaurantByCampaign;
+use common\models\RestaurantUpload;
 use common\models\Setting;
 use common\models\VendorCampaign;
 use Yii;
@@ -552,15 +553,28 @@ class StoreController extends BaseController
     }
 
     /**
-     * Create tap account
-     * @param type $id
+     * @param $id
      * @return array
+     * @throws NotFoundHttpException
      */
-    public function actionCreateTapAccount($id = null)
+    public function actionUpdateBusinessDetails($id = null)
     {
         $model = $this->findModel($id);
 
         $model->setScenario(Restaurant::SCENARIO_CREATE_TAP_ACCOUNT);
+
+        $model->owner_name_title = Yii::$app->request->getBodyParam('owner_name_title');
+        $model->owner_middle_name = Yii::$app->request->getBodyParam('owner_middle_name');
+        $model->owner_nationality = Yii::$app->request->getBodyParam('owner_nationality');
+        $model->owner_date_of_birth = Yii::$app->request->getBodyParam('owner_date_of_birth');
+
+        if($model->owner_date_of_birth) {
+            $model->owner_date_of_birth = date('Y-m-d', strtotime($model->owner_date_of_birth));
+        }
+
+        $model->tax_number = Yii::$app->request->getBodyParam('tax_number');
+        $model->swift_code = Yii::$app->request->getBodyParam('swift_code');
+        $model->account_number = Yii::$app->request->getBodyParam('account_number');
 
         $model->owner_first_name = Yii::$app->request->getBodyParam('owner_first_name');
         $model->owner_last_name = Yii::$app->request->getBodyParam('owner_last_name');
@@ -573,6 +587,26 @@ class StoreController extends BaseController
         $model->license_number = Yii::$app->request->getBodyParam('license_number');
         $model->iban = Yii::$app->request->getBodyParam('iban');
 
+        if ($model->country && $model->country->iso != 'KW') {
+            $model->business_type = 'corp';
+        }
+
+        if (!$model->save()) {
+            return self::message("error", $model->errors);
+        }
+
+        return self::message("success", "Business details updated successfully!");
+    }
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionUploadDocs($id = null)
+    {
+        $model = $this->findModel($id);
+
         //file urls
 
         $identification_file_front_side = Yii::$app->request->getBodyParam('identification_file_front_side');
@@ -581,18 +615,9 @@ class StoreController extends BaseController
         $authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
         $iban_certificate_file = Yii::$app->request->getBodyParam('iban_certificate_file');
 
-        if ($model->country && $model->country->iso != 'KW') {
-            $model->business_type = 'corp';
-        }
-
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
-
-            if (!$model->save()) {
-                $transaction->rollBack();
-                return self::message("error",$model->errors);
-            }
 
             /*-------- uploading documents-------*/
 
@@ -658,24 +683,14 @@ class StoreController extends BaseController
                 return self::message("error",$model->errors);
             }
 
-            /*-------- uploading documents-------*/
-
-            $payment_gateway_queue = new PaymentGatewayQueue;
-            $payment_gateway_queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
-            $payment_gateway_queue->restaurant_uuid = $model->restaurant_uuid;
-            $payment_gateway_queue->payment_gateway =  'tap';
-
-            if (!$payment_gateway_queue->save()) {
+            if (!$model->save()) {
                 $transaction->rollBack();
                 return self::message("error",$model->errors);
             }
 
-            $model->payment_gateway_queue_id = $payment_gateway_queue->payment_gateway_queue_id;
-            $model->save(false);
-
             $transaction->commit();
 
-            return self::message("success", "Your request has been successfully submitted");
+            return self::message("success", "Documents uploaded successfully!");
         }
         catch (\Exception $e)
         {
@@ -683,6 +698,72 @@ class StoreController extends BaseController
 
             return self::message("error",$e->getMessage());
         }
+    }
+
+    /**
+     * Create tap account
+     * @param type $id
+     * @return array
+     */
+    public function actionCreateTapAccount($id = null)
+    {
+        $response = $this->actionUpdateBusinessDetails($id);
+
+        if ($response['operation'] != "success") {
+            return $response;
+        }
+
+        $response = $this->actionUploadDocs($id);
+
+        if ($response['operation'] != "success") {
+            return $response;
+        }
+
+        $response = $this->actionCreateTapQueue($id);
+
+        if ($response['operation'] != "success") {
+            return $response;
+        }
+
+        return self::message("success", "Your request has been successfully submitted");
+    }
+
+    /**
+     * create tap queue
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionCreateTapQueue($id = null) {
+
+        $model = $this->findModel($id);
+
+        //check if already in Queue
+
+        $payment_gateway_queue = PaymentGatewayQueue::find()
+            ->andWhere(['restaurant_uuid' => $model->restaurant_uuid, "queue_status" => PaymentGatewayQueue::QUEUE_STATUS_PENDING])
+            ->one();
+
+        if($payment_gateway_queue) {
+            return self::message("success", "Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
+        }
+
+        $payment_gateway_queue = new PaymentGatewayQueue;
+        $payment_gateway_queue->queue_status = PaymentGatewayQueue::QUEUE_STATUS_PENDING;
+        $payment_gateway_queue->restaurant_uuid = $model->restaurant_uuid;
+        $payment_gateway_queue->payment_gateway =  'tap';
+
+        if (!$payment_gateway_queue->save()) {
+            return self::message("error", $model->errors);
+        }
+
+        $model->payment_gateway_queue_id = $payment_gateway_queue->payment_gateway_queue_id;
+
+        if(!$model->save(false)) {
+            return self::message("error", $model->errors);
+        }
+
+        return self::message("success", "Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
     }
 
     /**
@@ -720,7 +801,9 @@ class StoreController extends BaseController
             }
         }
 
-        $creditCard = $model->getRestaurantPaymentMethods()->where(['payment_method_id' => 2])->one();
+        $creditCard = $model->getRestaurantPaymentMethods()
+            ->where(['payment_method_id' => 2])
+            ->one();
 
         if (!$creditCard) {
 
@@ -745,6 +828,7 @@ class StoreController extends BaseController
         }
 
         $transaction->commit();
+
         return self::message("success","Online payments enabled successfully");
     }
 
@@ -969,7 +1053,7 @@ class StoreController extends BaseController
 
         $payment_method = $model->getRestaurantPaymentMethods()
             ->joinWith('paymentMethod')
-            ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPECODE_UPAYMENT])
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_UPAYMENT])
             ->exists();
 
         if ($payment_method) {
@@ -977,7 +1061,7 @@ class StoreController extends BaseController
         }
 
         $codPaymentMethod = PaymentMethod::find()
-            ->andWhere(['payment_method_code' => PaymentMethod::CODE_STRIPECODE_UPAYMENT])
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_UPAYMENT])
             ->one();
 
         if(!$codPaymentMethod) {
@@ -1089,6 +1173,53 @@ class StoreController extends BaseController
         }
 
         return self::message("success","Free checkout disabled successfully");
+    }
+
+    /**
+     * @return void
+     */
+    public function actionUploadAppleDomainAssociation()
+    {
+        $store = $this->findModel();
+
+        //apple domain association
+
+        $upload = $store->getRestaurantUploads()
+            ->andWhere(['filename' => "apple-developer-merchantid-domain-association"])
+            ->one();
+
+        if(!$upload)
+            $upload = new RestaurantUpload;
+
+        $upload->restaurant_uuid = $store->restaurant_uuid;
+        $upload->content = Yii::$app->request->getBodyParam("content");
+        $upload->path =  ".well-known";
+        $upload->filename = "apple-developer-merchantid-domain-association";
+        $upload->created_by = Yii::$app->user->getId();
+
+        if (!$upload->save()) {
+            return self::message("error", $upload->getErrors());
+        }
+
+        //add apple pay in store if not already
+
+        $paymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_APPLE_PAY])
+            ->one();
+
+        $rpm = new RestaurantPaymentMethod();
+        $rpm->restaurant_uuid = $store->restaurant_uuid;
+        $rpm->payment_method_id = $paymentMethod->payment_method_id;
+
+        if(!$rpm->save()) {
+            return self::message("error", $rpm->getErrors());
+        }
+
+        return [
+            "operation" => 'success',
+            "message" => "File uploaded.",
+            "restaurantUploads" => $store->getRestaurantUploads()->all()
+        ];
     }
 
     /**

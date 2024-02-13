@@ -3,13 +3,10 @@
 namespace api\modules\v2\controllers;
 
 use Yii;
-use common\models\Restaurant;
-use common\models\Voucher;
-use yii\data\ActiveDataProvider;
 use yii\rest\Controller;
-use yii\web\NotFoundHttpException;
 
-class VoucherController extends BaseController
+
+class BaseController extends Controller
 {
     public function behaviors()
     {
@@ -36,6 +33,14 @@ class VoucherController extends BaseController
             ],
         ];
 
+        // Bearer Auth checks for Authorize: Bearer <Token> header to login the user
+        $behaviors['authenticator'] = [
+            'class' => \yii\filters\auth\HttpBearerAuth::className(),
+        ];
+
+        // avoid authentication on CORS-pre-flight requests (HTTP OPTIONS method)
+        $behaviors['authenticator']['except'] = ['options'];
+
         return $behaviors;
     }
 
@@ -54,39 +59,24 @@ class VoucherController extends BaseController
         return $actions;
     }
 
-    public function actionList() {
-
-        $store = $this->findStore();
-
-        $query = $store->getVouchers()
-            ->orderBy('voucher_created_at DESC')
-            ->where([
-                'is_public' => 1,
-                'voucher_status' => Voucher::VOUCHER_STATUS_ACTIVE
-            ]);
-
-        return new ActiveDataProvider([
-            'query' => $query
-        ]);
-    }
-
     /**
-     * Finds the Restaurant model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param \yii\base\Action $action
+     * @return bool
+     * @throws \yii\web\BadRequestHttpException
      */
-    protected function findStore($id = null)
+    public function beforeAction($action)
     {
-        if(!$id)
-            $id = Yii::$app->request->getHeaders()->get('Store-Id');
-
-        $model = Restaurant::findOne($id);
-
-        if ($model !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested record does not exist.');
+        if(!parent::beforeAction($action)) {
+            return false;
         }
+
+        if(Yii::$app->user->identity) {
+            Yii::$app->eventManager->setUser(Yii::$app->user->getId(), [
+                'name' => trim(Yii::$app->user->identity->customer_name),
+                'email' => Yii::$app->user->identity->customer_email,
+            ]);
+        }
+
+        return true;
     }
 }

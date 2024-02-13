@@ -5,7 +5,7 @@ namespace agent\modules\v1\controllers;
 use Yii;
 use yii\rest\Controller;
 
-class PingController extends Controller
+class PingController extends BaseController
 {
     public function behaviors()
     {

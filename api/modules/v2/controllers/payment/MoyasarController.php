@@ -15,7 +15,7 @@ use yii\web\Cookie;
 use yii\web\NotFoundHttpException;
 
 
-class MoyasarController extends Controller
+class MoyasarController extends BaseController
 {
     public function behaviors()
     {
