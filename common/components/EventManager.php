@@ -126,8 +126,9 @@ class EventManager extends Component
      */
     public function track($event, $eventData, $timestamp = null, $storeId = null)
     {
-        if(!$storeId)
+        if(!$storeId && isset(Yii::$app->request) && Yii::$app->request instanceof \yii\web\Request) {
             $storeId = Yii::$app->request->headers->get('Store-Id');
+        }
 
         $language = Yii::$app->language == "ar"? "ar": "en";
 
@@ -140,7 +141,7 @@ class EventManager extends Component
 
         //if login
 
-        if(!Yii::$app->user->isGuest) {
+        if(isset(Yii::$app->user) && !Yii::$app->user->isGuest) {
 
             //if agent login
 
