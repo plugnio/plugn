@@ -190,7 +190,7 @@ class StoreController extends BaseController
                 return [
                     "operation" => "error",
                     "code" => 0,
-                    "message" => Yii::t('candidate', "Invalid captcha validation")
+                    "message" => Yii::t('agent', "Invalid captcha validation")
                 ];
             }
         }
