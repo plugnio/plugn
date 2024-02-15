@@ -707,6 +707,8 @@ class AuthController extends BaseController {
             } else if ($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED) {
                 $agent->sendVerificationEmail();
             }
+
+
         } else {
             $errorCode = 3;
             $errors['email'] = [Yii::t('agent', 'Account not found')];

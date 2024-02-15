@@ -124,8 +124,14 @@ class DeliveryZone extends \yii\db\ActiveRecord
                 ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
                 ->count();
 
-            if($count == 1 && !$this->businessLocation->support_pick_up) {
+            //&& !$this->businessLocation->support_pick_up
+            if($count == 1) {
                 Yii::$app->eventManager->track('Store Setup Step Complete', [
+                    'step_name' => "Shipping",
+                    'step_number' => 3
+                ], null, $this->restaurant_uuid);
+
+                Yii::$app->eventManager->track('Onboard Step Complete', [
                     'step_name' => "Shipping",
                     'step_number' => 3
                 ], null, $this->restaurant_uuid);

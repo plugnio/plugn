@@ -420,6 +420,11 @@ class Item extends \yii\db\ActiveRecord
                     'step_number' => 2
                 ], null, $this->restaurant_uuid);
 
+                Yii::$app->eventManager->track('Onboard Step Complete', [
+                    'step_name' => "Item Added",
+                    'step_number' => 2
+                ], null, $this->restaurant_uuid);
+
                 $this->restaurant->checkOnboardCompleted();
             }
 
