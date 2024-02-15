@@ -1108,7 +1108,6 @@ class Restaurant extends ActiveRecord
 
         if($itemCount > 0 && $pmCount > 0 && ($supportPickUp || $dzCount > 0)) {
             Yii::$app->eventManager->track('Onboard Complete', [
-                'step_name' => "Item Added",
             ], null, $this->restaurant_uuid);
         }
     }
@@ -2958,11 +2957,12 @@ class Restaurant extends ActiveRecord
                 "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign : null,
                 "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium : null,
                 "currency" => $this->currency? $this->currency->code: null,
-                "status" => $this->restaurant_status
+                "status" => "Open"
             ],
                 null,
                 $this->restaurant_uuid
             );
+        // $this->restaurant_status
 
             /**
              * Yii::$app->eventManager->track('Agent Signup', [

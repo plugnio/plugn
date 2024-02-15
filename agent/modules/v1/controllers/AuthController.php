@@ -497,6 +497,8 @@ class AuthController extends BaseController {
                 "country" => $store->country ? $store->country->country_name : null,
                 "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
                 "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
+                "profile_status" => "Active",
+                "user_id" => $agent->agent_id
             ]);
 
             if (!$store->save()) {
