@@ -206,6 +206,18 @@ class ItemVariant extends \yii\db\ActiveRecord
             ['item_variant_uuid' => $this->item_variant_uuid],
             ['NOT IN', 'item_variant_image_uuid', $itemVariantImageIds]
         ]);
+
+        //if stock_qty changed
+
+        if(!$insert && isset($changedAttributes['stock_qty']))  {
+            Yii::$app->eventManager->track('Inventory Updated', [
+                'product_id' => $this->item_uuid,
+                'item_variant_uuid' => $this->item_variant_uuid,
+                'item_uuid' => $this->item_uuid,
+                'previous_stock' => $changedAttributes['stock_qty'],
+                'updated_stock' => $this->stock_qty
+            ], null, $this->item->restaurant_uuid);
+        }
     }
 
     /**

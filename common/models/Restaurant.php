@@ -961,8 +961,8 @@ class Restaurant extends ActiveRecord
             ->one();
 
         if ($restaurantDomain && date("Y-m-d", strtotime($restaurantDomain->created_at)) == date("Y-m-d")) {
-            $this->addError($attribute, 'You can not update domain more than twice in single day');
-            return false;
+        //    $this->addError($attribute, 'You can not update domain more than twice in single day');
+        //    return false;
         }
 
         return true;
@@ -986,7 +986,6 @@ class Restaurant extends ActiveRecord
      */
     public function notifyDomainRequest($old_domain)
     {
-
         $model = new RestaurantDomainRequest;
         $model->restaurant_uuid = $this->restaurant_uuid;
         $model->created_by = Yii::$app->user->getId();
@@ -1032,8 +1031,23 @@ class Restaurant extends ActiveRecord
         ];
     }
 
+    /**
+     * @param $old_domain
+     * @return array
+     */
     public function notifyDomainUpdated($old_domain)
     {
+        if(!str_contains($this->restaurant_domain, '.plugn.')) {
+            Yii::$app->eventManager->track('Custom Domain Activated', [
+                    "old_domain" => $old_domain,
+                    "custom_domain" => $this->restaurant_domain,
+                    "domain_requested" => $this->restaurant_domain,
+                    "store_custom_domain" => $this->restaurant_domain,
+                ],
+                null,
+                $this->restaurant_uuid
+            );
+        }
 
         $model = new RestaurantDomainRequest;
         $model->restaurant_uuid = $this->restaurant_uuid;

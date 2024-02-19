@@ -212,7 +212,7 @@ class EventManager extends Component
                 if(empty($mixpanelData['$distinct_id'])) {
                     $mixpanelData['$distinct_id'] = $userId;
                 }
-            } else {
+            } else if (isset($mixpanelData['$distinct_id'])) {
                 $mixpanelData['$user_id'] = $mixpanelData['$distinct_id'];
             }
 
