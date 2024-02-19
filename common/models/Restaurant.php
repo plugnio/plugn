@@ -1498,7 +1498,7 @@ class Restaurant extends ActiveRecord
 
     public function createBusiness()
     {
-        $businessApiResponse = Yii::$app->tapPayments->createBussiness($this);
+        $businessApiResponse = Yii::$app->tapPayments->createBusiness($this);
 
         //&& isset($businessApiResponse->data['entity']['operator'])
         if ($businessApiResponse->isOk) {
