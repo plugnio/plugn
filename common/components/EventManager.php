@@ -218,7 +218,8 @@ class EventManager extends Component
 
             //to fix: not showing in listing but in detail view in mixpanel
 
-            $mixpanelData['distinct_id'] = $mixpanelData['$distinct_id'];
+            if(isset($mixpanelData['$distinct_id']))
+                $mixpanelData['distinct_id'] = $mixpanelData['$distinct_id'];
 
             $this->_client->track($event, $mixpanelData);
 
