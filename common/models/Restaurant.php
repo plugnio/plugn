@@ -2346,7 +2346,7 @@ class Restaurant extends ActiveRecord
 
     public function pollTapBusinessStatus()
     {
-        $businessApiResponse = Yii::$app->tapPayments->getBussiness($this);
+        $businessApiResponse = Yii::$app->tapPayments->getBusiness($this);
 
         if ($businessApiResponse->isOk && $businessApiResponse->data['status'] === 'Active') {
 
