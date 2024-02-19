@@ -253,12 +253,12 @@ class TapPayments extends Component
                     "type" => $restaurant->license_type,
                     "number" => $restaurant->license_number,
                 ],
-                "not_for_profit" => (bool) $restaurant->not_for_profit,
+               //"not_for_profit" => (bool) $restaurant->not_for_profit,
             ],
             "contact_person" => [
                 "nationality" => $restaurant->owner_nationality,
                 "date_of_birth" =>$restaurant->owner_date_of_birth? date('Y-m-d', strtotime($restaurant->owner_date_of_birth)): null,
-                "is_authorized" => true,
+                //"is_authorized" => true,
                 "name" => [
                     "title" => $restaurant->owner_name_title,
                     "first" => $restaurant->owner_first_name,
