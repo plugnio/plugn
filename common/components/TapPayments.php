@@ -332,7 +332,8 @@ class TapPayments extends Component
             ]
         ];
 
-        $restaurant_billing_address = $restaurant->getRestaurantBillingAddress->one();
+        $restaurant_billing_address = $restaurant->getRestaurantBillingAddress()
+            ->one();
 
         if ($restaurant_billing_address) {
             $businessParams["billing_address"] = [
