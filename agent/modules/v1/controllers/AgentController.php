@@ -126,6 +126,16 @@ class AgentController extends BaseController
             $message = Yii::t('agent', "Please click on the link sent to you by email to verify your account");
         }
 
+        $restaurantUuid = Yii::$app->request->headers->get('Store-Id');
+
+        Yii::$app->eventManager->track('Profile Updated', [
+            "email_notification" => $model->email_notification,
+            "reminder_email_order_acceptance" => $model->reminder_email,
+            "weekly_stats_email" => $model->receive_weekly_stats,
+            "user_name" => $model->agent_name,
+            "email" => $model->agent_email
+        ], null, $restaurantUuid);
+
         return [
             'model' => $model,
             "operation" => "success",

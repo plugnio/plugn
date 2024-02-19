@@ -1098,15 +1098,17 @@ class Restaurant extends ActiveRecord
             ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
             ->count();*/
 
-        $supportPickUp = BusinessLocation::find()
+        /*$supportPickUp = BusinessLocation::find()
             ->andWhere(['restaurant_uuid' => $this->restaurant_uuid, 'support_pick_up' => 1])
-            ->count();
+            ->count();*/
 
         $dzCount = DeliveryZone::find()
             ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
             ->count();
 
-        if($itemCount > 0 && $pmCount > 0 && ($supportPickUp || $dzCount > 0)) {
+        //$supportPickUp
+
+        if($itemCount > 0 && $pmCount > 0 && $dzCount > 0) {
             Yii::$app->eventManager->track('Onboard Complete', [
             ], null, $this->restaurant_uuid);
 
@@ -2892,6 +2894,17 @@ class Restaurant extends ActiveRecord
             null,
             $this->restaurant_uuid
         );
+
+        Yii::$app->eventManager->track('Store Setup Step Complete', [
+            'step_name' => "Website Design",
+            'step_number' => 1
+        ], null, $this->restaurant_uuid);
+
+        Yii::$app->eventManager->track('Onboard Step Complete', [
+            'step_name' => "Website Design",
+            'step_number' => 3
+        ], null, $this->restaurant_uuid);
+
 
         //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
 

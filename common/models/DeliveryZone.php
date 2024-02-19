@@ -133,7 +133,7 @@ class DeliveryZone extends \yii\db\ActiveRecord
 
                 Yii::$app->eventManager->track('Onboard Step Complete', [
                     'step_name' => "Shipping",
-                    'step_number' => 3
+                    'step_number' => 5
                 ], null, $this->restaurant_uuid);
 
                 $this->restaurant->checkOnboardCompleted();

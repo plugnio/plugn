@@ -136,9 +136,9 @@ class RestaurantPaymentMethod extends \yii\db\ActiveRecord {
                     'step_number' => 4
                 ], null, $this->restaurant_uuid);
 
-                Yii::$app->eventManager->track('Payment Method Added', [
+                Yii::$app->eventManager->track('Onboard Step Complete', [
                     'step_name' => "Payment Method Added",
-                    'step_number' => 4
+                    'step_number' => 6
                 ], null, $this->restaurant_uuid);
 
                 $this->restaurant->checkOnboardCompleted();

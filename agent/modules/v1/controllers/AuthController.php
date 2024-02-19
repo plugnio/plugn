@@ -42,7 +42,8 @@ class AuthController extends BaseController {
                     'X-Pagination-Per-Page',
                     'X-Pagination-Total-Count',
                     'X-Error-Email',
-                    'X-Error-Password'
+                    'X-Error-Password',
+                    'Mixpanel-Distinct-ID'
                 ],
             ],
         ];
