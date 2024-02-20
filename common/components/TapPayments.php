@@ -228,6 +228,12 @@ class TapPayments extends Component
     {
         $businessEndpoint = $this->apiEndpoint . "/business";
 
+        // Split the email address into username and domain parts
+        $emailParts = explode('@', $restaurant->owner_email);
+        //list($username, $domain) = explode('@', $restaurant->owner_email);
+
+        $email = $emailParts[0] . '+' . date('Y-m-d H:m:s') . '@' . $emailParts[1];
+
         $businessParams = [
             "name" => [
                 "en" => $restaurant->company_name. ' - Plugn @'. date('Y-m-d H:m:s'),
@@ -283,7 +289,7 @@ class TapPayments extends Component
                 ],
                 "contact_info" => [
                     "primary" => [
-                        "email" => $restaurant->owner_email,
+                        "email" => $email,// $restaurant->owner_email,
                         "phone" => [
                             "country_code" => $restaurant->owner_phone_country_code,
                             "number" => str_replace(' ','',(str_replace('+'.$restaurant->owner_phone_country_code, '',$restaurant->owner_number)))
