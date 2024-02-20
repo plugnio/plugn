@@ -1,8 +1,8 @@
-<?php
+\<?php
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use common\models\Restaurant;
+use common\models\PaymentGatewayQueue;
 use yii\helpers\ArrayHelper;
 use kartik\select2\Select2;
 
@@ -40,11 +40,14 @@ use kartik\select2\Select2;
         ]);
    ?>
 
-    <?= $form->field($model, 'queue_status')->textInput() ?>
-
-    <?= $form->field($model, 'queue_start_at')->textInput() ?>
-
-    <?= $form->field($model, 'queue_end_at')->textInput() ?>
+    <?= $form->field($model, 'queue_status')->dropDownList(
+        [
+            PaymentGatewayQueue:: QUEUE_STATUS_PENDING => 'Pending',
+            PaymentGatewayQueue:: QUEUE_STATUS_CREATING => 'Creating',
+            PaymentGatewayQueue:: QUEUE_STATUS_COMPLETE => 'Complete',
+            PaymentGatewayQueue:: QUEUE_STATUS_FAILED => 'Failed'
+        ]
+    ); ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
