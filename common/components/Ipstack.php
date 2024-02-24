@@ -50,7 +50,13 @@ class Ipstack {
             return false;
         }
 
-        $result = \GuzzleHttp\json_decode($responseObj->getBody()->getContents());
+        $result = null;
+
+        try {
+            $result = \GuzzleHttp\json_decode($responseObj->getBody()->getContents());
+        }catch (\Exception $e) {
+            return null;
+        }
 
         if($populateData) {
 
