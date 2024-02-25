@@ -11,7 +11,7 @@ use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\web\Cookie;
 use yii\web\NotFoundHttpException;
-
+use api\modules\v2\controllers\BaseController;
 
 class StripeController extends BaseController
 {

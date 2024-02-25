@@ -10,6 +10,8 @@ use common\models\Setting;
 use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
+use api\modules\v2\controllers\BaseController;
+
 
 class UpaymentController extends BaseController
 {

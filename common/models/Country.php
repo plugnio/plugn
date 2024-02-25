@@ -12,6 +12,7 @@ use yii\db\Expression;
  * @property string|null $country_name
  * @property string|null $country_name_ar
  * @property string|null $iso
+ * @property string|null $currency_code
  * @property string|null $emoji
  * @property int|null $country_code
 
@@ -21,6 +22,7 @@ use yii\db\Expression;
  * @property PaymentMethod[] $paymentMethods
  * @property DeliveryZone[] $deliveryZones
  * @property Restaurant[] $restaurants
+ * @property Currency $currency
  */
 class Country extends \yii\db\ActiveRecord
 {
@@ -40,6 +42,7 @@ class Country extends \yii\db\ActiveRecord
         return [
             [['country_name'], 'required'],
             [['country_code'], 'integer'],
+            [['currency_code'], 'string', "max" => 3],
             [['country_name','country_name_ar'], 'string', 'max' => 80],
             [['iso'], 'string', 'max' => 2],
             [['emoji'], 'safe'],
@@ -57,9 +60,15 @@ class Country extends \yii\db\ActiveRecord
             'iso' => Yii::t('app','Iso'),
             'emoji' => Yii::t('app','Emoji'),
             'country_code' => Yii::t('app','Country Code'),
+            "currency_code" => Yii::t('app','Currency Code'),
         ];
     }
 
+    /**
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
+     */
     public function getCashOrderTotal() {
 
         $paymentMethod = PaymentMethod::find()
@@ -87,6 +96,11 @@ class Country extends \yii\db\ActiveRecord
         }, $cacheDuration, $cacheDependency);
     }
 
+    /**
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
+     */
     public function getCSV() {
 
         $cacheDuration = 60 * 60 * 24 * 7;// 7 day then delete from cache
@@ -204,6 +218,15 @@ class Country extends \yii\db\ActiveRecord
     public function getRestaurants($modelClass = "\common\models\Restaurant")
     {
         return $this->hasMany($modelClass::className(), ['country_id' => 'country_id']);
+    }
+
+    /**
+     * @param $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCurrency($modelClass = "\common\models\Currency")
+    {
+        return $this->hasOne($modelClass::className(), ['code' => 'currency_code']);
     }
 
     /**

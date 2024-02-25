@@ -228,6 +228,12 @@ class TapPayments extends Component
     {
         $businessEndpoint = $this->apiEndpoint . "/business";
 
+        // Split the email address into username and domain parts
+        $emailParts = explode('@', $restaurant->owner_email);
+        //list($username, $domain) = explode('@', $restaurant->owner_email);
+
+        $email = $emailParts[0] . '+' . date('Y-m-d H:m:s') . '@' . $emailParts[1];
+
         $businessParams = [
             "name" => [
                 "en" => $restaurant->company_name. ' - Plugn @'. date('Y-m-d H:m:s'),
@@ -253,12 +259,12 @@ class TapPayments extends Component
                     "type" => $restaurant->license_type,
                     "number" => $restaurant->license_number,
                 ],
-                "not_for_profit" => (bool) $restaurant->not_for_profit,
+               //"not_for_profit" => (bool) $restaurant->not_for_profit,
             ],
             "contact_person" => [
                 "nationality" => $restaurant->owner_nationality,
                 "date_of_birth" =>$restaurant->owner_date_of_birth? date('Y-m-d', strtotime($restaurant->owner_date_of_birth)): null,
-                "is_authorized" => true,
+                //"is_authorized" => true,
                 "name" => [
                     "title" => $restaurant->owner_name_title,
                     "first" => $restaurant->owner_first_name,
@@ -283,7 +289,7 @@ class TapPayments extends Component
                 ],
                 "contact_info" => [
                     "primary" => [
-                        "email" => $restaurant->owner_email,
+                        "email" => $email,// $restaurant->owner_email,
                         "phone" => [
                             "country_code" => $restaurant->owner_phone_country_code,
                             "number" => str_replace(' ','',(str_replace('+'.$restaurant->owner_phone_country_code, '',$restaurant->owner_number)))
@@ -332,7 +338,8 @@ class TapPayments extends Component
             ]
         ];
 
-        $restaurant_billing_address = $restaurant->getRestaurantBillingAddress->one();
+        $restaurant_billing_address = $restaurant->getRestaurantBillingAddress()
+            ->one();
 
         if ($restaurant_billing_address) {
             $businessParams["billing_address"] = [
