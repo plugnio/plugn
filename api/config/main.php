@@ -246,6 +246,7 @@ return [
                         'GET locations/<id>' => 'list-all-stores-locations',
                         'GET get-restaurant-data/<branch_name>' => 'get-restaurant-data',
                         'GET by-domain/<domain>' => 'by-domain',
+                        'GET manifest-by-domain/<domain>' => 'manifest-by-domain',
                         'GET <id>' => 'view',
                         'POST get-delivery-time' => 'get-delivery-time',
                         // OPTIONS VERBS
@@ -255,6 +256,7 @@ return [
                         'OPTIONS get-restaurant-data/<branch_name>' => 'options',
                         'OPTIONS by-domain/<domain>' => 'options',
                         'OPTIONS <id>' => 'options',
+                        'OPTIONS manifest-by-domain/<domain>' => 'options',
                         'OPTIONS' => 'options',
                     ]
                 ],

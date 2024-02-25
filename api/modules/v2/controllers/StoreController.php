@@ -11,6 +11,7 @@ use common\models\OpeningHour;
 use api\models\BusinessLocation;
 use common\models\DeliveryZone;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 
 class StoreController extends BaseController
@@ -104,9 +105,71 @@ class StoreController extends BaseController
         return $store;
     }
 
+    /**
+     * @param $domain
+     * @return \common\models\Restaurant
+     * @throws NotFoundHttpException
+     */
     public function actionByDomain($domain)
     {
         return $this->findByDomain($domain);
+    }
+
+    /**
+     * @param $domain
+     * @return void
+     * @throws NotFoundHttpException
+     */
+    public function actionManifestByDomain($domain)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        $store = $this->findByDomain($domain);
+
+        if(!$store->logo || !$store->restaurantTheme) {
+            return [];//todo: show 404?
+        }
+
+        $theme = $store->restaurantTheme;
+
+        $url192 = 'https://res.cloudinary.com/plugn/image/upload/c_scale,f_jpg,q_100,w_192,h_192/restaurants/'
+            . $store->restaurant_uuid . '/logo/' . $store->logo;
+
+        $url512 = 'https://res.cloudinary.com/plugn/image/upload/c_scale,f_jpg,q_100,w_512,h_512/restaurants/'
+            . $store->restaurant_uuid . '/logo/' . $store->logo;
+
+        return [
+            "name" => $store->name,
+            "short_name" => $store->name,
+            "theme_color" => $theme ? $theme->primary: "#4DBA87",
+            "icons" => [
+                [
+                    "src" => $url192,
+                    "sizes"=> "192x192",
+                    //"type"=> "image/png"
+                ],
+                [
+                    "src"=> $url512,
+                    "sizes"=> "512x512",
+                    //"type"=> "image/png"
+                ],
+                [
+                    "src"=> $url192,
+                    "sizes"=> "192x192",
+                    //"type"=> "image/png",
+                    "purpose"=> "maskable"
+                ],
+                [
+                    "src"=> $url512,
+                    "sizes"=> "512x512",
+                    //"type"=> "image/png",
+                    "purpose"=> "maskable"
+                ]
+            ],
+            "start_url"=> ".",
+            "display"=> "standalone",
+            "background_color"=> $theme ? $theme->dark: "#000000"
+        ];
     }
 
     /**

@@ -1032,9 +1032,12 @@ class Restaurant extends ActiveRecord
         ];
     }
 
+    /**
+     * @param $old_domain
+     * @return array
+     */
     public function notifyDomainUpdated($old_domain)
     {
-
         $model = new RestaurantDomainRequest;
         $model->restaurant_uuid = $this->restaurant_uuid;
         $model->created_by = Yii::$app->user->getId();
