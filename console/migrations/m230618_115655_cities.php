@@ -13,6 +13,8 @@ class m230618_115655_cities extends Migration
      */
     public function safeUp()
     {
+        $this->addColumn("country", "currency_code", $this->char(3));
+
         $this->addColumn('city', 'state_id', $this->integer(11)->after('city_id'));
 
         $this->createIndex(

@@ -12,7 +12,14 @@ class m240225_062220_country_currency_code extends Migration
      */
     public function safeUp()
     {
-        //$this->addColumn("country", "currency_code", $this->char(3));
+        $table = $this
+            ->getDb()
+            ->getSchema()
+            ->getTableSchema('country');
+
+        if (!isset($table->columns['currency_symbol'])) {
+            $this->addColumn("country", "currency_code", $this->char(3));
+        }
 
         $countryToCurrency = json_decode('{
   "AF": "AFN",
