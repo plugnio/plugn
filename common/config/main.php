@@ -64,7 +64,8 @@ return [
         ],
         'ipstack' => [
             'class' => 'common\components\Ipstack',
-            'accessKey' => 'fac3c2117d877e078e3e8fa7839d8204'
+            'accessKey' => '198d3167a0e7db'
+            //fac3c2117d877e078e3e8fa7839d8204
         ],
         'reCaptcha' => [
             'class' => 'common\components\ReCaptcha',
