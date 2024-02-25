@@ -17,7 +17,7 @@ class m240225_062220_country_currency_code extends Migration
             ->getSchema()
             ->getTableSchema('country');
 
-        if (!isset($table->columns['currency_symbol'])) {
+        if (!isset($table->columns['currency_code'])) {
             $this->addColumn("country", "currency_code", $this->char(3));
         }
 
