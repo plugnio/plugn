@@ -123,7 +123,7 @@ class StoreController extends BaseController
     public function actionManifestByDomain($domain)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        
+
         $store = $this->findByDomain($domain);
 
         if(!$store->logo || !$store->restaurantTheme) {
@@ -166,7 +166,7 @@ class StoreController extends BaseController
                     "purpose"=> "maskable"
                 ]
             ],
-            "start_url"=> ".",
+            "start_url"=> $store->restaurant_domain,
             "display"=> "standalone",
             "background_color"=> $theme ? $theme->dark: "#000000"
         ];
