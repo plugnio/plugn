@@ -1432,8 +1432,9 @@ class StoreController extends BaseController
             $props["integrations_enabled"] = [];
 
             foreach ($props as $key => $prop) {
-                if($key) {
-                    $props["integrations_enabled"][] = explode("_", $key)[0];
+                if($prop) {
+                    $props["integrations_enabled"][] = str_replace(["_id", "_"], ["", " "], $key);
+                        //explode("_", $key)[0];
                 }
             }
 
