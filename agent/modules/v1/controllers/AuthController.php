@@ -42,7 +42,8 @@ class AuthController extends BaseController {
                     'X-Pagination-Per-Page',
                     'X-Pagination-Total-Count',
                     'X-Error-Email',
-                    'X-Error-Password'
+                    'X-Error-Password',
+                    'Mixpanel-Distinct-ID'
                 ],
             ],
         ];
@@ -497,6 +498,8 @@ class AuthController extends BaseController {
                 "country" => $store->country ? $store->country->country_name : null,
                 "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
                 "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
+                "profile_status" => "Active",
+                "user_id" => $agent->agent_id
             ]);
 
             if (!$store->save()) {
@@ -705,6 +708,8 @@ class AuthController extends BaseController {
             } else if ($agent->agent_email_verification == Agent::EMAIL_NOT_VERIFIED) {
                 $agent->sendVerificationEmail();
             }
+
+
         } else {
             $errorCode = 3;
             $errors['email'] = [Yii::t('agent', 'Account not found')];

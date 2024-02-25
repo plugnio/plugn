@@ -129,6 +129,8 @@ class RestaurantDomainRequest extends \yii\db\ActiveRecord
         if (!$insert && isset($changedAttributes['status']) && $this->status == self::STATUS_ASSIGNED) {
             $this->restaurant->restaurant_domain = $this->domain;
             $this->restaurant->save(false);
+
+            $this->restaurant->notifyDomainUpdated();
         }
 
         return true;

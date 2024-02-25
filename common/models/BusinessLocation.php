@@ -143,7 +143,7 @@ class BusinessLocation extends \yii\db\ActiveRecord
 
             //if first business location
 
-            $count  = self::find()
+            /*$count  = self::find()
                 ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
                 ->count();
 
@@ -153,8 +153,13 @@ class BusinessLocation extends \yii\db\ActiveRecord
                     'step_number' => 3
                 ], null, $this->restaurant_uuid);
 
+                Yii::$app->eventManager->track('Onboard Step Complete', [
+                    'step_name' => "Shipping",
+                    'step_number' => 3
+                ], null, $this->restaurant_uuid);
+
                 $this->restaurant->checkOnboardCompleted();
-            }
+            }*/
         }
     }
 

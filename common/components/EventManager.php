@@ -2,6 +2,7 @@
 namespace common\components;
 
 use agent\models\AgentAssignment;
+use Mpdf\Tag\P;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -126,6 +127,8 @@ class EventManager extends Component
      */
     public function track($event, $eventData, $timestamp = null, $storeId = null)
     {
+        $distinctID = Yii::$app->request->headers->get('Mixpanel-Distinct-ID');
+
         if(!$storeId && isset(Yii::$app->request) && Yii::$app->request instanceof \yii\web\Request) {
             $storeId = Yii::$app->request->headers->get('Store-Id');
         }
@@ -198,10 +201,26 @@ class EventManager extends Component
                 ], $eventData);
             }
 
-            if($userId) {
-                $mixpanelData['$distinct_id'] = $userId;
-                $mixpanelData['$user_id'] = $userId;
+            if($distinctID) {
+                $mixpanelData['$distinct_id'] = $distinctID;
             }
+
+            if($userId) {
+                $mixpanelData['$user_id'] = $userId;
+                $mixpanelData['user_id'] = $userId;
+
+                if(empty($mixpanelData['$distinct_id'])) {
+                    $mixpanelData['$distinct_id'] = $userId;
+                }
+            } else if (isset($mixpanelData['$distinct_id'])) {
+                $mixpanelData['$user_id'] = $mixpanelData['$distinct_id'];
+            }
+
+            //to fix: not showing in listing but in detail view in mixpanel
+
+            if(isset($mixpanelData['$distinct_id']))
+                $mixpanelData['distinct_id'] = $mixpanelData['$distinct_id'];
+
             $this->_client->track($event, $mixpanelData);
 
             //to fix order

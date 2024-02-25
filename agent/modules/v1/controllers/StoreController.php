@@ -287,7 +287,10 @@ class StoreController extends BaseController
 
     /**
      * Displays  Real time orders
-     *
+     * scenarios
+     * 1) custom domain + purchase
+     * 2) custom domain + request to purchase on behalf of client
+     * 3) plugn sub domain
      * @return mixed
      */
     public function actionConnectDomain()
@@ -315,15 +318,15 @@ class StoreController extends BaseController
 
         //todo: response validation
 
-        if($purchase) {//&& strpos($domain, '.plugn.') == -1
+        if($purchase) {// && strpos($domain, '.plugn.') == -1
 
-                Yii::$app->eventManager->track('Domain Requests', [
+             Yii::$app->eventManager->track('Domain Requests', [
                         "domain" =>  $domain
                     ],
                     null,
                     $store->restaurant_uuid);
  
-            return $store->notifyDomainRequest($old_domain);
+             return $store->notifyDomainRequest($old_domain);
         }
 
         return $store->notifyDomainUpdated($old_domain);
@@ -379,6 +382,12 @@ class StoreController extends BaseController
         Setting::setConfig($model->restaurant_uuid,'mail', 'password', $password);
         Setting::setConfig($model->restaurant_uuid,'mail', 'port', $port);
         Setting::setConfig($model->restaurant_uuid,'mail', 'encryption', $encryption);
+
+        Yii::$app->eventManager->track('Email Configuration Added', [
+            "smtp" => $host,
+            "port" => $port,
+            "encryption" => $encryption
+        ], null, $model->restaurant_uuid);
 
         return self::message("success",'Mail settings updated successfully');
     }
@@ -1423,8 +1432,9 @@ class StoreController extends BaseController
             $props["integrations_enabled"] = [];
 
             foreach ($props as $key => $prop) {
-                if($key) {
-                    $props["integrations_enabled"][] = explode("_", $key)[0];
+                if($prop) {
+                    $props["integrations_enabled"][] = str_replace(["_id", "_"], ["", " "], $key);
+                        //explode("_", $key)[0];
                 }
             }
 

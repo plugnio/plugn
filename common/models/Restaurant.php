@@ -961,8 +961,8 @@ class Restaurant extends ActiveRecord
             ->one();
 
         if ($restaurantDomain && date("Y-m-d", strtotime($restaurantDomain->created_at)) == date("Y-m-d")) {
-            $this->addError($attribute, 'You can not update domain more than twice in single day');
-            return false;
+        //    $this->addError($attribute, 'You can not update domain more than twice in single day');
+        //    return false;
         }
 
         return true;
@@ -986,7 +986,6 @@ class Restaurant extends ActiveRecord
      */
     public function notifyDomainRequest($old_domain)
     {
-
         $model = new RestaurantDomainRequest;
         $model->restaurant_uuid = $this->restaurant_uuid;
         $model->created_by = Yii::$app->user->getId();
@@ -1038,6 +1037,20 @@ class Restaurant extends ActiveRecord
      */
     public function notifyDomainUpdated($old_domain)
     {
+
+        if(!str_contains($this->restaurant_domain, '.plugn.')) {
+            Yii::$app->eventManager->track('Custom Domain Activated', [
+                    "old_domain" => $old_domain,
+                    "custom_domain" => $this->restaurant_domain,
+                    "domain_requested" => $this->restaurant_domain,
+                    "store_custom_domain" => $this->restaurant_domain,
+                ],
+                null,
+                $this->restaurant_uuid
+            );
+        }
+
+
         $model = new RestaurantDomainRequest;
         $model->restaurant_uuid = $this->restaurant_uuid;
         $model->created_by = Yii::$app->user->getId();
@@ -1101,17 +1114,21 @@ class Restaurant extends ActiveRecord
             ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
             ->count();*/
 
-        $supportPickUp = BusinessLocation::find()
+        /*$supportPickUp = BusinessLocation::find()
             ->andWhere(['restaurant_uuid' => $this->restaurant_uuid, 'support_pick_up' => 1])
-            ->count();
+            ->count();*/
 
         $dzCount = DeliveryZone::find()
             ->andWhere(['restaurant_uuid' => $this->restaurant_uuid])
             ->count();
 
-        if($itemCount > 0 && $pmCount > 0 && ($supportPickUp || $dzCount > 0)) {
+        //$supportPickUp
+
+        if($itemCount > 0 && $pmCount > 0 && $dzCount > 0) {
             Yii::$app->eventManager->track('Onboard Complete', [
-                'step_name' => "Item Added",
+            ], null, $this->restaurant_uuid);
+
+            Yii::$app->eventManager->track('Store Setup Completed', [
             ], null, $this->restaurant_uuid);
         }
     }
@@ -2872,6 +2889,39 @@ class Restaurant extends ActiveRecord
 
     public function setupStore($agent)
     {
+        $full_name = explode(' ', $agent->agent_name);
+        $firstname = $full_name[0];
+        $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
+
+        Yii::$app->eventManager->track('Store Created', [
+            "restaurant_uuid" => $this->restaurant_uuid,
+            'first_name' => trim($firstname),
+            'last_name' => trim($lastname),
+            'store_name' => $this->name,
+            'phone_number' => $this->owner_phone_country_code . $this->owner_number,
+            'email' => $agent->agent_email,
+            'store_url' => $this->restaurant_domain,
+            "country" => $this->country ? $this->country->country_name : null,
+            "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign : null,
+            "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium : null,
+            "currency" => $this->currency? $this->currency->code: null,
+            "status" => "Open"
+        ],
+            null,
+            $this->restaurant_uuid
+        );
+
+        Yii::$app->eventManager->track('Store Setup Step Complete', [
+            'step_name' => "Website Design",
+            'step_number' => 1
+        ], null, $this->restaurant_uuid);
+
+        Yii::$app->eventManager->track('Onboard Step Complete', [
+            'step_name' => "Website Design",
+            'step_number' => 3
+        ], null, $this->restaurant_uuid);
+
+
         //Create a catrgory for a store by default named "Products". so they can get started adding products without having to add category first
 
         $category = new Category();
@@ -2945,27 +2995,7 @@ class Restaurant extends ActiveRecord
 
         Yii::info("[New Store Signup] " . $this->name . " has just joined Plugn", __METHOD__);
 
-            $full_name = explode(' ', $agent->agent_name);
-            $firstname = $full_name[0];
-            $lastname = array_key_exists(1, $full_name) ? $full_name[1] : null;
-
-            Yii::$app->eventManager->track('Store Created', [
-                "restaurant_uuid" => $this->restaurant_uuid,
-                'first_name' => trim($firstname),
-                'last_name' => trim($lastname),
-                'store_name' => $this->name,
-                'phone_number' => $this->owner_phone_country_code . $this->owner_number,
-                'email' => $agent->agent_email,
-                'store_url' => $this->restaurant_domain,
-                "country" => $this->country ? $this->country->country_name : null,
-                "campaign" => $this->sourceCampaign ? $this->sourceCampaign->utm_campaign : null,
-                "utm_medium" => $this->sourceCampaign ? $this->sourceCampaign->utm_medium : null,
-                "currency" => $this->currency? $this->currency->code: null,
-                "status" => $this->restaurant_status
-            ],
-                null,
-                $this->restaurant_uuid
-            );
+        // $this->restaurant_status
 
             /**
              * Yii::$app->eventManager->track('Agent Signup', [

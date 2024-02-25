@@ -31,7 +31,8 @@ class ItemController extends BaseController {
                     'X-Pagination-Current-Page',
                     'X-Pagination-Page-Count',
                     'X-Pagination-Per-Page',
-                    'X-Pagination-Total-Count'
+                    'X-Pagination-Total-Count',
+                    'Mixpanel-Distinct-ID'
                 ],
             ],
         ];

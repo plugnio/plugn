@@ -15,8 +15,9 @@ class EventManager extends \common\components\EventManager
      */
     public function track($event, $eventData, $timestamp = null, $store_id = null)
     {
-        if(!$store_id)
+        if(!$store_id) {
             $store_id = Yii::$app->request->headers->get('Store-Id');
+        }
 
         $eventData["channel"] = "Store Web App";
 

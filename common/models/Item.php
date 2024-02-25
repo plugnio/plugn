@@ -353,8 +353,21 @@ class Item extends \yii\db\ActiveRecord
 
         //not firing on insert as it will not have all data yet
 
-        if (!$insert && $this->scenario != self::SCENARIO_UPDATE_STOCK) {
+        if (!$insert && $this->scenario == self::SCENARIO_UPDATE_STOCK) {
             $this->trackEvents($insert);
+        }
+
+        //if stock_qty changed
+
+        Yii::info($changedAttributes);
+
+        if(!$insert && (isset($changedAttributes['stock_qty']) || isset($changedAttributes['track_quantity'])))  {
+            Yii::$app->eventManager->track('Inventory Updated', [
+                'product_id' => $this->item_uuid,
+                'item_uuid' => $this->item_uuid,
+                'previous_stock' => $changedAttributes['stock_qty'],
+                'updated_stock' => $this->stock_qty
+            ], null, $this->restaurant_uuid);
         }
 
         return true;
@@ -418,6 +431,11 @@ class Item extends \yii\db\ActiveRecord
                 Yii::$app->eventManager->track('Store Setup Step Complete', [
                     'step_name' => "Item Added",
                     'step_number' => 2
+                ], null, $this->restaurant_uuid);
+
+                Yii::$app->eventManager->track('Onboard Step Complete', [
+                    'step_name' => "Item Added",
+                    'step_number' => 4
                 ], null, $this->restaurant_uuid);
 
                 $this->restaurant->checkOnboardCompleted();
