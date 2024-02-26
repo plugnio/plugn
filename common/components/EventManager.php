@@ -127,10 +127,15 @@ class EventManager extends Component
      */
     public function track($event, $eventData, $timestamp = null, $storeId = null)
     {
-        $distinctID = Yii::$app->request->headers->get('Mixpanel-Distinct-ID');
+        $distinctID = null;
 
-        if(!$storeId && isset(Yii::$app->request) && Yii::$app->request instanceof \yii\web\Request) {
-            $storeId = Yii::$app->request->headers->get('Store-Id');
+        if(isset(Yii::$app->request) && Yii::$app->request instanceof \yii\web\Request) {
+
+            if(!$storeId) {
+                $storeId = Yii::$app->request->headers->get('Store-Id');
+            }
+
+            $distinctID = Yii::$app->request->headers->get('Mixpanel-Distinct-ID');
         }
 
         $language = Yii::$app->language == "ar"? "ar": "en";
