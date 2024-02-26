@@ -965,6 +965,23 @@ class Restaurant extends ActiveRecord
         //    return false;
         }
 
+        //check for netlify site also, as they can have .site domain in future on site upgrade
+
+        if(str_contains($this->restaurant_domain, ".plugn.site")) {
+
+            $isExists = self::find()
+                ->andWhere([
+                    'is_deleted' => 0,
+                    'restaurant_domain' => str_replace(".site", ".store", $this->restaurant_domain)
+                ])
+                ->exists();
+
+            if($isExists) {
+                $this->addError($attribute, Yii::t("app", 'Domain already registered with other website'));
+                return false;
+            }
+        }
+
         return true;
     }
 
