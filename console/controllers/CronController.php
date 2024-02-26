@@ -19,6 +19,7 @@ use common\models\Refund;
 use common\models\Order;
 use common\models\Subscription;
 use \DateTime;
+use yii\db\Exception;
 use yii\helpers\Console;
 use yii\db\Expression;
 
@@ -47,41 +48,46 @@ class CronController extends \yii\console\Controller
 
         //adding date as older account not had email verification
 
-        $agents = Agent::find()
-            ->andWhere(new Expression("agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20')"))
-            ->all();
+        $query = Agent::find()
+            ->andWhere(new Expression("agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20')"));
 
             //Yii::$app->db->createCommand("SELECT * FROM agent where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20')")
             //->queryAll();
 
-        foreach ($agents as $agent) {
+        $total = 0;
 
-            $assignments = $agent->getAgentAssignments()->all();
+        foreach ($query->batch() as $agents) {
 
-            foreach ($assignments as $assignment) {
+            $total += sizeof($agents);
 
-                $store = $assignment->restaurant;
+            foreach ($agents as $agent) {
 
-                //if store having only 1 assignment
+                $assignments = $agent->getAgentAssignments()->all();
 
-                $count = $store->getAgentAssignments()->count();
+                foreach ($assignments as $assignment) {
 
-                if($count == 1) {
-                    $store->deleteSite();
-                    //delete
-                  //  $assignment->delete();
+                    $store = $assignment->restaurant;
+
+                    //if store having only 1 assignment
+
+                    $count = $store->getAgentAssignments()->count();
+
+                    if ($count == 1) {
+                        $store->deleteSite();
+                        //delete
+                        //  $assignment->delete();
+                    } else {
+                        $msg = $store->name . " having " . $count . "assignments";
+                        Yii::info($msg);
+                    }
                 }
-                else{
-                    $msg = $store->name . " having " . $count . "assignments";
-                    Yii::info($msg);
-                }
+
+                $agent->deleted = 1;
+                $agent->save(false);
             }
-
-            $agent->deleted = 1;
-            $agent->save(false);
         }
 
-        echo  sizeof($agents) . " agnets updated!";
+        echo  $total . " agnets updated!";
     }
 
     /**
@@ -110,44 +116,53 @@ class CronController extends \yii\console\Controller
         }
     }
 
+    /**
+     * todo: remove from cron as we not longer need this
+     * @return int
+     */
     public function actionSiteStatus()
     {
-        $restaurants = Restaurant::find()
+        $query = Restaurant::find()
             ->andWhere(['has_deployed' => 0])
-            ->all();
+            ->andWhere(new Expression('site_id IS NOT NULL'))
+            ->andWhere(['!=', 'site_id', ""])
+            ->andWhere(['!=', 'restaurant_email', ""]);
 
-        foreach ($restaurants as $restaurant) {
+        foreach ($query->batch() as $restaurants) {
 
-            if ($restaurant->site_id && $restaurant->restaurant_email) {
+            foreach ($restaurants as $restaurant) {
 
                 $getSiteResponse = Yii::$app->netlifyComponent->getSiteData($restaurant->site_id);
 
-                if ($getSiteResponse->isOk) {
-                    if ($getSiteResponse->data['state'] == 'current') {
+                if (!$getSiteResponse->isOk) {
+                    continue;
+                }
 
-                        $restaurant->has_deployed = 1;
-                        $restaurant->save(false);
+                if ($getSiteResponse->data['state'] == 'current') {
 
-                        $mailer = \Yii::$app->mailer->compose([
+                    $restaurant->has_deployed = 1;
+                    $restaurant->save(false);
+
+                    $mailer = \Yii::$app->mailer->compose([
                             'html' => 'store-ready',
                         ], [
                             'store' => $restaurant,
                         ])
-                            ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
-                            ->setTo([$restaurant->restaurant_email])
-                            ->setSubject('Your store ' . $restaurant->name . ' is now ready');
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setTo([$restaurant->restaurant_email])
+                        ->setSubject('Your store ' . $restaurant->name . ' is now ready');
 
-                        try {
-                            $mailer->send();
-                        } catch (\Swift_TransportException $e) {
-                            Yii::error($e->getMessage(), "email");
-                        }
+                    try {
+                        $mailer->send();
+                    } catch (\Swift_TransportException $e) {
+                        Yii::error($e->getMessage(), "email");
                     }
                 }
             }
         }
 
         $this->stdout("Thank you Big Boss \n", Console::FG_RED, Console::NORMAL);
+
         return self::EXIT_CODE_NORMAL;
     }
 
@@ -160,40 +175,42 @@ class CronController extends \yii\console\Controller
     {
         //todo: why processing all stores, when need only with no orders
 
-        $stores = Restaurant::find()
+        $query = Restaurant::find()
             ->joinWith(['items', 'ownerAgent'])
             ->andWhere(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 2 DAY) ')
-            ->andWhere(['retention_email_sent' => 0])
-            ->all();
+            ->andWhere(['retention_email_sent' => 0]);
 
-        foreach ($stores as $key => $store) {
+        foreach ($query->batch() as $stores) {
 
-            $count = $store->getItems()->count();
+            foreach ($stores as $key => $store) {
 
-            if ($count > 0) {
-                continue;
-            }
+                $count = $store->getItems()->count();
 
-            foreach ($store->ownerAgent as $agent) {
-
-                $mailer = Yii::$app->mailer->compose([
-                    'html' => 'offer-assistance',
-                ], [
-                    'store' => $store
-                ])
-                    ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
-                    ->setTo($agent->agent_email)
-                    ->setSubject('Is there anything we can help with?');
-
-                try {
-                    $mailer->send();
-                } catch (\Swift_TransportException $e) {
-                    Yii::error($e->getMessage(), "email");
+                if ($count > 0) {
+                    continue;
                 }
-            }
 
-            $store->retention_email_sent = 1;
-            $store->save(false);
+                foreach ($store->ownerAgent as $agent) {
+
+                    $mailer = Yii::$app->mailer->compose([
+                        'html' => 'offer-assistance',
+                    ], [
+                        'store' => $store
+                    ])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setTo($agent->agent_email)
+                        ->setSubject('Is there anything we can help with?');
+
+                    try {
+                        $mailer->send();
+                    } catch (\Swift_TransportException $e) {
+                        Yii::error($e->getMessage(), "email");
+                    }
+                }
+
+                $store->retention_email_sent = 1;
+                $store->save(false);
+            }
         }
     }
 
@@ -201,65 +218,120 @@ class CronController extends \yii\console\Controller
     {
         //todo: why processing all stores, when need only with no orders
 
-        $stores = Restaurant::find()
+        $query = Restaurant::find()
             ->joinWith(['orders', 'ownerAgent'])
             ->andWhere(' DATE(restaurant_created_at) = DATE(NOW() - INTERVAL 5 DAY) ')
-            ->andWhere(['retention_email_sent' => 0])
-            ->all();
+            ->andWhere(['retention_email_sent' => 0]);
 
+        foreach ($query->batch() as $stores) {
+            foreach ($stores as $key => $store) {
 
-        foreach ($stores as $key => $store) {
+                $count = $store->getOrders()->count();
 
-            $count = $store->getOrders()->count();
-
-            if ($count > 0) {
-                continue;
-            }
-
-            foreach ($store->ownerAgent as $agent) {
-
-                $mailer = Yii::$app->mailer->compose([
-                    'html' => 'offer-assistance',
-                ], [
-                    'store' => $store
-                ])
-                    ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
-                    ->setTo($agent->agent_email)
-                    ->setSubject('Is there anything we can help with?');
-
-                try {
-                    $mailer->send();
-                } catch (\Swift_TransportException $e) {
-                    Yii::error($e->getMessage(), "email");
+                if ($count > 0) {
+                    continue;
                 }
-            }
 
-            $store->retention_email_sent = 1;
-            $store->save(false);
+                foreach ($store->ownerAgent as $agent) {
+
+                    $mailer = Yii::$app->mailer->compose([
+                        'html' => 'offer-assistance',
+                    ], [
+                        'store' => $store
+                    ])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setTo($agent->agent_email)
+                        ->setSubject('Is there anything we can help with?');
+
+                    try {
+                        $mailer->send();
+                    } catch (\Swift_TransportException $e) {
+                        Yii::error($e->getMessage(), "email");
+                    }
+                }
+
+                $store->retention_email_sent = 1;
+                $store->save(false);
+            }
         }
     }
 
+    /**
+     * @return void
+     */
     public function actionDowngradedStoreSubscription()
     {
         $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d")));
         $end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d")));
 
-        $subscriptions = Subscription::find()
+        $query = Subscription::find()
             ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
             // ->andWhere(['notified_email' => 1])
             ->andWhere(['not', ['subscription_end_at' => null]])
             ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])//todo: try DATE mysql function
-            ->with(['plan', 'restaurant'])
-            ->all();
+            ->with(['plan', 'restaurant']);
 
-        foreach ($subscriptions as $subscription) {
+        foreach ($query->batch() as $subscriptions) {
+            foreach ($subscriptions as $subscription) {
 
-            if (date('Y-m-d', strtotime($subscription->subscription_end_at)) == date('Y-m-d')) {
+                if (date('Y-m-d', strtotime($subscription->subscription_end_at)) == date('Y-m-d')) {
+
+                    foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
+
+                        $mailer = \Yii::$app->mailer->compose([
+                            'html' => 'subscription-expired',
+                        ], [
+                            'subscription' => $subscription,
+                            'store' => $subscription->restaurant,
+                            'plan' => $subscription->plan->name,
+                            'agent_name' => $agent->agent_name,
+                        ])
+                            ->setFrom([\Yii::$app->params['noReplyEmail']])
+                            ->setTo($agent->agent_email)
+                            ->setBcc(\Yii::$app->params['supportEmail'])
+                            ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan');
+
+                        try {
+
+                            $result = $mailer->send();
+
+                            if (!$result)
+                                Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
+
+                        } catch (\Swift_TransportException $e) {
+                            Yii::error($e->getMessage(), "email");
+                        }
+                    }
+
+                    $subscription->subscription_status = Subscription::STATUS_INACTIVE;
+                    $subscription->save();
+                }
+            }
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function actionNotifyAgentsForSubscriptionThatWillExpireSoon()
+    {
+        $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") + 5));
+        $end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") + 5));
+
+        $query = Subscription::find()
+            ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
+            ->andWhere(['notified_email' => 0])
+            ->andWhere(['not', ['subscription_end_at' => null]])
+            ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
+            ->with(['plan', 'restaurant']);
+
+        foreach ($query->batch() as $subscriptions) {
+            foreach ($subscriptions as $subscription) {
 
                 foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
 
                     $mailer = \Yii::$app->mailer->compose([
-                        'html' => 'subscription-expired',
+                        'html' => 'subscription-will-expire-soon-html',
                     ], [
                         'subscription' => $subscription,
                         'store' => $subscription->restaurant,
@@ -269,68 +341,21 @@ class CronController extends \yii\console\Controller
                         ->setFrom([\Yii::$app->params['noReplyEmail']])
                         ->setTo($agent->agent_email)
                         ->setBcc(\Yii::$app->params['supportEmail'])
-                        ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan');
+                        ->setSubject('Your Subscription is Expiring');
 
                     try {
-
                         $result = $mailer->send();
 
-                        if(!$result)
-                            Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
+                        if ($result) {
+                            $subscription->notified_email = 1;
+                            $subscription->save(false);
+                        }
 
                     } catch (\Swift_TransportException $e) {
                         Yii::error($e->getMessage(), "email");
                     }
+
                 }
-
-                $subscription->subscription_status = Subscription::STATUS_INACTIVE;
-                $subscription->save();
-            }
-        }
-    }
-
-    public function actionNotifyAgentsForSubscriptionThatWillExpireSoon()
-    {
-        $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d") + 5));
-        $end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d") + 5));
-
-        $subscriptions = Subscription::find()
-            ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
-            ->andWhere(['notified_email' => 0])
-            ->andWhere(['not', ['subscription_end_at' => null]])
-            ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
-            ->with(['plan', 'restaurant'])
-            ->all();
-
-        foreach ($subscriptions as $subscription) {
-
-            foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
-
-                $mailer = \Yii::$app->mailer->compose([
-                    'html' => 'subscription-will-expire-soon-html',
-                ], [
-                    'subscription' => $subscription,
-                    'store' => $subscription->restaurant,
-                    'plan' => $subscription->plan->name,
-                    'agent_name' => $agent->agent_name,
-                ])
-                    ->setFrom([\Yii::$app->params['noReplyEmail']])
-                    ->setTo($agent->agent_email)
-                    ->setBcc(\Yii::$app->params['supportEmail'])
-                    ->setSubject('Your Subscription is Expiring');
-
-                try {
-                    $result = $mailer->send();
-
-                    if ($result) {
-                        $subscription->notified_email = 1;
-                        $subscription->save(false);
-                    }
-
-                } catch (\Swift_TransportException $e) {
-                    Yii::error($e->getMessage(), "email");
-                }
-
             }
         }
 
@@ -360,6 +385,9 @@ class CronController extends \yii\console\Controller
         }
     }
 
+    /**
+     * @return void
+     */
     public function actionCreateBuildJsFile()
     {
         $queue = Queue::find()
@@ -497,7 +525,7 @@ class CronController extends \yii\console\Controller
      */
     public function actionMakeRefund()
     {
-        $refunds = Refund::find()
+         $query = Refund::find()
             ->joinWith(['store', 'payment', 'currency', 'order'])
             ->where(['refund.refund_reference' => null])
             ->andWhere([
@@ -505,132 +533,128 @@ class CronController extends \yii\console\Controller
                 'payment.payment_current_status' => 'CAPTURED'
             ])
             ->andWhere(['NOT', ['refund.payment_uuid' => null]])
-            ->andWhere(new Expression('refund_status IS NULL OR refund_status="" or refund_status = "Initiated"'))
-            ->all();
+            ->andWhere(new Expression('refund_status IS NULL OR refund_status="" or refund_status = "Initiated"'));
 
-        foreach ($refunds as $refund) {
+         foreach ($query->batch() as $refunds) {
+             foreach ($refunds as $refund) {
 
-            // in case order is deleted but still exist
+                 // in case order is deleted but still exist
 
-            if (!$refund->payment) {
-                Yii::error('Refund Error > Payment id not found for refund id (' . $refund->refund_id. '): ');
-                continue;
-            }
+                 if (!$refund->payment) {
+                     Yii::error('Refund Error > Payment id not found for refund id (' . $refund->refund_id . '): ');
+                     continue;
+                 }
 
-            if ($refund->store->is_myfatoorah_enable) {
+                 if ($refund->store->is_myfatoorah_enable) {
 
-                Yii::$app->myFatoorahPayment->setApiKeys($refund->currency->code);
+                     Yii::$app->myFatoorahPayment->setApiKeys($refund->currency->code);
 
-                $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode);
+                     $response = Yii::$app->myFatoorahPayment->makeRefund($refund->payment->payment_gateway_payment_id, $refund->refund_amount, $refund->reason, $refund->store->supplierCode);
 
-                $responseContent = json_decode($response->content);
+                     $responseContent = json_decode($response->content);
 
-                if (!$response->isOk || ($responseContent && !$responseContent->IsSuccess))
-                {
-                    $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
+                     if (!$response->isOk || ($responseContent && !$responseContent->IsSuccess)) {
+                         $errorMessage = "Error: " . $responseContent->Message . " - " . isset($responseContent->ValidationErrors) ? json_encode($responseContent->ValidationErrors) : $responseContent->Message;
 
-                    $refund->refund_status = 'REJECTED';
-                    $refund->refund_message = 'Rejected because: ' . $errorMessage;
+                         $refund->refund_status = 'REJECTED';
+                         $refund->refund_message = 'Rejected because: ' . $errorMessage;
 
-                    if(!$refund->save()) {
-                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
-                            ' Data: '. $refund->attributes .' Message:' . $errorMessage);
-                    }
+                         if (!$refund->save()) {
+                             Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
+                                 ' Data: ' . $refund->attributes . ' Message:' . $errorMessage);
+                         }
 
-                    //mark as failed and notify customer + vendor
+                         //mark as failed and notify customer + vendor
 
-                    $refund->notifyFailure($errorMessage);
+                         $refund->notifyFailure($errorMessage);
 
-                    //Yii::error('Refund Error (' . $refund->refund_id . '): ' . $errorMessage);
+                         //Yii::error('Refund Error (' . $refund->refund_id . '): ' . $errorMessage);
 
-                }
-                else
-                {
-                    $refund->refund_reference = $responseContent->Data->RefundReference;
-                    $refund->refund_status = 'Pending';
+                     } else {
+                         $refund->refund_reference = $responseContent->Data->RefundReference;
+                         $refund->refund_status = 'Pending';
 
-                    if(!$refund->save()) {
-                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) . ' Data: '. $refund->attributes);
-                    }
+                         if (!$refund->save()) {
+                             Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) . ' Data: ' . $refund->attributes);
+                         }
 
-                    $this->stdout("Your refund request has been initiated successfully #".$refund->refund_id."  \n", Console::FG_RED, Console::BOLD);
+                         $this->stdout("Your refund request has been initiated successfully #" . $refund->refund_id . "  \n", Console::FG_RED, Console::BOLD);
 
-                    //return self::EXIT_CODE_NORMAL;
-                }
+                         //return self::EXIT_CODE_NORMAL;
+                     }
 
-            } else if ($refund->store->is_tap_enable) {
+                 } else if ($refund->store->is_tap_enable) {
 
-                Yii::$app->tapPayments->setApiKeys(
-                    $refund->store->live_api_key,
-                    $refund->store->test_api_key,
-                    $refund->payment->is_sandbox
-                );
+                     Yii::$app->tapPayments->setApiKeys(
+                         $refund->store->live_api_key,
+                         $refund->store->test_api_key,
+                         $refund->payment->is_sandbox
+                     );
 
-                $response = Yii::$app->tapPayments->createRefund(
-                    $refund->payment->payment_gateway_transaction_id,
-                    $refund->refund_amount,
-                    $refund->currency->code,
-                    $refund->reason ? $refund->reason : 'requested_by_customer',
-                    $refund->store
-                );
+                     $response = Yii::$app->tapPayments->createRefund(
+                         $refund->payment->payment_gateway_transaction_id,
+                         $refund->refund_amount,
+                         $refund->currency->code,
+                         $refund->reason ? $refund->reason : 'requested_by_customer',
+                         $refund->store
+                     );
 
-                if (array_key_exists('errors', $response->data)) {
+                     if (array_key_exists('errors', $response->data)) {
 
-                    $errorMessage = $response->data['errors'][0]['description'];
+                         $errorMessage = $response->data['errors'][0]['description'];
 
-                    //Yii::error('Refund Error (' . $refund->refund_id . '): ' . $errorMessage);
+                         //Yii::error('Refund Error (' . $refund->refund_id . '): ' . $errorMessage);
 
-                    //mark as failed and notify customer + vendor
+                         //mark as failed and notify customer + vendor
 
-                    $refund->notifyFailure($errorMessage);
+                         $refund->notifyFailure($errorMessage);
 
-                    $refund->refund_status = 'REJECTED';
-                    $refund->refund_message = 'Rejected because: ' . $errorMessage;
+                         $refund->refund_status = 'REJECTED';
+                         $refund->refund_message = 'Rejected because: ' . $errorMessage;
 
-                    if(!$refund->save()) {
-                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
-                            ' Data: '. $refund->attributes .' Response: ' . serialize($response->data));
-                    }
+                         if (!$refund->save()) {
+                             Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
+                                 ' Data: ' . $refund->attributes . ' Response: ' . serialize($response->data));
+                         }
 
-                    //return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
+                         //return $refund->addError('refund_amount', $response->data['errors'][0]['description']);
 
-                }
-                else if ($response->data && isset($response->data['status'])) {
+                     } else if ($response->data && isset($response->data['status'])) {
 
-                    $refund->refund_reference = isset($response->data['id']) ? $response->data['id'] : null;
-                    $refund->refund_status = $response->data['status'];
+                         $refund->refund_reference = isset($response->data['id']) ? $response->data['id'] : null;
+                         $refund->refund_status = $response->data['status'];
 
-                    if(!$refund->save()) {
-                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
-                            ' Data: '. $refund->attributes . ' Response: '. serialize($response->data));
-                    }
+                         if (!$refund->save()) {
+                             Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
+                                 ' Data: ' . $refund->attributes . ' Response: ' . serialize($response->data));
+                         }
 
-                    $this->stdout("Your refund request has been initiated successfully #".$refund->refund_id."  \n", Console::FG_RED, Console::BOLD);
+                         $this->stdout("Your refund request has been initiated successfully #" . $refund->refund_id . "  \n", Console::FG_RED, Console::BOLD);
 
-                    //return self::EXIT_CODE_NORMAL;
-                }
-            }
+                         //return self::EXIT_CODE_NORMAL;
+                     }
+                 }
 
-                $rate = 1;//default rate
+                 $rate = 1;//default rate
 
-                if(isset($refund->order->currency)) {
-                    $rate = 1 / $refund->order->currency->rate;// to USD
-                }
+                 if (isset($refund->order->currency)) {
+                     $rate = 1 / $refund->order->currency->rate;// to USD
+                 }
 
-                Yii::$app->eventManager->track('Refunds Processed', array_merge($refund->attributes, [
-                        'refund_amount' => $refund->refund_amount,
-                        'value' => $refund->refund_amount * $rate, 
-                        'currency' => 'USD'
-                    ]),
-                    null,
-                    $refund->restaurant_uuid);
+                 Yii::$app->eventManager->track('Refunds Processed', array_merge($refund->attributes, [
+                     'refund_amount' => $refund->refund_amount,
+                     'value' => $refund->refund_amount * $rate,
+                     'currency' => 'USD'
+                 ]),
+                     null,
+                     $refund->restaurant_uuid);
 
-        }
+             }
+         }
 
        // $this->stdout("No refund requests available \n", Console::FG_RED, Console::BOLD);
 
        // return self::EXIT_CODE_NORMAL;
-
     }
 
     /**
@@ -638,7 +662,7 @@ class CronController extends \yii\console\Controller
      */
     public function actionUpdateRefundStatusMessage()
     {
-        $refunds = Refund::find()
+        $query = Refund::find()
             ->joinWith(['store'])
             ->where(['NOT', ['refund.refund_reference' => null]])
             ->andWhere(['restaurant.is_tap_enable' => 1])
@@ -647,44 +671,41 @@ class CronController extends \yii\console\Controller
                 'IN',
                 'refund.refund_status',
                 ['PENDING', 'IN_PROGRESS']
-            ])
-            ->all();
+            ]);
 
-        foreach ($refunds as $refund)
-        {
-            //todo: what if fatoorah used? instead of tap
+        foreach ($query->batch() as $refunds) {
+            foreach ($refunds as $refund) {
+                //todo: what if fatoorah used? instead of tap
 
-            if(!$refund->payment) {
-                continue;
-            }
-            
-            Yii::$app->tapPayments->setApiKeys(
-                $refund->store->live_api_key,
-                $refund->store->test_api_key,
-                $refund->payment->is_sandbox
-            );
+                if (!$refund->payment) {
+                    continue;
+                }
 
-            $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
+                Yii::$app->tapPayments->setApiKeys(
+                    $refund->store->live_api_key,
+                    $refund->store->test_api_key,
+                    $refund->payment->is_sandbox
+                );
 
-            if (!array_key_exists('errors', $response->data) && isset($response->data['status'])) {
+                $response = Yii::$app->tapPayments->retrieveRefund($refund->refund_reference);
 
-                if ($refund->refund_status != $response->data['status'])
-                {
-                    //REFUNDED, PENDING, IN_PROGRESS, CANCELLED, FAILED, DECLINED, RESTRICRTED, TIMEDOUT, UNKNOWN
+                if (!array_key_exists('errors', $response->data) && isset($response->data['status'])) {
 
-                    if(!in_array($response->data['status'], ['REFUNDED', 'PENDING', 'IN_PROGRESS']))
-                    {
-                        $errorMessage = $response->data['status'];//$response->data['errors'][0]['description'];
+                    if ($refund->refund_status != $response->data['status']) {
+                        //REFUNDED, PENDING, IN_PROGRESS, CANCELLED, FAILED, DECLINED, RESTRICRTED, TIMEDOUT, UNKNOWN
 
-                        $refund->notifyFailure($errorMessage);
-                    }
+                        if (!in_array($response->data['status'], ['REFUNDED', 'PENDING', 'IN_PROGRESS'])) {
+                            $errorMessage = $response->data['status'];//$response->data['errors'][0]['description'];
 
-                    $refund->refund_status = $response->data['status'];
+                            $refund->notifyFailure($errorMessage);
+                        }
 
-                    if(!$refund->save())
-                    {
-                        Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
-                            ' Data: '. $refund->attributes . ' Response: '. serialize($response->data));
+                        $refund->refund_status = $response->data['status'];
+
+                        if (!$refund->save()) {
+                            Yii::error('Refund Error (' . $refund->refund_id . '): ' . serialize($refund->errors) .
+                                ' Data: ' . $refund->attributes . ' Response: ' . serialize($response->data));
+                        }
                     }
                 }
             }
@@ -697,22 +718,29 @@ class CronController extends \yii\console\Controller
      */
     public function actionUpdateVoucherStatus()
     {
-        $vouchers = Voucher::find()->all();
+        $query = Voucher::find()
+            ->andWhere(["!=", "voucher_status", Voucher::VOUCHER_STATUS_EXPIRED])
+            ->andWhere(new Expression("valid_until IS NOT NULL"));
 
-        foreach ($vouchers as $voucher) {
-            if ($voucher->valid_until && date('Y-m-d', strtotime('now')) >= date('Y-m-d', strtotime($voucher->valid_until))) {
-                $voucher->voucher_status = Voucher::VOUCHER_STATUS_EXPIRED;
-                $voucher->save();
+        foreach ($query->batch() as $vouchers) {
+            foreach ($vouchers as $voucher) {
+                if (date('Y-m-d', strtotime('now')) >= date('Y-m-d', strtotime($voucher->valid_until))) {
+                    $voucher->voucher_status = Voucher::VOUCHER_STATUS_EXPIRED;
+                    $voucher->save();
+                }
             }
         }
 
-        $bankDiscounts = BankDiscount::find()->all();
+        $query = BankDiscount::find()
+            ->andWhere(["!=", "bank_discount_status", BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED])
+            ->andWhere(new Expression("valid_until IS NOT NULL"));
 
-        foreach ($bankDiscounts as $bankDiscount)
-        {
-            if ($bankDiscount->valid_until && date('Y-m-d', strtotime('now')) >= date('Y-m-d', strtotime($bankDiscount->valid_until))) {
-                $bankDiscount->bank_discount_status = BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED;
-                $bankDiscount->save();
+        foreach ($query->batch() as $bankDiscounts) {
+            foreach ($bankDiscounts as $bankDiscount) {
+                if ($bankDiscount->valid_until && date('Y-m-d', strtotime('now')) >= date('Y-m-d', strtotime($bankDiscount->valid_until))) {
+                    $bankDiscount->bank_discount_status = BankDiscount::BANK_DISCOUNT_STATUS_EXPIRED;
+                    $bankDiscount->save();
+                }
             }
         }
     }
@@ -722,18 +750,16 @@ class CronController extends \yii\console\Controller
      */
     public function actionUpdateTransactions()
     {
-        $now = new DateTime('now');
+        //$now = new DateTime('now');
 
-        $payments = Payment::find()
+        $query = Payment::find()
             ->where("received_callback = 0")
             ->andWhere(['payment_gateway_name' => 'tap'])
-            ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')])
-            ->all();
+            ->andWhere(['<', 'payment_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 10 MINUTE)')]);
 
-        if ($payments) {
+        foreach ($query->batch() as $payments) {
             foreach ($payments as $payment) {
                 try {
-
                     if ($payment->payment_gateway_transaction_id) {
                         $payment = Payment::updatePaymentStatusFromTap($payment->payment_gateway_transaction_id);
                         $payment->received_callback = true;
@@ -743,10 +769,10 @@ class CronController extends \yii\console\Controller
                     \Yii::error("[Issue checking status (" . $payment->restaurant_uuid . ") Order Uuid: " . $payment->order_uuid . "] " . $e->getMessage(), __METHOD__);
                 }
             }
-        } else {
-            $this->stdout("All Payments received callback \n", Console::FG_RED, Console::BOLD);
-            return self::EXIT_CODE_NORMAL;
         }
+
+        //    $this->stdout("All Payments received callback \n", Console::FG_RED, Console::BOLD);
+        //    return self::EXIT_CODE_NORMAL;
 
         $this->stdout("Payments status updated successfully \n", Console::FG_RED, Console::BOLD);
         return self::EXIT_CODE_NORMAL;
@@ -757,15 +783,14 @@ class CronController extends \yii\console\Controller
      */
     public function actionSendReminderEmail()
     {
-        $now = new DateTime('now');
+        //$now = new DateTime('now');
 
-        $orders = Order::find()
+        $query = Order::find()
             ->andWhere(['order_status' => Order::STATUS_PENDING])
             ->andWhere(['reminder_sent' => 0])
-            ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')])
-            ->all();
+            ->andWhere(['<', 'order_created_at', new Expression('DATE_SUB(NOW(), INTERVAL 5 MINUTE)')]);
 
-        if ($orders) {
+        foreach ($query->batch() as $orders) {
 
             foreach ($orders as $order) {
 
@@ -818,17 +843,26 @@ class CronController extends \yii\console\Controller
     public function actionHour() {
     }
 
+    /**
+     * @return void
+     */
     public function actionMinute() {
 
-        $campaigns = VendorCampaign::find()
-            ->andWhere(['status' => VendorCampaign::STATUS_READY])
-            ->all();
+        $query = VendorCampaign::find()
+            ->andWhere(['status' => VendorCampaign::STATUS_READY]);
 
-        foreach ($campaigns as $campaign) {
-            $campaign->process();
+        $total = 0;
+
+        foreach ($query->batch() as $campaigns) {
+
+            $total += sizeof($campaigns);
+
+            foreach ($campaigns as $campaign) {
+                $campaign->process();
+            }
         }
 
-        $this->stdout( sizeof($campaigns) . " Campaign processed \n", Console::FG_RED, Console::BOLD);
+        $this->stdout( $total . " Campaign processed \n", Console::FG_RED, Console::BOLD);
     }
 
     /**
@@ -941,45 +975,49 @@ class CronController extends \yii\console\Controller
     }
 
     /**
+     * todo: check if we still need this
      * fix store missing netlify site_id (because of failed site upgrade attempt)
      * @return void
      */
     public function actionNetlifyFix() {
 
-        $stores = Restaurant::find()
-            ->andWhere(new Expression("is_deleted=0 and site_id is null and has_deployed=1"))
-            ->all();
+        $query = Restaurant::find()
+            ->andWhere(["NOT LIKE", "restaurant_domain", ".site"])//hosted only on netlify
+            ->andWhere(new Expression("is_deleted=0 and site_id is null and has_deployed=1"));
 
         $i = 0;
 
-        foreach($stores as $store) {
+        foreach ($query->batch() as $stores) {
 
-            $domain = str_replace(["https://", "http://", "www"], ["","",""], $store['restaurant_domain']);
+            foreach ($stores as $store) {
 
-            $response = Yii::$app->netlifyComponent->listSiteData(1, $domain);
+                $domain = str_replace(["https://", "http://", "www"], ["", "", ""], $store['restaurant_domain']);
 
-            $site_id = null;
+                $response = Yii::$app->netlifyComponent->listSiteData(1, $domain);
 
-            foreach ($response->data as $site) {
-                if (
-                    $domain == $site['custom_domain'] ||
-                    in_array($domain, $site['domain_aliases'])
-                ) {
-                    $site_id = $site['site_id'];
-                    continue;
+                $site_id = null;
+
+                foreach ($response->data as $site) {
+                    if (
+                        $domain == $site['custom_domain'] ||
+                        in_array($domain, $site['domain_aliases'])
+                    ) {
+                        $site_id = $site['site_id'];
+                        continue;
+                    }
                 }
-            }
 
-            if($site_id) {
-                $i++;
-                //$this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
+                if ($site_id) {
+                    $i++;
+                    //$this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
 
-                $store->site_id = $site_id;
-                $store->save(false);
+                    $store->site_id = $site_id;
+                    $store->save(false);
 
-                Yii::$app->netlifyComponent->upgradeSite($store);
+                    Yii::$app->netlifyComponent->upgradeSite($store);
 
-                $this->stdout($store->restaurant_domain . ' Updated' . PHP_EOL);
+                    $this->stdout($store->restaurant_domain . ' Updated' . PHP_EOL);
+                }
             }
         }
 

@@ -1037,6 +1037,7 @@ class Restaurant extends ActiveRecord
      */
     public function notifyDomainUpdated($old_domain)
     {
+
         if(!str_contains($this->restaurant_domain, '.plugn.')) {
             Yii::$app->eventManager->track('Custom Domain Activated', [
                     "old_domain" => $old_domain,
@@ -1048,6 +1049,7 @@ class Restaurant extends ActiveRecord
                 $this->restaurant_uuid
             );
         }
+
 
         $model = new RestaurantDomainRequest;
         $model->restaurant_uuid = $this->restaurant_uuid;
