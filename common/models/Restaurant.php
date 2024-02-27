@@ -1030,6 +1030,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
             ->setTo(Yii::$app->params['adminEmail'])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('[Plugn] Agent updated DN');
 
         try {
@@ -1093,6 +1094,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
             //->setTo(Yii::$app->params['adminEmail'])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('Store Domain Updated');
 
         $agents = $this->getAgentAssignments()
@@ -1178,7 +1180,9 @@ class Restaurant extends ActiveRecord
         $mailer = Yii::$app->mailer->compose([
             'html' => 'store/in-active'
         ])
-            ->setFrom([Yii::$app->params['noReplyEmail']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            //->setFrom([Yii::$app->params['noReplyEmail']])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject("We miss you!");
 
         $agents = $this->getAgentAssignments()
@@ -1230,7 +1234,8 @@ class Restaurant extends ActiveRecord
 
         $mailer = Yii::$app->mailer->compose()
             ->setHtmlBody($html)
-            ->setFrom([Yii::$app->params['noReplyEmail']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($campaign->template->subject);
 
         $agents = $this->getAgentAssignments()
@@ -1494,8 +1499,9 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => 'MyFatoorah',
         ])
-            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo([$this->restaurant_email])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
         try {
@@ -2314,8 +2320,9 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => $paymentGateway,
         ])
-            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo([$this->restaurant_email])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
         try {
@@ -2344,8 +2351,9 @@ class Restaurant extends ActiveRecord
             'status' => $status,
             'paymentGateway' => $paymentGateway,
         ])
-            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo([$this->restaurant_email])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setSubject($subject);
 
@@ -2407,8 +2415,9 @@ class Restaurant extends ActiveRecord
             'store' => $this,
             'paymentGateway' => 'Tap',
         ])
-            ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo([$this->restaurant_email])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
         try {
@@ -4437,8 +4446,9 @@ class Restaurant extends ActiveRecord
                         'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
                         'thisWeekCustomerGained' => $thisWeekCustomerGained,
                     ])
-                        ->setFrom([Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
                         ->setTo([$agentAssignment->agent->agent_email])
+                        ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setSubject('Weekly Store Summary');
 
                     if ($key == 0)

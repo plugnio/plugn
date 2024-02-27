@@ -174,7 +174,8 @@ class AgentAssignment extends \yii\db\ActiveRecord {
                 'model' => $this,
                 'password' => $password
             ])
-            ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo($this->agent->agent_email)
             ->setSubject("You've been invited to manage " . $this->restaurant->name);
 
@@ -201,7 +202,8 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         ], [
             'model' => $this
         ])
-            ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo($this->agent->agent_email)
             ->setSubject( $this->restaurant->name  . " has added you as a team member on their Plugn store");
 

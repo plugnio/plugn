@@ -165,8 +165,9 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
         ], [
             'staff' => $this
         ])
-            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo ($this->staff_email)
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject (Yii::t ('staff', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
             ->send ();
     }

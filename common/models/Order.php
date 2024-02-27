@@ -850,8 +850,10 @@ class Order extends \yii\db\ActiveRecord
                 'order' => $this,
                 'payment' => $payment
             ])
-                ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
+                ->setFrom([$fromEmail => $this->restaurant->name])
+                //->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                 ->setTo($this->customer_email)
+                ->setReplyTo(\Yii::$app->params['supportEmail'])
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                 //->setReplyTo($replyTo)
 
@@ -877,8 +879,10 @@ class Order extends \yii\db\ActiveRecord
                 ], [
                     'order' => $this
                 ])
-                    ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
+                    ->setFrom([$fromEmail => $this->restaurant->name])
+                    //->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                     ->setTo($agentAssignment->agent->agent_email)
+                    ->setReplyTo(\Yii::$app->params['supportEmail'])
                     ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                     //->setReplyTo($replyTo)
 
@@ -903,8 +907,10 @@ class Order extends \yii\db\ActiveRecord
                 ], [
                     'order' => $this
                 ])
-                ->setFrom($fromEmail)//[$this->restaurant->restaurant_email => $this->restaurant->name]
+                ->setFrom([$fromEmail => $this->restaurant->name])
+                //->setFrom($fromEmail)//[$this->restaurant->restaurant_email => $this->restaurant->name]
                 ->setTo($this->restaurant->restaurant_email)
+                ->setReplyTo(\Yii::$app->params['supportEmail'])
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                // ->setReplyTo($replyTo)
 

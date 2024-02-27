@@ -746,7 +746,8 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             'customer' => $this,
             'restaurant' => $restaurant
         ])
-            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo ($this->customer_email)
             ->setSubject (Yii::t ('customer', 'Your '. $restaurant->restaurant.' password has been changed'))
             ->send();
@@ -879,8 +880,9 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
                 'restaurant' => $restaurant,
                 'verifyLink' => $verifyLink
             ])
-            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo($email)
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('Please confirm your email address');
 
         try {

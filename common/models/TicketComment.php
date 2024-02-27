@@ -158,7 +158,8 @@ class TicketComment extends \yii\db\ActiveRecord
             ], [
                 'model' => $this
             ])
-            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            //->setFrom ([Yii::$app->params['supportEmail']])
             ->setReplyTo([$fromEmail])
             ->setTo ($toEmails)
             ->setCc (Yii::$app->params['supportEmail'])

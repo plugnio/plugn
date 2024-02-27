@@ -338,8 +338,9 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                 'subscription' => $subscription,
                 'store' => $paymentRecord->restaurant,
             ])
-                ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
                 ->setTo([$agent->agent_email])
+                ->setReplyTo(\Yii::$app->params['supportEmail'])
                 ->setBcc(\Yii::$app->params['supportEmail'])
                 ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name);
 
