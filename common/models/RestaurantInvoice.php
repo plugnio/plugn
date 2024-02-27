@@ -204,6 +204,12 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
         if(sizeof($emails) ==  0)
             return true;
 
+        $ml = new MailLog();
+        $ml->to = $emails[0];
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Invoice #' . $this->invoice_number . ' for Plugn commission | ' . $this->restaurant->name;
+        $ml->save();
+
         $mailer = \Yii::$app->mailer->compose([
             'html' => 'store/pending-invoice-html',
         ], [

@@ -79,6 +79,12 @@ class TapQueue extends \yii\db\ActiveRecord
 
                     foreach ($this->restaurant->getOwnerAgent()->all() as $agent) {
 
+                        $ml = new MailLog();
+                        $ml->to = $agent->agent_email;
+                        $ml->from = \Yii::$app->params['noReplyEmail'];
+                        $ml->subject = 'Your TAP Payments account has been approved';
+                        $ml->save();
+
                         $mailer = \Yii::$app->mailer->compose([
                             'html' => 'tap-created',
                         ], [

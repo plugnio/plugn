@@ -211,6 +211,12 @@ class Ticket extends \yii\db\ActiveRecord
      */
     public function sendTicketAssignedMail() {
 
+        $ml = new MailLog();
+        $ml->to = $this->staff->staff_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Ticket assigned for ' . $this->restaurant->name;
+        $ml->save();
+
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
         \Yii::$app->mailer->compose ([
@@ -233,6 +239,12 @@ class Ticket extends \yii\db\ActiveRecord
         $staffs = Staff::find()->all();
 
         $staffEmails = ArrayHelper::getColumn ($staffs, 'staff_email');
+
+        $ml = new MailLog();
+        $ml->to = Yii::$app->params['supportEmail'];
+        $ml->from = \Yii::$app->params['supportEmail'];
+        $ml->subject = 'New ticket generated for ' . $this->restaurant->name;
+        $ml->save();
 
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 

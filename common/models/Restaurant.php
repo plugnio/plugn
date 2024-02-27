@@ -1015,6 +1015,12 @@ class Restaurant extends ActiveRecord
         Yii::info("[Store Domain Update Request] " . $this->name . " want to change domain from " .
             $old_domain . " to " . $this->restaurant_domain, __METHOD__);
 
+        $ml = new MailLog();
+        $ml->to = Yii::$app->params['adminEmail'];
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = '[Plugn] Agent updated DN';
+        $ml->save();
+
         $mailer = Yii::$app->mailer->compose([
             'html' => 'domain-update-request',
         ], [
@@ -1094,6 +1100,13 @@ class Restaurant extends ActiveRecord
             ->all();
 
         foreach ($agents as $agentAssignment) {
+
+            $ml = new MailLog();
+            $ml->to = $agentAssignment->agent->agent_email;
+            $ml->from = \Yii::$app->params['noReplyEmail'];
+            $ml->subject = 'Store Domain Updated';
+            $ml->save();
+
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
@@ -1173,6 +1186,13 @@ class Restaurant extends ActiveRecord
             ->all();
 
         foreach ($agents as $agentAssignment) {
+
+            $ml = new MailLog();
+            $ml->to = $agentAssignment->agent->agent_email;
+            $ml->from = \Yii::$app->params['noReplyEmail'];
+            $ml->subject = 'Store Domain Updated';
+            $ml->save();
+
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
@@ -1218,6 +1238,13 @@ class Restaurant extends ActiveRecord
             ->all();
 
         foreach ($agents as $agentAssignment) {
+
+            $ml = new MailLog();
+            $ml->to = $agentAssignment->agent->agent_email;
+            $ml->from = \Yii::$app->params['noReplyEmail'];
+            $ml->subject = 'Store Domain Updated';
+            $ml->save();
+
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
@@ -1454,6 +1481,12 @@ class Restaurant extends ActiveRecord
         $paymentGateway = 'MyFatoorah';
 
         $subject = 'Your ' . $paymentGateway . ' account data has been created';
+
+        $ml = new MailLog();
+        $ml->to = $this->restaurant_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = $subject;
+        $ml->save();
 
         $mailer = Yii::$app->mailer->compose([
             'html' => 'payment-gateway-created',
@@ -2269,6 +2302,12 @@ class Restaurant extends ActiveRecord
 
         $subject = 'Your ' . $paymentGateway . ' account data has been approved';
 
+        $ml = new MailLog();
+        $ml->to = $this->restaurant_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = $subject;
+        $ml->save();
+
         $mailer = Yii::$app->mailer->compose([
             'html' => 'agent/tap-approved',
         ], [
@@ -2291,6 +2330,12 @@ class Restaurant extends ActiveRecord
         $paymentGateway = 'Tap Payment';
 
         $subject = 'Your ' . $paymentGateway . ' account status is ' . $status;
+
+        $ml = new MailLog();
+        $ml->to = $this->restaurant_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = $subject;
+        $ml->save();
 
         $mailer = Yii::$app->mailer->compose([
             'html' => 'agent/tap-rejected',
@@ -2349,6 +2394,12 @@ class Restaurant extends ActiveRecord
     public function onTapCreated()
     {
         $subject = 'Your Tap account has been created';
+
+        $ml = new MailLog();
+        $ml->to = $this->restaurant_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = $subject;
+        $ml->save();
 
         $mailer = Yii::$app->mailer->compose([
             'html' => 'payment-gateway-created',
@@ -4367,6 +4418,12 @@ class Restaurant extends ActiveRecord
             foreach ($agentAssignments as $key => $agentAssignment) {
 
                 if ($agentAssignment->receive_weekly_stats) {
+
+                    $ml = new MailLog();
+                    $ml->to = $agentAssignment->agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = "Weekly Store Summary";
+                    $ml->save();
 
                     $weeklyStoreSummaryEmail = Yii::$app->mailer->compose([
                         'html' => 'weekly-summary',

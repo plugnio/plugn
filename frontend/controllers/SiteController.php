@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\MailLog;
 use Yii;
 use agent\models\Currency;
 use frontend\models\VerifyEmailForm;
@@ -179,6 +180,13 @@ class SiteController extends Controller
                 $managedRestaurant->restaurant_domain = rtrim($managedRestaurant->restaurant_domain, '/');
 
                 if ($managedRestaurant->save()) {
+
+                    $ml = new MailLog();
+                    $ml->to = \Yii::$app->params['adminEmail'];
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = '[Plugn] Agent updated DN';
+                    $ml->save();
+
                     Yii::$app->session->setFlash('successResponse', "Congratulations you have successfully changed your domain name");
 
                     \Yii::$app->mailer->compose([
@@ -188,7 +196,7 @@ class SiteController extends Controller
                         'new_domain' => $managedRestaurant->restaurant_domain,
                         'old_domain' => $old_domain
                     ])
-                        ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+                        ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
                         ->setTo(Yii::$app->params['adminEmail'])
                         ->setSubject('[Plugn] Agent updated DN')
                         ->send();
@@ -463,13 +471,19 @@ class SiteController extends Controller
 
                 foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {
 
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = '[Plugn] Agent updated DN';
+                    $ml->save();
+
                     \Yii::$app->mailer->compose([
                            'html' => 'premium-upgrade',
                                ], [
                            'subscription' => $subscription_model,
                            'store' => $paymentRecord->restaurant,
                        ])
-                       ->setFrom([\Yii::$app->params['supportEmail'] => 'Plugn'])
+                       ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                        ->setTo([$agent->agent_email])
                        ->setBcc(\Yii::$app->params['supportEmail'])
                        ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)

@@ -838,6 +838,12 @@ class Order extends \yii\db\ActiveRecord
 
         if ($this->customer_email) {
 
+            $ml = new MailLog();
+            $ml->to = $this->customer_email;
+            $ml->from = $fromEmail;
+            $ml->subject = 'Order #' . $this->order_uuid . ' from ' . $this->restaurant->name;
+            $ml->save();
+
             $mailer = \Yii::$app->mailer->compose([
                 'html' => 'payment-confirm-html',
             ], [
@@ -860,6 +866,12 @@ class Order extends \yii\db\ActiveRecord
 
             if ($agentAssignment->email_notification) {
 
+                $ml = new MailLog();
+                $ml->to = $agentAssignment->agent->agent_email;
+                $ml->from = $fromEmail;
+                $ml->subject = 'Order #' . $this->order_uuid . ' from ' . $this->restaurant->name;
+                $ml->save();
+
                 $mailer = \Yii::$app->mailer->compose([
                     'html' => 'payment-confirm-html',
                 ], [
@@ -879,6 +891,12 @@ class Order extends \yii\db\ActiveRecord
         }
 
         if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email) {
+
+            $ml = new MailLog();
+            $ml->to = $this->restaurant->restaurant_email;
+            $ml->from = $fromEmail;
+            $ml->subject = 'Order #' . $this->order_uuid . ' from ' . $this->restaurant->name;
+            $ml->save();
 
             $mailer = \Yii::$app->mailer->compose([
                     'html' => 'payment-confirm-html',

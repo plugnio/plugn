@@ -156,7 +156,18 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * @param $password
+     * @return bool|void
+     */
     public function notificationMail($password) {
+
+        $ml = new MailLog();
+        $ml->to = $this->agent->agent_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = "You've been invited to manage " . $this->restaurant->name;
+        $ml->save();
+
         $mailter = Yii::$app->mailer->compose([
                 'html' => 'new-agent',
             ], [
@@ -174,7 +185,17 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         }
     }
 
+    /**
+     * @return bool|void
+     */
     public function inviteAgent() {
+
+        $ml = new MailLog();
+        $ml->to = $this->agent->agent_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = $this->restaurant->name  . " has added you as a team member on their Plugn store";
+        $ml->save();
+
         $mailer = Yii::$app->mailer->compose([
             'html' => 'agent-invitation',
         ], [
