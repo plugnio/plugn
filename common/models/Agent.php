@@ -240,6 +240,12 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function sendPasswordUpdatedEmail()
     {
+        $ml = new MailLog();
+        $ml->to = $this->agent_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Your '. \Yii::$app->params['appName'] .' password has been changed';
+        $ml->save();
+
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
         \Yii::$app->mailer->compose ([
@@ -341,6 +347,12 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         } else {
             $email = $this->agent_email;
         }
+
+        $ml = new MailLog();
+        $ml->to = $email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Please confirm your email address';
+        $ml->save();
 
         $mailter = Yii::$app->mailer->compose([
             'html' => 'agent/verify-email-html',

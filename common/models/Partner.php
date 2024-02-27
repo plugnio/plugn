@@ -300,6 +300,12 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
    */
   public static function passwordMail($model, $password)
   {
+      $ml = new MailLog();
+      $ml->to = $model->partner_email;
+      $ml->from = \Yii::$app->params['noReplyEmail'];
+      $ml->subject = 'Your account password has been reset';
+      $ml->save();
+
       $mailer = \Yii::$app->mailer->compose([
                    'html' => 'staff-password',
                        ], [

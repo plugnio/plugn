@@ -373,15 +373,30 @@ class StoreController extends BaseController
      */
     protected function findByDomain($domain)
     {
-        $model = Restaurant::find()
-            ->andWhere([
-                "OR",
-                ['restaurant_domain' => 'https://'. $domain],
-                ['restaurant_domain' => 'https://www.'. $domain],
+        $conditions = [
+            "OR",
+            ['restaurant_domain' => 'https://'. $domain],
+            ['restaurant_domain' => 'https://www.'. $domain],
+            //custom domain can have http https://bawescompany.atlassian.net/browse/TECH-449
+            ['restaurant_domain' => 'http://'. $domain],
+            ['restaurant_domain' => 'http://www.'. $domain]
+        ];
+
+        if(str_contains($domain, ".plugn.store")) {
+
+            $oldDomain = str_replace(".plugn.store", ".plugn.site", $domain);
+
+            $conditions = array_merge($conditions, [
+                ['restaurant_domain' => 'https://'. $oldDomain],
+                ['restaurant_domain' => 'https://www.'. $oldDomain],
                 //custom domain can have http https://bawescompany.atlassian.net/browse/TECH-449
-                ['restaurant_domain' => 'http://'. $domain],
-                ['restaurant_domain' => 'http://www.'. $domain]
-            ])
+                ['restaurant_domain' => 'http://'. $oldDomain],
+                ['restaurant_domain' => 'http://www.'. $oldDomain]
+            ]);
+        }
+
+        $model = Restaurant::find()
+            ->andWhere($conditions)
             ->one();
 
         if ($model !== null) {

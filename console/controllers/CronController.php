@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\Agent;
+use common\models\MailLog;
 use Yii;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
@@ -143,6 +144,12 @@ class CronController extends \yii\console\Controller
                     $restaurant->has_deployed = 1;
                     $restaurant->save(false);
 
+                    $ml = new MailLog();
+                    $ml->to = $restaurant->restaurant_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Your store ' . $restaurant->name . ' is now ready';
+                    $ml->save();
+
                     $mailer = \Yii::$app->mailer->compose([
                             'html' => 'store-ready',
                         ], [
@@ -192,6 +199,12 @@ class CronController extends \yii\console\Controller
 
                 foreach ($store->ownerAgent as $agent) {
 
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Is there anything we can help with?';
+                    $ml->save();
+
                     $mailer = Yii::$app->mailer->compose([
                         'html' => 'offer-assistance',
                     ], [
@@ -233,6 +246,12 @@ class CronController extends \yii\console\Controller
                 }
 
                 foreach ($store->ownerAgent as $agent) {
+
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Is there anything we can help with?';
+                    $ml->save();
 
                     $mailer = Yii::$app->mailer->compose([
                         'html' => 'offer-assistance',
@@ -277,6 +296,12 @@ class CronController extends \yii\console\Controller
                 if (date('Y-m-d', strtotime($subscription->subscription_end_at)) == date('Y-m-d')) {
 
                     foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
+
+                        $ml = new MailLog();
+                        $ml->to = $agent->agent_email;
+                        $ml->from = \Yii::$app->params['noReplyEmail'];
+                        $ml->subject = $subscription->restaurant->name . ' has been downgraded to our free plan';
+                        $ml->save();
 
                         $mailer = \Yii::$app->mailer->compose([
                             'html' => 'subscription-expired',
@@ -329,6 +354,12 @@ class CronController extends \yii\console\Controller
             foreach ($subscriptions as $subscription) {
 
                 foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
+
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Your Subscription is Expiring';
+                    $ml->save();
 
                     $mailer = \Yii::$app->mailer->compose([
                         'html' => 'subscription-will-expire-soon-html',
@@ -810,6 +841,12 @@ class CronController extends \yii\console\Controller
                             }
                         }
 
+                        $ml = new MailLog();
+                        $ml->to = $agentAssignment->agent->agent_email;
+                        $ml->from = \Yii::$app->params['noReplyEmail'];
+                        $ml->subject = 'Your Subscription is Expiring';
+                        $ml->save();
+
                         $mailer = \Yii::$app->mailer->compose([
                             'html' => 'order-reminder-html',
                         ], [
@@ -971,7 +1008,6 @@ class CronController extends \yii\console\Controller
             ];
 
             Yii::$app->eventManager->track('Inactive stores',  $data);
-
     }
 
     /**

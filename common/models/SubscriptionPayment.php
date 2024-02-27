@@ -326,6 +326,12 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
 
+            $ml = new MailLog();
+            $ml->to = $agent->agent_email;
+            $ml->from = \Yii::$app->params['noReplyEmail'];
+            $ml->subject = 'Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name;
+            $ml->save();
+
             $mailer = \Yii::$app->mailer->compose([
                 'html' => 'premium-upgrade',
             ], [

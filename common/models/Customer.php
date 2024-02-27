@@ -732,7 +732,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
         }
 
         $restaurant = Restaurant::find()->andWhere(['restaurant_uuid' => $restaurant_uuid])->one();
- 
+
+        $ml = new MailLog();
+        $ml->to = $this->customer_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Your '. $restaurant->restaurant.' password has been changed';
+        $ml->save();
+
         \Yii::$app->mailer->compose ([
             'html' => 'customer/password-updated-html',
             'text' => 'customer/password-updated-text',
@@ -857,7 +863,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             $verifyLink = $verifyLink = Yii::$app->params['newDashboardAppUrl'] . '/verify-email/' . urlencode($email) . '/' 
                 . $this->customer_auth_key;
         }
-            
+
+        $ml = new MailLog();
+        $ml->to = $email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Please confirm your email address';
+        $ml->save();
+
         $mailer = Yii::$app->mailer->compose([
                 'html' => 'customer/verify-email-html',
                 'text' => 'customer/verify-email-text',

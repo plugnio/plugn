@@ -2,6 +2,7 @@
 
 namespace agent\models;
 
+use common\models\MailLog;
 use Yii;
 use yii\base\Model;
 use common\models\Agent;
@@ -43,35 +44,44 @@ class PasswordResetRequestForm extends Model {
           ]);
       }
 
-      if ($agent) {
-          if (!Agent::isPasswordResetTokenValid($agent->agent_password_reset_token)) {
-              $agent->generatePasswordResetToken();
-          }
-
-          if ($agent->save(false)) {
-
-              $resetLink = Yii::$app->params['newDashboardAppUrl'] . '/update-password/' . $agent->agent_password_reset_token;
-
-              $mailer = Yii::$app->mailer->compose([
-                  'html' => 'passwordResetToken-html',
-                  'text' => 'passwordResetToken-text'
-                ], [
-                      'resetLink' => $resetLink,
-                      'agent' => $agent
-                  ]
-                )
-                  ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
-                  ->setTo($this->email)
-                  ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard');
-
-              try {
-                  return $mailer->send();
-              } catch (\Swift_TransportException $e) {
-                  Yii::error($e->getMessage(), "email");
-              }
-        }
+      if (!$agent) {
+          return false;
       }
 
+        if (!Agent::isPasswordResetTokenValid($agent->agent_password_reset_token)) {
+            $agent->generatePasswordResetToken();
+        }
+
+        if ($agent->save(false)) {
+
+            $ml = new MailLog();
+            $ml->to = $this->email;
+            $ml->from = Yii::$app->params['noReplyEmail'];
+            $ml->subject = 'Password reset for ' . Yii::$app->name . ' Dashboard';
+            $ml->save();
+
+            $resetLink = Yii::$app->params['newDashboardAppUrl'] . '/update-password/' . $agent->agent_password_reset_token;
+
+            $mailer = Yii::$app->mailer->compose([
+                'html' => 'passwordResetToken-html',
+                'text' => 'passwordResetToken-text'
+            ], [
+                    'resetLink' => $resetLink,
+                    'agent' => $agent
+                ]
+            )
+                ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
+                ->setTo($this->email)
+                ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard');
+
+            try {
+                return $mailer->send();
+            } catch (\Swift_TransportException $e) {
+                Yii::error($e->getMessage(), "email");
+            }
+        }
+
+      return true;
    }
 
 

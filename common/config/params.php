@@ -14,6 +14,7 @@ return [
     'myfatoorah.kuwaitSecretKey' => 'WmlCnGR8+MXAlNZ3lyMdW/mD06jXa2kWa44g21lPawoRTMoZpKmn39ihdcQKYKw3uax7QYfhuEK+qPDkIvzfmA==',
     'myfatoorah.saudiSecretKey' => 'sFfT2vIPVu7+GWlGFWqyH47wuVfNrhnqNpg2FCScRDrhoDiEmyvCPKBJcWcPf4takQR21o/PBK/oXfabiq0dUg==',
     'storeVersion' => 5,
+    'mailThreshold' => 500,
     'allowedOrigins' => [
         //'https://api.yo3an.io/',
         //Dev Envs
