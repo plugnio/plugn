@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "Emojis are not allowed." => "الرموز التعبيرية غير مسموح بها.",
     "Domain already registered with other website" => "المجال مسجل بالفعل مع موقع آخر",
     "We limiting no of store per user to 5 for now!" => "نحن نحدد عدد المتاجر لكل مستخدم بـ 5 في الوقت الحالي!",
     "Phone no. already exist." => "رقم الهاتف. موجود مسبقا.",
