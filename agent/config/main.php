@@ -265,6 +265,7 @@ return [
                         'GET orders-report' => 'orders-report',
                         'GET total-pending' => 'total-pending',
                         'GET download-invoice/<id>' => 'download-invoice',
+                        'GET download-today-invoices' => 'download-today-invoices',
                         'GET archive-orders' => 'archive-orders',
                         'GET live-orders' => 'live-orders',
                         'GET <type>' => 'list',
