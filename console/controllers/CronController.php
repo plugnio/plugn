@@ -1050,6 +1050,7 @@ class CronController extends \yii\console\Controller
                 }
 
                 if ($site_id) {
+
                     $i++;
                     //$this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
 

@@ -1417,8 +1417,9 @@ class StoreController extends BaseController
 
         //update site
 
-        if($model->site_id)
+        if($model->site_id) {
             Yii::$app->netlifyComponent->upgradeSite($model);
+        }
 
             $props =  [
                 "google_analytics_id" => !empty($model->google_analytics_id),
