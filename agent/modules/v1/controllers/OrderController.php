@@ -12,11 +12,13 @@ use common\models\Payment;
 use common\models\PaymentMethod;
 use common\models\RestaurantInvoice;
 use common\models\shipping\Aramex;
+use http\Exception\UnexpectedValueException;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use agent\models\Order;
 use agent\models\OrderItem;
@@ -2011,6 +2013,114 @@ class OrderController extends BaseController
                 'defaultheaderline' => 0,  //for header
                 'defaulfooterline' => 0,  //for footer
                 'title' => 'Invoice #' . $order->order_uuid,
+                'fontDir' => array_merge($fontDirs, [
+                    __DIR__ . '/Nunito',
+                    // __DIR__ . '/../../../web/fonts/Nunito/'
+                ]),
+                'fontdata' => array_merge($fontData, [
+                    "Nunito" => [
+                        'R' => 'Nunito-Regular.ttf',
+                        'B' => 'Nunito-Bold.ttf',
+                        'B' => 'Nunito-Italic.ttf',
+                    ],
+                    "NunitoSans" => [
+                        'R' => 'NunitoSans-Regular.ttf',
+                        'I' => "NunitoSans-Italic.ttf", // Italic  - OPTIONAL
+                        'B' => 'NunitoSans-Bold.ttf' // Bold    - OPTIONAL
+                    ],
+                ])
+            ],
+            'defaultFont' => "Nunito",
+            'mode' => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4,
+            'marginTop' => 5,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => Pdf::DEST_BROWSER,
+            // your html content input
+            'content' => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            'cssFile' => [
+                __DIR__ . '/../../../web/css/invoice.css',
+                '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css'
+            ]
+            //Url::to('@web/css/invoice.css', true),
+            //'@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            // any css to be embedded if required
+//            'methods' => [
+//                'SetHeader'=>[$candidate->employeeId .'<br/>'. 'Prepared by '.Yii::$app->user->identity->staff_name],
+//                'SetHeader'=>[$candidate->employeeId .'<br/>'. 'Prepared by Khalid'],
+//            ]
+        ]);
+
+        header('Access-Control-Allow-Origin: *');
+        return $pdf->render();
+    }
+
+    /**
+     * @return string
+     * @throws NotFoundHttpException
+     * @throws \Mpdf\MpdfException
+     * @throws \setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException
+     * @throws \setasign\Fpdi\PdfParser\PdfParserException
+     * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionDownloadTodayInvoices()
+    {
+        $store = Yii::$app->accountManager->getManagedAccount();
+
+        $this->layout = 'pdf';
+
+        $defaultLogo = Url::to('@web/images/icon-128x128.png', true);
+
+        $orderQuery = $store->getOrders()
+           // ->limit(100);
+            ->andWhere(new Expression("DATE(order_created_at) = DATE('".date("Y-m-d")."')"));
+
+        $count = $orderQuery->count();
+
+        if($count > 100) {
+
+            throw new HttpException(406, Yii::t("app", "No more than 100 invoices can be downloaded on single request"));
+
+            return [
+                "operation" => "error",
+                "message" => Yii::t("app", "No more than 100 invoices can be downloaded on single request")
+            ];
+        }
+
+        $content = "";
+
+        foreach ($orderQuery->batch() as $orders) {
+
+            foreach ($orders as $order) {
+
+                $content .= $this->render('invoice', [
+                    'order' => $order,
+                    'defaultLogo' => $defaultLogo,
+                    'bankDiscount' => $order->voucher_discount,
+                    'voucherDiscount' => $order->bank_discount,
+                ]);
+            }
+        }
+
+        $defaultConfig = (new \Mpdf\Config\ConfigVariables())->getDefaults();
+        $fontDirs = $defaultConfig['fontDir'];
+
+        $defaultFontConfig = (new \Mpdf\Config\FontVariables())->getDefaults();
+        $fontData = $defaultFontConfig['fontdata'];
+
+        //echo  __DIR__ . '/../../../web/fonts/Nunito';
+        //die();
+        $pdf = new Pdf([
+            'options' => [
+                'defaultheaderline' => 0,  //for header
+                'defaulfooterline' => 0,  //for footer
+                'title' => 'Invoices',
                 'fontDir' => array_merge($fontDirs, [
                     __DIR__ . '/Nunito',
                     // __DIR__ . '/../../../web/fonts/Nunito/'
