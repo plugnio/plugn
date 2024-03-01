@@ -211,6 +211,12 @@ class Ticket extends \yii\db\ActiveRecord
      */
     public function sendTicketAssignedMail() {
 
+        $ml = new MailLog();
+        $ml->to = $this->staff->staff_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Ticket assigned for ' . $this->restaurant->name;
+        $ml->save();
+
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
         \Yii::$app->mailer->compose ([
@@ -219,8 +225,10 @@ class Ticket extends \yii\db\ActiveRecord
         ], [
             'model' => $this
         ])
-            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            //->setFrom ([Yii::$app->params['supportEmail']])
             ->setTo ($this->staff->staff_email)
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject ('Ticket assigned for ' . $this->restaurant->name)
             ->send ();
     }
@@ -234,6 +242,12 @@ class Ticket extends \yii\db\ActiveRecord
 
         $staffEmails = ArrayHelper::getColumn ($staffs, 'staff_email');
 
+        $ml = new MailLog();
+        $ml->to = Yii::$app->params['supportEmail'];
+        $ml->from = \Yii::$app->params['supportEmail'];
+        $ml->subject = 'New ticket generated for ' . $this->restaurant->name;
+        $ml->save();
+
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
         \Yii::$app->mailer->compose ([
@@ -242,9 +256,11 @@ class Ticket extends \yii\db\ActiveRecord
             ], [
                 'model' => $this
             ])
-            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            //->setFrom ([Yii::$app->params['supportEmail']])
             ->setTo (Yii::$app->params['supportEmail'])
             ->setCc ($staffEmails)
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject ('New ticket generated for ' . $this->restaurant->name)
             ->send ();
     }

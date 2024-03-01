@@ -245,6 +245,13 @@ class Refund extends \yii\db\ActiveRecord
                 $this->store->owner_email
             ];
         }
+
+        $ml = new MailLog();
+        $ml->to = $replyTo;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Refund was not processed successfully for Order #' . $this->order_uuid;
+        $ml->save();
+
         $message = \Yii::$app->mailer->compose([
             'html' => 'refund-failure-html',
         ], [
@@ -253,6 +260,8 @@ class Refund extends \yii\db\ActiveRecord
         ]);
         $message->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name]);
         $message->setTo($replyTo);
+        $message->setReplyTo(\Yii::$app->params['supportEmail']);
+
         if ($this->order->customer_email) {
             $message->setCc([$this->order->customer_email]);
         }

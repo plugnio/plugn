@@ -151,6 +151,12 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function sendPasswordUpdatedEmail()
     {
+        $ml = new MailLog();
+        $ml->to = $this->staff_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Your '. \Yii::$app->params['appName'] .' password has been changed';
+        $ml->save();
+
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
         \Yii::$app->mailer->compose ([
@@ -159,8 +165,9 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
         ], [
             'staff' => $this
         ])
-            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo ($this->staff_email)
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject (Yii::t ('staff', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
             ->send ();
     }

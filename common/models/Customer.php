@@ -732,7 +732,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
         }
 
         $restaurant = Restaurant::find()->andWhere(['restaurant_uuid' => $restaurant_uuid])->one();
- 
+
+        $ml = new MailLog();
+        $ml->to = $this->customer_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Your '. $restaurant->restaurant.' password has been changed';
+        $ml->save();
+
         \Yii::$app->mailer->compose ([
             'html' => 'customer/password-updated-html',
             'text' => 'customer/password-updated-text',
@@ -740,7 +746,8 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             'customer' => $this,
             'restaurant' => $restaurant
         ])
-            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo ($this->customer_email)
             ->setSubject (Yii::t ('customer', 'Your '. $restaurant->restaurant.' password has been changed'))
             ->send();
@@ -857,7 +864,13 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             $verifyLink = $verifyLink = Yii::$app->params['newDashboardAppUrl'] . '/verify-email/' . urlencode($email) . '/' 
                 . $this->customer_auth_key;
         }
-            
+
+        $ml = new MailLog();
+        $ml->to = $email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Please confirm your email address';
+        $ml->save();
+
         $mailer = Yii::$app->mailer->compose([
                 'html' => 'customer/verify-email-html',
                 'text' => 'customer/verify-email-text',
@@ -867,8 +880,9 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
                 'restaurant' => $restaurant,
                 'verifyLink' => $verifyLink
             ])
-            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo($email)
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('Please confirm your email address');
 
         try {

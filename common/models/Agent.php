@@ -240,6 +240,12 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function sendPasswordUpdatedEmail()
     {
+        $ml = new MailLog();
+        $ml->to = $this->agent_email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Your '. \Yii::$app->params['appName'] .' password has been changed';
+        $ml->save();
+
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
         \Yii::$app->mailer->compose ([
@@ -248,7 +254,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ], [
                 'agent' => $this
             ])
-            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo ($this->agent_email)
             ->setSubject (Yii::t ('agent', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
             ->send ();
@@ -342,6 +349,12 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             $email = $this->agent_email;
         }
 
+        $ml = new MailLog();
+        $ml->to = $email;
+        $ml->from = \Yii::$app->params['noReplyEmail'];
+        $ml->subject = 'Please confirm your email address';
+        $ml->save();
+
         $mailter = Yii::$app->mailer->compose([
             'html' => 'agent/verify-email-html',
             'text' => 'agent/verify-email-text',
@@ -349,7 +362,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             'agent' => $this,
             'email' => $email
         ])
-            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo($email)
             ->setSubject('Please confirm your email address');
 

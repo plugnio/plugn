@@ -838,14 +838,22 @@ class Order extends \yii\db\ActiveRecord
 
         if ($this->customer_email) {
 
+            $ml = new MailLog();
+            $ml->to = $this->customer_email;
+            $ml->from = $fromEmail;
+            $ml->subject = 'Order #' . $this->order_uuid . ' from ' . $this->restaurant->name;
+            $ml->save();
+
             $mailer = \Yii::$app->mailer->compose([
                 'html' => 'payment-confirm-html',
             ], [
                 'order' => $this,
                 'payment' => $payment
             ])
-                ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
+                ->setFrom([$fromEmail => $this->restaurant->name])
+                //->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                 ->setTo($this->customer_email)
+                ->setReplyTo(\Yii::$app->params['supportEmail'])
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                 //->setReplyTo($replyTo)
 
@@ -860,13 +868,21 @@ class Order extends \yii\db\ActiveRecord
 
             if ($agentAssignment->email_notification) {
 
+                $ml = new MailLog();
+                $ml->to = $agentAssignment->agent->agent_email;
+                $ml->from = $fromEmail;
+                $ml->subject = 'Order #' . $this->order_uuid . ' from ' . $this->restaurant->name;
+                $ml->save();
+
                 $mailer = \Yii::$app->mailer->compose([
                     'html' => 'payment-confirm-html',
                 ], [
                     'order' => $this
                 ])
-                    ->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
+                    ->setFrom([$fromEmail => $this->restaurant->name])
+                    //->setFrom($fromEmail)//[$fromEmail => $this->restaurant->name]
                     ->setTo($agentAssignment->agent->agent_email)
+                    ->setReplyTo(\Yii::$app->params['supportEmail'])
                     ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                     //->setReplyTo($replyTo)
 
@@ -880,13 +896,21 @@ class Order extends \yii\db\ActiveRecord
 
         if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email) {
 
+            $ml = new MailLog();
+            $ml->to = $this->restaurant->restaurant_email;
+            $ml->from = $fromEmail;
+            $ml->subject = 'Order #' . $this->order_uuid . ' from ' . $this->restaurant->name;
+            $ml->save();
+
             $mailer = \Yii::$app->mailer->compose([
                     'html' => 'payment-confirm-html',
                 ], [
                     'order' => $this
                 ])
-                ->setFrom($fromEmail)//[$this->restaurant->restaurant_email => $this->restaurant->name]
+                ->setFrom([$fromEmail => $this->restaurant->name])
+                //->setFrom($fromEmail)//[$this->restaurant->restaurant_email => $this->restaurant->name]
                 ->setTo($this->restaurant->restaurant_email)
+                ->setReplyTo(\Yii::$app->params['supportEmail'])
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                // ->setReplyTo($replyTo)
 

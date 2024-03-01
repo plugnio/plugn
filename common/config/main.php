@@ -8,10 +8,10 @@ return [
     'name' => 'Plugn',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
-        /*'cache' => [
+        'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'cache' => [
+       /* 'cache' => [
             'class' => 'yii\redis\Cache',
             'redis' => [
                 'hostname' => 'localhost',

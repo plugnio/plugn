@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\Agent;
+use common\models\MailLog;
 use Yii;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
@@ -143,12 +144,19 @@ class CronController extends \yii\console\Controller
                     $restaurant->has_deployed = 1;
                     $restaurant->save(false);
 
+                    $ml = new MailLog();
+                    $ml->to = $restaurant->restaurant_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Your store ' . $restaurant->name . ' is now ready';
+                    $ml->save();
+
                     $mailer = \Yii::$app->mailer->compose([
                             'html' => 'store-ready',
                         ], [
                             'store' => $restaurant,
                         ])
-                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                        ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setTo([$restaurant->restaurant_email])
                         ->setSubject('Your store ' . $restaurant->name . ' is now ready');
 
@@ -192,12 +200,19 @@ class CronController extends \yii\console\Controller
 
                 foreach ($store->ownerAgent as $agent) {
 
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Is there anything we can help with?';
+                    $ml->save();
+
                     $mailer = Yii::$app->mailer->compose([
                         'html' => 'offer-assistance',
                     ], [
                         'store' => $store
                     ])
-                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                        ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setTo($agent->agent_email)
                         ->setSubject('Is there anything we can help with?');
 
@@ -234,12 +249,19 @@ class CronController extends \yii\console\Controller
 
                 foreach ($store->ownerAgent as $agent) {
 
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Is there anything we can help with?';
+                    $ml->save();
+
                     $mailer = Yii::$app->mailer->compose([
                         'html' => 'offer-assistance',
                     ], [
                         'store' => $store
                     ])
-                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                        ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setTo($agent->agent_email)
                         ->setSubject('Is there anything we can help with?');
 
@@ -278,6 +300,12 @@ class CronController extends \yii\console\Controller
 
                     foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
 
+                        $ml = new MailLog();
+                        $ml->to = $agent->agent_email;
+                        $ml->from = \Yii::$app->params['noReplyEmail'];
+                        $ml->subject = $subscription->restaurant->name . ' has been downgraded to our free plan';
+                        $ml->save();
+
                         $mailer = \Yii::$app->mailer->compose([
                             'html' => 'subscription-expired',
                         ], [
@@ -286,7 +314,8 @@ class CronController extends \yii\console\Controller
                             'plan' => $subscription->plan->name,
                             'agent_name' => $agent->agent_name,
                         ])
-                            ->setFrom([\Yii::$app->params['noReplyEmail']])
+                            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                            ->setReplyTo(\Yii::$app->params['supportEmail'])
                             ->setTo($agent->agent_email)
                             ->setBcc(\Yii::$app->params['supportEmail'])
                             ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan');
@@ -330,6 +359,12 @@ class CronController extends \yii\console\Controller
 
                 foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
 
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Your Subscription is Expiring';
+                    $ml->save();
+
                     $mailer = \Yii::$app->mailer->compose([
                         'html' => 'subscription-will-expire-soon-html',
                     ], [
@@ -338,7 +373,8 @@ class CronController extends \yii\console\Controller
                         'plan' => $subscription->plan->name,
                         'agent_name' => $agent->agent_name,
                     ])
-                        ->setFrom([\Yii::$app->params['noReplyEmail']])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                        ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setTo($agent->agent_email)
                         ->setBcc(\Yii::$app->params['supportEmail'])
                         ->setSubject('Your Subscription is Expiring');
@@ -810,6 +846,12 @@ class CronController extends \yii\console\Controller
                             }
                         }
 
+                        $ml = new MailLog();
+                        $ml->to = $agentAssignment->agent->agent_email;
+                        $ml->from = \Yii::$app->params['noReplyEmail'];
+                        $ml->subject = 'Order #' . $order->order_uuid . ' from ' . $order->restaurant->name;
+                        $ml->save();
+
                         $mailer = \Yii::$app->mailer->compose([
                             'html' => 'order-reminder-html',
                         ], [
@@ -817,6 +859,7 @@ class CronController extends \yii\console\Controller
                             'agent_name' => $agentAssignment->agent->agent_name
                         ])
                             ->setFrom([\Yii::$app->params['noReplyEmail'] => $order->restaurant->name])
+                            ->setReplyTo(\Yii::$app->params['supportEmail'])
                             ->setTo($agentAssignment->agent->agent_email)
                             ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name);
 
@@ -971,7 +1014,6 @@ class CronController extends \yii\console\Controller
             ];
 
             Yii::$app->eventManager->track('Inactive stores',  $data);
-
     }
 
     /**
@@ -1008,6 +1050,7 @@ class CronController extends \yii\console\Controller
                 }
 
                 if ($site_id) {
+
                     $i++;
                     //$this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
 

@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use agent\models\Currency;
+use common\models\MailLog;
 use common\models\RestaurantAddon;
 use Yii;
 use common\components\TapPayments;
@@ -323,6 +324,12 @@ class AddonController extends BaseController
 
                 foreach ($paymentRecord->restaurant->getOwnerAgent()->all() as $agent ) {
 
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = Yii::$app->params['noReplyEmail'];
+                    $ml->subject ='Thank you for your purchase';
+                    $ml->save();
+
                     $mailer = \Yii::$app->mailer->compose([
                         'html' => 'addon-purchased',
                     ], [
@@ -330,8 +337,9 @@ class AddonController extends BaseController
                         'addon' => $paymentRecord->addon,
                         'store' => $paymentRecord->restaurant,
                     ])
-                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
                         ->setTo([$agent->agent_email])
+                        ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setBcc(\Yii::$app->params['supportEmail'])
                         ->setSubject('Thank you for your purchase');
 

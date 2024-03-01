@@ -3,6 +3,7 @@
 namespace agent\modules\v1\controllers;
 
 use agent\models\Currency;
+use common\models\MailLog;
 use common\models\PlanPrice;
 use Yii;
 use common\components\TapPayments;
@@ -388,14 +389,21 @@ class PlanController extends BaseController
 
                 foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
 
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = Yii::$app->params['noReplyEmail'];
+                    $ml->subject = 'Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name;
+                    $ml->save();
+
                     $mailer = \Yii::$app->mailer->compose([
                         'html' => 'premium-upgrade',
                     ], [
                         'subscription' => $subscription,
                         'store' => $paymentRecord->restaurant,
                     ])
-                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
                         ->setTo([$agent->agent_email])
+                        ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setBcc(\Yii::$app->params['supportEmail'])
                         ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name);
 

@@ -237,6 +237,12 @@ class AddonPayment extends \yii\db\ActiveRecord
 
             foreach ($paymentRecord->restaurant->getOwnerAgent()->all() as $agent ) {
 
+                $ml = new MailLog();
+                $ml->to = $agent->agent_email;
+                $ml->from = \Yii::$app->params['noReplyEmail'];
+                $ml->subject = 'Thank you for your purchase';
+                $ml->save();
+
                 $mailter = \Yii::$app->mailer->compose([
                     'html' => 'addon-purchased',
                 ], [
@@ -244,7 +250,8 @@ class AddonPayment extends \yii\db\ActiveRecord
                     'addon' => $paymentRecord->addon,
                     'store' => $paymentRecord->restaurant,
                 ])
-                    ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
+                    ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                    ->setReplyTo(\Yii::$app->params['supportEmail'])
                     ->setTo([$agent->agent_email])
                     ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Thank you for your purchase');

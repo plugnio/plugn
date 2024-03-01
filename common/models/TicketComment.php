@@ -144,6 +144,12 @@ class TicketComment extends \yii\db\ActiveRecord
             }
         }
 
+        $ml = new MailLog();
+        $ml->to = $toEmails[0];
+        $ml->from = \Yii::$app->params['supportEmail'];
+        $ml->subject = 'New comment on ticket #' . $this->ticket_uuid;
+        $ml->save();
+
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
         \Yii::$app->mailer->compose ([
@@ -152,7 +158,8 @@ class TicketComment extends \yii\db\ActiveRecord
             ], [
                 'model' => $this
             ])
-            ->setFrom ([Yii::$app->params['supportEmail']])
+            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+            //->setFrom ([Yii::$app->params['supportEmail']])
             ->setReplyTo([$fromEmail])
             ->setTo ($toEmails)
             ->setCc (Yii::$app->params['supportEmail'])

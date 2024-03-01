@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\NoEmojiValidator;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
@@ -79,6 +80,7 @@ class Voucher extends \yii\db\ActiveRecord {
             }],
             [['voucher_created_at', 'voucher_updated_at', 'is_public'], 'safe'],
             [['code','description','description_ar'], 'string', 'max' => 255],
+            ['code', NoEmojiValidator::class],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
