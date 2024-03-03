@@ -17,8 +17,8 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "No more than 100 invoices can be downloaded on single request" => "لا يمكن تنزيل أكثر من 100 فاتورة عند الطلب الواحد",
     "Emojis are not allowed." => "الرموز التعبيرية غير مسموح بها.",
-    "No more than 100 invoices can be downloaded on single request" => "",
     "Domain already registered with other website" => "المجال مسجل بالفعل مع موقع آخر",
     "We limiting no of store per user to 5 for now!" => "نحن نحدد عدد المتاجر لكل مستخدم بـ 5 في الوقت الحالي!",
     "Phone no. already exist." => "رقم الهاتف. موجود مسبقا.",

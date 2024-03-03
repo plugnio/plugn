@@ -115,9 +115,10 @@ AppAsset::register($this);
                 'label' => 'Security',
                 'items' => [
                     ['label' => 'Blocked IP', 'url' => ['/blocked-ip/index']],
+                    ['label' => 'Mail Log', 'url' => ['/mail-log/index']],
+                    ['label' => 'Mail Stats', 'url' => ['/mail-log/stats/7']],
                 ]
             ],
-
             [
                 'label' => 'Settings',
                 'items' => [
