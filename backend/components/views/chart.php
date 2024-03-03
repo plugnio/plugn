@@ -8,7 +8,7 @@ if($currency_code) {
    var tooltip_". $id ." = {
           y: {
             formatter: (val) => {
-              return val + ' <?= $currency_code ?>';
+              return val + '". $currency_code ."';
             }
           },
           x: {
@@ -27,7 +27,7 @@ if($currency_code) {
       }
     },
     x: {
-      show: <?= $show ?>,
+      show: ". $show .",
     }
   }";
 } 
