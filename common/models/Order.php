@@ -18,6 +18,7 @@ use yii\web\BadRequestHttpException;
  * @property int $customer_id
  * @property string|null $restaurant_uuid
  * @property int $area_id
+ * @property int $state_id
  * @property int|null $delivery_zone_id
  * @property int|null $shipping_country_id
  * @property string|null $country_name
@@ -179,7 +180,7 @@ class Order extends \yii\db\ActiveRecord
             ]],
             [['order_uuid'], 'string', 'max' => 40],
             [['order_uuid'], 'unique'],
-            [['area_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted'], 'integer', 'min' => 0],
+            [['area_id', 'state_id', 'payment_method_id', 'order_status', 'mashkor_order_status', 'customer_id', 'is_deleted'], 'integer', 'min' => 0],
             [['items_has_been_restocked', 'is_order_scheduled', 'voucher_id', 'reminder_sent', 'sms_sent', 'customer_phone_country_code', 'delivery_zone_id', 'shipping_country_id', 'pickup_location_id'], 'integer'],
 
             ['mashkor_order_status', 'in', 'range' => [
@@ -343,6 +344,7 @@ class Order extends \yii\db\ActiveRecord
                 'targetAttribute' => ['delivery_zone_id' => 'delivery_zone_id', 'restaurant_uuid']],
             [['shipping_country_id'], 'exist', 'skipOnError' => false, 'targetClass' => Country::className(), 'targetAttribute' => ['shipping_country_id' => 'country_id']],
             [['area_id'], 'exist', 'skipOnError' => false, 'targetClass' => Area::className(), 'targetAttribute' => ['area_id' => 'area_id']],
+            [['state_id'], 'exist', 'skipOnError' => false, 'targetClass' => State::className(), 'targetAttribute' => ['state_id' => 'state_id']],
             [['bank_discount_id'], 'exist', 'skipOnError' => true, 'targetClass' => BankDiscount::className(), 'targetAttribute' => ['bank_discount_id' => 'bank_discount_id']],
             [['customer_id'], 'exist', 'skipOnError' => false, 'targetClass' => Customer::className(), 'targetAttribute' => ['customer_id' => 'customer_id']],
             [['payment_method_id'], 'exist', 'skipOnError' => false, 'targetClass' => PaymentMethod::className(), 'targetAttribute' => ['payment_method_id' => 'payment_method_id']],
@@ -465,6 +467,7 @@ class Order extends \yii\db\ActiveRecord
             'restaurant',
             'orderItems',
             'area',
+            'state',
             'country',
             /*'orderItems' => function ($order) {
                 return $order->getOrderItems()
@@ -612,6 +615,10 @@ class Order extends \yii\db\ActiveRecord
             $query->andWhere(new Expression('area_id IS NULL OR area_id="' . $this->area_id . '"'));
         }
 
+        if($this->state_id) {
+            $query->andWhere(['state_id' => $this->state_id]);
+        }
+
         /*
         TODO: validate city for outside of Kuwait order
         if($this->city_id) {
@@ -721,6 +728,7 @@ class Order extends \yii\db\ActiveRecord
             'payment_uuid' => Yii::t('app','Payment Uuid'),
             'restaurant_uuid' => Yii::t('app','Restaurant Uuid'),
             'area_id' => Yii::t('app','Area ID'),
+            'state_id' => Yii::t('app','State ID'),
             'shipping_country_id' => Yii::t('app','Country ID'),
             'delivery_zone_id' => Yii::t('app','Delivery Zone ID'),
             'country_name' => Yii::t('app','Country Name'),
@@ -2524,6 +2532,16 @@ failed: the order has failed to find a driver */
         return $this->hasOne($modelClass::className(), ['area_id' => 'area_id'])
             ->via('area')
             ->andWhere(['restaurant_uuid' => $this->restaurant_uuid]);
+    }
+
+    /**
+     * Gets query for [[State]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getState($modelClass = "\common\models\State")
+    {
+        return $this->hasOne($modelClass::className(), ['state_id' => 'state_id']);
     }
 
     /**

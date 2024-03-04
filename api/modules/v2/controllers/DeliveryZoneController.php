@@ -228,8 +228,9 @@ class DeliveryZoneController extends BaseController
     {
         $area_id = Yii::$app->request->get('area_id');
         $city_id = Yii::$app->request->get('city_id');
+        $state_id = Yii::$app->request->get("state_id");
 
-        if (!$area_id && !$city_id) {
+        if (!$state_id && !$area_id && !$city_id) {
             return [
                 "operation" => "error",
                 "message" => "Location details missing"
@@ -273,6 +274,20 @@ class DeliveryZoneController extends BaseController
                     AND area_delivery_zone.city_id IS NULL AND area_delivery_zone.area_id IS NULL'),
                 ['area_delivery_zone.city_id' => $city_id]
             ]);
+        }
+        else if ($state_id)
+        {
+            $state = \common\models\State::find()
+                ->andWhere(['state_id' => $state_id])
+                ->one();
+
+            if(!$state) {
+                return null;
+            }
+
+            $query->andWhere(new Expression('area_delivery_zone.state_id="'.$state_id.'" AND 
+                    area_delivery_zone.city_id IS NULL AND 
+                    area_delivery_zone.area_id IS NULL'));
         }
 
         return $query->one();
