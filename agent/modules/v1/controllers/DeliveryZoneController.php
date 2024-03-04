@@ -134,10 +134,16 @@ class DeliveryZoneController extends BaseController
           ];
         }
 
+        $zone = DeliveryZone::find()
+            ->andWhere(['delivery_zone_id' => $model->delivery_zone_id])
+            ->with(['country'])
+            ->asArray()
+            ->one();
+
         return [
             "operation" => "success",
             "message" => Yii::t('agent', "Delivery Zone created successfully"),
-            "model" => DeliveryZone::findOne($model->delivery_zone_id)
+            "model" => $zone
         ];
 
     }
@@ -192,11 +198,17 @@ class DeliveryZoneController extends BaseController
             $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
             $area_delivery_zone->save(false);
         }
-        
+
+        $zone = DeliveryZone::find()
+            ->andWhere(['delivery_zone_id' => $model->delivery_zone_id])
+            ->with(['country'])
+            ->asArray()
+            ->one();
+
         return [
             "operation" => "success",
             "message" => Yii::t('agent',"Delivery zone updated successfully"),
-            "model" => $model
+            "model" => $zone
         ];
     }
 
@@ -405,17 +417,20 @@ class DeliveryZoneController extends BaseController
             ->one();
 
         //state wide
+
         if(!$areaDeliveryZone) {
+
             $areaDeliveryZone = $store->getAreaDeliveryZones()
                 ->andWhere([
                     'state_id' => $state_id,
-                    'country_id' => $country_id
+                   // 'country_id' => $country_id
                 ])
                 ->andWhere(new Expression("city_id IS NULL"))
                 ->one();
         }
 
         //country wide
+
         if(!$areaDeliveryZone) {
             $areaDeliveryZone = $store->getAreaDeliveryZones()
                 ->andWhere([

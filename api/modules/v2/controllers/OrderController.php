@@ -162,6 +162,7 @@ class OrderController extends BaseController
                 }
 
                 $order->area_id = Yii::$app->request->getBodyParam("area_id");
+                $order->state_id = Yii::$app->request->getBodyParam("state_id");
 
                 if($order->area_id && !$order->city) {
 

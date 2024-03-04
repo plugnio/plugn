@@ -12,6 +12,9 @@ use Yii;
  */
 class Order extends \common\models\Order
 {
+    /**
+     * @return array|false|int[]|string[]
+     */
     public function fields()
     {
         $fields = parent::fields();
@@ -67,6 +70,7 @@ class Order extends \common\models\Order
             'bankDiscount',
             'refunds',
             'area',
+            'state',
             'currency',
             'customer',
             'itemImage'//first image in first order item 
