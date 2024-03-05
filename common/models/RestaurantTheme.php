@@ -14,6 +14,7 @@ use Yii;
  * @property string|null $light
  * @property string|null $medium
  * @property string|null $dark
+ * @property string|null $show_description_in_list
  *
  * @property Restaurant $restaurant
  */
@@ -35,10 +36,17 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
             [['restaurant_uuid', 'primary', 'secondary', 'tertiary', 'light', 'medium', 'dark'], 'string', 'max' => 60],
             [['primary'], 'validateColorFormat'],//, 'secondary', 'tertiary', 'light', 'medium', 'dark'
             [['restaurant_uuid'], 'unique'],
+            [['show_description_in_list'], 'boolean'],
             [['restaurant_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Restaurant::className(), 'targetAttribute' => ['restaurant_uuid' => 'restaurant_uuid']],
         ];
     }
 
+    /**
+     * @param $attribute
+     * @param $params
+     * @param $validator
+     * @return void
+     */
     public function validateColorFormat($attribute, $params, $validator) {
         if($this->$attribute[0] != '#')
             $this->addError($attribute, Yii::t('app', 'Invalid color format'));
@@ -55,7 +63,8 @@ class RestaurantTheme extends \yii\db\ActiveRecord {
             'tertiary' => Yii::t('app','Tertiary'),
             'light' => Yii::t('app','Light'),
             'medium' => Yii::t('app','Medium'),
-            'dark' => Yii::t('app','Dark')
+            'dark' => Yii::t('app','Dark'),
+            'show_description_in_list' => Yii::t('app','Show Description in List'),
         ];
     }
 

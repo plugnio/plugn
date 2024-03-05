@@ -1308,6 +1308,8 @@ class StoreController extends BaseController
             $restaurantTheme->primary = Yii::$app->request->getBodyParam('primary');
         }
 
+        $restaurantTheme->show_description_in_list = Yii::$app->request->getBodyParam('show_description_in_list');
+
         if(!$restaurantTheme->save()) {
             $transaction->rollBack ();
 
