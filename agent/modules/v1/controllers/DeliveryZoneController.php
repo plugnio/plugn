@@ -525,6 +525,89 @@ class DeliveryZoneController extends BaseController
     }
 
     /**
+     * @param $state_id
+     * @param $delivery_zone_id
+     * @return string[]
+     */
+    public function actionRemoveStateFromDeliveryArea($state_id, $delivery_zone_id) {
+
+        $store_id = Yii::$app->request->getHeaders()
+            ->get('Store-Id');
+
+        //validate delivery zone access
+
+        $this->findModel($delivery_zone_id);
+
+        AreaDeliveryZone::updateAll([
+            'is_deleted' => 1
+        ], [
+            'restaurant_uuid' => $store_id,
+            "state_id" => $state_id,
+            'delivery_zone_id' => $delivery_zone_id
+        ]);
+
+        return [
+            "operation" => "success"
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function actionAddStateToDeliveryArea() {
+
+        $store_id = Yii::$app->request->getHeaders()
+            ->get('Store-Id');
+
+        $state_id = Yii::$app->request->getBodyParam("state_id");
+        $delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
+
+        //validate delivery zone access
+
+        $this->findModel($delivery_zone_id);
+
+        $exists = AreaDeliveryZone::find()
+            ->andWhere(['is_deleted' => 0, 'restaurant_uuid' => $store_id, "state_id" => $state_id, 'delivery_zone_id' => $delivery_zone_id])
+            ->andWhere(new Expression("area_id IS NULL AND city_id IS NULL"))
+            ->exists();
+
+        if($exists) {
+            return [
+                "operation" => "error",
+                "message" => "Already added!"
+            ];
+        }
+
+        $state = State::findOne($state_id);
+
+        if(!$state) {
+            return [
+                "operation" => "error",
+                "message" => "State not found!"
+            ];
+        }
+
+        $model = new AreaDeliveryZone;
+        $model->restaurant_uuid = $store_id;
+        $model->delivery_zone_id = $delivery_zone_id;
+        $model->state_id = $state_id;
+        $model->country_id = $state->country_id;
+
+        if(!$model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "added",
+            "model" => $model
+        ];
+    }
+
+    /**
      * Finds the Item model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id

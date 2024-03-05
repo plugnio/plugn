@@ -4,7 +4,7 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use agent\models\DeliveryZone;
-use common\models\State;
+use agent\models\State;
 use yii\data\ActiveDataProvider;
 
 class StateController extends BaseController
