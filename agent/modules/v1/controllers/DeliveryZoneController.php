@@ -126,7 +126,6 @@ class DeliveryZoneController extends BaseController
                 $area_delivery_zone->save(false);
             }
 
-
         } else {
           return [
               "operation" => "error",
@@ -190,13 +189,21 @@ class DeliveryZoneController extends BaseController
 
         if($model->deliver_whole_country) 
         {
-            AreaDeliveryZone::deleteAll(['delivery_zone_id' => $delivery_zone_id]);
+            //AreaDeliveryZone::deleteAll(['delivery_zone_id' => $delivery_zone_id]);
 
-            $area_delivery_zone = new AreaDeliveryZone();
-            $area_delivery_zone->delivery_zone_id = $model->delivery_zone_id;
-            $area_delivery_zone->country_id = $model->country_id;
-            $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
-            $area_delivery_zone->save(false);
+            $area_delivery_zone = AreaDeliveryZone::find()
+                ->andWhere(["delivery_zone_id" => $model->delivery_zone_id])
+                ->andWhere(new Expression('area_delivery_zone.country_id="'.$model->country_id.'" AND area_delivery_zone.state_id IS NULL 
+                    AND area_delivery_zone.city_id IS NULL AND area_delivery_zone.area_id IS NULL AND is_deleted = 0'))
+                ->one();
+
+            if(!$area_delivery_zone) {
+                $area_delivery_zone = new AreaDeliveryZone();
+                $area_delivery_zone->delivery_zone_id = $model->delivery_zone_id;
+                $area_delivery_zone->country_id = $model->country_id;
+                $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
+                $area_delivery_zone->save(false);
+            }
         }
 
         $zone = DeliveryZone::find()

@@ -1038,7 +1038,7 @@ class RestaurantController extends Controller {
                 $model->saveRestaurantPaymentMethod($model->restaurant_payments_method);
 
 
-            if ($model->save()) {
+            if ($model->save(false)) {
 
                 $thumbnail_image = UploadedFile::getInstances($model, 'restaurant_thumbnail_image');
 

@@ -4927,6 +4927,7 @@ class Restaurant extends ActiveRecord
     public function getPaymentGatewayQueue()
     {
         return $this->hasOne(PaymentGatewayQueue::className(), ['payment_gateway_queue_id' => 'payment_gateway_queue_id']);
+            //->orderBy('payment_gateway_queue_id DESC');
     }
 
     /**

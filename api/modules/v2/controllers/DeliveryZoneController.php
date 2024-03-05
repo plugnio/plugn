@@ -251,6 +251,8 @@ class DeliveryZoneController extends BaseController
                 return null;
             }
 
+            //area or whole country, not having states in Kuwait
+
             $query->andWhere([
                 'OR',
                 new Expression('area_delivery_zone.country_id="'.$area->city->country_id.'" AND area_delivery_zone.state_id IS NULL 
@@ -268,12 +270,24 @@ class DeliveryZoneController extends BaseController
                 return null;
             }
 
-            $query->andWhere([
+            //city or whole country
+
+            $conditions = [
                 'OR',
                 new Expression('area_delivery_zone.country_id="'.$city->country_id.'" AND area_delivery_zone.state_id IS NULL 
                     AND area_delivery_zone.city_id IS NULL AND area_delivery_zone.area_id IS NULL'),
                 ['area_delivery_zone.city_id' => $city_id]
-            ]);
+            ];
+
+            // or whole state, some cities might not have state, so checking if having state
+
+            if($city->state_id) {
+                $conditions[] = new Expression('area_delivery_zone.state_id="'.$city->state_id.'" AND 
+                    area_delivery_zone.city_id IS NULL AND 
+                    area_delivery_zone.area_id IS NULL');
+            }
+
+            $query->andWhere($conditions);
         }
         else if ($state_id)
         {
@@ -285,9 +299,17 @@ class DeliveryZoneController extends BaseController
                 return null;
             }
 
-            $query->andWhere(new Expression('area_delivery_zone.state_id="'.$state_id.'" AND 
+            //delivering to whole state or whole country
+
+            $query->andWhere([
+                "OR",
+                new Expression('area_delivery_zone.state_id="'.$state_id.'" AND 
                     area_delivery_zone.city_id IS NULL AND 
-                    area_delivery_zone.area_id IS NULL'));
+                    area_delivery_zone.area_id IS NULL'),
+                new Expression('area_delivery_zone.country_id="'.$state->country_id.'" AND 
+                    area_delivery_zone.city_id IS NULL AND 
+                    area_delivery_zone.area_id IS NULL')
+            ]);
         }
 
         return $query->one();
@@ -298,7 +320,6 @@ class DeliveryZoneController extends BaseController
      */
     public function actionGetPickupLocation($restaurant_uuid, $pickup_location_id)
     {
-
         if ($store = Restaurant::findOne($restaurant_uuid)) {
 
             if ($pickupLocation = $store->getBusinessLocations()->where(['business_location_id' => $pickup_location_id])->asArray()->one()) {
