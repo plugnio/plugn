@@ -361,7 +361,11 @@ class Item extends \yii\db\ActiveRecord
 
         Yii::info($changedAttributes);
 
-        if(!$insert && (isset($changedAttributes['stock_qty']) || isset($changedAttributes['track_quantity'])))  {
+        if (
+            !$insert &&
+            isset($changedAttributes['stock_qty']) &&
+            isset($changedAttributes['track_quantity'])
+        ) {
             Yii::$app->eventManager->track('Inventory Updated', [
                 'product_id' => $this->item_uuid,
                 'item_uuid' => $this->item_uuid,
