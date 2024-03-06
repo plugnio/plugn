@@ -126,7 +126,6 @@ class DeliveryZoneController extends BaseController
                 $area_delivery_zone->save(false);
             }
 
-
         } else {
           return [
               "operation" => "error",
@@ -134,10 +133,16 @@ class DeliveryZoneController extends BaseController
           ];
         }
 
+        $zone = DeliveryZone::find()
+            ->andWhere(['delivery_zone_id' => $model->delivery_zone_id])
+            ->with(['country'])
+            ->asArray()
+            ->one();
+
         return [
             "operation" => "success",
             "message" => Yii::t('agent', "Delivery Zone created successfully"),
-            "model" => DeliveryZone::findOne($model->delivery_zone_id)
+            "model" => $zone
         ];
 
     }
@@ -184,19 +189,33 @@ class DeliveryZoneController extends BaseController
 
         if($model->deliver_whole_country) 
         {
-            AreaDeliveryZone::deleteAll(['delivery_zone_id' => $delivery_zone_id]);
+            //AreaDeliveryZone::deleteAll(['delivery_zone_id' => $delivery_zone_id]);
 
-            $area_delivery_zone = new AreaDeliveryZone();
-            $area_delivery_zone->delivery_zone_id = $model->delivery_zone_id;
-            $area_delivery_zone->country_id = $model->country_id;
-            $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
-            $area_delivery_zone->save(false);
+            $area_delivery_zone = AreaDeliveryZone::find()
+                ->andWhere(["delivery_zone_id" => $model->delivery_zone_id])
+                ->andWhere(new Expression('area_delivery_zone.country_id="'.$model->country_id.'" AND area_delivery_zone.state_id IS NULL 
+                    AND area_delivery_zone.city_id IS NULL AND area_delivery_zone.area_id IS NULL AND is_deleted = 0'))
+                ->one();
+
+            if(!$area_delivery_zone) {
+                $area_delivery_zone = new AreaDeliveryZone();
+                $area_delivery_zone->delivery_zone_id = $model->delivery_zone_id;
+                $area_delivery_zone->country_id = $model->country_id;
+                $area_delivery_zone->restaurant_uuid = $store->restaurant_uuid;
+                $area_delivery_zone->save(false);
+            }
         }
-        
+
+        $zone = DeliveryZone::find()
+            ->andWhere(['delivery_zone_id' => $model->delivery_zone_id])
+            ->with(['country'])
+            ->asArray()
+            ->one();
+
         return [
             "operation" => "success",
             "message" => Yii::t('agent',"Delivery zone updated successfully"),
-            "model" => $model
+            "model" => $zone
         ];
     }
 
@@ -405,17 +424,20 @@ class DeliveryZoneController extends BaseController
             ->one();
 
         //state wide
+
         if(!$areaDeliveryZone) {
+
             $areaDeliveryZone = $store->getAreaDeliveryZones()
                 ->andWhere([
                     'state_id' => $state_id,
-                    'country_id' => $country_id
+                   // 'country_id' => $country_id
                 ])
                 ->andWhere(new Expression("city_id IS NULL"))
                 ->one();
         }
 
         //country wide
+
         if(!$areaDeliveryZone) {
             $areaDeliveryZone = $store->getAreaDeliveryZones()
                 ->andWhere([
@@ -507,6 +529,89 @@ class DeliveryZoneController extends BaseController
         }
 
         return $data;
+    }
+
+    /**
+     * @param $state_id
+     * @param $delivery_zone_id
+     * @return string[]
+     */
+    public function actionRemoveStateFromDeliveryArea($state_id, $delivery_zone_id) {
+
+        $store_id = Yii::$app->request->getHeaders()
+            ->get('Store-Id');
+
+        //validate delivery zone access
+
+        $this->findModel($delivery_zone_id);
+
+        AreaDeliveryZone::updateAll([
+            'is_deleted' => 1
+        ], [
+            'restaurant_uuid' => $store_id,
+            "state_id" => $state_id,
+            'delivery_zone_id' => $delivery_zone_id
+        ]);
+
+        return [
+            "operation" => "success"
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function actionAddStateToDeliveryArea() {
+
+        $store_id = Yii::$app->request->getHeaders()
+            ->get('Store-Id');
+
+        $state_id = Yii::$app->request->getBodyParam("state_id");
+        $delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
+
+        //validate delivery zone access
+
+        $this->findModel($delivery_zone_id);
+
+        $exists = AreaDeliveryZone::find()
+            ->andWhere(['is_deleted' => 0, 'restaurant_uuid' => $store_id, "state_id" => $state_id, 'delivery_zone_id' => $delivery_zone_id])
+            ->andWhere(new Expression("area_id IS NULL AND city_id IS NULL"))
+            ->exists();
+
+        if($exists) {
+            return [
+                "operation" => "error",
+                "message" => "Already added!"
+            ];
+        }
+
+        $state = State::findOne($state_id);
+
+        if(!$state) {
+            return [
+                "operation" => "error",
+                "message" => "State not found!"
+            ];
+        }
+
+        $model = new AreaDeliveryZone;
+        $model->restaurant_uuid = $store_id;
+        $model->delivery_zone_id = $delivery_zone_id;
+        $model->state_id = $state_id;
+        $model->country_id = $state->country_id;
+
+        if(!$model->save()) {
+            return [
+                "operation" => "error",
+                "message" => $model->errors
+            ];
+        }
+
+        return [
+            "operation" => "success",
+            "message" => "added",
+            "model" => $model
+        ];
     }
 
     /**
