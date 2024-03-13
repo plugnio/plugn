@@ -25,6 +25,16 @@ return [
                 'database' => 2,
             ]
         ],
+
+        'log' => [
+            'traceLevel' => YII_DEBUG ? 3 : 0,
+            'targets' => [
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['error', 'warning'],
+                ],
+            ],
+        ],
         'mailer' => [
                  'class' => 'yii\swiftmailer\Mailer',
                  'viewPath' => '@common/mail',
