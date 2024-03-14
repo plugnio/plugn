@@ -120,15 +120,15 @@ class TicketComment extends \yii\db\ActiveRecord
         {
             $toEmails = [$this->ticket->agent->agent_email]; //store owner from support agent
 
-            $fromName = $this->staff->staff_name;
+            //$fromName = $this->staff->staff_name;
 
-            $fromEmail = $this->staff->staff_email;
+            //$fromEmail = $this->staff->staff_email;
         }
         else if($this->agent_id)
         {
-            $fromName = $this->agent->agent_name;
+            //$fromName = $this->agent->agent_name;
 
-            $fromEmail = $this->agent->agent_email;
+            //$fromEmail = $this->agent->agent_email;
 
             //if assigned > notify assigned staff
 
@@ -160,7 +160,7 @@ class TicketComment extends \yii\db\ActiveRecord
             ])
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             //->setFrom ([Yii::$app->params['supportEmail']])
-            ->setReplyTo([$fromEmail])
+            ->setReplyTo($this->ticket_uuid . Yii::$app->params['remailerDomain']) //inbound email address
             ->setTo ($toEmails)
             ->setCc (Yii::$app->params['supportEmail'])
             ->setSubject ('New comment on ticket #' . $this->ticket_uuid)
