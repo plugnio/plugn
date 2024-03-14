@@ -217,6 +217,39 @@ class TicketComment extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * Remove reply text and contents that should have been invisible from email text
+     * It returns the adjusted mail content
+     * @param string $email
+     * @return string
+     */
+    public static function extractMessageFromEmail($emailContents) {
+        // Parse the reply via GitHub's library
+        $emailContents = \EmailReplyParser\EmailReplyParser::parseReply($emailContents);
+
+        // Fix for regular mail clients
+        $emailContents = preg_replace('~On(.*?)wrote:(.*?)$~si', '', $emailContents);
+
+        // Fix for Outlook mail client replies
+        $emailContents = preg_replace('~From:(.*?)Sent:(.*?)To:(.*?)Subject:(.*?)$~si', '', $emailContents);
+
+        return $emailContents;
+    }
+
+    /**
+     * Extracts email from a string
+     * Example Input: Khalid Al-Mutawa <dwa-dw@md.dwa.g.website.io>
+     * Returns "dwa-dw@md.dwa.g.website.io"
+     * @param string $email
+     * @return string
+     */
+    public static function extractEmailFromString($email) {
+        $pattern = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
+        preg_match_all($pattern, $email, $matches);
+
+        return $matches[0][0];
+    }
+
     public function extraFields()
     {
         return [

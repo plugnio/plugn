@@ -25,6 +25,7 @@
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "openbuildings/swiftmailer-css-inliner": "*",
+        "willdurand/email-reply-parser": "^2.10.0",
         "wbraganca/yii2-dynamicform": "dev-master",
         "yiisoft/yii2-shell": "^2.0",
         "leandrogehlen/yii2-treegrid": "*",
@@ -66,7 +67,7 @@
         "phpunit/phpunit": "~5.7.27 || ~6.5.5",
         "codeception/verify": "~0.5.0 || ~1.1.0",
         "symfony/browser-kit": ">=2.7 <=4.2.4",
-        "codeception/specify": "~0.4.6"
+        "codeception/specify": "~0.4.6",
     },
     "config": {
         "process-timeout": 1800,
