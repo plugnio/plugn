@@ -10,6 +10,7 @@ return [
     // 'senderName' => 'Example.com mailer',
     'user.passwordResetTokenExpire' => 3600,
     'bsDependencyEnabled' => false,
+    'google_api_key' => 'AIzaSyCGCusw5MJ_aJwyzIi4q7pJY71k2CNXAbA',
     'liveApiKey' => 'sk_live_23JyAf874rMkZwsLjVpQ0WOq', //Plugn secrect api key
     'testApiKey' => 'sk_test_95DtopzOnv38QSag7mT6WIbs',
     'myfatoorah.kuwaitSecretKey' => 'WmlCnGR8+MXAlNZ3lyMdW/mD06jXa2kWa44g21lPawoRTMoZpKmn39ihdcQKYKw3uax7QYfhuEK+qPDkIvzfmA==',
