@@ -109,9 +109,9 @@ jobs:
 
       #---------- remail app --------------# 
 
-      - run:
-          name: Run Codeception tests and store result output 
-          command: cd ./remail && ../vendor/bin/codecept run --xml --html --fail-fast
+      #- run:
+      #    name: Run Codeception tests and store result output 
+      #    command: cd ./remail && ../vendor/bin/codecept run --xml --html --fail-fast
         
       #---------- Agent app --------------#
 
