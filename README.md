@@ -226,3 +226,30 @@ https://developers.tap.company/reference/files
 
 
 https://stripe.com/docs/payments/payment-methods/pmd-registration
+
+
+## Email Notification POST Parameters
+
+from_email (from address)
+ 
+from_name (from name)
+ 
+env_from (envelope from address - MAIL FROM)
+ 
+env_to_list (list of envelope to addresses - RCPT TO, separated by CRLF)
+ 
+to_list (list of email addresses the email was sent to separated by /r/n)
+ 
+header_list (email headers as HeaderName: HeaderValue separated by /r/n)
+ 
+subject (email subject)
+ 
+body_text (text body content)
+ 
+body_html (html body content)
+ 
+att1_name=attachment_file_name&att1_content=encoded_to_base64_binary_data
+ 
+att2_name=attachment_file_name&att2_content=encoded_to_base64_binary_data
+ 
+You can also receive any custom postback header as described in the previous section.

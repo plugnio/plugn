@@ -40,15 +40,6 @@ return [
                 'application/json' => 'yii\web\JsonParser',
             ]
         ],
-        'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
-        ],
         'currency' => [
             'class' => 'api\components\Currency',
         ],

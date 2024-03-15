@@ -220,6 +220,21 @@ class DeliveryZoneController extends BaseController
     }
 
     /**
+     * @return void
+     */
+    public function actionCityByLocation() {
+        $latitude = Yii::$app->request->get('latitude');
+        $longitude = Yii::$app->request->get('longitude');
+        $postal_code = Yii::$app->request->get("postal_code");
+
+        // call google api to get country name, lat, long
+
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $latitude .','. $longitude;
+
+        return City::addByGoogleAPIResponse($url, null, null, $postal_code);
+    }
+
+    /**
      * return delivery zone for tax + delivery fee details by location provided
      * @return string[]
      * @throws NotFoundHttpException

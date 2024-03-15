@@ -25,6 +25,7 @@
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "openbuildings/swiftmailer-css-inliner": "*",
+        "willdurand/email-reply-parser": "^2.10.0",
         "wbraganca/yii2-dynamicform": "dev-master",
         "yiisoft/yii2-shell": "^2.0",
         "leandrogehlen/yii2-treegrid": "*",

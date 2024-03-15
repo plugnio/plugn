@@ -53,6 +53,384 @@ class City extends \yii\db\ActiveRecord
         ];
     }
 
+
+    /**
+     * Get country object from Google API response
+     * @param type $response
+     * @return type
+     */
+    public static function getGoogleAPICountryObject($response)
+    {
+        foreach($response->results[0]->address_components as $component) {
+            if(in_array('country', $component->types)) {
+                return $component;
+            }
+        }
+    }
+
+    /**
+     * @param $response
+     * @return void
+     */
+    public static function getGoogleAPIStateObject($response)
+    {
+        foreach ($response->results as $key => $address_component) {
+            foreach($address_component->address_components as $component) {
+                if(in_array('administrative_area_level_1', $component->types)) {
+                    return $component;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $response
+     * @return mixed|void
+     */
+    public static function getGoogleAPIAreaObject($response)
+    {
+        foreach ($response->results as $key => $address_component) {
+            foreach($address_component->address_components as $component) {
+                if(in_array('sublocality_level_1', $component->types)) {
+                    return $component;
+                }
+            }
+        }
+    }
+
+    /**
+     * Get city object from Google API response
+     * @param type $response
+     * @return type
+     */
+    public static function getGoogleAPICityObject($response)
+    {
+        foreach ($response->results as $key => $address_component) {
+            foreach($address_component->address_components as $component) {
+                if(in_array('locality', $component->types)) {
+                    return $component;
+                }
+            }
+        }
+
+        foreach ($response->results as $key => $address_component) {
+            foreach($address_component->address_components as $component) {
+                if(in_array('administrative_area_level_3', $component->types)) {
+                    return $component;
+                }
+            }
+        }
+
+        foreach ($response->results as $key => $address_component) {
+            foreach($address_component->address_components as $component) {
+                if(in_array('administrative_area_level_1', $component->types)) {
+                    return $component;
+                }
+            }
+        }
+
+//        foreach($response->results[0]->address_components as $component) {
+//            if(in_array('locality', $component->types)) {
+//                return $component;
+//            }
+//        }
+
+        //in case not able to find city, return political area
+
+//        foreach($response->results[0]->address_components as $component) {
+//            if(in_array('administrative_area_level_1', $component->types)) {
+//                return $component;
+//            }
+//        }
+    }
+
+    /**
+     * Add city by info we got in ipinfo api response in app
+     * @param type $city_name
+     * @param type $country_name
+     * @param type $country_code
+     * @param type $latitude
+     * @param type $longitude
+     */
+    public static function addByIpInfo($city_name, $country_name, $country_code, $latitude, $longitude, $postal_code = null)
+    {
+        //add country if not available
+
+        $country = Country::find()
+            ->where(['country_name' => $country_name])
+            ->one();
+
+        if(!$country)
+        {
+            $countryInfo = json_decode(file_get_contents('https://restcountries.eu/rest/v2/alpha/' . $country_code));
+
+            $country = new Country;
+            $country->country_name = $country_name;
+            $country->country_name_ar = $country_name;
+            $country->iso = strtolower($country_code);
+            $country->country_code = isset($countryInfo->callingCodes[0]) ? $countryInfo->callingCodes[0]: null;
+            $country->save();
+        }
+
+        //todo: add state
+
+        $model = new City;
+        //todo: state_id
+        $model->country_id = $country->country_id;
+        $model->city_name = ucwords($city_name);
+        $model->city_name_ar = ucwords($city_name);
+        $model->save();
+
+        $city = City::find()
+            ->with('country')
+            ->where(['city_uuid' => $model->city_id])
+            ->asArray()
+            ->one();
+
+        //todo: add area
+        /*$model->city_latitude = $latitude;
+        $model->city_longitude = $longitude;
+        $model->city_postal_code = $postal_code;
+        */
+
+        return [
+            'operation' => 'success',
+            'city' => $city
+        ];
+    }
+
+    /**
+     * Add city if not available by Google API response
+     * https://maps.googleapis.com/maps/api/geocode/json?latlng=22.260728864087454,73.13252570265993&key=AIzaSyCGCusw5MJ_aJwyzIi4q7pJY71k2CNXAbA&location_type=APPROXIMATE
+     * @param string $url
+     * @param type $city_name
+     * @param type $area_name
+     * @return type
+     */
+    public static function addByGoogleAPIResponse($url, $city_name = null, $area_name = null, $postal_code = null)
+    {
+        $url .= '&key=' . Yii::$app->params['google_api_key'];
+        $url .= '&location_type=APPROXIMATE';
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, str_replace(' ', '+', $url));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = json_decode(curl_exec($ch));
+
+        if(isset($response->result))
+            $response->results = [$response->result];
+
+        if(!$response || empty($response->results))
+        {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('app', 'Sorry not able to find your city!')
+            ];
+        }
+
+        $objCountry = self::getGoogleAPICountryObject($response);
+
+        if(empty($objCountry->long_name) || empty($response->results[0]->geometry->location->lat)) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('app', 'Sorry not able to find your city!')
+            ];
+        }
+
+        $country_name = $objCountry->long_name;
+        $country_code = $objCountry->short_name;
+
+        //add country if not available
+
+        $country = Country::find()
+            ->where(['country_name' => $country_name])
+            ->one();
+
+        if(!$country)
+        {
+            $countryInfo = json_decode(file_get_contents('https://restcountries.eu/rest/v2/alpha/' . $country_code));
+
+            $country = new Country;
+            $country->country_name = $country_name;
+            $country->country_name_ar = $country_name;
+            $country->iso = strtolower($country_code);
+            $country->country_code = isset($countryInfo->callingCodes[0]) ? $countryInfo->callingCodes[0]: null;
+            $country->save();
+        }
+
+        $objState = self::getGoogleAPIStateObject($response);
+        $cityObject = self::getGoogleAPICityObject($response);
+        $areaObject = self::getGoogleAPIAreaObject($response);
+
+        if(!$cityObject) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('app', 'Sorry not able to find your city!')
+            ];
+        }
+
+        $city_name = $cityObject->long_name;
+
+        $area_name = $areaObject? $areaObject->long_name: null;
+
+        $city = City::find()
+            //->with('country')
+            ->andWhere(['city_name' => $city_name, 'country_id' => $country->country_id])
+            //->asArray()
+            ->one();
+
+        //if city already available
+
+        if($city) {
+
+            $state = $city->getState()->one();
+
+            // check if area already available
+
+            if($areaObject) {
+
+                $area = Area::find()
+                    //->joinWith(['city'])
+                    ->andWhere(['area_name' => $area_name, 'city_id' => $city->city_id])
+                    ->one();
+
+                if ($area) {
+
+                    return [
+                        'operation' => 'success',
+                        "area" => $area,
+                        'city' => $city,
+                        "state" => $state,
+                        "country" => $city->country,//$state? $state->country:
+                        // 'area' => self::_isGooglePlaceIsArea($area_name, $city, $response->results[0])
+                    ];
+                }
+
+            } else {
+
+                return [
+                    'operation' => 'success',
+                    'city' => $city,
+                    "state" => $state,
+                    "country" => $city->country,//$state? $state->country:
+                    // 'area' => self::_isGooglePlaceIsArea($area_name, $city, $response->results[0])
+                ];
+            }
+        }
+
+        //add area + city + state as not available
+
+        //add state
+
+        $state = null;
+
+        // make sure state name not same as city (as some country might not have states)
+
+        if ($objState && $objState->long_name != $city_name) {
+
+            $state = State::find()
+                ->andWhere(['name' => $objState->long_name, "country_id" => $country->country_id])
+                ->one();
+
+            if(!$state) {
+                $state = new State();
+                $state->country_id = $country->country_id;
+                $state->name = $objState->long_name;
+                $state->save();
+            }
+        }
+
+        //add city
+
+        $model = new City;
+        $model->state_id = $state? $state->state_id: null;
+        $model->country_id = $country->country_id;
+        $model->city_name = ucwords($city_name);
+        $model->city_name_ar = ucwords($city_name);
+        $model->save();
+
+        $city = City::find()
+            //->with('country')
+            ->where(['city_id' => $model->city_id])
+            //->asArray()
+            ->one();
+
+        //for kuwait sub-locality = area
+
+        if ($areaObject) {//$country_name == "Kuwait"
+
+            //add area
+
+            $area = new Area;
+            $area->city_id = $city->city_id;
+            $area->area_name = $area_name;
+            $area->area_name_ar = $area_name;
+            $area->latitude = $response->results[0]->geometry->location->lat;
+            $area->longitude= $response->results[0]->geometry->location->lng;
+            $area->save();
+
+            if ($area) {
+
+                return [
+                    'operation' => 'success',
+                    'area' => $area,
+                    'city' => $city,
+                    "state" => $state,
+                    "country" =>  $city->country,//$state? $state->country:
+                    //self::_isGooglePlaceIsArea($area_name, $city, $response->results[0])
+                ];
+            }
+        }
+
+        // if no area then return city, state, country
+
+        return [
+            'operation' => 'success',
+            'city' => $city,
+            "state" => $state,
+            "country" => $city->country,
+            //'area' => self::_isGooglePlaceIsArea($area_name, $city, $response->results[0])
+        ];
+    }
+
+    /**
+     * Check if it is area the place we getting by place_id from google
+     * @param type $area_name
+     * @param type $city
+     * @param type $response
+     * @return \common\models\Area
+     */
+    static function _isGooglePlaceIsArea($area_name, $city, $response) {
+
+        if(
+            $area_name &&
+            !in_array('locality', $response->types) &&
+            !in_array('administrative_area_level_1', $response->types)
+        ) {
+            $area = Area::find()
+                ->andWhere([
+                    'OR',
+                    [
+                        'area_name_en' => $area_name
+                    ],
+                    [
+                        'area_name_ar' => $area_name
+                    ],
+                ])
+                ->one();
+
+            if(!$area) {
+                $area = new Area;
+                $area->area_name = $area_name;
+                $area->area_name_ar = $area_name;
+                $area->city_id = $city['city_id'];
+                $area->save();
+            }
+
+            return $area;
+        }
+    }
+
     /**
      * @inheritdoc
      */
