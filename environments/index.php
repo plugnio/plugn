@@ -18,7 +18,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -35,6 +37,7 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
     'Development [Krushn]' => [
@@ -55,7 +58,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -71,6 +76,7 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
     'Development [Saoud]' => [
@@ -91,7 +97,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -108,6 +116,7 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
     'Development [Docker Compose]' => [
@@ -126,7 +135,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -143,6 +154,7 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
     'Development' => [
@@ -161,7 +173,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -178,6 +192,7 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
     'Circle-CI' => [
@@ -196,7 +211,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -213,9 +230,9 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
-
     'Dev-Server' => [
         'path' => 'dev-server',
         'setWritable' => [
@@ -234,7 +251,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -250,6 +269,7 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
     'Staging-Server' => [
@@ -270,7 +290,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -286,6 +308,7 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
     'Production' => [
@@ -306,7 +329,9 @@ return [
             'agent/web/assets',
             'crm/runtime',
             'crm/web/assets',
-            'shortner/runtime'
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
         ],
         'setExecutable' => [
             'yii',
@@ -319,6 +344,7 @@ return [
             'agent/config/main-local.php',
             'crm/config/main-local.php',
             'shortner/config/main-local.php',
+            'remail/config/main-local.php',
         ],
     ],
 ];
