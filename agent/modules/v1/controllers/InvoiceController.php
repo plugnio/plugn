@@ -259,7 +259,8 @@ class InvoiceController extends BaseController
             }
 
             $payment = \common\models\InvoicePayment::findOne([
-                'payment_gateway_transaction_id' => $charge_id]);
+                'payment_gateway_transaction_id' => $charge_id
+            ]);
 
             if (!$payment) {
                 throw new NotFoundHttpException('The requested payment does not exist in our database.');

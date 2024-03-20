@@ -250,22 +250,29 @@ class ItemController extends BaseController
 
             foreach($variant['itemVariantOptions'] as $value) {
 
-                if(empty($value['option_id'])) {
-                    $option_id = Option::findOne([
-                        'item_uuid' => $itemVariant->item_uuid,
-                        'option_name' => $value['option']['option_name']
-                    ])->option_id;
-                }
-                else
+                if(!empty($value['option_id']))
                 {
                     $option_id = $value['option_id'];
                 }
+                else
+                {
+                    $o = Option::findOne([
+                        'item_uuid' => $itemVariant->item_uuid,
+                        'option_name' => $value['option']['option_name']
+                    ]);
+
+                    $option_id = $o ? $o->option_id: null;
+                }
 
                 if(empty($value['extra_option_id'])) {
-                    $extra_option_id = ExtraOption::findOne([
+                    $e = ExtraOption::findOne([
                         'option_id' => $option_id,
                         'extra_option_name' => $value['extraOption']['extra_option_name']
-                    ])->extra_option_id;
+                    ]);
+
+                    if($e) {
+                        $extra_option_id = $e->extra_option_id;
+                    }
                 }
                 else
                 {
@@ -534,26 +541,34 @@ class ItemController extends BaseController
 
                 foreach($variant['itemVariantOptions'] as $value) {
 
-                    if(empty($value['option_id'])) {
-                        $option_id = Option::findOne([
-                            'item_uuid' => $itemVariant->item_uuid,
-                            'option_name' => $value['option']['option_name']
-                        ])->option_id;
-                    }
-                    else
-                    {
+                    $option_id = null;
+
+                    if(!empty($value['option_id'])) {
                         $option_id = $value['option_id'];
                     }
-
-                    if(empty($value['extra_option_id'])) {
-                        $extra_option_id = ExtraOption::findOne([
-                            'option_id' => $option_id,
-                            'extra_option_name' => $value['extraOption']['extra_option_name']
-                        ])->extra_option_id;
-                    }
                     else
                     {
+                        $o = Option::findOne([
+                            'item_uuid' => $itemVariant->item_uuid,
+                            'option_name' => $value['option']['option_name']
+                        ]);
+
+                        if($o) {
+                            $option_id = $o->option_id;
+                        }
+                    }
+
+                    if(!empty($value['extra_option_id'])) {
                         $extra_option_id = $value['extra_option_id'];
+                    } else {
+                        $e = ExtraOption::findOne([
+                            'option_id' => $option_id,
+                            'extra_option_name' => $value['extraOption']['extra_option_name']
+                        ]);
+
+                        if ($e) {
+                            $extra_option_id = $e->extra_option_id;
+                        }
                     }
 
                     if(empty($value['item_variant_option_uuid'])) {
