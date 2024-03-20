@@ -1572,6 +1572,9 @@ class Restaurant extends ActiveRecord
         ];
     }
 
+    /**
+     * @return array|string[]
+     */
     public function createBusiness()
     {
         $businessApiResponse = Yii::$app->tapPayments->createBusiness($this);
@@ -2732,6 +2735,10 @@ class Restaurant extends ActiveRecord
                     $biModel->save(false);
 
                     return $this->addError('ip_address', "Too many store registration");
+                }
+            } else {
+                if ($this->referral_code == "") {
+                    $this->referral_code = null;
                 }
             }
         }

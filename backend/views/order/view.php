@@ -60,15 +60,23 @@ $this->registerJs($js);
 $armadaApiKey = null;
 $mashkorBranchId = null;
 
-if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->armada_api_key != null)
-  $armadaApiKey = $model->deliveryZone->businessLocation->armada_api_key;
+if  (
+    $model->delivery_zone_id &&
+    $model->deliveryZone->business_location_id &&
+    $model->deliveryZone->businessLocation
+) {
+    if ($model->deliveryZone->businessLocation->armada_api_key != null) {
+        $armadaApiKey = $model->deliveryZone->businessLocation->armada_api_key;
+    }
 
-if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->mashkor_branch_id != null)
-  $mashkorBranchId = $model->deliveryZone->businessLocation->mashkor_branch_id;
+    if ($model->deliveryZone->businessLocation->mashkor_branch_id != null) {
+        $mashkorBranchId = $model->deliveryZone->businessLocation->mashkor_branch_id;
+    }
 
-if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $model->deliveryZone->businessLocation->diggipack_customer_id != null)
-  $diggipack_customer_id = $model->deliveryZone->businessLocation->diggipack_customer_id;
-
+    if ($model->deliveryZone->businessLocation->diggipack_customer_id != null) {
+        $diggipack_customer_id = $model->deliveryZone->businessLocation->diggipack_customer_id;
+    }
+}
 ?>
 
 <div class="page-title">
@@ -337,105 +345,106 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
                 <div class="card-body">
                     <div class="box-body table-responsive no-padding">
 
-    <?=
-    GridView::widget([
-        'dataProvider' => $orderItems,
-        'sorter' => false,
-        'columns' => [
-            [
-                'label' => 'Item image',
-                'format' => 'html',
-                'value' => function ($data) {
-                    $itemItmage = $data->itemImage;
+                        <?=
+                        GridView::widget([
+                            'dataProvider' => $orderItems,
+                            'sorter' => false,
+                            'columns' => [
+                                [
+                                    'label' => 'Item image',
+                                    'format' => 'html',
+                                    'value' => function ($data) {
+                                        $itemItmage = $data->itemImage;
 
-                      if ($data->itemImage && $data->itemImage->product_file_name) {
-                        return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant_uuid. "/items/" . $itemItmage->product_file_name);
-                    }
-                },
-                'contentOptions' => ['style' => 'width: 100px;'],
-            ],
-            'item_name',
-            [
-                'label' => 'SKU',
-                'format' => 'raw',
-                'value' => function ($data) {
+                                        if ($data->itemImage && $data->itemImage->product_file_name) {
+                                            return Html::img("https://res.cloudinary.com/plugn/image/upload/c_scale,h_105,w_105/restaurants/" . $data->restaurant_uuid. "/items/" . $itemItmage->product_file_name);
+                                        }
+                                    },
+                                    'contentOptions' => ['style' => 'width: 100px;'],
+                                ],
+                                'item_name',
+                                [
+                                    'label' => 'SKU',
+                                    'format' => 'raw',
+                                    'value' => function ($data) {
 
-                    if($data->variant) {
-                       return $data->variant->sku;
-                    }else if($data->item) {
-                        return $data->item->sku;
-                    }
-                },
-            ],
-            [
-                'label' => 'Barcode',
-                'format' => 'raw',
-                //'value' => 'item.barcode',
-                'value' => function ($data) {
+                                        if($data->variant) {
+                                            return $data->variant->sku;
+                                        }else if($data->item) {
+                                            return $data->item->sku;
+                                        }
+                                    },
+                                ],
+                                [
+                                    'label' => 'Barcode',
+                                    'format' => 'raw',
+                                    //'value' => 'item.barcode',
+                                    'value' => function ($data) {
 
-                    if($data->variant) {
-                        return $data->variant->barcode;
-                    }else if($data->item) {
-                        return $data->item->barcode;
-                    }
-                },
-            ],
-            // 'customer_instruction',
-            [
-                'attribute' => 'customer_instruction',
-                'format' => 'html',
-                'value' => function ($data) {
-                    return  $data->customer_instruction ? '<b>' . $data->customer_instruction  . '</b>' : '(not set)' ;
-                }
-            ],
-            [
-                'attribute' => 'qty',
-                'format' => 'html',
-                'value' => function ($data) {
-                    return  '<b>' . $data->qty  . '</b>';
-                }
-            ],
-            [
-                'label' => 'Extra Options',
-                'value' => function ($data) {
-                    $extraOptions = '';
+                                        if($data->variant) {
+                                            return $data->variant->barcode;
+                                        }else if($data->item) {
+                                            return $data->item->barcode;
+                                        }
+                                    },
+                                ],
+                                // 'customer_instruction',
+                                [
+                                    'attribute' => 'customer_instruction',
+                                    'format' => 'html',
+                                    'value' => function ($data) {
+                                        return  $data->customer_instruction ? '<b>' . $data->customer_instruction  . '</b>' : '(not set)' ;
+                                    }
+                                ],
+                                [
+                                    'attribute' => 'qty',
+                                    'format' => 'html',
+                                    'value' => function ($data) {
+                                        return  '<b>' . $data->qty  . '</b>';
+                                    }
+                                ],
+                                [
+                                    'label' => 'Extra Options',
+                                    'value' => function ($data) {
+                                        $extraOptions = '';
 
-                    foreach ($data->orderItemExtraOptions as $key => $extraOption) {
-                        if ($key == 0) {
-                            $extraOptions .= $extraOption['extra_option_name'];
-                        } else {
-                            $extraOptions .= ', ' . $extraOption['extra_option_name'];
-                        }
-                    }
+                                        foreach ($data->orderItemExtraOptions as $key => $extraOption) {
+                                            if ($key == 0) {
+                                                $extraOptions .= $extraOption['extra_option_name'];
+                                            } else {
+                                                $extraOptions .= ', ' . $extraOption['extra_option_name'];
+                                            }
+                                        }
 
-                    return $extraOptions;
-                },
-                'format' => 'raw'
-            ],
-            [
-                'label' => 'Subtotal',
-                'value' => function ($orderItem) use ($model)  {
-                    return Yii::$app->formatter->asCurrency($orderItem->item_price * $model->currency_rate, $orderItem->currency->code, [
-                        \NumberFormatter::MAX_FRACTION_DIGITS => $orderItem->currency->decimal_place
-                    ]);
-                }
-            ],
-        ],
-        'layout' => '{items}{pager}',
-        'tableOptions' => ['class' => 'table table-bordered table-hover'],
-    ]);
-    ?>
+                                        return $extraOptions;
+                                    },
+                                    'format' => 'raw'
+                                ],
+                                [
+                                    'label' => 'Subtotal',
+                                    'value' => function ($orderItem) use ($model)  {
+                                        return Yii::$app->formatter->asCurrency($orderItem->item_price * $model->currency_rate, $orderItem->currency->code, [
+                                            \NumberFormatter::MAX_FRACTION_DIGITS => $orderItem->currency->decimal_place
+                                        ]);
+                                    }
+                                ],
+                            ],
+                            'layout' => '{items}{pager}',
+                            'tableOptions' => ['class' => 'table table-bordered table-hover'],
+                        ]);
+                        ?>
 
                     </div>
                 </div>
             </div>
         </section>
-                    <?php } ?>
+    <?php } ?>
 
-                    <?php
-                    $totalNumberOfItems = $orderItems->query->count();
+    <?php
 
-                    if ( $totalNumberOfItems > 0 ) {
+    $totalNumberOfItems = $orderItems->query->count();
+
+    if ( $totalNumberOfItems > 0 ) {
                         ?>
         <div class="card">
             <div class="card-body">

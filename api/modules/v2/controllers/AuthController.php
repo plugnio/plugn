@@ -173,7 +173,7 @@ class AuthController extends BaseController {
             return [
                 "operation" => "error",
                 "errorType" => "email-not-verified",
-                "message" => Yii::t('candidate',"Please click the verification link sent to you by email to activate your account"),
+                "message" => Yii::t('agent',"Please click the verification link sent to you by email to activate your account"),
                 "unVerifiedToken" => $this->_loginResponse($customer)
             ];
         }

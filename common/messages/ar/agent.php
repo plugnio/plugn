@@ -1,5 +1,6 @@
 <?php
 return [
+    "Method not found!" => "لم يتم العثور على الطريقة!",
     "Invalid access token" => "تصريح الدخول غير صالح",
     "We've faced a problem creating your account, please contact us for assistance." => "لقد واجهنا مشكلة في إنشاء حسابك، يرجى الاتصال بنا للحصول على المساعدة.",
     "Invalid captcha validation" => "التحقق من صحة كلمة التحقق غير صالح",

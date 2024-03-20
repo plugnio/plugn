@@ -69,6 +69,15 @@ class StripeController extends BaseController
             $stripeSecretKey = Setting::getConfig(null, "Stripe", 'payment_stripe_secret_key');
             $stripePublishableKey = Setting::getConfig(null, "Stripe", 'payment_stripe_publishable_key');
 
+            if(!$stripeSecretKey) {
+                Yii::error("Stripe API Key Missing!");
+
+                return [
+                    'operation' => 'agent',
+                    'message' => Yii::t("agent", "API Key Missing")
+                ];
+            }
+
             \Stripe\Stripe::setApiKey($stripeSecretKey);
 
             // Create a PaymentIntent with amount and currency

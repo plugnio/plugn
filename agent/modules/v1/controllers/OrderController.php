@@ -862,6 +862,16 @@ class OrderController extends BaseController
 
         $orderItems = Yii::$app->request->getBodyParam('orderItems');
 
+        if(!$orderItems || sizeof($orderItems) == 0) {
+
+            $transaction->rollBack();
+
+            return [
+                'operation' => 'error',
+                'message' => "Order Items Missing!",
+            ];
+        }
+
         //delete order items not available in input but in db
 
         OrderItem::deleteAll([

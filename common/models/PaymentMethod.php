@@ -51,6 +51,23 @@ class PaymentMethod extends \yii\db\ActiveRecord
     }
 
     /**
+     * @param $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if(!parent::beforeSave($insert)) {
+            return false;
+        }
+
+        if(!$this->vat) {
+            $this->vat = 0;
+        }
+
+        return  true;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels()

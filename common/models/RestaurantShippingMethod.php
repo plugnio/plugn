@@ -38,6 +38,9 @@ class RestaurantShippingMethod extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * @return array|false|int[]|string[]
+     */
     public function extraFields()
     {
         return array_merge(parent::extraFields(), [
@@ -72,6 +75,7 @@ class RestaurantShippingMethod extends \yii\db\ActiveRecord
         $props = [];
 
         foreach ($methods as $method) {
+
             $key = strtolower($method->name_en) . "_enabled";
 
             $props[$key] = $this->restaurant->getRestaurantShippingMethods()

@@ -68,7 +68,9 @@ class PartnerToken extends \yii\db\ActiveRecord
      * @return string
      */
     public static function generateUniqueTokenString(){
+
         $randomString = Yii::$app->getSecurity()->generateRandomString();
+
         if(!static::findOne(['token_value' => $randomString ])){
             return $randomString;
 

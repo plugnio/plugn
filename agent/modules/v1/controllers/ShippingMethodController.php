@@ -180,6 +180,11 @@ class ShippingMethodController extends BaseController
         }
     }
 
+    /**
+     * @param $store
+     * @param $code
+     * @return array
+     */
     private function _enableMethod($store, $code) {
 
         $shipping_method = $store->getRestaurantShippingMethods()
@@ -192,6 +197,10 @@ class ShippingMethodController extends BaseController
             $aramexShippingMethod = ShippingMethod::find()
                 ->andWhere(['code' => $code])
                 ->one();
+
+            if(!$aramexShippingMethod) {
+                return self::message("error", Yii::t("agent", "Method not found!"));
+            }
 
             $shippings_method = new RestaurantShippingMethod();
             $shippings_method->shipping_method_id = $aramexShippingMethod->shipping_method_id;
