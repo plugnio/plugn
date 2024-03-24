@@ -138,7 +138,9 @@ class TicketComment extends \yii\db\ActiveRecord
             }
             else // else all staff
             {
-                $staffs = Staff::find()->all();
+                $staffs = Staff::find()
+                    ->filterActive()
+                    ->all();
 
                 $toEmails = ArrayHelper::getColumn ($staffs, 'staff_email');
             }

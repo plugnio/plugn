@@ -31,6 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'admin_status',
             //'admin_created_at',
             //'admin_updated_at',
+            [
+                'attribute' => 'staff_status',
+                'label' => 'Status',
+                "value" => function($model) {
+                    return $model->staff_status == \common\models\Staff::STATUS_ACTIVE ? "Active" : 'Deleted';
+                }
+            ],
 
             ['class' => 'yii\grid\ActionColumn', 'template' => '{view} {update} {delete}'],
         ],

@@ -113,6 +113,7 @@ class IncomingController extends Controller {
             ->one();
 
         $staff = Staff::find()
+            ->filterActive()
             ->andWhere(['staff_email' => $from_email])
             ->one();
 

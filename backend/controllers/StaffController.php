@@ -125,9 +125,12 @@ class StaffController extends Controller {
     public function actionDelete($id) {
         $model = $this->findModel($id);
 
-        Yii::info('[Staff Deleted > ' . $model->saff_name . '] By ' . Yii::$app->user->identity->admin_name, __METHOD__);
+        Yii::info('[Staff Deleted > ' . $model->staff_name . '] By ' . Yii::$app->user->identity->admin_name, __METHOD__);
 
-        $model->delete();
+        $model->staff_status = Staff::STATUS_DELETED;
+        $model->save(false);
+
+       // $model->delete();
 
         return $this->redirect(['index']);
     }
