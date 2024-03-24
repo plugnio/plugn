@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => 'Status',
-                'value' => $model->status,
+                'value' => $model->status == \common\models\Staff::STATUS_ACTIVE? "Active": "Deleted",
             ],
             'staff_created_at:datetime',
             'staff_updated_at:datetime',

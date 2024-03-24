@@ -238,7 +238,9 @@ class Ticket extends \yii\db\ActiveRecord
      */
     public function sendTicketGeneratedMail() {
 
-        $staffs = Staff::find()->all();
+        $staffs = Staff::find()
+            ->filterActive()
+            ->all();
 
         $staffEmails = ArrayHelper::getColumn ($staffs, 'staff_email');
 

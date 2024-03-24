@@ -136,6 +136,11 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
         }
     }
 
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave ($insert, $changedAttributes);
@@ -372,7 +377,6 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
         $token->delete ();
     }
 
-
     /**
      * @inheritdoc
      */
@@ -388,4 +392,11 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
         return $fields;
     }
 
+    /**
+     * @return query\StaffQuery
+     */
+    public static function find()
+    {
+        return new query\StaffQuery(get_called_class());
+    }
 }
