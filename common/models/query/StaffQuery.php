@@ -30,6 +30,6 @@ class StaffQuery extends \yii\db\ActiveQuery
      * @return void
      */
     public function filterActive() {
-        $this->andWhere(['staff.staff_status' => Staff::STATUS_ACTIVE]);
+        return $this->andWhere(['staff.staff_status' => Staff::STATUS_ACTIVE]);
     }
 }
