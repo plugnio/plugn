@@ -865,6 +865,8 @@ class Order extends \yii\db\ActiveRecord
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                 //->setReplyTo($replyTo)
 
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
             try {
                 $mailer->send();
             } catch (\Swift_TransportException $e) {
@@ -894,6 +896,8 @@ class Order extends \yii\db\ActiveRecord
                     ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                     //->setReplyTo($replyTo)
 
+                $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
                 try {
                     $mailer->send();
                 } catch (\Swift_TransportException $e) {
@@ -921,6 +925,8 @@ class Order extends \yii\db\ActiveRecord
                 ->setReplyTo(\Yii::$app->params['supportEmail'])
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                // ->setReplyTo($replyTo)
+
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
             try {
                 $mailer->send();

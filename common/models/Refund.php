@@ -267,6 +267,8 @@ class Refund extends \yii\db\ActiveRecord
         }
         $message->setSubject('Refund was not processed successfully for Order #' . $this->order_uuid);
 
+        $message->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
         try {
             return $message->send();
         } catch (\Swift_TransportException $e) {

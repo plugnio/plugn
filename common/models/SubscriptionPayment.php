@@ -344,6 +344,8 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                 ->setBcc(\Yii::$app->params['supportEmail'])
                 ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription->plan->name);
 
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
             try {
                 $mailer->send();
             } catch (\Swift_TransportException $e) {

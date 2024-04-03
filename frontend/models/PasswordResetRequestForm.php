@@ -59,7 +59,7 @@ class PasswordResetRequestForm extends Model {
 
         $resetLink = Yii::$app->urlManager->createAbsoluteUrl(['site/reset-password', 'token' => $agent->agent_password_reset_token]);
 
-        return Yii::$app->mailer
+        $mailer = Yii::$app->mailer
             ->compose(
                 [
                     'html' => 'passwordResetToken-html', 
@@ -71,8 +71,11 @@ class PasswordResetRequestForm extends Model {
             )
             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
             ->setTo($this->email)
-            ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard')
-            ->send();
+            ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard');
+
+        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        return $mailer->send();
     }
 
 }

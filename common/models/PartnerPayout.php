@@ -260,7 +260,7 @@ class PartnerPayout extends \yii\db\ActiveRecord
       //
       //     Yii::$app->mailer->htmlLayout = 'layouts/html';
       //
-      //     return Yii::$app->mailer->compose("candidate/transfer-fail.php",
+      //     $mailer = Yii::$app->mailer->compose("candidate/transfer-fail.php",
       //         [
       //             "name" => (isset($tmpName[0]))  ? $tmpName[0] : $this->candidate->candidate_name,
       //             'logo' => Url::to('@web/images/logo.png', true),
@@ -269,8 +269,11 @@ class PartnerPayout extends \yii\db\ActiveRecord
       //         ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->params['appName']])
       //         ->setTo($this->candidate->candidate_email)
       //         ->setBcc(Yii::$app->params['supportEmail'])
-      //         ->setSubject('Transfer failed. Please update your bank info')
-      //         ->send();
+      //         ->setSubject('Transfer failed. Please update your bank info');
+      //
+      //        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+      //
+    //        $mailer->send();
       // }
 
 

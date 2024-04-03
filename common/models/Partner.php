@@ -318,6 +318,8 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                ->setBcc(\Yii::$app->params['supportEmail'])
                ->setSubject('Your account password has been reset');
 
+      $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
       try {
           return $mailer->send();
       } catch (\Swift_TransportException $e) {

@@ -164,7 +164,7 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
 
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
-        \Yii::$app->mailer->compose ([
+        $mailer = \Yii::$app->mailer->compose ([
             'html' => 'staff/password-updated-html',
             'text' => 'staff/password-updated-text',
         ], [
@@ -173,8 +173,11 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo ($this->staff_email)
             ->setReplyTo(\Yii::$app->params['supportEmail'])
-            ->setSubject (Yii::t ('staff', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
-            ->send ();
+            ->setSubject (Yii::t ('staff', 'Your '. \Yii::$app->params['appName'] .' password has been changed'));
+
+        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        $mailer->send ();
     }
 
     /**

@@ -248,7 +248,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
-        \Yii::$app->mailer->compose ([
+        $mailer = \Yii::$app->mailer->compose ([
                 'html' => 'agent/password-updated-html',
                 'text' => 'agent/password-updated-text',
             ], [
@@ -257,8 +257,11 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo ($this->agent_email)
-            ->setSubject (Yii::t ('agent', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
-            ->send ();
+            ->setSubject (Yii::t ('agent', 'Your '. \Yii::$app->params['appName'] .' password has been changed'));
+
+        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        $mailer->send ();
     }
 
     /**
@@ -366,6 +369,8 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo($email)
             ->setSubject('Please confirm your email address');
+
+        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             return $mailter->send();

@@ -86,7 +86,7 @@ class IncomingController extends Controller {
 
             Yii::$app->mailer->htmlLayout = "layouts/html";
 
-            Yii::$app->mailer->compose([
+            $mailer = Yii::$app->mailer->compose([
                 'html' => 'remail/email-dropped-ticket-not-found-html',
                 'text' => 'remail/email-dropped-ticket-not-found-text',
             ], [
@@ -95,8 +95,11 @@ class IncomingController extends Controller {
             ])
                 ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
                 ->setTo($from_email)
-                ->setSubject("Your message wasn't delivered")
-                ->send();
+                ->setSubject("Your message wasn't delivered");
+
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+            $mailer->send();
 
             // Return error message
             $errorMessage = "Ticket not found";
@@ -144,7 +147,7 @@ class IncomingController extends Controller {
 
             Yii::$app->mailer->htmlLayout = "layouts/html";
 
-            Yii::$app->mailer->compose([
+            $mailer = Yii::$app->mailer->compose([
                         'html' => 'remail/email-dropped-unauthorized-html',
                         'text' => 'remail/email-dropped-unauthorized-text',
                             ], [
@@ -154,8 +157,11 @@ class IncomingController extends Controller {
                     ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
                     ->setTo($email->email_from)
-                    ->setSubject("Your message wasn't delivered")
-                    ->send();
+                    ->setSubject("Your message wasn't delivered");
+
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+            $mailer->send();
 
             // Return error message
             $errorMessage = 'You do not have access to this conversation';
@@ -263,7 +269,7 @@ class IncomingController extends Controller {
             // Send email back to sender telling him that email is dropped
             $defaultMailLayout = Yii::$app->mailer->htmlLayout;
             Yii::$app->mailer->htmlLayout = "layouts/html";
-            Yii::$app->mailer->compose([
+    $mailer = Yii::$app->mailer->compose([
                         'html' => 'remail/email-dropped-conv-not-found-html',
                         'text' => 'remail/email-dropped-conv-not-found-text',
                             ], [
@@ -272,8 +278,11 @@ class IncomingController extends Controller {
                     ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
                     ->setTo($email->email_from)
-                    ->setSubject("Your message wasn't delivered")
-                    ->send();
+                    ->setSubject("Your message wasn't delivered");
+     *
+     * $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+     *
+    $mailer->send();
             Yii::$app->mailer->htmlLayout = $defaultMailLayout;
 
             // Return error message
@@ -324,7 +333,7 @@ class IncomingController extends Controller {
             // Send email back to sender telling him that email is dropped
             $defaultMailLayout = Yii::$app->mailer->htmlLayout;
             Yii::$app->mailer->htmlLayout = "layouts/html";
-            Yii::$app->mailer->compose([
+    $mailer = Yii::$app->mailer->compose([
                         'html' => 'remail/email-dropped-unauthorized-html',
                         'text' => 'remail/email-dropped-unauthorized-text',
                             ], [
@@ -334,8 +343,10 @@ class IncomingController extends Controller {
                     ])
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
                     ->setTo($email->email_from)
-                    ->setSubject("Your message wasn't delivered")
-                    ->send();
+                    ->setSubject("Your message wasn't delivered");
+     * $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+     *
+     * $mailer->send();
             Yii::$app->mailer->htmlLayout = $defaultMailLayout;
 
             // Return error message

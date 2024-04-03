@@ -47,15 +47,16 @@ class ResendVerificationEmailForm extends Model
             return false;
         }
 
-        return Yii::$app
-            ->mailer
-            ->compose(
+        $mailer = Yii::$app->mailer->compose(
                 ['html' => 'emailVerify-html', 'text' => 'emailVerify-text'],
                 ['user' => $user]
             )
             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
             ->setTo($this->email)
-            ->setSubject('Account registration at ' . Yii::$app->name)
-            ->send();
+            ->setSubject('Account registration at ' . Yii::$app->name);
+
+        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        return $mailer->send();
     }
 }

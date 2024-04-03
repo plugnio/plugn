@@ -623,7 +623,7 @@ class Payment extends \yii\db\ActiveRecord
         
             if ($agentAssignment->email_notification) {
 
-                \Yii::$app->mailer->compose([
+                $mailer = \Yii::$app->mailer->compose([
                     'html' => 'payment-failed-html',
                 ], [
                     'payment' => $paymentRecord,
@@ -632,9 +632,12 @@ class Payment extends \yii\db\ActiveRecord
                     ->setFrom(Yii::$app->params['supportEmail'])//[$fromEmail => $this->restaurant->name]
                     //->setTo($agentAssignment->agent->agent_email)
                     ->setTo(Yii::$app->params['supportEmail'])
-                    ->setSubject('Payment failed for order #' . $paymentRecord->order_uuid . ' from ' . $paymentRecord->restaurant->name)
+                    ->setSubject('Payment failed for order #' . $paymentRecord->order_uuid . ' from ' . $paymentRecord->restaurant->name);
                     //->setReplyTo($replyTo)
-                    ->send();
+
+                $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+                $mailer->send();
             }
         }*/
     }
