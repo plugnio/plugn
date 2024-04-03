@@ -865,7 +865,8 @@ class Order extends \yii\db\ActiveRecord
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                 //->setReplyTo($replyTo)
 
-            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+            if(\Yii::$app->params['elasticMailIpPool'])
+                $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
             try {
                 $mailer->send();
@@ -873,6 +874,8 @@ class Order extends \yii\db\ActiveRecord
                 Yii::error($e->getMessage(), "email");
             }
         }
+
+        $emailSentTo = [];
 
         foreach ($this->restaurant->getAgentAssignments()->all() as $agentAssignment) {
 
@@ -896,18 +899,23 @@ class Order extends \yii\db\ActiveRecord
                     ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                     //->setReplyTo($replyTo)
 
-                $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                if(\Yii::$app->params['elasticMailIpPool'])
+                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                 try {
                     $mailer->send();
+                    $emailSentTo[] = $agentAssignment->agent->agent_email;
                 } catch (\Swift_TransportException $e) {
                     Yii::error($e->getMessage(), "email");
                 }
             }
         }
 
-        if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email) {
-
+        if (
+            $this->restaurant->restaurant_email_notification &&
+            $this->restaurant->restaurant_email &&
+            !in_array($this->restaurant->restaurant_email, $emailSentTo)
+        ) {
             $ml = new MailLog();
             $ml->to = $this->restaurant->restaurant_email;
             $ml->from = $fromEmail;
@@ -926,7 +934,8 @@ class Order extends \yii\db\ActiveRecord
                 ->setSubject('Order #' . $this->order_uuid . ' from ' . $this->restaurant->name);
                // ->setReplyTo($replyTo)
 
-            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+            if(\Yii::$app->params['elasticMailIpPool'])
+                $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
             try {
                 $mailer->send();
@@ -934,7 +943,6 @@ class Order extends \yii\db\ActiveRecord
                 Yii::error($e->getMessage(), "email");
             }
         }
-
     }
 
     // /**

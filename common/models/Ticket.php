@@ -231,7 +231,8 @@ class Ticket extends \yii\db\ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject ('Ticket assigned for ' . $this->restaurant->name);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $mailer->send ();
     }
@@ -268,7 +269,8 @@ class Ticket extends \yii\db\ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject ('New ticket generated for ' . $this->restaurant->name);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $mailer->send ();
     }

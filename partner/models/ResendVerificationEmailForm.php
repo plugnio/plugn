@@ -55,7 +55,8 @@ class ResendVerificationEmailForm extends Model
             ->setTo($this->email)
             ->setSubject('Account registration at ' . Yii::$app->name);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         return $mailer->send();
     }

@@ -52,7 +52,8 @@ class SignupForm extends Model {
                         ->setTo(Yii::$app->params['supportEmail'])
                         ->setSubject('[Plugn] New Agent - ' . $this->name );
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         return $mailer->send();
     }

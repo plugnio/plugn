@@ -1033,7 +1033,8 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('[Plugn] Agent updated DN');
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             $mailer->send();
@@ -1099,7 +1100,8 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('Store Domain Updated');
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $agents = $this->getAgentAssignments()
             //->andWhere(['email_notification' => true])
@@ -1189,7 +1191,8 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject("We miss you!");
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $agents = $this->getAgentAssignments()
             //->andWhere(['email_notification' => true])
@@ -1244,7 +1247,8 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($campaign->template->subject);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $agents = $this->getAgentAssignments()
             //->andWhere(['email_notification' => true])
@@ -1512,7 +1516,8 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             $mailer->send();
@@ -2338,7 +2343,8 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             $mailer->send();
@@ -2372,7 +2378,8 @@ class Restaurant extends ActiveRecord
             ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setSubject($subject);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             $mailer->send();
@@ -2437,7 +2444,8 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             $mailer->send();

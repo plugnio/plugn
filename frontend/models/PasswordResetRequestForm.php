@@ -73,7 +73,8 @@ class PasswordResetRequestForm extends Model {
             ->setTo($this->email)
             ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard');
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         return $mailer->send();
     }

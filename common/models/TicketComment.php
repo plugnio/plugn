@@ -167,7 +167,8 @@ class TicketComment extends \yii\db\ActiveRecord
             ->setCc (Yii::$app->params['supportEmail'])
             ->setSubject ('New comment on ticket #' . $this->ticket_uuid);
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $mailer->send ();
     }

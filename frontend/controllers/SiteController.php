@@ -201,7 +201,8 @@ class SiteController extends Controller
                         ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setSubject('[Plugn] Agent updated DN');
 
-                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                     $mailer->send();
                 }
@@ -491,7 +492,8 @@ class SiteController extends Controller
                        ->setBcc(\Yii::$app->params['supportEmail'])
                        ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name);
 
-                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                     $mailer->send();
                 }

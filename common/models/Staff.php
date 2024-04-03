@@ -175,7 +175,8 @@ class Staff extends \yii\db\ActiveRecord implements IdentityInterface
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject (Yii::t ('staff', 'Your '. \Yii::$app->params['appName'] .' password has been changed'));
 
-        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $mailer->send ();
     }

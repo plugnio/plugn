@@ -97,7 +97,8 @@ class IncomingController extends Controller {
                 ->setTo($from_email)
                 ->setSubject("Your message wasn't delivered");
 
-            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+            if(\Yii::$app->params['elasticMailIpPool'])
+                $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
             $mailer->send();
 
@@ -159,7 +160,8 @@ class IncomingController extends Controller {
                     ->setTo($email->email_from)
                     ->setSubject("Your message wasn't delivered");
 
-            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+            if(\Yii::$app->params['elasticMailIpPool'])
+                $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
             $mailer->send();
 
@@ -280,6 +282,7 @@ class IncomingController extends Controller {
                     ->setTo($email->email_from)
                     ->setSubject("Your message wasn't delivered");
      *
+     * if(\Yii::$app->params['elasticMailIpPool'])
      * $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
      *
     $mailer->send();
@@ -344,6 +347,7 @@ class IncomingController extends Controller {
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->params['appName']])
                     ->setTo($email->email_from)
                     ->setSubject("Your message wasn't delivered");
+     * if(\Yii::$app->params['elasticMailIpPool'])
      * $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
      *
      * $mailer->send();

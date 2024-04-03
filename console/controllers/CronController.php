@@ -34,7 +34,7 @@ class CronController extends \yii\console\Controller
 
         //UPDATE agent SET deleted=1 where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20');
 
-        Yii::$app->mailer->compose ([
+        /*Yii::$app->mailer->compose ([
             'text' => 'test',
             'message' => 'test'
         ])
@@ -43,7 +43,7 @@ class CronController extends \yii\console\Controller
             ->setTo ("kathrechakrushn@gmail.com")
             //->setCc($contactEmails)
             ->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
-            ->send ();
+            ->send ();*/
     }
 
     public function actionFixSpam() {
@@ -161,7 +161,8 @@ class CronController extends \yii\console\Controller
                         ->setTo([$restaurant->restaurant_email])
                         ->setSubject('Your store ' . $restaurant->name . ' is now ready');
 
-                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                     try {
                         $mailer->send();
@@ -219,7 +220,8 @@ class CronController extends \yii\console\Controller
                         ->setTo($agent->agent_email)
                         ->setSubject('Is there anything we can help with?');
 
-                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                     try {
                         $mailer->send();
@@ -270,7 +272,8 @@ class CronController extends \yii\console\Controller
                         ->setTo($agent->agent_email)
                         ->setSubject('Is there anything we can help with?');
 
-                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                     try {
                         $mailer->send();
@@ -327,7 +330,8 @@ class CronController extends \yii\console\Controller
                             ->setBcc(\Yii::$app->params['supportEmail'])
                             ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan');
 
-                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                        if(\Yii::$app->params['elasticMailIpPool'])
+                            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                         try {
 
@@ -388,7 +392,8 @@ class CronController extends \yii\console\Controller
                         ->setBcc(\Yii::$app->params['supportEmail'])
                         ->setSubject('Your Subscription is Expiring');
 
-                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                     try {
                         $result = $mailer->send();
@@ -874,7 +879,8 @@ class CronController extends \yii\console\Controller
                             ->setTo($agentAssignment->agent->agent_email)
                             ->setSubject('Order #' . $order->order_uuid . ' from ' . $order->restaurant->name);
 
-                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                        if(\Yii::$app->params['elasticMailIpPool'])
+                            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                         try {
                             $mailer->send();

@@ -343,7 +343,8 @@ class AddonController extends BaseController
                         ->setBcc(\Yii::$app->params['supportEmail'])
                         ->setSubject('Thank you for your purchase');
 
-                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                     try {
                         $mailer->send();

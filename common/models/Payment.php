@@ -635,7 +635,8 @@ class Payment extends \yii\db\ActiveRecord
                     ->setSubject('Payment failed for order #' . $paymentRecord->order_uuid . ' from ' . $paymentRecord->restaurant->name);
                     //->setReplyTo($replyTo)
 
-                $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                if(\Yii::$app->params['elasticMailIpPool'])
+        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                 $mailer->send();
             }

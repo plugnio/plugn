@@ -271,7 +271,8 @@ class PartnerPayout extends \yii\db\ActiveRecord
       //         ->setBcc(Yii::$app->params['supportEmail'])
       //         ->setSubject('Transfer failed. Please update your bank info');
       //
-      //        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+      //        if(\Yii::$app->params['elasticMailIpPool'])
+    //$mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
       //
     //        $mailer->send();
       // }
