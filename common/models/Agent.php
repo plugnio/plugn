@@ -248,7 +248,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
-        \Yii::$app->mailer->compose ([
+        $mailer = \Yii::$app->mailer->compose ([
                 'html' => 'agent/password-updated-html',
                 'text' => 'agent/password-updated-text',
             ], [
@@ -257,8 +257,12 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo ($this->agent_email)
-            ->setSubject (Yii::t ('agent', 'Your '. \Yii::$app->params['appName'] .' password has been changed'))
-            ->send ();
+            ->setSubject (Yii::t ('agent', 'Your '. \Yii::$app->params['appName'] .' password has been changed'));
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        $mailer->send ();
     }
 
     /**
@@ -355,7 +359,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
         $ml->subject = 'Please confirm your email address';
         $ml->save();
 
-        $mailter = Yii::$app->mailer->compose([
+        $mailer = Yii::$app->mailer->compose([
             'html' => 'agent/verify-email-html',
             'text' => 'agent/verify-email-text',
         ], [
@@ -367,8 +371,11 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
             ->setTo($email)
             ->setSubject('Please confirm your email address');
 
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
         try {
-            return $mailter->send();
+            return $mailer->send();
         } catch (\Swift_TransportException $e) {
             Yii::error($e->getMessage(), "email");
         }

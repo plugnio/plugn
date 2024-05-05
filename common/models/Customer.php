@@ -739,7 +739,7 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
         $ml->subject = 'Your '. $restaurant->restaurant.' password has been changed';
         $ml->save();
 
-        \Yii::$app->mailer->compose ([
+        $mailer = \Yii::$app->mailer->compose ([
             'html' => 'customer/password-updated-html',
             'text' => 'customer/password-updated-text',
         ], [
@@ -749,8 +749,12 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo ($this->customer_email)
-            ->setSubject (Yii::t ('customer', 'Your '. $restaurant->restaurant.' password has been changed'))
-            ->send();
+            ->setSubject (Yii::t ('customer', 'Your '. $restaurant->restaurant.' password has been changed'));
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        $mailer->send();
     }
 
     /**
@@ -884,6 +888,9 @@ class Customer extends \yii\db\ActiveRecord implements IdentityInterface {
             ->setTo($email)
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('Please confirm your email address');
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             return $mailer->send();

@@ -154,7 +154,7 @@ class TicketComment extends \yii\db\ActiveRecord
 
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
-        \Yii::$app->mailer->compose ([
+        $mailer = \Yii::$app->mailer->compose ([
                 'html' => 'agent/ticket-commented-html',
                 'text' => 'agent/ticket-commented-text',
             ], [
@@ -165,8 +165,12 @@ class TicketComment extends \yii\db\ActiveRecord
             ->setReplyTo($this->ticket_uuid . Yii::$app->params['remailerDomain']) //inbound email address
             ->setTo ($toEmails)
             ->setCc (Yii::$app->params['supportEmail'])
-            ->setSubject ('New comment on ticket #' . $this->ticket_uuid)
-            ->send ();
+            ->setSubject ('New comment on ticket #' . $this->ticket_uuid);
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        $mailer->send ();
     }
 
     /**

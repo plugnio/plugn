@@ -45,14 +45,18 @@ class SignupForm extends Model {
             return null;
         }
 
-        return Yii::$app->mailer
+        $mailer = Yii::$app->mailer
                         ->compose(
                                 ['html' => 'signupForm-html', 'text' => 'signupForm-text'], ['model' => $this]
                         )
                         ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                         ->setTo(Yii::$app->params['supportEmail'])
-                        ->setSubject('[Plugn] New Agent - ' . $this->name )
-                        ->send();
+                        ->setSubject('[Plugn] New Agent - ' . $this->name );
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        return $mailer->send();
     }
 
 }

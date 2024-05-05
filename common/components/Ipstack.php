@@ -103,10 +103,18 @@ class Ipstack {
                     ->where(['iso' => $result->country])
                     ->one();
 
+                if(!$country) {
+                    Yii::error("Country not found with iso code: " . $result->country);
+                }
+
                 $result->country = $country;
 
                 if(empty($result->currency)) {
-                    $result->currency = $country->currency;
+                    if ($country) {
+                        $result->currency = $country->currency;
+                    } else {
+                        $result->currency = Currency::findOne(['code' => "KWD"]);
+                    }
                 }
             }
         }

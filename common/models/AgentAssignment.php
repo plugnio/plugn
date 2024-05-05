@@ -168,7 +168,7 @@ class AgentAssignment extends \yii\db\ActiveRecord {
         $ml->subject = "You've been invited to manage " . $this->restaurant->name;
         $ml->save();
 
-        $mailter = Yii::$app->mailer->compose([
+        $mailer = Yii::$app->mailer->compose([
                 'html' => 'new-agent',
             ], [
                 'model' => $this,
@@ -179,8 +179,11 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             ->setTo($this->agent->agent_email)
             ->setSubject("You've been invited to manage " . $this->restaurant->name);
 
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
         try {
-            return $mailter->send();
+            return $mailer->send();
         } catch (\Swift_TransportException $e) {
             Yii::error($e->getMessage(), "email");
         }
@@ -206,6 +209,9 @@ class AgentAssignment extends \yii\db\ActiveRecord {
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setTo($this->agent->agent_email)
             ->setSubject( $this->restaurant->name  . " has added you as a team member on their Plugn store");
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             return $mailer->send();

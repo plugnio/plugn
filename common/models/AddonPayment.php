@@ -243,7 +243,7 @@ class AddonPayment extends \yii\db\ActiveRecord
                 $ml->subject = 'Thank you for your purchase';
                 $ml->save();
 
-                $mailter = \Yii::$app->mailer->compose([
+                $mailer = \Yii::$app->mailer->compose([
                     'html' => 'addon-purchased',
                 ], [
                     'paymentRecord' => $paymentRecord,
@@ -256,8 +256,11 @@ class AddonPayment extends \yii\db\ActiveRecord
                     ->setBcc(\Yii::$app->params['supportEmail'])
                     ->setSubject('Thank you for your purchase');
 
+                if(\Yii::$app->params['elasticMailIpPool'])
+                    $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
                 try {
-                    $mailter->send();
+                    $mailer->send();
                 } catch (\Swift_TransportException $e) {
                     Yii::error($e->getMessage(), "email");
                 }

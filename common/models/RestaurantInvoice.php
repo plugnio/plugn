@@ -223,6 +223,9 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
             ->setSubject('Invoice #' . $this->invoice_number . ' for Plugn commission | ' . $this->restaurant->name)
             ->setReplyTo(\Yii::$app->params['supportEmail']);
 
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
         try {
             $mailer->send();
         } catch (\Swift_TransportException $e) {

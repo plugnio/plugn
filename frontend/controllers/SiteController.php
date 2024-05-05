@@ -189,7 +189,7 @@ class SiteController extends Controller
 
                     Yii::$app->session->setFlash('successResponse', "Congratulations you have successfully changed your domain name");
 
-                    \Yii::$app->mailer->compose([
+                    $mailer = \Yii::$app->mailer->compose([
                         'html' => 'domain-update-request',
                     ], [
                         'store_name' => $managedRestaurant->name,
@@ -199,11 +199,13 @@ class SiteController extends Controller
                         ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
                         ->setTo(Yii::$app->params['adminEmail'])
                         ->setReplyTo(\Yii::$app->params['supportEmail'])
-                        ->setSubject('[Plugn] Agent updated DN')
-                        ->send();
+                        ->setSubject('[Plugn] Agent updated DN');
 
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+                    $mailer->send();
                 }
-
             }
         }
 
@@ -478,9 +480,9 @@ class SiteController extends Controller
                     $ml->subject = '[Plugn] Agent updated DN';
                     $ml->save();
 
-                    \Yii::$app->mailer->compose([
+                    $mailer = \Yii::$app->mailer->compose([
                            'html' => 'premium-upgrade',
-                               ], [
+                       ], [
                            'subscription' => $subscription_model,
                            'store' => $paymentRecord->restaurant,
                        ])
@@ -488,8 +490,12 @@ class SiteController extends Controller
                        ->setTo([$agent->agent_email])
                        ->setReplyTo(\Yii::$app->params['supportEmail'])
                        ->setBcc(\Yii::$app->params['supportEmail'])
-                       ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name)
-                       ->send();
+                       ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name);
+
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+                    $mailer->send();
                 }
 
                     $kwdCurrency = Currency::findOne(['code' => 'KWD']);

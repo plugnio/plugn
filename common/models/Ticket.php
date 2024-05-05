@@ -219,7 +219,7 @@ class Ticket extends \yii\db\ActiveRecord
 
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
-        \Yii::$app->mailer->compose ([
+        $mailer = \Yii::$app->mailer->compose ([
             'html' => 'agent/ticket-assigned-html',
             'text' => 'agent/ticket-assigned-text',
         ], [
@@ -229,8 +229,12 @@ class Ticket extends \yii\db\ActiveRecord
             //->setFrom ([Yii::$app->params['supportEmail']])
             ->setTo ($this->staff->staff_email)
             ->setReplyTo(\Yii::$app->params['supportEmail'])
-            ->setSubject ('Ticket assigned for ' . $this->restaurant->name)
-            ->send ();
+            ->setSubject ('Ticket assigned for ' . $this->restaurant->name);
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        $mailer->send ();
     }
 
     /**
@@ -252,7 +256,7 @@ class Ticket extends \yii\db\ActiveRecord
 
         \Yii::$app->mailer->htmlLayout = "layouts/text";
 
-        \Yii::$app->mailer->compose ([
+        $mailer = \Yii::$app->mailer->compose ([
                 'html' => 'agent/ticket-generated-html',
                 'text' => 'agent/ticket-generated-text',
             ], [
@@ -263,8 +267,12 @@ class Ticket extends \yii\db\ActiveRecord
             ->setTo (Yii::$app->params['supportEmail'])
             ->setCc ($staffEmails)
             ->setReplyTo(\Yii::$app->params['supportEmail'])
-            ->setSubject ('New ticket generated for ' . $this->restaurant->name)
-            ->send ();
+            ->setSubject ('New ticket generated for ' . $this->restaurant->name);
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        $mailer->send ();
     }
 
     /**

@@ -124,7 +124,7 @@ class StoreController extends BaseController
 
         $store->setScenario(Restaurant::SCENARIO_UPDATE);
 
-        $store->enable_guest_checkout = Yii::$app->request->getBodyParam('enable_guest_checkout');
+        $store->enable_guest_checkout = Yii::$app->request->getBodyParam('enable_guest_checkout', 1);
         $store->is_sandbox = Yii::$app->request->getBodyParam('is_sandbox');
         $store->country_id = Yii::$app->request->getBodyParam('country_id');
         $store->restaurant_email_notification = Yii::$app->request->getBodyParam('email_notification');

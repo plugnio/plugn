@@ -95,6 +95,9 @@ class TapQueue extends \yii\db\ActiveRecord
                             ->setReplyTo(\Yii::$app->params['supportEmail'])
                             ->setSubject('Your TAP Payments account has been approved');
 
+                        if(\Yii::$app->params['elasticMailIpPool'])
+                            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
                         try {
                             $mailer->send();
                         } catch (\Swift_TransportException $e) {

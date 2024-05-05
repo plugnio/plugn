@@ -17,6 +17,7 @@ return [
     'myfatoorah.saudiSecretKey' => 'sFfT2vIPVu7+GWlGFWqyH47wuVfNrhnqNpg2FCScRDrhoDiEmyvCPKBJcWcPf4takQR21o/PBK/oXfabiq0dUg==',
     'storeVersion' => 5,
     'mailThreshold' => 500,
+    "elasticMailIpPool" => "Default",
     'allowedOrigins' => [
         //'https://api.yo3an.io/',
         //Dev Envs

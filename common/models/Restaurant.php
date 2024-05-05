@@ -1033,6 +1033,9 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('[Plugn] Agent updated DN');
 
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
         try {
             $mailer->send();
         } catch (Swift_TransportException $e) {
@@ -1096,6 +1099,9 @@ class Restaurant extends ActiveRecord
             //->setTo(Yii::$app->params['adminEmail'])
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('Store Domain Updated');
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $agents = $this->getAgentAssignments()
             //->andWhere(['email_notification' => true])
@@ -1185,6 +1191,9 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject("We miss you!");
 
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
         $agents = $this->getAgentAssignments()
             //->andWhere(['email_notification' => true])
             ->all();
@@ -1237,6 +1246,9 @@ class Restaurant extends ActiveRecord
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($campaign->template->subject);
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         $agents = $this->getAgentAssignments()
             //->andWhere(['email_notification' => true])
@@ -1503,6 +1515,9 @@ class Restaurant extends ActiveRecord
             ->setTo([$this->restaurant_email])
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             $mailer->send();
@@ -2328,6 +2343,9 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
         try {
             $mailer->send();
         } catch (Swift_TransportException $e) {
@@ -2359,6 +2377,9 @@ class Restaurant extends ActiveRecord
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setSubject($subject);
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             $mailer->send();
@@ -2422,6 +2443,9 @@ class Restaurant extends ActiveRecord
             ->setTo([$this->restaurant_email])
             ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
         try {
             $mailer->send();
@@ -4457,6 +4481,8 @@ class Restaurant extends ActiveRecord
                         ->setTo([$agentAssignment->agent->agent_email])
                         ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setSubject('Weekly Store Summary');
+
+                    $weeklyStoreSummaryEmail->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
                     if ($key == 0)
                         $weeklyStoreSummaryEmail->setBcc(Yii::$app->params['supportEmail']);
