@@ -27,7 +27,7 @@ use yii\db\Expression;
  * @property string|null $created_at
  * @property string|null $updated_at
  *
- * @property Restaurant $restaurantUu
+ * @property Restaurant $restaurant
  */
 class Campaign extends \yii\db\ActiveRecord
 {

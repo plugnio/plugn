@@ -70,6 +70,15 @@ return [
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
+                [// CampaignController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/campaign',
+                    'patterns' => [
+                        'PATCH click/<id>' => 'click',
+                        // OPTIONS VERBS
+                        'OPTIONS click/s<id>' => 'options',
+                    ]
+                ],
                 [ // AccountController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/account',
