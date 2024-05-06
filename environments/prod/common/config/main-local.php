@@ -91,13 +91,12 @@ return [
             'viewPath' => '@common/mail',
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
-                'host' => 'email-smtp.eu-west-1.amazonaws.com',
-                'username' => 'AKIAWMITDJRKVNB2AFUL',//AKIAWMITDJRKTH5HBB2O //AKIAWMITDJRKTQGXUQT3
-                'password' => 'BFXl6illZPE3NP5EQrVNbCO+gMBCopuIi/uy5nwCsUZ6',//BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ //GDkiUbOkIxx4qpd0fcksh//0qKvAITbj4PCywBjh
-                'port' => '587  ',
-                'encryption' => 'tls',
-                // 'username' => 'AKIAWMITDJRKTQGXUQT3',//AKIAWMITDJRKTH5HBB2O
-                // 'password' => 'GDkiUbOkIxx4qpd0fcksh//0qKvAITbj4PCywBjh',//BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ
+                'host' => 'smtp.elasticemail.com',
+                'username' => 'no-reply@mail.plugn.site',
+                'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
+                'port' => '2525',
+                'encryption' => 'tls'
+
             ],
         ],
 /*
@@ -106,13 +105,16 @@ return [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
             'transport' => [
+
                 'class' => 'Swift_SmtpTransport',
-                'host' => 'smtp.elasticemail.com',
-                'username' => 'no-reply@mail.plugn.site',
-                'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
-                'port' => '2525',
-                'encryption' => 'tls'
-                /*
+                'host' => 'email-smtp.eu-west-1.amazonaws.com',
+                'username' => 'AKIAWMITDJRKVNB2AFUL',//AKIAWMITDJRKTH5HBB2O //AKIAWMITDJRKTQGXUQT3
+                'password' => 'BFXl6illZPE3NP5EQrVNbCO+gMBCopuIi/uy5nwCsUZ6',//BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ //GDkiUbOkIxx4qpd0fcksh//0qKvAITbj4PCywBjh
+                'port' => '587  ',
+                'encryption' => 'tls',
+                // 'username' => 'AKIAWMITDJRKTQGXUQT3',//AKIAWMITDJRKTH5HBB2O
+                // 'password' => 'GDkiUbOkIxx4qpd0fcksh//0qKvAITbj4PCywBjh',//BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ
+
                 'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.elasticemail.com',
                 'username' => 'support@plugn.io',

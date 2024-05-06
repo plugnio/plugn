@@ -4,7 +4,7 @@ return [
     'appName' => 'Plugn',
     'adminEmail' => 'contact@plugn.io',
     'supportEmail' => 'support@plugn.io',
-    'noReplyEmail' => 'contact@plugn.io',//no-reply@mail.plugn.site',
+    'noReplyEmail' => 'no-reply@mail.plugn.site',//contact@plugn.io
     'remailerDomain' => '@remail.plugn.site',
     // 'senderEmail' => 'noreply@example.com',
     // 'senderName' => 'Example.com mailer',

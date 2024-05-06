@@ -38,7 +38,7 @@ class CronController extends \yii\console\Controller
             'text' => 'test',
             'message' => 'test'
         ])
-            ->setFrom (["contact@plugn.io" => \Yii::$app->params['appName']])
+            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
             //no-reply@mail.plugn.site
             ->setSubject ('Test aws config')
             ->setTo ("kathrechakrushn@gmail.com")
