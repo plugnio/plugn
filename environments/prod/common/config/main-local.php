@@ -86,19 +86,21 @@ return [
         ], 
 
         //aws
-        /*'mailer' => [
+        'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',
             'transport' => [
-                    'class' => 'Swift_SmtpTransport',
-                    'host' => 'email-smtp.eu-west-1.amazonaws.com',
-                    'username' => 'AKIAWMITDJRKTQGXUQT3',//AKIAWMITDJRKTH5HBB2O
-                    'password' => 'GDkiUbOkIxx4qpd0fcksh//0qKvAITbj4PCywBjh',//BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ
-                    'port' => '587',
-                    'encryption' => 'tls',
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'email-smtp.eu-west-1.amazonaws.com',
+                'username' => 'AKIAWMITDJRKVNB2AFUL',//AKIAWMITDJRKTH5HBB2O //AKIAWMITDJRKTQGXUQT3
+                'password' => 'BFXl6illZPE3NP5EQrVNbCO+gMBCopuIi/uy5nwCsUZ6',//BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ //GDkiUbOkIxx4qpd0fcksh//0qKvAITbj4PCywBjh
+                'port' => '587  ',
+                'encryption' => 'tls',
+                // 'username' => 'AKIAWMITDJRKTQGXUQT3',//AKIAWMITDJRKTH5HBB2O
+                // 'password' => 'GDkiUbOkIxx4qpd0fcksh//0qKvAITbj4PCywBjh',//BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ
             ],
-        ],*/
-
+        ],
+/*
         //mailgun
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -133,14 +135,14 @@ return [
                 'username' => 'postmaster@plugn.io',
                 'password' => '2d43d23b68911184532de9f81810f5ca-18e06deb-d74119cb',
                 'port' => '587',
-                'encryption' => 'tls',*/
+                'encryption' => 'tls',
                 // 'plugins' => [
                 //     [
                 //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
                 //     ],
                 // ],
             ],
-        ],/*
+        ],
         //sendgrid
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
