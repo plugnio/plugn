@@ -715,6 +715,7 @@ class OrderController extends BaseController
             return [
                 'operation' => 'redirecting',
                 'is_sandbox' => $order->restaurant->is_sandbox,
+                'orderUuid' => $order->order_uuid,
                 'redirectUrl' => $redirectUrl,
             ];
 
