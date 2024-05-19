@@ -899,9 +899,10 @@ class OrderController extends BaseController
             $paymentRecord->save(false);
 
             // Redirect back to app for Failed Payment
-            if ($paymentRecord->payment_current_status != 'Paid' && $paymentRecord->payment_current_status != 'Succss' && $paymentRecord->payment_current_status != 'SUCCSS' && $paymentRecord->payment_current_status != 'SUCCESS') {
+            if ($paymentRecord->payment_current_status != 'Paid' && $paymentRecord->payment_current_status != 'Succss' &&
+                $paymentRecord->payment_current_status != 'SUCCSS' && $paymentRecord->payment_current_status != 'SUCCESS') {
 
-                $url = $paymentRecord->order->is_market_order?
+                $url = $paymentRecord->order && $paymentRecord->order->is_market_order?
                     'https://market.plugn.io/payment-failed/' . $paymentRecord->order_uuid:
                     $paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid;
 
@@ -912,7 +913,7 @@ class OrderController extends BaseController
 
             // Redirect back to app
 
-            $url = $paymentRecord->order->is_market_order?
+            $url = $paymentRecord->order && $paymentRecord->order->is_market_order?
                 'https://market.plugn.io/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid:
                 $paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid;
 
@@ -926,7 +927,7 @@ class OrderController extends BaseController
 
             $paymentRecord = \common\models\Payment::find()->where(['payment_gateway_invoice_id' => $responseContent->Data->InvoiceId])->one();
 
-            $url = $paymentRecord->order->is_market_order?
+            $url = $paymentRecord->order && $paymentRecord->order->is_market_order?
                 'https://market.plugn.io/payment-failed/' . $paymentRecord->order_uuid:
                 $paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid;
 
@@ -949,7 +950,7 @@ class OrderController extends BaseController
             // Redirect back to app for failed Payment
             if ($paymentRecord->payment_current_status != 'CAPTURED') {
 
-                $url = $paymentRecord->order->is_market_order?
+                $url = $paymentRecord->order && $paymentRecord->order->is_market_order?
                     'https://market.plugn.io/payment-failed/' . $paymentRecord->order_uuid:
                     $paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid;
 
@@ -960,7 +961,7 @@ class OrderController extends BaseController
 
             // Redirect back to app
             // $paymentRecord->order->changeOrderStatusToPending();
-            $url = $paymentRecord->order->is_market_order ?
+            $url = $paymentRecord->order && $paymentRecord->order->is_market_order ?
                 'https://market.plugn.io/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid:
                 $paymentRecord->restaurant->restaurant_domain . '/payment-success/' . $paymentRecord->order_uuid . '/' . $paymentRecord->payment_uuid;
 
@@ -976,7 +977,7 @@ class OrderController extends BaseController
 
             $paymentRecord = \common\models\Payment::findOne(['payment_gateway_transaction_id' => $tap_id]);
 
-            $url = $paymentRecord->order->is_market_order?
+            $url = $paymentRecord->order && $paymentRecord->order->is_market_order?
                 'https://market.plugn.io/payment-failed/' . $paymentRecord->order_uuid:
                 $paymentRecord->restaurant->restaurant_domain . '/payment-failed/' . $paymentRecord->order_uuid;
 

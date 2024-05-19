@@ -499,6 +499,13 @@ class AuthController extends BaseController {
 
         $customer = Customer::findOne($filter);
 
+        if(!$customer) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('api', 'Account not found')
+            ];
+        }
+
         //Check if this user sent an email in past few minutes (to limit email spam)
         $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
         date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));

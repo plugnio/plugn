@@ -110,6 +110,11 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
         $scenarios['SCENARIO_DELETE'] = ['deleted', 'ip_address', 'agent_deleted_at'];
 
+        $scenarios[self::SCENARIO_CREATE_NEW_AGENT] = [
+            "utm_uuid", "agent_name", "agent_email", "agent_number", "agent_phone_country_code",
+            "agent_email_verification", "agent_password_hash"
+        ];
+
         return $scenarios;
     }
 

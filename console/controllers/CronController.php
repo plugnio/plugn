@@ -34,16 +34,17 @@ class CronController extends \yii\console\Controller
 
         //UPDATE agent SET deleted=1 where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20');
 
-        /*Yii::$app->mailer->compose ([
+        Yii::$app->mailer->compose ([
             'text' => 'test',
             'message' => 'test'
         ])
-            ->setFrom (["no-reply@mail.plugn.site" => \Yii::$app->params['appName']])
-            ->setSubject ('Test email')
+            ->setFrom ([\Yii::$app->params['noReplyEmail'] => \Yii::$app->params['appName']])
+            //no-reply@mail.plugn.site
+            ->setSubject ('Test aws config')
             ->setTo ("kathrechakrushn@gmail.com")
             //->setCc($contactEmails)
-            ->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
-            ->send ();*/
+            //->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
+            ->send ();
     }
 
     public function actionFixSpam() {
