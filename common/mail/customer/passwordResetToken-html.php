@@ -324,7 +324,11 @@ use common\models\Restaurant;
                                                     <div
                                                         style="font-family:Proxima Nova, Arial, Arial, Helvetica, sans-serif;font-size:14px;line-height:24px;text-align:left;color:#000000;"
                                                     >
-                                                        Somebody (hopefully you) requested a new password for the <?= $restaurant->name ?> account for <?= $customer->customer_email ?>. No changes have been made to your account yet.
+                                                        Somebody (hopefully you) requested a new password
+                                                        <?php if (!empty($restaurant)) { ?>
+                                                        for the <?= $restaurant->name ?> account
+                                                        <?php } ?>
+                                                        for <?= $customer->customer_email ?>. No changes have been made to your account yet.
                                                     </div>
 
                                                 </td>
