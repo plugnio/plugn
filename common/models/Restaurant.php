@@ -1717,6 +1717,155 @@ class Restaurant extends ActiveRecord
      */
     public function fetchMerchant($notifyVendor = true) {
 
+        $merchantApiResponse = Yii::$app->tapPayments->fetchMerchant(
+            $this->merchant_id,
+            $this->is_sandbox? $this->test_api_key: $this->live_api_key
+        );
+
+        if ($merchantApiResponse->isOk && isset($merchantApiResponse->data['operator'])) {
+
+            if($this->country && $this->country->iso == "SA") {
+                if (
+                    $merchantApiResponse->data['is_acceptance_allowed'] &&
+                    $merchantApiResponse->data['is_payout_allowed']
+                ) {
+                    $this->tap_merchant_status = $merchantApiResponse->data['status'];
+                } else if(!$merchantApiResponse->data['is_acceptance_allowed']) {
+                    $this->tap_merchant_status = "Acceptance not allowed";
+                } else {
+                    $this->tap_merchant_status = "Payout not allowed";
+                }
+            } else {
+                $this->tap_merchant_status = $merchantApiResponse->data['status'];
+            }
+
+            //todo: notify vendor + show to admin + slack if status not active
+
+            if(!$this->wallet_id)
+                $this->wallet_id = $merchantApiResponse->data['operator']['wallet_id'];
+
+            $this->developer_id = $merchantApiResponse->data['operator']['developer_id'];
+
+            $this->operator_id = $merchantApiResponse->data['operator']['id'];
+            $this->test_api_key = $merchantApiResponse->data['operator']['api_credentials']['test']['secret'];
+            $this->test_public_key = $merchantApiResponse->data['operator']['api_credentials']['test']['public'];
+
+            if (array_key_exists('live', $merchantApiResponse->data['operator']['api_credentials'])) {
+                $this->live_api_key = $merchantApiResponse->data['operator']['api_credentials']['live']['secret'];
+                $this->live_public_key = $merchantApiResponse->data['operator']['api_credentials']['live']['public'];
+            }
+
+            //sandbox mode will give only test api keys
+
+            if ($this->live_api_key || $this->test_api_key) {
+                //$this->is_tap_enable = 1;
+                $this->is_tap_created = 1;
+                $this->is_myfatoorah_enable = 0;
+            } else {
+                $this->is_tap_created = 0;
+                //$this->is_tap_enable = 0;
+            }
+
+            if (
+                $this->is_tap_created &&
+                $this->is_tap_business_active &&
+                $this->tap_merchant_status == "Active"
+            ) {
+                $this->is_tap_enable = 1;
+            } else {
+                $this->is_tap_enable = 0;
+            }
+
+            self::updateAll([
+                'tap_merchant_status' => $this->tap_merchant_status,
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_tap_created' => $this->is_tap_created,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            if ($this->is_tap_created) {
+
+                if ($this->is_tap_enable) {
+                    $this->onTapApproved($notifyVendor);
+                } else {
+                    //$this->onTapCreated();
+
+                    //remove tap payment methods
+
+                    $paymentMethods = $this->getRestaurantPaymentMethods()->all();
+
+                    foreach ($paymentMethods as $paymentMethod) {
+                        $paymentMethod->delete();
+                    }
+                }
+            }
+
+            return [
+                "operation" => 'success',
+                "tap_merchant_status" => $this->tap_merchant_status,
+                "message" => "Merchant status is: " . $merchantApiResponse->data['status']
+            ];
+
+        } else {
+
+            //$merchantApiResponse->data['errors'][0]['code'] == 2109
+
+            if(
+                isset($merchantApiResponse->data['errors'][0]['error']) &&
+                $merchantApiResponse->data['errors'][0]['error'] == "Api_key_unauthorised"
+            ) {
+                return $this->fetchMerchantWithStoreKey($notifyVendor);
+            }
+
+            Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+
+            if (isset(Yii::$app->session->id))
+                Yii::$app->session->setFlash('errorResponse',  json_encode($merchantApiResponse->data));
+
+            $this->addError('operator_id', json_encode($merchantApiResponse->data));
+
+            self::updateAll([
+                'business_id' => $this->business_id,
+                'business_entity_id' => $this->business_entity_id,
+                'developer_id' => $this->developer_id,
+                'merchant_id' => $this->merchant_id,
+                'wallet_id' => $this->wallet_id,
+                'operator_id' => $this->operator_id,
+                'test_api_key' => $this->test_api_key,
+                'test_public_key' => $this->test_public_key,
+                'live_api_key' => $this->live_api_key,
+                'live_public_key' => $this->live_public_key,
+                'is_tap_enable' => $this->is_tap_enable,
+                'is_myfatoorah_enable' => $this->is_myfatoorah_enable
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+
+            return [
+                "operation" => 'error',
+                "message" => $merchantApiResponse->data
+            ];
+        }
+    }
+
+    /**
+     * fetch merchant details and set api keys
+     * @return array|string[]
+     */
+    public function fetchMerchantWithStoreKey($notifyVendor = true) {
+
         Yii::$app->tapPayments->setApiKeys(
             $this->live_api_key,
             $this->test_api_key,
@@ -1724,7 +1873,8 @@ class Restaurant extends ActiveRecord
         );
 
         $merchantApiResponse = Yii::$app->tapPayments->fetchMerchant(
-            $this->merchant_id
+            $this->merchant_id,
+            $this->is_sandbox? $this->test_api_key: $this->live_api_key
         );
 
         if ($merchantApiResponse->isOk && isset($merchantApiResponse->data['operator'])) {
@@ -2474,6 +2624,9 @@ class Restaurant extends ActiveRecord
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function pollTapBusinessStatus()
     {
         $businessApiResponse = Yii::$app->tapPayments->getBusiness($this);

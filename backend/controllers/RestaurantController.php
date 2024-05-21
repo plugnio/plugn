@@ -348,7 +348,9 @@ class RestaurantController extends Controller {
     {
         $model = $this->findModel($id);
 
-        $response = $model->fetchMerchant($model->merchant_id);
+        $key =  $model->is_sandbox? $model->test_api_key: $model->live_api_key;
+
+        $response = $model->fetchMerchant($model->merchant_id, $key);
 
         if($response["operation"] == 'error') {
             Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));
@@ -452,7 +454,9 @@ class RestaurantController extends Controller {
     {
         $model = $this->findModel($id);
 
-        $response = $model->fetchMerchant(false);
+        $key =  $model->is_sandbox? $model->test_api_key: $model->live_api_key;
+
+        $response = $model->fetchMerchant(false, $key);
 
         if($response["operation"] == 'error') {
             Yii::$app->session->setFlash('errorResponse', json_encode($response['message']));

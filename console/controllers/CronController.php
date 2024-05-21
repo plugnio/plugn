@@ -34,7 +34,7 @@ class CronController extends \yii\console\Controller
 
         //UPDATE agent SET deleted=1 where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20');
 
-        Yii::$app->mailer->compose ([
+        /*Yii::$app->mailer->compose ([
             'text' => 'test',
             'message' => 'test'
         ])
@@ -44,7 +44,7 @@ class CronController extends \yii\console\Controller
             ->setTo ("kathrechakrushn@gmail.com")
             //->setCc($contactEmails)
             //->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
-            ->send ();
+            ->send ();*/
     }
 
     public function actionFixSpam() {
@@ -944,7 +944,11 @@ class CronController extends \yii\console\Controller
                 ['is_tap_business_active' => false],
                 ['!=', 'tap_merchant_status', 'Active']
             ])*/
-            ->andWhere(['tap_merchant_status' => 'New Pending Approval'])
+            ->andWhere([
+                "OR",
+                ['tap_merchant_status' => 'New Pending Approval'],
+                new Expression("tap_merchant_status IS NULL")
+            ])
             ->andWhere(['is_tap_created' => true]);
 
         foreach ($query->batch() as $stores) {
