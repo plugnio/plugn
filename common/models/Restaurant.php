@@ -1717,6 +1717,12 @@ class Restaurant extends ActiveRecord
      */
     public function fetchMerchant($notifyVendor = true) {
 
+        Yii::$app->tapPayments->setApiKeys(
+            $this->live_api_key,
+            $this->test_api_key,
+            $this->is_sandbox
+        );
+
         $merchantApiResponse = Yii::$app->tapPayments->fetchMerchant(
             $this->merchant_id
         );
