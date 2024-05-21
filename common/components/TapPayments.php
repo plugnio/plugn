@@ -466,9 +466,15 @@ class TapPayments extends Component
      * @throws InvalidConfigException
      * @throws \yii\httpclient\Exception
      */
-    public function fetchMerchant($merchant_id)
+    public function fetchMerchant($merchant_id, $overrideKey = null)
     {
         $apiEndpoint = $this->apiEndpoint . "/merchant/" . $merchant_id;
+
+        $apiKey = !empty($this->vendorSecretApiKey) ? $this->vendorSecretApiKey: $this->plugnScretApiKey;
+
+        if($overrideKey) {
+            $apiKey = $overrideKey;
+        }
 
         $client = new Client();
 
@@ -476,7 +482,7 @@ class TapPayments extends Component
             ->setMethod('GET')
             ->setUrl($apiEndpoint)
             ->addHeaders([
-                'authorization' => 'Bearer ' . $this->plugnScretApiKey,
+                'authorization' => 'Bearer ' . $apiKey,
                 'content-type' => 'application/json',
             ])
             ->send();
