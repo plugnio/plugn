@@ -758,6 +758,7 @@ return [
                         'POST update-email-settings' => 'update-email-settings',
                         'POST update-store-settings' => 'update-store-settings',
 
+                        "PATCH update-kyc/<id>" => "update-kyc",
                         'PATCH update-status/<id>/<status>' => 'update-store-status',
                         'PATCH process-gateway-queue/<id>' => 'process-gateway-queue',
                         'PATCH deactivate' => 'deactivate',
@@ -825,6 +826,7 @@ return [
                         'OPTIONS update-delivery-integration' => 'options',
                         'OPTIONS process-gateway-queue' => 'options',
                         'OPTIONS remove-gateway-queue' => 'options',
+                        "OPTIONS update-kyc/<id>" => 'options'
                     ]
                 ],
                 [ // StatsController

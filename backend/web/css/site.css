@@ -185,7 +185,9 @@ a.desc:after {
     height: 100%;
 }
 
-
+.rtl {
+    direction: rtl !important;
+}
 
 
 

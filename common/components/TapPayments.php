@@ -252,7 +252,8 @@ class TapPayments extends Component
                 "bank_account" => [
                     "iban" => $restaurant->iban,
                     "swift_code" => $restaurant->swift_code,
-                    "account_number" => $restaurant->account_number
+                    "account_number" => $restaurant->account_number,
+                    "bank_account_name" => $restaurant->bank_account_name
                 ],
                 "tax_number" => $restaurant->tax_number,
                 "license" => [
@@ -354,6 +355,101 @@ class TapPayments extends Component
                 "country"=> $restaurant_billing_address->country->iso,
             ];
         }
+
+        KYC Documents
+place_of_birth: string;
+        marital_status: string;
+        residence_region: string;
+        source_of_income: string;
+        occupation: string;
+        expected_annual_sales: string;
+        sales_channels: string;
+
+        if (
+            $restaurant->tax_document_file_id
+        ) {
+            $document = [
+                "type" => "VAT Registration Certificate",
+                "number" => "",
+                "issuing_country" => $restaurant->country->iso,
+                "issuing_date" => "",
+                "expiry_date" => "",
+                "images" => [
+                    $restaurant->tax_document_file_id
+                ]
+            ];
+
+            array_push($businessParams['entity']['documents'], $document);
+        }
+
+        if (
+            $restaurant->commercial_registration_file_id
+        ) {
+            $document = [
+                "type" => "Commercial Registration",
+                "number" => "",
+                "issuing_country" => $restaurant->country->iso,
+                "issuing_date" => "",
+                "expiry_date" => "",
+                "images" => [
+                    $restaurant->commercial_registration_file_id
+                ]
+            ];
+
+            array_push($businessParams['entity']['documents'], $document);
+        }
+
+        if (
+            $restaurant->establishment_card_file_id
+        ) {
+            $document = [
+                "type" => "Establishment Card",
+                "number" => "",
+                "issuing_country" => $restaurant->country->iso,
+                "issuing_date" => "",
+                "expiry_date" => "",
+                "images" => [
+                    $restaurant->establishment_card_file_id
+                ]
+            ];
+
+            array_push($businessParams['entity']['documents'], $document);
+        }
+
+        if (
+            $restaurant->work_permit_file_id
+        ) {
+            $document = [
+                "type" => "Work Permit",
+                "number" => "",
+                "issuing_country" => $restaurant->country->iso,
+                "issuing_date" => "",
+                "expiry_date" => "",
+                "images" => [
+                    $restaurant->work_permit_file_id
+                ]
+            ];
+
+            array_push($businessParams['entity']['documents'], $document);
+        }
+
+        if (
+            $restaurant->residence_permit_file_id
+        ) {
+            $document = [
+                "type" => "Residence Permit",
+                "number" => "",
+                "issuing_country" => $restaurant->country->iso,
+                "issuing_date" => "",
+                "expiry_date" => "",
+                "images" => [
+                    $restaurant->residence_permit_file_id
+                ]
+            ];
+
+            array_push($businessParams['entity']['documents'], $document);
+        }
+
 
         if (
             $restaurant->iban_certificate_file_id
@@ -871,7 +967,7 @@ class TapPayments extends Component
      * @param  string $swift_code
      * @param  string $account_number
      */
-    public function updateBankAccount($wallet_id, $iban, $swift_code = null, $account_number = null)
+    public function updateBankAccount($wallet_id, $iban, $swift_code = null, $account_number = null, $bank_account_name = null)
     {
         $client = new Client();
 
@@ -881,7 +977,8 @@ class TapPayments extends Component
             ->setData([
                 'iban' => $iban,
                 'swift_code' => $swift_code,
-                'account_number' => $account_number
+                'account_number' => $account_number,
+                "bank_account_name" => $bank_account_name,
             ])
             ->addHeaders([
                 'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
