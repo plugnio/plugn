@@ -106,7 +106,7 @@ class Item extends \yii\db\ActiveRecord
             [['item_uuid'], 'string', 'max' => 300],
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['shipping'], 'boolean'],
-            [['weight', 'length', 'height', 'width'], 'number', "max" => 8],
+            [['weight', 'length', 'height', 'width'], 'number'],//, "max" => 10 ^ 8
             [['item_name', 'item_name_ar', 'item_image', 'barcode', 'sku'], 'string', 'max' => 255],
             [['item_description', 'item_description_ar', 'item_meta_title', 'item_meta_title_ar', 'item_meta_description', 'item_meta_description_ar'], 'string', 'max' => 2500],
             [['item_uuid'], 'unique'],
