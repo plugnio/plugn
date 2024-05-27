@@ -356,14 +356,14 @@ class TapPayments extends Component
             ];
         }
 
-        KYC Documents
-place_of_birth: string;
+        /*KYC Documents
+        place_of_birth: string;
         marital_status: string;
         residence_region: string;
         source_of_income: string;
         occupation: string;
         expected_annual_sales: string;
-        sales_channels: string;
+        sales_channels: string;*/
 
         if (
             $restaurant->tax_document_file_id

@@ -5066,6 +5066,11 @@ class Restaurant extends ActiveRecord
         }
     }
 
+
+    public function getStoreKyc($modelClass = "\common\models\StoreKyc")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
     /**
      * Gets query for [[StoreBillingAddress]].
      *

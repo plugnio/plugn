@@ -55,24 +55,43 @@ class m240522_083736_tap_requirements extends Migration
         $this->addColumn("restaurant", "tax_document_file_id", $this->string());
 
 
-        KYC Documents (Know Your Customer)
+        //KYC Documents (Know Your Customer)
 
-        place_of_birth: string;
-        marital_status: string;
-        residence_region: string;
-        source_of_income: string;
-        occupation: string;
-        expected_annual_sales: string;
-        sales_channels: string;
+        $this->createTable('{{%store_kyc}}', [
+            'kyc_uuid' => $this->char(60),
+            "restaurant_uuid"=> $this->char(60),
+            "place_of_birth" => $this->string(),
+            "marital_status" => $this->string(),
+            "residence_region" => $this->string(),
+            "source_of_income" => $this->string(),
+            "occupation" => $this->string(),
+            "expected_annual_sales" => $this->string(),
+            "sales_channels" => $this->string(),
+            'created_at' => $this->dateTime()->notNull(),
+            'updated_at' => $this->dateTime()->notNull(),
+        ], $tableOptions);
 
-    Place of birth (Name of country)
-Marital Status (Married, Single, Widowed)
-Residence region (please specify the country)
-Source of income (savings, investment, salary)
-Occupation (position and company)
-Expected annual sales
-Sales channels (Physical store, Online store, both)
+        $this->addPrimaryKey('PK', 'store_kyc', 'kyc_uuid');
 
+        // creates index for column `restaurant_uuid`
+        $this->createIndex(
+            'idx-store_kyc-restaurant_uuid', 'store_kyc', 'restaurant_uuid'
+        );
+
+        // add foreign key for table `restaurant`
+        $this->addForeignKey(
+            'fk-store_kyc-restaurant_uuid', 'store_kyc', 'restaurant_uuid', 'restaurant', 'restaurant_uuid'
+        );
+
+        /*
+           Place of birth (Name of country)
+       Marital Status (Married, Single, Widowed)
+       Residence region (please specify the country)
+       Source of income (savings, investment, salary)
+       Occupation (position and company)
+       Expected annual sales
+       Sales channels (Physical store, Online store, both)
+       */
 
     }
 
@@ -81,9 +100,6 @@ Sales channels (Physical store, Online store, both)
      */
     public function safeDown()
     {
-        echo "m240522_083736_tap_requirements cannot be reverted.\n";
-
-        return false;
     }
 
     /*
