@@ -1,4 +1,4 @@
-<!-- todo: update language support -->
+<!-- todo: update language support for api endpoint invoice -->
 
 <div class="ion-content">
 
@@ -252,7 +252,8 @@
                                     <td align="center"><?= $orderItem->item? $orderItem->item->barcode: '' ?></td>
                                     <td align="center"><?= $orderItem->customer_instruction ?></td>
                                     <td align="center"><?= $orderItem->qty ?></td>
-                                    <td align="start"><?= $orderItem->getOrderExtraOptionsText() ?></td>
+                                    <td align="start"><?= $orderItem->getOrderExtraOptionsText() ?>
+                                        <?= $orderItem->getDimenstionToText() ?></td>
                                     <td align="end">
                                         <!-- currency rate calculation? -->
                                         <?= $orderItem->currency? $orderItem->currency->code: '' ?> <?= $orderItem->item_price ?>

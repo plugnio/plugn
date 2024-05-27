@@ -278,10 +278,18 @@ class OrderItem extends \yii\db\ActiveRecord {
             $this->item_name_ar = $item->item_name_ar;
 
             $this->shipping = $item->shipping;
+
             $this->width  = $item->width;
             $this->length = $item->length;
             $this->height = $item->height;
-            $this->weight = $item->weight;            
+            $this->weight = $item->weight;
+
+            if($this->variant) {
+                $this->width  = $item->variant->width;
+                $this->length = $item->variant->length;
+                $this->height = $item->variant->height;
+                $this->weight = $item->variant->weight;
+            }
         }
 
         $this->item_price = $this->calculateOrderItemPrice();
@@ -342,7 +350,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         }
 
         //Update product inventory
-        
+
         if ($insert) {
           if ($item) {
               $this->item_name = $item->item_name;
@@ -399,6 +407,25 @@ class OrderItem extends \yii\db\ActiveRecord {
             $order->updateOrderTotalPrice();
 
         return parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function getDimenstionToText() {
+
+        $value = [];
+
+        if($this->weight > 0) {
+            $value[] = $this->weight . ' kg';
+        }
+
+        if($this->width > 0 || $this->length > 0 || $this->height > 0) {
+            $value[] = $this->width . ' cm (W) X ' . $this->length . ' cm (L) X ' . $this->height . ' cm (H)';
+        }
+
+        if (sizeof($value) > 0) {
+            return ' · '. implode(" / ", $value);
+        }
+
+        return "";
     }
 
     public function getOrderExtraOptionsText()
