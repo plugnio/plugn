@@ -117,6 +117,23 @@ class StoreController extends BaseController
     }
 
     /**
+     * @param $id
+     * @return array|\common\models\query\Agent
+     * @throws NotFoundHttpException
+     */
+    public function actionByPackage($id)
+    {
+        $model = Restaurant::find()
+            ->andWhere(['app_id' => $id])
+            ->one();
+
+        if (!$model)
+            throw new NotFoundHttpException('The requested record does not exist.');
+
+        return $model;
+    }
+
+    /**
      * @param $domain
      * @return void
      * @throws NotFoundHttpException

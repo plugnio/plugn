@@ -214,6 +214,14 @@ https://www.yiiframework.com/extension/yiisoft/yii2-redis/doc/api/2.0/yii-redis-
 
 https://docs.google.com/spreadsheets/d/14wzSPWjGcJ8h77SxmjiKSxc4rkJiYNITeIISvvRNNnE/edit#gid=1641519238
 
+# ssh 
+`eval $(ssh-agent)`
+`ssh-add ~/.ssh/github`
+ssh path `/home/ubuntu/snap/gh/502/.ssh/id_ed25519.pub`
+
+permission for terminus
+`sudo chown -R $(whoami) ./`
+
 # Plugn issue
 
 integrations@tap.company 

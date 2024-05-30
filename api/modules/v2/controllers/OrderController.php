@@ -178,6 +178,10 @@ class OrderController extends BaseController
                 $order->address_2 = Yii::$app->request->getBodyParam('address_2');
                 $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
 
+                if(!$order->postalcode) {
+                    $order->postalcode = Yii::$app->request->getBodyParam('postalcode');
+                }
+
                 $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
                 $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
                 $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
@@ -185,9 +189,8 @@ class OrderController extends BaseController
                 $order->street = Yii::$app->request->getBodyParam("street");
                 $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
                 $order->house_number = Yii::$app->request->getBodyParam("house_number");
-
-                if ((strtolower($order->unit_type) == Order::UNIT_TYPE_APARTMENT || strtolower($order->unit_type) == Order::UNIT_TYPE_OFFICE))
-                    $order->floor = Yii::$app->request->getBodyParam("floor");
+            $order->floor = Yii::$app->request->getBodyParam("floor");
+            $order->building = Yii::$app->request->getBodyParam("building");
 
                 if (strtolower($order->unit_type) == Order::UNIT_TYPE_APARTMENT)
                     $order->apartment = Yii::$app->request->getBodyParam("apartment");
@@ -712,6 +715,7 @@ class OrderController extends BaseController
             return [
                 'operation' => 'redirecting',
                 'is_sandbox' => $order->restaurant->is_sandbox,
+                'orderUuid' => $order->order_uuid,
                 'redirectUrl' => $redirectUrl,
             ];
 
