@@ -4,6 +4,7 @@ namespace agent\modules\v1\controllers;
 
 use agent\models\DeliveryZone;
 use Yii;
+use yii\db\Expression;
 use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use agent\models\City;
@@ -25,14 +26,20 @@ class CityController extends BaseController {
 
         Yii::$app->accountManager->getManagedAccount($store_uuid);
 
+        $query =  City::find();
+
         if($delivery_zone_id) {
             $dz = DeliveryZone::findOne(['delivery_zone_id' => $delivery_zone_id]);
 
-            if($dz)
+            if($dz) {
                 $country_id = $dz->country_id;
-        }
 
-        $query =  City::find();
+                if($dz->country && $dz->country->iso == "KW") {
+                    $query->andWhere(new Expression('state_id IS NULL'));
+                    //hide areas added as city in kuwait by google api
+                }
+            }
+        }
 
         if ($keyword) {
           $query->andWhere([
