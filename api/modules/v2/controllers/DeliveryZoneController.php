@@ -413,7 +413,6 @@ class DeliveryZoneController extends BaseController
      */
     public function actionStates($country_id)
     {
-
         $store_id = Yii::$app->request->getHeaders()->get('Store-Id');
 
         $keyword = Yii::$app->request->get("keyword");
@@ -442,7 +441,6 @@ class DeliveryZoneController extends BaseController
 
     public function actionCityAreas($city_id)
     {
-
         $keyword = Yii::$app->request->get("keyword");
 
         $city = City::findOne($city_id);
@@ -468,7 +466,6 @@ class DeliveryZoneController extends BaseController
 
     public function actionCountryAreas($country_id)
     {
-
         $keyword = Yii::$app->request->get("keyword");
 
         $country = Country::findOne($country_id);
@@ -494,7 +491,6 @@ class DeliveryZoneController extends BaseController
 
     public function actionCountryStates($country_id)
     {
-
         $keyword = Yii::$app->request->get("keyword");
 
         $country = Country::findOne($country_id);
@@ -520,7 +516,6 @@ class DeliveryZoneController extends BaseController
      */
     public function actionCountryCities($country_id)
     {
-
         $keyword = Yii::$app->request->get("keyword");
 
         $country = Country::findOne($country_id);
@@ -530,6 +525,11 @@ class DeliveryZoneController extends BaseController
         }
 
         $query = $country->getCities("\api\models\City");
+
+        if($country && $country->iso == "KW") {
+            $query->andWhere(new Expression('state_id IS NULL'));
+            //hide areas added as city in kuwait by google api
+        }
 
         if ($keyword) {
             $query->andWhere([
