@@ -512,6 +512,19 @@ return [
                         'OPTIONS cancel-override/<delivery_zone_id>' => 'options',
                     ]
                 ],
+
+                [// ApplePayController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment/apple-pay',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST process-payment' => 'process-payment',
+                        'POST validate-merchant' => 'validate-merchant',
+                        // OPTIONS VERBS
+                        'OPTIONS process-payment' => 'options',
+                        'OPTIONS validate-merchant' => 'options',
+                    ]
+                ],
                 [// MoyasarController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/payment/moyasar',
