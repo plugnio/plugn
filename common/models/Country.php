@@ -15,6 +15,7 @@ use yii\db\Expression;
  * @property string|null $currency_code
  * @property string|null $emoji
  * @property int|null $country_code
+ * @property boolean $is_deleted
 
  * @property BusinessLocation[] $businessLocations
  * @property City[] $cities
@@ -238,6 +239,14 @@ class Country extends \yii\db\ActiveRecord
     {
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
             ->via('restaurants');
+    }
+
+    /**
+     * @return query\CountryQuery
+     */
+    public static function find()
+    {
+        return new query\CountryQuery(get_called_class());
     }
 }
 

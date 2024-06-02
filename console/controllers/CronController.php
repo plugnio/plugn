@@ -52,7 +52,46 @@ class CronController extends \yii\console\Controller
             ->send ();*/
     }
 
-    public function actionFixDuplicateLocation() {
+    public function actionFixDuplicateAreas() {
+
+        $query = Area::find()
+            ->joinWith(['city'])
+            ->andWhere(['country_id' => 84])
+            ->groupBy('area_name');//get unique cities
+
+        foreach ($query->batch(100) as $areas) {
+
+            foreach ($areas as $area) {
+
+                //duplicate in same city only
+
+                $duplicates = Area::find()
+                    ->andWhere(['area_name' => $area->area_name, 'city_id' => $area->city_id])
+                    ->andWhere(['!=', 'area_id', $area->area_id])
+                    ->all();
+
+                foreach ($duplicates as $duplicate) {
+
+                    Order::updateAll(['area_id' => $area->area_id], [
+                        'area_id' => $duplicate->area_id
+                    ]);
+
+                    AreaDeliveryZone::updateAll(['area_id' => $area->area_id], [
+                        'area_id' => $duplicate->area_id
+                    ]);
+
+                    CustomerAddress::updateAll(['area_id' => $area->area_id], [
+                        'area_id' => $duplicate->area_id
+                    ]);
+
+                    $duplicate->is_deleted = 1;
+                    $duplicate->save();
+                }
+            }
+        }
+    }
+
+    public function actionFixDuplicateCities() {
 
         $query = City::find()
             ->andWhere(['country_id' => 84])

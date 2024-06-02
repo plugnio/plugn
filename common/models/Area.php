@@ -13,7 +13,7 @@ use Yii;
  * @property string $area_name_ar
  * @property float|null $latitude
  * @property float|null $longitude
- *
+ * @property boolean $is_deleted
  * @property City $city
  * @property Order[] $orders
  * @property Country $country
@@ -124,5 +124,13 @@ class Area extends \yii\db\ActiveRecord
     {
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
             ->viaTable('area_delivery_zone', ['area_id' => 'area_id']);
+    }
+
+    /**
+     * @return query\AreaQuery
+     */
+    public static function find()
+    {
+        return new query\AreaQuery(get_called_class());
     }
 }

@@ -12,6 +12,7 @@ use Yii;
  * @property int $country_id
  * @property string $city_name
  * @property string $city_name_ar
+ * @property boolean $is_deleted
  *
  * @property Area[] $areas
   * @property Country $country
@@ -577,5 +578,13 @@ class City extends \yii\db\ActiveRecord
     public function getRestaurantDeliveryAreas($modelClass = "\common\models\RestaurantDelivery")
     {
         return $this->hasMany ($modelClass::className (), ['area_id' => 'area_id'])->via ('areas')->with ('area');
+    }
+
+    /**
+     * @return query\CityQuery
+     */
+    public static function find()
+    {
+        return new query\CityQuery(get_called_class());
     }
 }
