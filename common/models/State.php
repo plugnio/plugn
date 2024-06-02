@@ -13,6 +13,7 @@ use Yii;
  * @property string|null $code
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property boolean $is_deleted
  *
  * @property Country $country
  */
@@ -84,5 +85,13 @@ class State extends \yii\db\ActiveRecord
     public function getCountry($modelClass = "\common\models\Country")
     {
         return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
+    }
+
+    /**
+     * @return query\StateQuery
+     */
+    public static function find()
+    {
+        return new query\StateQuery(get_called_class());
     }
 }
