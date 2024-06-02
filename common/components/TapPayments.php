@@ -845,6 +845,22 @@ class TapPayments extends Component
         return $response;
     }
 
+    public function fromApplePayToken($token) {
+
+        $client = new Client();
+        return $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl($this->apiEndpoint . "/tokens/")
+            ->addHeaders([
+                'authorization' => 'Bearer ' . $this->vendorSecretApiKey,
+                'content-type' => 'application/json',
+            ])
+            ->setData([
+                "type" => "applepay",
+                "token_data" => $token,
+            ]);
+    }
+
     /**
      * isValidToken
      * @param  string $chargeId
