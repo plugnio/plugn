@@ -65,18 +65,21 @@ class AddonController extends BaseController
     {
         $addon_uuid = Yii::$app->request->getBodyParam ('addon_uuid');
         $payment_method_id = Yii::$app->request->getBodyParam ('payment_method_id');
+        $token = Yii::$app->request->getBodyParam ('token');
 
         $addon = $this->findModel($addon_uuid);
 
         $store = Yii::$app->accountManager->getManagedAccount (null, false);
 
         $payment = new AddonPayment;
+        
         $payment->restaurant_uuid = $store->restaurant_uuid;
         $payment->payment_mode = $payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD;
         $payment->addon_uuid = $addon_uuid;
         $payment->payment_amount_charged = $addon->special_price > 0 ? $addon->special_price: $addon->price;
         $payment->payment_current_status = "Redirected to payment gateway";
         $payment->is_sandbox = false;//$store->is_sandbox;
+        $payment->payment_token = $token;
 
         if (!$payment->save ()) {
             return [
@@ -92,6 +95,11 @@ class AddonController extends BaseController
             $payment->is_sandbox
         );
 
+        if(!$token) {
+            $token = $payment_method_id == 1 ? TapPayments::GATEWAY_KNET :
+                TapPayments::GATEWAY_VISA_MASTERCARD;
+        }
+
         $response = Yii::$app->tapPayments->createCharge (
             "KWD",
             $addon->name . " for " . $store->name, // Description
@@ -105,7 +113,7 @@ class AddonController extends BaseController
             0, //Comission
             Url::to (['addons/callback'], true),
             Url::to(['addons/payment-webhook'], true),
-            $payment_method_id == 1 ? TapPayments::GATEWAY_KNET : TapPayments::GATEWAY_VISA_MASTERCARD,
+            $token,
             0,
             0,
             ''
@@ -137,7 +145,7 @@ class AddonController extends BaseController
 
             $payment->payment_gateway_transaction_id = $chargeId;
 
-            if (!$payment->save ()) {
+            if (!$payment->save()) {
 
                 //\Yii::error ($payment->errors, __METHOD__); // Log error faced by user
 
