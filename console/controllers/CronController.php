@@ -2,7 +2,11 @@
 
 namespace console\controllers;
 
+use agent\models\Area;
+use agent\models\AreaDeliveryZone;
+use api\models\City;
 use common\models\Agent;
+use common\models\CustomerAddress;
 use common\models\MailLog;
 use Yii;
 use common\models\Currency;
@@ -21,6 +25,7 @@ use common\models\Order;
 use common\models\Subscription;
 use \DateTime;
 use yii\db\Exception;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\db\Expression;
 
@@ -45,6 +50,41 @@ class CronController extends \yii\console\Controller
             //->setCc($contactEmails)
             //->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
             ->send ();*/
+    }
+
+    public function actionFixDuplicateLocation() {
+
+        $query = City::find()
+            ->andWhere(['country_id' => 84])
+            ->groupBy('city_name');//get unique cities
+
+        foreach ($query->batch(100) as $cities) {
+
+            foreach ($cities as $city) {
+
+                $duplicates = City::find()
+                    ->andWhere(['city_name' => $city->city_name])
+                    ->andWhere(['!=', 'city_id', $city->city_id])
+                    ->all();
+
+                foreach ($duplicates as $duplicate) {
+
+                    Area::updateAll(['city_id' => $city->city_id], [
+                        'city_id' => $duplicate->city_id
+                    ]);
+
+                    AreaDeliveryZone::updateAll(['city_id' => $city->city_id], [
+                        'city_id' => $duplicate->city_id
+                    ]);
+
+                    CustomerAddress::updateAll(['city_id' => $city->city_id], [
+                        'city_id' => $duplicate->city_id
+                    ]);
+
+                    $duplicate->delete();
+                }
+            }
+        }
     }
 
     public function actionFixSpam() {

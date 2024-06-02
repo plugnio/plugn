@@ -177,8 +177,8 @@ class City extends \yii\db\ActiveRecord
         $model = new City;
         //todo: state_id
         $model->country_id = $country->country_id;
-        $model->city_name = ucwords($city_name);
-        $model->city_name_ar = ucwords($city_name);
+        $model->city_name = $city_name;
+        $model->city_name_ar = $city_name;
         $model->save();
 
         $city = City::find()
@@ -199,7 +199,219 @@ class City extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function addByGoogleAPIResponseForOther($response, $country) {
+
+        $objState = self::getGoogleAPIStateObject($response);
+        $cityObject = self::getGoogleAPICityObject($response);
+        //$areaObject = self::getGoogleAPIAreaObject($response);
+
+        if(!$cityObject) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('app', 'Sorry not able to find your city!')
+            ];
+        }
+
+        $city_name = $cityObject->long_name;
+
+        //$area_name = $areaObject? $areaObject->long_name: null;
+
+        $city = City::find()
+            //->with('country')
+            ->andWhere(['city_name' => $city_name, 'country_id' => $country->country_id])
+            //->asArray()
+            ->one();
+
+        //if city already available
+
+        if($city) {
+
+            $state = $city->getState()->one();
+
+            // check if area already available
+
+            $area = null;
+
+            /*if($areaObject) {
+                $area = self::_isGooglePlaceIsArea($area_name, $city, $response->results[0]);
+            }*/
+
+            return [
+                'operation' => 'success',
+                "area" => $area,
+                'city' => $city,
+                "state" => $state,
+                "country" => $city->country,
+            ];
+        }
+
+        //add area + city + state as not available
+
+        //add state
+
+        $state = null;
+
+        // make sure state name not same as city (as some country might not have states)
+
+        if ($objState && $objState->long_name != $city_name) {
+
+            $state = State::find()
+                ->andWhere([
+                    'name' => $objState->long_name,
+                    "country_id" => $country->country_id])
+                ->one();
+
+            if(!$state) {
+                $state = new State();
+                $state->country_id = $country->country_id;
+                $state->name = $objState->long_name;
+                $state->save();
+            }
+        }
+
+        //add city
+
+        $city = new City;
+        $city->state_id = $state? $state->state_id: null;
+        $city->country_id = $country->country_id;
+        $city->city_name = $city_name;
+        $city->city_name_ar = $city_name;
+        $city->save();
+
+        // check if area already available
+
+        /*$area = null;
+
+        if($areaObject) {
+            $area = self::_isGooglePlaceIsArea($area_name, $city, $response->results[0]);
+        }*/
+
+        return [
+            'operation' => 'success',
+            //"area" => $area,
+            'city' => $city,
+            "state" => $state,
+            "country" => $city->country
+        ];
+    }
+
+    public static function addByGoogleAPIResponseForKuwait($response, $country) {
+
+        $objState = self::getGoogleAPIStateObject($response);
+        $cityObject = self::getGoogleAPICityObject($response);
+        $areaObject = self::getGoogleAPIAreaObject($response);
+
+        if(!$areaObject || !$cityObject) {
+            return [
+                'operation' => 'error',
+                'message' => Yii::t('app', 'Sorry not able to find your city!')
+            ];
+        }
+
+        $city_name = $cityObject->long_name;
+
+        $area_name = $areaObject? $areaObject->long_name: null;
+
+        $city = City::find()
+            //->with('country')
+            ->andWhere([
+                'city_name' => $city_name,
+                'country_id' => $country->country_id
+            ])
+            //->asArray()
+            ->one();
+
+        //if city already available
+
+        if($city) {
+
+            $state = $city->getState()->one();
+
+            // check if area already available
+
+            $area = null;
+
+            if($areaObject) {
+                $area = self::_isGooglePlaceIsArea($area_name, $city, $response->results[0]);
+            }
+
+            return [
+                'operation' => 'success',
+                "area" => $area,
+                'city' => $city,
+                "state" => $state,
+                "country" => $city->country,
+            ];
+        }
+
+        //add area + city + state as not available
+
+        //add state
+
+        $state = null;
+
+        // make sure state name not same as city (as some country might not have states)
+
+        if ($objState && $objState->long_name != $city_name) {
+
+            $state = State::find()
+                ->andWhere([
+                    'name' => $objState->long_name,
+                    "country_id" => $country->country_id])
+                ->one();
+
+            if(!$state) {
+                $state = new State();
+                $state->country_id = $country->country_id;
+                $state->name = $objState->long_name;
+                $state->save();
+            }
+        }
+
+        //add city
+
+        $city = new City;
+        $city->state_id = $state? $state->state_id: null;
+        $city->country_id = $country->country_id;
+        $city->city_name = $city_name;
+        $city->city_name_ar = $city_name;
+        $city->save();
+
+        //for kuwait sub-locality = area
+
+        $area = null;
+
+        if ($areaObject) {//$country_name == "Kuwait"
+
+            $area = self::_isGooglePlaceIsArea($area_name, $city, $response->results[0]);
+
+            //add area
+/*
+            $area = new Area;
+            $area->city_id = $city->city_id;
+            $area->area_name = $area_name;
+            $area->area_name_ar = $area_name;
+            $area->latitude = $response->results[0]->geometry->location->lat;
+            $area->longitude= $response->results[0]->geometry->location->lng;
+            $area->save();*/
+        }
+
+        // if no area then return city, state, country
+
+        return [
+            'operation' => 'success',
+            'area' => $area,
+            'city' => $city,
+            "state" => $state,
+            "country" => $city->country
+        ];
+    }
+
     /**
+     * todo:
+     * 1) fix adding cities without states
+     * 2) fix adding duplicate cities on providing different areas of same cities
+     * 3) test function by providing different lacation (unknown)
      * Add city if not available by Google API response
      * https://maps.googleapis.com/maps/api/geocode/json?latlng=22.260728864087454,73.13252570265993&key=AIzaSyCGCusw5MJ_aJwyzIi4q7pJY71k2CNXAbA&location_type=APPROXIMATE
      * @param string $url
@@ -258,139 +470,11 @@ class City extends \yii\db\ActiveRecord
             $country->save();
         }
 
-        $objState = self::getGoogleAPIStateObject($response);
-        $cityObject = self::getGoogleAPICityObject($response);
-        $areaObject = self::getGoogleAPIAreaObject($response);
-
-        if(!$cityObject) {
-            return [
-                'operation' => 'error',
-                'message' => Yii::t('app', 'Sorry not able to find your city!')
-            ];
+        if($country->iso == "KW") {
+            return self::addByGoogleAPIResponseForKuwait($response, $country);
         }
 
-        $city_name = $cityObject->long_name;
-
-        $area_name = $areaObject? $areaObject->long_name: null;
-
-        $city = City::find()
-            //->with('country')
-            ->andWhere(['city_name' => $city_name, 'country_id' => $country->country_id])
-            //->asArray()
-            ->one();
-
-        //if city already available
-
-        if($city) {
-
-            $state = $city->getState()->one();
-
-            // check if area already available
-
-            if($areaObject) {
-
-                $area = Area::find()
-                    //->joinWith(['city'])
-                    ->andWhere(['area_name' => $area_name, 'city_id' => $city->city_id])
-                    ->one();
-
-                if ($area) {
-
-                    return [
-                        'operation' => 'success',
-                        "area" => $area,
-                        'city' => $city,
-                        "state" => $state,
-                        "country" => $city->country,//$state? $state->country:
-                        // 'area' => self::_isGooglePlaceIsArea($area_name, $city, $response->results[0])
-                    ];
-                }
-
-            } else {
-
-                return [
-                    'operation' => 'success',
-                    'city' => $city,
-                    "state" => $state,
-                    "country" => $city->country,//$state? $state->country:
-                    // 'area' => self::_isGooglePlaceIsArea($area_name, $city, $response->results[0])
-                ];
-            }
-        }
-
-        //add area + city + state as not available
-
-        //add state
-
-        $state = null;
-
-        // make sure state name not same as city (as some country might not have states)
-
-        if ($objState && $objState->long_name != $city_name) {
-
-            $state = State::find()
-                ->andWhere(['name' => $objState->long_name, "country_id" => $country->country_id])
-                ->one();
-
-            if(!$state) {
-                $state = new State();
-                $state->country_id = $country->country_id;
-                $state->name = $objState->long_name;
-                $state->save();
-            }
-        }
-
-        //add city
-
-        $model = new City;
-        $model->state_id = $state? $state->state_id: null;
-        $model->country_id = $country->country_id;
-        $model->city_name = ucwords($city_name);
-        $model->city_name_ar = ucwords($city_name);
-        $model->save();
-
-        $city = City::find()
-            //->with('country')
-            ->where(['city_id' => $model->city_id])
-            //->asArray()
-            ->one();
-
-        //for kuwait sub-locality = area
-
-        if ($areaObject) {//$country_name == "Kuwait"
-
-            //add area
-
-            $area = new Area;
-            $area->city_id = $city->city_id;
-            $area->area_name = $area_name;
-            $area->area_name_ar = $area_name;
-            $area->latitude = $response->results[0]->geometry->location->lat;
-            $area->longitude= $response->results[0]->geometry->location->lng;
-            $area->save();
-
-            if ($area) {
-
-                return [
-                    'operation' => 'success',
-                    'area' => $area,
-                    'city' => $city,
-                    "state" => $state,
-                    "country" =>  $city->country,//$state? $state->country:
-                    //self::_isGooglePlaceIsArea($area_name, $city, $response->results[0])
-                ];
-            }
-        }
-
-        // if no area then return city, state, country
-
-        return [
-            'operation' => 'success',
-            'city' => $city,
-            "state" => $state,
-            "country" => $city->country,
-            //'area' => self::_isGooglePlaceIsArea($area_name, $city, $response->results[0])
-        ];
+        return self::addByGoogleAPIResponseForOther($response, $country);
     }
 
     /**
@@ -407,11 +491,12 @@ class City extends \yii\db\ActiveRecord
             !in_array('locality', $response->types) &&
             !in_array('administrative_area_level_1', $response->types)
         ) {
+
             $area = Area::find()
                 ->andWhere([
                     'OR',
                     [
-                        'area_name_en' => $area_name
+                        'area_name' => $area_name
                     ],
                     [
                         'area_name_ar' => $area_name
@@ -424,6 +509,8 @@ class City extends \yii\db\ActiveRecord
                 $area->area_name = $area_name;
                 $area->area_name_ar = $area_name;
                 $area->city_id = $city['city_id'];
+                $area->latitude = $response->geometry->location->lat;
+                $area->longitude = $response->geometry->location->lng;
                 $area->save();
             }
 
