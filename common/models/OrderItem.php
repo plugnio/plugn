@@ -285,10 +285,10 @@ class OrderItem extends \yii\db\ActiveRecord {
             $this->weight = $item->weight;
 
             if($this->variant) {
-                $this->width  = $item->variant->width;
-                $this->length = $item->variant->length;
-                $this->height = $item->variant->height;
-                $this->weight = $item->variant->weight;
+                $this->width  = $this->variant->width;
+                $this->length = $this->variant->length;
+                $this->height = $this->variant->height;
+                $this->weight = $this->variant->weight;
             }
         }
 
