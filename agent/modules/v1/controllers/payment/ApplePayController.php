@@ -201,7 +201,6 @@ class ApplePayController extends BaseController
      */
     public function actionValidateMerchant()
     {
-
         $validationURL = \Yii::$app->request->getBodyParam("validationURL");
 
         if (!$validationURL) {
@@ -244,10 +243,8 @@ class ApplePayController extends BaseController
                 'json' => $body,
             ]);
 
-            Yii::error($response->getBody());
-            
-            //header('Content-Type: application/json');
-            return $response->getBody();
+            return json_decode($response->getBody()->getContents());
+
         } catch (RequestException $e) {
 
             Yii::error($e->getMessage());
