@@ -62,6 +62,9 @@ return [
         'zapier' => [
             'class' => 'common\components\Zapier'
         ],
+        "applePay" => [
+            'class' => 'common\components\ApplePay',
+        ],
         'ipstack' => [
             'class' => 'common\components\Ipstack',
             'accessKey' => '911bdd76f42e7f'

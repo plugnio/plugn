@@ -5374,4 +5374,12 @@ class Restaurant extends ActiveRecord
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+    /**
+     * merchant id for Apple Pay
+     * @return string
+     */
+    public function getMerchantIdentifier() {
+        return "merchant." . $this->app_id;
+    }
 }
