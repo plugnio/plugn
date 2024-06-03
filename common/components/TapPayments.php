@@ -846,7 +846,6 @@ class TapPayments extends Component
     }
 
     public function fromApplePayToken($token) {
-
         $client = new Client();
         return $client->createRequest()
             ->setMethod('POST')
