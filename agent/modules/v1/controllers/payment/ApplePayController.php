@@ -36,6 +36,14 @@ class ApplePayController extends BaseController
         $payment_method_id = \Yii::$app->request->getBodyParam ('payment_method_id');
         $token = \Yii::$app->request->getBodyParam ('token');
 
+        \Yii::error($token);
+
+        \Yii::$app->tapPayments->setApiKeys (
+            \Yii::$app->params['liveApiKey'],
+            \Yii::$app->params['testApiKey'],
+            false
+        );
+
         //convert apple pay token to Tap apple pay token
 
         if($token) {
@@ -64,16 +72,10 @@ class ApplePayController extends BaseController
         if (!$payment->save ()) {
             return [
                 'operation' => 'error',
+                "code" => 1,
                 'message' => $payment->getErrors ()
             ];
         }
-
-        // Redirect to payment gateway
-        \Yii::$app->tapPayments->setApiKeys (
-            \Yii::$app->params['liveApiKey'],
-            \Yii::$app->params['testApiKey'],
-            $payment->is_sandbox
-        );
 
         if(!$token) {
             $token = $payment_method_id == 1 ? TapPayments::GATEWAY_KNET :
@@ -116,6 +118,7 @@ class ApplePayController extends BaseController
 
             return [
                 'operation' => 'error',
+                "code" => 2,
                 'message' => $errorMessage,
                 "response" => $responseContent
             ];
@@ -137,6 +140,7 @@ class ApplePayController extends BaseController
 
                 return [
                     'operation' => 'error',
+                    "code" => 3,
                     'message' => $payment->getErrors (),
                     "response" => $responseContent
                 ];
@@ -160,6 +164,7 @@ class ApplePayController extends BaseController
                 } else {
                     return [
                         'operation' => 'error',
+                        "code" => 4,
                         'message' => "There seems to be an issue with your payment, please try again."
                     ];
                 }
@@ -171,6 +176,7 @@ class ApplePayController extends BaseController
 
             return [
                 'operation' => 'error',
+                "code" => 5,
                 'message' => \Yii::t('agent','Payment Issue > Charge id is missing')
             ];
         }
@@ -179,6 +185,7 @@ class ApplePayController extends BaseController
 
         return [
             'operation' => 'error',
+            "code" => 6,
             'message' => "unknown error"
         ];
 
