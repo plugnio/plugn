@@ -122,7 +122,13 @@ class CityController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        $model->is_deleted = true;
+
+        if(!$model->save()) {
+            return $this->goBack();
+        }
 
         return $this->redirect(['index']);
     }
