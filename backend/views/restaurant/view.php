@@ -67,6 +67,8 @@ $this->registerJs($js);
 
     <p>
 
+        <?= Html::a('Login', ['login', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
 
         <?php if($model->is_deleted) {
