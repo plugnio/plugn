@@ -30,6 +30,7 @@ class m200119_140111_create_area_table extends Migration {
             'area_name_ar' => $this->string(255)->notNull(),
             'latitude' => $this->decimal(9, 6),
             'longitude' => $this->decimal(9, 6),
+            "is_deleted" => $this->boolean()->defaultValue(0)
                 ], $tableOptions);
 
         // creates index for column `city_id`

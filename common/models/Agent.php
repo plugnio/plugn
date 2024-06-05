@@ -763,7 +763,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->hasMany ($modelClass::className (), ['restaurant_uuid' => 'restaurant_uuid'])
             ->via ('agentAssignments')
-            ->andWhere(['is_deleted' => false]);
+            ->andWhere(['restaurant.is_deleted' => false]);
     }
 
     /**

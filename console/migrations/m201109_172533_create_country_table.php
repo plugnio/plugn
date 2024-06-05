@@ -26,6 +26,7 @@ class m201109_172533_create_country_table extends Migration
             'iso' => $this->char(2),
             'emoji' => $this->char(3),
             'country_code' => $this->integer(3),
+            "is_deleted" => $this->boolean()->defaultValue(0)
         ], $tableOptions);
 
         $sql = "

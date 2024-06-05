@@ -23,6 +23,7 @@ class m230618_112926_state extends Migration
             "country_id" => $this->integer(11)->notNull(),
             'name' => $this->string(100)->notNull(),
             "code" => $this->string(),
+            "is_deleted" => $this->boolean()->defaultValue(0),
             "created_at" => $this->dateTime(),
             "updated_at" => $this->dateTime(),
         ], $tableOptions);

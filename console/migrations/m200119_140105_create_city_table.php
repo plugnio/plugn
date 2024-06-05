@@ -22,6 +22,7 @@ class m200119_140105_create_city_table extends Migration {
             'city_id' => $this->primaryKey(),
             'city_name' => $this->string(255)->notNull(),
             'city_name_ar' => $this->string(255)->notNull(),
+            "is_deleted" => $this->boolean()->defaultValue(0)
                 ], $tableOptions);
 
  
