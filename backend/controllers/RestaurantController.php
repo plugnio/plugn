@@ -61,6 +61,30 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionLogin($id)
+    {
+        $store = $this->findModel($id);
+
+        $model = $store->getOwnerAgent()->one();
+
+        $model->generateAuthKey();
+
+        if(!$model->save(false)) {
+            Yii::$app->session->setFlash('errorResponse', $model->errors);
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
+        $url = Yii::$app->params['newDashboardAppUrl']. '?auth_key='.$model->agent_auth_key;
+
+        return $this->redirect($url);
+    }
+
+    /**
      * Lists all Restaurant models.
      * @return mixed
      */

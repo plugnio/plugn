@@ -7,11 +7,13 @@ use agent\models\Currency;
 use agent\models\Restaurant;
 use common\models\RestaurantByCampaign;
 use common\models\AgentEmailVerifyAttempt;
+use staff\models\Staff;
 use Yii;
 use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
 use agent\models\Agent;
 use agent\models\PasswordResetRequestForm;
+use yii\web\NotFoundHttpException;
 
 
 /**
@@ -102,7 +104,8 @@ class AuthController extends BaseController {
             'login-auth0',
             'locate',
             'login-by-apple',
-            'login-by-google'
+            'login-by-google',
+            'login-by-key'
         ];
 
         return $behaviors;
@@ -217,6 +220,39 @@ class AuthController extends BaseController {
         ]);
 
         return $this->_loginResponse($agent);
+    }
+
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionLoginByKey() {
+
+        $auth_key = Yii::$app->request->getBodyParam('auth_key');
+
+        $model = Agent::find()
+            ->andWhere(['agent_auth_key' => $auth_key])
+            ->one();
+
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+
+            /*return [
+                "operation" => "error",
+                "code" => 1,
+                "message" => Yii::t('agent',"Account not found")
+            ];*/
+        }
+
+        Yii::$app->eventManager->track('Log In', [
+            "login_method" => "Admin"
+        ]);
+
+        $model->agent_auth_key = "";
+        $model->save(false);
+
+        return $this->_loginResponse($model);
     }
 
     /**

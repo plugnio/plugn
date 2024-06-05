@@ -68,6 +68,7 @@ return [
                         'POST verify-email' => 'verify-email',
                         'POST login-by-apple' => 'login-by-apple',
                         'POST login-by-google' => 'login-by-google',
+                        'POST login-by-key' => 'login-by-key',
                         // OPTIONS VERBS
                         'OPTIONS login' => 'options',
                         'OPTIONS locate' => 'options',
@@ -80,6 +81,7 @@ return [
                         'OPTIONS resend-verification-email' => 'options',
                         'OPTIONS verify-email' => 'options',
                         'OPTIONS signup-step-one' => 'options',
+                        'OPTIONS login-by-key' => 'options',
                         'OPTIONS login-by-apple' => 'options',
                         'OPTIONS login-by-google' => 'options'
                     ]
