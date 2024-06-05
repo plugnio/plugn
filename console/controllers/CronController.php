@@ -1128,7 +1128,7 @@ class CronController extends \yii\console\Controller
 
         $query = Restaurant::find()
             ->andWhere(["NOT LIKE", "restaurant_domain", ".site"])//hosted only on netlify
-            ->andWhere(new Expression("is_deleted=0 and site_id is null and has_deployed=1"));
+            ->andWhere(new Expression("restaurant.is_deleted=0 and site_id is null and has_deployed=1"));
 
         $i = 0;
 

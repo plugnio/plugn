@@ -725,7 +725,7 @@ class StatsController extends Controller
             $categories[] = $bcategory['business_category_en'];
             $seriesData[] = (int) Restaurant::find()
                 ->joinWith(['restaurantType'])
-                ->andWhere(['is_deleted' => 0, 'business_category_uuid' => $bcategory['business_category_uuid']])
+                ->andWhere(['restaurant.is_deleted' => 0, 'business_category_uuid' => $bcategory['business_category_uuid']])
                 ->count();
             $orderSeriesData[] = (int) Order::find()
                 ->joinWith(['restaurantType'])
@@ -737,7 +737,7 @@ class StatsController extends Controller
         $categories[] = "Not categorized";
         $seriesData[] = (int) Restaurant::find()
             ->joinWith(['restaurantType'])
-            ->andWhere(['is_deleted' => 0])
+            ->andWhere(['restaurant.is_deleted' => 0])
             ->andWhere(new Expression("business_category_uuid IS NULL"))
             ->count();
         $orderSeriesData[] = (int) Order::find()
