@@ -913,7 +913,8 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            throw new BadRequestHttpException('The requested record does not exist.');
+            //throw new BadRequestHttpException('The requested record does not exist.');
+            return self::message("success", "Cash on delivery disabled already!");
         }
 
         if (!$payment_method->delete()) {
@@ -971,7 +972,8 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            throw new BadRequestHttpException('The requested record does not exist.');
+            return self::message("success", "Moyasar disabled already!");
+           // throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         if (!$payment_method->delete()) {
@@ -1036,7 +1038,8 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            throw new BadRequestHttpException('The requested record does not exist.');
+            return self::message("success", "Stripe disabled already!");
+            //throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         if (!$payment_method->delete()) {
@@ -1172,7 +1175,8 @@ class StoreController extends BaseController
             ->one();
 
         if (!$restaurantPaymentMethod) {
-            throw new BadRequestHttpException('The requested record does not exist.');
+            return self::message("success", "Free checkout disabled already!");
+            //throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         $restaurantPaymentMethod->status = RestaurantPaymentMethod::STATUS_INACTIVE;
