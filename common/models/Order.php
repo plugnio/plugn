@@ -262,14 +262,17 @@ class Order extends \yii\db\ActiveRecord
                 }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
 
-            ['house_number', function ($attribute, $params, $validator) {
-                if ($this->area_id && strtolower($this->unit_type) != self::UNIT_TYPE_OFFICE && $this->house_number == null
+            /*
+             * commenting temporary for frontend validation error
+             * ['house_number', function ($attribute, $params, $validator) {
+                if ($this->area_id && strtolower($this->unit_type) != self::UNIT_TYPE_OFFICE &&
+                    $this->house_number == null
                     && $this->order_mode == Order::ORDER_MODE_DELIVERY)
                 {
-                    $this->addError($attribute, strtolower($this->unit_type) .':'.  self::UNIT_TYPE_OFFICE .':'.Yii::t('app','House number cannot be blank.'));
+                    $this->addError($attribute, Yii::t('app','House number cannot be blank.'));
                 }
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
-
+*/
             [['floor'], 'required', 'when' => function ($model) {
                 return strtolower($model->unit_type) == self::UNIT_TYPE_APARTMENT &&
                     $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
@@ -280,6 +283,7 @@ class Order extends \yii\db\ActiveRecord
                     $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
             }
             ],
+
             [['apartment'], 'required', 'when' => function ($model) {
                 return strtolower($model->unit_type) == self::UNIT_TYPE_APARTMENT &&
                     $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
