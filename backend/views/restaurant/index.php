@@ -6,10 +6,17 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\RestaurantSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $downloadUrl string */
+/* @var $totalFilter number */
 
 $this->title = 'Restaurants';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<style type="text/css">
+    .btn {
+        margin-inline-start: 7px;
+    }
+</style>
 <div class="restaurant-index">
 
     <h1>
@@ -19,7 +26,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         $selected = $totalFilter > 0 ? '&nbsp;<b>('.$totalFilter . " selected)</b>": "";
 
-        echo Html::a('Search with more options' .$selected, ['filter'], ['class' => 'pull-right btn btn-primary']); ?>
+        echo Html::a('Search with more options' .$selected, ['filter'], ['class' => 'pull-right btn btn-primary']);
+
+        echo Html::a('Download', urldecode($downloadUrl), ['class' => 'pull-right btn btn-warning']); ?>
+
+
     </h1>
 
     <p>
@@ -71,8 +82,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                         $icon = Html::a('<i class="glyphicon glyphicon-exclamation-sign"></i> Failed', ['queue/view', 'id' => $data->queue->queue_id], ['title' => 'Failed']);
 
                                     }
-
-                                    $name = $data->name . ' ' . $data->queue->queue_status . '&nbsp;&nbsp;' . $icon;
+                                //$data->queue->queue_status .
+                                    $name = $data->name . ' ' . '&nbsp;&nbsp;' . $icon;
                                 } else {
                                     $name = $data->name;
                                 }

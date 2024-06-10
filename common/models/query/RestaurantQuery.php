@@ -47,7 +47,7 @@ class RestaurantQuery extends \yii\db\ActiveQuery
     public function filterNotPublished() {
         return $this
             //->andWhere(['not like', 'restaurant_domain', "%.site%"])
-            ->andWhere(['has_deployed' => 0, 'is_deleted' => 0]);
+            ->andWhere(['has_deployed' => 0, 'restaurant.is_deleted' => 0]);
         //->andWhere(['<', 'version', 5])
     }
 

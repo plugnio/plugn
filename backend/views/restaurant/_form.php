@@ -71,7 +71,6 @@ use borales\extensions\phoneInput\PhoneInput;
 
     if ($model->restaurant_uuid != null) {
 
-
         $sotredRestaurantPaymentMethod = RestaurantPaymentMethod::find()
                 ->select('payment_method_id')
                 ->asArray()
