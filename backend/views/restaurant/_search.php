@@ -141,6 +141,10 @@ use common\models\Restaurant;
                 <?php echo $form->field($model, 'notActive')->checkbox(['label' => 'In-active for last 30 days']) ?>
             </div>
             <div class="col-md-3">
+                <?php echo $form->field($model, 'notActive90Days')
+                    ->checkbox(['label' => 'In-active for last 90 days']) ?>
+            </div>
+            <div class="col-md-3">
                 <?php echo $form->field($model, 'is_tap_enable')->checkbox([]) ?>
             </div>
             <div class="col-md-3">

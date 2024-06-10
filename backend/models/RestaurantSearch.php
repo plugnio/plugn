@@ -19,6 +19,7 @@ class RestaurantSearch extends Restaurant
     public $noOrder;
     public $noItem;
     public $notActive;
+    public $notActive90Days;
     public $customDomain;
 
     /**
@@ -34,7 +35,7 @@ class RestaurantSearch extends Restaurant
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
                  'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders',
-                 'customDomain', 'noItem', 'notActive', 'ip_address'], 'safe'],
+                 'customDomain', 'noItem', 'notActive', 'ip_address', 'notActive90Days'], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee','version', 'total_orders'], 'number'],
          ];
@@ -148,6 +149,11 @@ class RestaurantSearch extends Restaurant
         if($this->notActive) {
             $query->andWhere("last_active_at IS NULL OR DATE(last_active_at) < DATE('".
                 date('Y-m-d', strtotime("-30 days"))."')");
+        }
+
+        if($this->notActive90Days) {
+            $query->andWhere("last_active_at IS NULL OR DATE(last_active_at) < DATE('".
+                date('Y-m-d', strtotime("-90 days"))."')");
         }
 
         if($this->noOrder) {
