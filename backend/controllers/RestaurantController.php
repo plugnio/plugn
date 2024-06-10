@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use agent\models\PaymentMethod;
 use backend\models\Admin;
+use backend\models\PaymentSearch;
 use common\models\BusinessCategory;
 use common\models\BusinessItemType;
 use common\models\BusinessType;
@@ -103,10 +104,72 @@ class RestaurantController extends Controller {
             }
         }
 
+        $downloadUrl = Url::to(['restaurant/export-to-excel', 'RestaurantSearch' =>
+            Yii::$app->request->queryParams['RestaurantSearch']]);
+
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+            "downloadUrl" => $downloadUrl,
             'totalFilter' => $totalFilter
+        ]);
+    }
+
+    public function actionExportToExcel()
+    {
+        /**
+         * echo "<pre />";
+        print_r(Yii::$app->request->queryParams);
+        die();
+
+         */
+        $searchModel = new RestaurantSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $dataProvider->query->orderBy("restaurant_created_at DESC");
+
+        header('Access-Control-Allow-Origin: *');
+        header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        header("Content-Disposition: attachment;filename=\"stores.xlsx\"");
+        header("Cache-Control: max-age=0");
+
+        $arrStatus = Restaurant::arrStatus();
+
+        \moonland\phpexcel\Excel::export([
+            'isMultipleSheet' => false,
+            'models' => $dataProvider->query->all(),
+            'columns' => [
+                'country.country_name',
+                'currency.title',
+                'plan.name',
+                'name',
+                "restaurant_domain",
+                'has_deployed:boolean',
+                'is_tap_enable:boolean',
+                'is_sandbox:boolean',
+                'is_under_maintenance:boolean',
+                'restaurant.is_deleted',
+                'last_active_at',
+                [
+                    'attribute' => 'last_order_at',
+                    'value' => function($data) {
+                        return !empty($data->last_order_at) ?
+                            Yii::$app->formatter->asDatetime($data->last_order_at): "";
+                    }
+                ],
+                'is_public:boolean',
+                'accept_order_247:boolean',
+                "total_orders",
+                [
+                    'attribute' => 'restaurant_status',
+                    'value' => function($data) use ($arrStatus) {
+                        return isset($arrStatus[$data->restaurant_status]) ?
+                            $arrStatus[$data->restaurant_status]: '';
+                    }
+                ],
+                'restaurant_uuid',
+                'restaurant_created_at:datetime'
+            ]
         ]);
     }
 

@@ -146,6 +146,9 @@ use common\models\Restaurant;
             <div class="col-md-3">
                 <?php echo $form->field($model, 'is_myfatoorah_enable')->checkbox([]) ?>
             </div>
+            <div class="col-md-3">
+                <?php echo $form->field($model, 'customDomain')->checkbox([]) ?>
+            </div>
             <!--
             <div class="col-md-3">
                 <?php echo $form->field($model, 'has_deployed')->checkbox([]) ?>
@@ -196,7 +199,8 @@ use common\models\Restaurant;
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-          <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-default']) ?>
+
+        <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-default']) ?>
 
     </div>
 

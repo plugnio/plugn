@@ -19,6 +19,7 @@ class RestaurantSearch extends Restaurant
     public $noOrder;
     public $noItem;
     public $notActive;
+    public $customDomain;
 
     /**
      * {@inheritdoc}
@@ -32,7 +33,8 @@ class RestaurantSearch extends Restaurant
                 'restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
-                 'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders', 'noItem', 'notActive', 'ip_address'], 'safe'],
+                 'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders',
+                 'customDomain', 'noItem', 'notActive', 'ip_address'], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee','version', 'total_orders'], 'number'],
          ];
@@ -115,7 +117,8 @@ class RestaurantSearch extends Restaurant
             $query->filterNotPublished();
         }
 
-        if(isset($this->has_deployed)) {
+        if(isset($this->has_deployed) && strlen($this->has_deployed) > 0) { //in_array($this->has_deployed, [1, 0])
+
             if($this->has_deployed) {
                 $query->andFilterWhere(['has_deployed' => $this->has_deployed]);
             } else {
@@ -168,12 +171,21 @@ class RestaurantSearch extends Restaurant
                date('Y-m-d', strtotime($this->last_order_at))."')");
         }
 
-        if($this->is_public)
+        if($this->is_public) {
             $query->andFilterWhere(['is_public' => $this->is_public]);
-        if($this->accept_order_247)
+        }
+
+        if($this->accept_order_247) {
             $query->andFilterWhere(['accept_order_247' => $this->accept_order_247]);
-        if($this->enable_gift_message)
+        }
+
+        if($this->customDomain) {
+            $query->andFilterWhere(['not like', 'restaurant_domain', ".plugn."]);
+        }
+
+        if($this->enable_gift_message) {
             $query->andFilterWhere(['enable_gift_message' => $this->enable_gift_message]);
+        }
 
         $query->andFilterWhere(['like', 'country_id', $this->country_id])
             ->andFilterWhere(['like', 'currency_id', $this->currency_id])
@@ -200,7 +212,6 @@ class RestaurantSearch extends Restaurant
         if($this->country_name)
             $query->andFilterWhere(['like', 'country.country_name',
                 new Expression("'%". $this->country_name . "%'")]);
-
 
         return $dataProvider;
     }
