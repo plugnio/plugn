@@ -104,8 +104,9 @@ class RestaurantController extends Controller {
             }
         }
 
-        $downloadUrl = Url::to(['restaurant/export-to-excel', 'RestaurantSearch' =>
-            Yii::$app->request->queryParams['RestaurantSearch']]);
+        $downloadUrl = isset(Yii::$app->request->queryParams['RestaurantSearch']) ?
+            Url::to(['restaurant/export-to-excel', 'RestaurantSearch' => Yii::$app->request->queryParams['RestaurantSearch']]) :
+            Url::to(['restaurant/export-to-excel']);
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
