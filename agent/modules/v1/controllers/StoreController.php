@@ -584,7 +584,8 @@ class StoreController extends BaseController
         $model->tax_number = Yii::$app->request->getBodyParam('tax_number');
         $model->swift_code = Yii::$app->request->getBodyParam('swift_code');
         $model->account_number = Yii::$app->request->getBodyParam('account_number');
-
+        $model->account_number = Yii::$app->request->getBodyParam('account_number');
+        $model->bank_account_name = Yii::$app->request->getBodyParam('bank_account_name');
         $model->owner_first_name = Yii::$app->request->getBodyParam('owner_first_name');
         $model->owner_last_name = Yii::$app->request->getBodyParam('owner_last_name');
         $model->owner_email = Yii::$app->request->getBodyParam('owner_email');
@@ -612,6 +613,35 @@ class StoreController extends BaseController
      * @return array
      * @throws NotFoundHttpException
      */
+    public function actionUpdateKyc($id) {
+
+        $model = $this->findModel($id);
+
+        if(!$model->storeKyc) {
+            $model->storeKyc = new StoreKyc;
+        }
+
+        $model->storeKyc->place_of_birth = Yii::$app->request->getBodyParam('place_of_birth');
+        $model->storeKyc->marital_status = Yii::$app->request->getBodyParam('marital_status');
+        $model->storeKyc->residence_region = Yii::$app->request->getBodyParam('residence_region');
+        $model->storeKyc->source_of_income = Yii::$app->request->getBodyParam('source_of_income');
+
+        $model->storeKyc->occupation = Yii::$app->request->getBodyParam('occupation');
+        $model->storeKyc->expected_annual_sales = Yii::$app->request->getBodyParam('expected_annual_sales');
+        $model->storeKyc->sales_channels = Yii::$app->request->getBodyParam('sales_channels');
+
+        if(!$model->storeKyc->save()) {
+            return self::message("error",$model->errors);
+        }
+
+        return self::message("success", "KYC updated successfully");
+    }
+
+    /**
+     * @param $id
+     * @return array
+     * @throws NotFoundHttpException
+     */
     public function actionUploadDocs($id = null)
     {
         $model = $this->findModel($id);
@@ -624,11 +654,77 @@ class StoreController extends BaseController
         $authorized_signature_file = Yii::$app->request->getBodyParam('authorized_signature_file');
         $iban_certificate_file = Yii::$app->request->getBodyParam('iban_certificate_file');
 
+        $commercial_registration = Yii::$app->request->getBodyParam('commercial_registration');
+        $establishment_card = Yii::$app->request->getBodyParam('establishment_card');
+        $work_permit = Yii::$app->request->getBodyParam('work_permit');
+        $residence_permit = Yii::$app->request->getBodyParam('residence_permit');
+        $tax_document= Yii::$app->request->getBodyParam('tax_document');
+
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
 
             /*-------- uploading documents-------*/
+
+            if (
+                $tax_document &&
+                $model->tax_document != $tax_document &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $tax_document,
+                    'tax_document'
+                )
+            ) {
+                $transaction->rollBack();
+                return self::message("error", $model->errors);
+            }
+
+            if (
+                $work_permit &&
+                $model->work_permit != $work_permit &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $work_permit,
+                    'work_permit'
+                )
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
+
+            if (
+                $residence_permit &&
+                $model->residence_permit != $residence_permit &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $residence_permit,
+                    'residence_permit'
+                )
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
+
+            if (
+                $establishment_card &&
+                $model->establishment_card != $establishment_card &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $establishment_card,
+                    'establishment_card'
+                )
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
+
+            if (
+                $commercial_registration &&
+                $model->commercial_registration != $commercial_registration &&
+                !$model->uploadFileFromAwsToCloudinary(
+                    $commercial_registration,
+                    'commercial_registration'
+                )
+            ) {
+                $transaction->rollBack();
+                return self::message("error",$model->errors);
+            }
 
             //if provided + changed
 
@@ -913,7 +1009,8 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            throw new BadRequestHttpException('The requested record does not exist.');
+            //throw new BadRequestHttpException('The requested record does not exist.');
+            return self::message("success", "Cash on delivery disabled already!");
         }
 
         if (!$payment_method->delete()) {
@@ -971,7 +1068,8 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            throw new BadRequestHttpException('The requested record does not exist.');
+            return self::message("success", "Moyasar disabled already!");
+           // throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         if (!$payment_method->delete()) {
@@ -1036,7 +1134,8 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            throw new BadRequestHttpException('The requested record does not exist.');
+            return self::message("success", "Stripe disabled already!");
+            //throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         if (!$payment_method->delete()) {
@@ -1172,7 +1271,8 @@ class StoreController extends BaseController
             ->one();
 
         if (!$restaurantPaymentMethod) {
-            throw new BadRequestHttpException('The requested record does not exist.');
+            return self::message("success", "Free checkout disabled already!");
+            //throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         $restaurantPaymentMethod->status = RestaurantPaymentMethod::STATUS_INACTIVE;

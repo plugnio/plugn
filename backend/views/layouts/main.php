@@ -92,6 +92,7 @@ AppAsset::register($this);
                     ['label' => 'Payment', 'url' => ['/payment/index']],
                     ['label' => 'Failed Payment', 'url' => ['/payment-failed/index']],
                     ['label' => 'Subscription Payment', 'url' => ['/subscription-payment/index']],
+                    ['label' => 'Tap Requirements', 'url' => ['tap-requirements/index']]
                 ]
             ],
             [

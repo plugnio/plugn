@@ -54,7 +54,7 @@ $countries = ["0" => "All"] + $countries;
 
     <div class="form-group">
         <label class="control-label">Country</label>
-    <?= Html::dropDownList('CampaignFilter[country_id]', null, \yii\helpers\ArrayHelper::map($countries, 'country_id', 'country_name'), ['class' => 'form-control']) ?>
+        <?= Html::dropDownList('CampaignFilter[country_id]', null, \yii\helpers\ArrayHelper::map($countries, 'country_id', 'country_name'), ['class' => 'form-control']) ?>
     </div>
 
         <div class="form-group">

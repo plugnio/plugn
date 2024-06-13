@@ -45,6 +45,7 @@ class ApplePayController extends BaseController
         );
 
         //convert apple pay token to Tap apple pay token
+        //https://developers.tap.company/docs/apple-pay-token
 
         if($token) {
             $response = \Yii::$app->tapPayments->fromApplePayToken($token);

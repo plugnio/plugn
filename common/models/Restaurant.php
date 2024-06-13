@@ -455,10 +455,16 @@ class Restaurant extends ActiveRecord
                 return $model->business_type == 'corp';
             }*/
             [['owner_first_name', 'owner_last_name'], 'string', 'min' => 3, 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
-            [['identification_file_id_back_side', 'identification_file_id_front_side', 'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file', 'iban_certificate_file_id', 'logo_file_id'], 'safe', 'on' => [
+
+            [["commercial_registration", "establishment_card", "work_permit",  "residence_permit",
+                "commercial_registration_file_id", "establishment_card_file_id", "work_permit_file_id",
+                "residence_permit_file_id", 'identification_file_id_back_side', 'identification_file_id_front_side',
+                'authorized_signature_file_id', 'commercial_license_file_id', 'iban_certificate_file',
+                'iban_certificate_file_id', 'logo_file_id'], 'safe', 'on' => [
                 self::SCENARIO_CREATE_TAP_ACCOUNT,
                 self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT
             ]],
+
             [['not_for_profit', 'total_orders'], 'number'],
 
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
@@ -474,6 +480,7 @@ class Restaurant extends ActiveRecord
                     'owner_first_name', 'owner_last_name',
                     'owner_email',
                     'tap_merchant_status',
+                    "tax_document", "tax_document_file_id",
                     'identification_issuing_date', 'identification_title',
                     'identification_expiry_date', 'identification_file_back_side', 'identification_file_front_side', 'identification_file_purpose',
                     'business_id', 'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
@@ -668,6 +675,7 @@ class Restaurant extends ActiveRecord
                 'ip_address'
             ],
             self::SCENARIO_RESET_TAP_ACCOUNT => [
+                "tax_document", "tax_document_file_id",
                 'business_id',
                 'business_entity_id',
                 'tap_merchant_status',
@@ -701,6 +709,9 @@ class Restaurant extends ActiveRecord
                 'commercial_license_file_purpose',
                 'iban_certificate_file',
                 'iban_certificate_file_id',
+                "commercial_registration", "establishment_card", "work_permit",  "residence_permit",
+                "commercial_registration_file_id", "establishment_card_file_id", "work_permit_file_id",
+                "residence_permit_file_id",
                 'live_public_key',
                 'test_public_key',
                 'is_tap_enable',
@@ -714,6 +725,7 @@ class Restaurant extends ActiveRecord
                 "owner_name_title", "owner_middle_name", "owner_nationality", "owner_date_of_birth", "tax_number", "swift_code", "account_number",
             ],
             self::SCENARIO_CREATE_TAP_ACCOUNT => [
+                "tax_document", "tax_document_file_id",
                 'owner_first_name', 'owner_last_name', 'owner_email', 'owner_number',
                 'vendor_sector', 'iban', 'company_name', 'business_type',
                 'identification_file_id_back_side', 'identification_file_id_front_side',
@@ -722,9 +734,14 @@ class Restaurant extends ActiveRecord
                 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date',
                 'identification_expiry_date', 'iban_certificate_file', 'iban_certificate_file_id', 'tap_merchant_status',
                 'is_tap_business_active', 'ip_address', "owner_name_title", "owner_middle_name", "owner_nationality",
-                "owner_date_of_birth", "tax_number", "swift_code", "account_number"],
+                "owner_date_of_birth", "tax_number", "swift_code", "account_number", "commercial_registration", "establishment_card", "work_permit",  "residence_permit",
+                "commercial_registration_file_id", "establishment_card_file_id", "work_permit_file_id",
+                "residence_permit_file_id"],
 
             self::SCENARIO_UPLOAD_STORE_DOCUMENT => [
+                "commercial_registration", "establishment_card", "work_permit",  "residence_permit",
+                "commercial_registration_file_id", "establishment_card_file_id", "work_permit_file_id",
+                "residence_permit_file_id",
                 'commercial_license_file', 'authorized_signature_file', 'identification_file_front_side',
                 'identification_file_back_side', 'restaurant_commercial_license_file', 'owner_identification_file_front_side',
                 'owner_identification_file_back_side', 'restaurant_authorized_signature_file', 'ip_address'
@@ -983,6 +1000,15 @@ class Restaurant extends ActiveRecord
         }
 
         return true;
+    }
+
+    /**
+     * @param $modelClass
+     * @return ActiveQuery
+     */
+    public function getTapRequirements($modelClass = "\common\models\TapRequirements")
+    {
+        return $this->hasOne($modelClass::className(), ['country_id' => 'country_id']);
     }
 
     /**
@@ -2137,6 +2163,246 @@ class Restaurant extends ActiveRecord
 
         if (!$this->identification_title) {
             $this->identification_title = "Owner's civil id";
+        }
+
+        if ($this->tax_document && !$this->tax_document_file_id) {
+
+            $tmpFile = sys_get_temp_dir() . '/' . $this->tax_document;
+
+            if (!file_put_contents($tmpFile, file_get_contents('https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->tax_document))) {
+                //Yii::error ('Error reading document: ');
+
+                $this->addError('tax_document', 'Error reading document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document'
+                ];
+            }
+
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                $tmpFile,
+                "tax_document_user_upload",
+                "VAT Registration Certificate",
+                [
+                    "issuing_country" => $this->country->iso
+                ]
+            );
+
+            @unlink($tmpFile);
+
+            if ($response->isOk) {
+                $this->tax_document_file_id = $response->data['id'];
+            } else {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                //Yii::error ('Error when uploading document: ' . $error);
+
+                $this->addError('tax_document', 'Error reading document' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document' . $error
+                ];
+            }
+        }
+
+        if ($this->commercial_registration && !$this->commercial_registration_file_id) {
+
+            $tmpFile = sys_get_temp_dir() . '/' . $this->commercial_registration;
+
+            if (!file_put_contents($tmpFile, file_get_contents('https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->commercial_registration))) {
+                //Yii::error ('Error reading commercial registration document: ');
+
+                $this->addError('commercial_registration', 'Error reading IBAN certificate document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading commercial registration'
+                ];
+            }
+
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                $tmpFile,
+                "commercial_registration",
+                "Commercial Registration",
+                [
+                    "issuing_country" => $this->country->iso
+                ]
+            );
+
+            @unlink($tmpFile);
+
+            if ($response->isOk) {
+                $this->commercial_registration_file_id = $response->data['id'];
+            } else {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                //Yii::error ('Error when uploading commercial registration document: ' . $error);
+
+                $this->addError('commercial_registration', 'Error reading document' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document' . $error
+                ];
+            }
+        }
+
+        if ($this->establishment_card && !$this->establishment_card_file_id) {
+
+            $tmpFile = sys_get_temp_dir() . '/' . $this->establishment_card;
+
+            if (!file_put_contents($tmpFile, file_get_contents('https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->establishment_card))) {
+                //Yii::error ('Error reading document: ');
+
+                $this->addError('establishment_card', 'Error reading document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document'
+                ];
+            }
+
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                $tmpFile,
+                "establishment_card",
+                "Establishment Card",
+                [
+                    "issuing_country" => $this->country->iso
+                ]
+            );
+
+            @unlink($tmpFile);
+
+            if ($response->isOk) {
+                $this->establishment_card_file_id = $response->data['id'];
+            } else {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                //Yii::error ('Error when uploading document: ' . $error);
+
+                $this->addError('establishment_card', 'Error reading document' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document' . $error
+                ];
+            }
+        }
+
+        if ($this->work_permit && !$this->work_permit_file_id) {
+
+            $tmpFile = sys_get_temp_dir() . '/' . $this->work_permit;
+
+            if (!file_put_contents($tmpFile, file_get_contents('https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->work_permit))) {
+                //Yii::error ('Error reading document: ');
+
+                $this->addError('establishment_card', 'Error reading document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document'
+                ];
+            }
+
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                $tmpFile,
+                "work_permit",
+                "Work Permit",
+                [
+                    "issuing_country" => $this->country->iso
+                ]
+            );
+
+            @unlink($tmpFile);
+
+            if ($response->isOk) {
+                $this->work_permit_file_id = $response->data['id'];
+            } else {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                //Yii::error ('Error when uploading document: ' . $error);
+
+                $this->addError('work_permit', 'Error reading document' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document' . $error
+                ];
+            }
+        }
+
+        if ($this->residence_permit && !$this->residence_permit_file_id) {
+
+            $tmpFile = sys_get_temp_dir() . '/' . $this->residence_permit;
+
+            if (!file_put_contents($tmpFile, file_get_contents('https://res.cloudinary.com/plugn/image/upload/restaurants/'
+                . $this->restaurant_uuid . '/private_documents/'
+                . $this->residence_permit))) {
+                //Yii::error ('Error reading document: ');
+
+                $this->addError('residence_permit', 'Error reading document');
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document'
+                ];
+            }
+
+            $response = Yii::$app->tapPayments->uploadFileToTap(
+                $tmpFile,
+                "residence_permit",
+                "Residence Permit",
+                [
+                    "issuing_country" => $this->country->iso
+                ]
+            );
+
+            @unlink($tmpFile);
+
+            if ($response->isOk) {
+                $this->residence_permit_file_id = $response->data['id'];
+            } else {
+                try {
+                    $error = is_object($response->data) || is_array($response->data) ? print_r($response->data, true) : $response->data;
+                } catch (\Exception $e) {
+                    $error = "500 error from server";
+                }
+
+                //Yii::error ('Error when uploading document: ' . $error);
+
+                $this->addError('residence_permit', 'Error reading document' . $error);
+
+                return [
+                    "operation" => 'error',
+                    "message" => 'Error reading document' . $error
+                ];
+            }
         }
 
         if ($this->logo && !$this->logo_file_id) {
@@ -3441,6 +3707,7 @@ class Restaurant extends ActiveRecord
     public function extraFields()
     {
         return [
+            'tapRequirements',
             'noOfItems',
             'categories',
             'restaurantPages',
@@ -4799,6 +5066,11 @@ class Restaurant extends ActiveRecord
         }
     }
 
+
+    public function getStoreKyc($modelClass = "\common\models\StoreKyc")
+    {
+        return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
     /**
      * Gets query for [[StoreBillingAddress]].
      *
@@ -5373,5 +5645,13 @@ class Restaurant extends ActiveRecord
     public function getRestaurantType($modelClass = "\common\models\RestaurantType")
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * merchant id for Apple Pay
+     * @return string
+     */
+    public function getMerchantIdentifier() {
+        return "merchant." . $this->app_id;
     }
 }

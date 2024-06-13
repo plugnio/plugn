@@ -7,11 +7,15 @@ use yii;
 
 class Restaurant extends \common\models\Restaurant {
 
+    /**
+     * @return array
+     */
     public function extraFields()
     {
         $fields = parent::extraFields ();
 
         return array_merge ($fields, [
+            'storeKyc',
             'role',
             'restaurantPaymentMethods',
             'activeSubscription',
