@@ -4854,7 +4854,6 @@ class Restaurant extends ActiveRecord
             $ordersReceivedPercentage = $decrease / $lastWeekOrdersReceived * -100;
         }
 
-
         //Customer gained
         $customerGainedPercentage = 0;
 
@@ -4872,55 +4871,76 @@ class Restaurant extends ActiveRecord
             $customerGainedPercentage = $decrease / $lastWeekCustomerGained * -100;
         }
 
-        if ($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
-            $agentAssignments = $this->getAgentAssignments()
+        $data = [
+            'store' => $this,
+            'revenuePercentage' => $revenuePercentage,
+            'ordersReceivedPercentage' => $ordersReceivedPercentage,
+            'customerGainedPercentage' => $customerGainedPercentage,
+            'thisWeekRevenue' => $thisWeekRevenue,
+            'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
+            'thisWeekCustomerGained' => $thisWeekCustomerGained,
+        ];
+
+        /*if ($lastWeekOrdersReceived == 0 && $thisWeekOrdersReceived == 0) {
+            return Yii::$app->eventManager->track(
+                'Store Weekly Summary',
+                $data,
+                null,
+                $this->restaurant_uuid);
+        }*/
+
+            $agentAssignmentQuery = $this->getAgentAssignments()
                 ->andWhere([
                     'role' => AgentAssignment::AGENT_ROLE_OWNER,
-                    'receive_weekly_stats' => 1
-                ])
-                ->all();
+                    // 'receive_weekly_stats' => 1
+                ]);
+                //->all();
 
-            foreach ($agentAssignments as $key => $agentAssignment) {
+            foreach ($agentAssignmentQuery->batch(100) as $agentAssignments) {
 
-                if ($agentAssignment->receive_weekly_stats) {
+                foreach ($agentAssignments as $key => $agentAssignment) {
 
-                    $ml = new MailLog();
-                    $ml->to = $agentAssignment->agent->agent_email;
-                    $ml->from = \Yii::$app->params['noReplyEmail'];
-                    $ml->subject = "Weekly Store Summary";
-                    $ml->save();
+                    $data['agent_name'] = $agentAssignment->agent->agent_name;
 
-                    $weeklyStoreSummaryEmail = Yii::$app->mailer->compose([
-                        'html' => 'weekly-summary',
-                    ], [
-                        'store' => $this,
-                        'agent_name' => $agentAssignment->agent->agent_name,
-                        'revenuePercentage' => $revenuePercentage,
-                        'ordersReceivedPercentage' => $ordersReceivedPercentage,
-                        'customerGainedPercentage' => $customerGainedPercentage,
-                        'thisWeekRevenue' => $thisWeekRevenue,
-                        'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
-                        'thisWeekCustomerGained' => $thisWeekCustomerGained,
-                    ])
-                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
-                        ->setTo([$agentAssignment->agent->agent_email])
-                        ->setReplyTo(\Yii::$app->params['supportEmail'])
-                        ->setSubject('Weekly Store Summary');
+                    if ($agentAssignment->receive_weekly_stats) {
 
-                    $weeklyStoreSummaryEmail->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                        $ml = new MailLog();
+                        $ml->to = $agentAssignment->agent->agent_email;
+                        $ml->from = \Yii::$app->params['noReplyEmail'];
+                        $ml->subject = "Weekly Store Summary";
+                        $ml->save();
 
-                    if ($key == 0)
-                        $weeklyStoreSummaryEmail->setBcc(Yii::$app->params['supportEmail']);
+                        $weeklyStoreSummaryEmail = Yii::$app->mailer->compose([
+                            'html' => 'weekly-summary',
+                        ], $data)
+                            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                            ->setTo([$agentAssignment->agent->agent_email])
+                            ->setReplyTo(\Yii::$app->params['supportEmail'])
+                            ->setSubject('Weekly Store Summary');
 
-                    try {
-                        $weeklyStoreSummaryEmail->send();
-                    } catch (Swift_TransportException $e) {
-                        Yii::error($e->getMessage(), "email");
+                        $weeklyStoreSummaryEmail->setHeader("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+                        //if ($key == 0)
+                        //    $weeklyStoreSummaryEmail->setBcc(Yii::$app->params['supportEmail']);
+
+                        try {
+                            $weeklyStoreSummaryEmail->send();
+                        } catch (Swift_TransportException $e) {
+                            Yii::error($e->getMessage(), "email");
+                        }
+                    }
+
+                    if ($key == 0) {
+                        Yii::$app->eventManager->track(
+                            'Store Weekly Summary',
+                            $data,
+                            null,
+                            $this->restaurant_uuid);
                     }
                 }
             }
-        }
+        //}
     }
 
     /**
