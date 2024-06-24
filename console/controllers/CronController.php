@@ -177,7 +177,8 @@ class CronController extends \yii\console\Controller
      */
     public function actionWeeklyReport()
     {
-        $query = Restaurant::find();
+        $query = Restaurant::find()
+            ->andWhere(['is_deleted' => false]);
 
         foreach ($query->batch(100) as $stores) {
             foreach ($stores as $key => $store) {

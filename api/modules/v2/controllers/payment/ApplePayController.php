@@ -2,8 +2,12 @@
 
 namespace api\modules\v2\controllers\payment;
 
+use Yii;
+use agent\models\Restaurant;
+use api\models\Order;
 use api\modules\v2\controllers\BaseController;
-use yii\httpclient\Client;
+use GuzzleHttp\Exception\RequestException;
+use yii\web\NotFoundHttpException;
 
 class ApplePayController extends BaseController
 {
@@ -59,11 +63,39 @@ class ApplePayController extends BaseController
      */
     public function actionProcessPayment()
     {
-        $body = Yii::$app->request->getBodyParams();
+        $order_uuid = Yii::$app->request->getBodyParam ('order_uuid');
+        $token = \Yii::$app->request->getBodyParam ('token');
+
+        //$paymentMethod = PaymentMethod::findOne(['payment_method_code' => 'Moyasar']);
+
+        $order = $this->findOrder($order_uuid);
+
+        Yii::$app->tapPayments->setApiKeys(
+            $order->restaurant->live_api_key,
+            $order->restaurant->test_api_key,
+            false
+        );
+
+        //convert apple pay token to Tap apple pay token
+        //https://developers.tap.company/docs/apple-pay-token
+
+        if($token) {
+            $response = \Yii::$app->tapPayments->fromApplePayToken($token);
+            $responseContent = json_decode($response->content);
+
+            \Yii::error($responseContent);
+
+            $token = $responseContent->id;
+
+            return [
+                "success" => true,
+                "token" => $token
+            ];
+        }
 
         return [
-            "success" => true,
-            "body" => $body
+            "success" => false,
+            "message" => "no token"
         ];
     }
 
@@ -71,31 +103,100 @@ class ApplePayController extends BaseController
      * @return void
      */
     public function actionValidateMerchant() {
-        $body = Yii::$app->request->getBodyParams();
 
-        return [
-            "success" => true,
-            "body" => $body
+        $validationURL = \Yii::$app->request->getBodyParam("validationURL");
+        $restaurant_uuid = \Yii::$app->request->getBodyParam("restaurant_uuid");
+
+        $store = $this->findModel($restaurant_uuid);
+
+        if (!$validationURL) {
+            $validationURL = "https://apple-pay-gateway.apple.com/paymentservices/paymentSession";
+            //https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/requesting_an_apple_pay_payment_session
+
+            /*return [
+                "operation" => "error",
+                "message" => "Validation URL missing!"
+            ];*/
+        }
+
+        $certPath = Yii::getAlias('@common') . '/certificates/cert.pem';//merchant_id.cer';
+        $pemPath = Yii::getAlias('@common') . '/certificates/key.pem';
+
+        $body = [
+            "merchantIdentifier" => 'merchant.io.plugn.dashboard',
+            "domainName" => $store->restaurant_domain,// 'dash.plugn.io',
+            "displayName" => $store->name,//'Plugn',
+            "initiative" => "web",
+            "initiativeContext" => $store->restaurant_domain,//"dash.plugn.io"
         ];
-        /*
-        $validationURL = Yii::$app->request->getBodyParam("validationURL");
 
-        $client = new Client();
-        $response = $client->createRequest()
-            ->setMethod('POST')
-            ->setUrl($validationURL)
-            ->addHeaders([
-                'Authorization' => 'Bearer ' . $this->token, //YOUR_MERCHANT_ID_TOKEN
+        try {
+            $client = new \GuzzleHttp\Client([
+                'base_uri' => "",
+                'timeout' => 10.0,
+                'verify' => true,
+                'cert' => $certPath,
+                'ssl_key' => $pemPath,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'curl' => [
+                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+                ]
+            ]);
+
+            $response = $client->post($validationURL, [
+                'json' => $body,
+            ]);
+
+            return json_decode($response->getBody()->getContents());
+
+        } catch (RequestException $e) {
+
+            Yii::error($e->getMessage());
+
+            //header('Content-Type: application/json', true, 500);
+            return json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Finds the Order model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Order the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findOrder($order_uuid)
+    {
+        $model = Order::find()
+            ->andWhere([
+                'order_uuid' => $order_uuid
             ])
-            ->setData([
-                "merchantIdentifier" => 'merchant.com.your.merchant.id',
-                "domainName" => 'your-website.com',
-                "displayName" => 'Your Merchant Name'
-            ])
-            ->send();
+            ->one();
 
-        Yii::debug($response);
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
+    }
 
-        return $response->data;*/
+    /**
+     * Finds the Restaurant model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Restaurant the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($store_uuid =  null)
+    {
+        $model = Restaurant::find()->andWhere(['restaurant_uuid' => $store_uuid]);
+
+        if ($model !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested record does not exist.');
+        }
     }
 }

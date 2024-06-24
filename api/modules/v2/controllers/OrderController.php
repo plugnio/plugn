@@ -138,7 +138,8 @@ class OrderController extends BaseController
 
         //payment method
 
-        //$order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+        $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+
         $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
         $order->currency_code = Yii::$app->currency->getCode();
 
