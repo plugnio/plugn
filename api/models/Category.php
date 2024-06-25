@@ -15,7 +15,22 @@ use yii\helpers\ArrayHelper;
  */
 class Category extends \common\models\Category {
 
-  /**
+    /**
+     * @return array|\Closure[]
+     */
+    public function extraFields()
+    {
+        $fields = parent::extraFields();
+
+        $fields['noOfItems'] = function($data) {
+            return $data->getItems()
+                ->count();
+        };
+
+        return $fields;
+    }
+
+    /**
    * Gets query for [[ItemUus]].
    *
    * @return \yii\db\ActiveQuery

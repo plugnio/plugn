@@ -186,7 +186,8 @@ class Category extends \yii\db\ActiveRecord
             //items,items.options,items.itemImage
 
             'noOfItems' => function($data) {
-                return $data->getCategoryItems()->count();
+                return $data->getCategoryItems()
+                    ->count();
             }
         ];
     }    
