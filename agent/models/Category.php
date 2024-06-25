@@ -16,6 +16,7 @@ class Category extends \common\models\Category {
       $fields = parent::extraFields();
 
       $fields[] = 'allItems';
+
       $fields['pagination'] = function($model) {
           return [
               'totalPage' => ceil($this->itemQuantity/$this->itemPerPageLimit),
@@ -24,6 +25,7 @@ class Category extends \common\models\Category {
               'pagePage' => $this->itemPerPageLimit,
           ];
       };
+
       return $fields;
   }
 

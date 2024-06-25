@@ -1207,6 +1207,9 @@ class Restaurant extends ActiveRecord
             ->with('agent');
     }
 
+    /**
+     * @return void
+     */
     public function alertInActive()
     {
         $mailer = Yii::$app->mailer->compose([
@@ -3933,6 +3936,9 @@ class Restaurant extends ActiveRecord
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * @return bool|void
+     */
     public function beforeDelete()
     {
         $transaction = Yii::$app->db->beginTransaction();
@@ -4065,6 +4071,11 @@ class Restaurant extends ActiveRecord
             ->via('orders');
     }
 
+    /**
+     * @return array
+     * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
+     */
     public function getTotalRevenueByWeek()
     {
         $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
@@ -5086,11 +5097,15 @@ class Restaurant extends ActiveRecord
         }
     }
 
-
+    /**
+     * @param $modelClass
+     * @return ActiveQuery
+     */
     public function getStoreKyc($modelClass = "\common\models\StoreKyc")
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
     /**
      * Gets query for [[StoreBillingAddress]].
      *
