@@ -112,7 +112,7 @@ class RestaurantSearch extends Restaurant
 
         $query->andFilterWhere(['restaurant_status' => $this->restaurant_status]);
 
-        if ($this->platform_fee) {
+        if (!is_null($this->platform_fee)) {
             $query->andFilterWhere(['platform_fee' => $this->platform_fee]);
         }
 
