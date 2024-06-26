@@ -297,17 +297,19 @@ $this->registerJs($js);
 
             //if(str_contains($model->restaurant_domain, ".plugn.store")) {
 
-            if(str_contains($model->restaurant_domain, ".plugn.site")) {
 
-                echo Html::a('Downgrade', ['downgrade', 'id' => $model->restaurant_uuid], [
-                    'class' => 'btn btn-danger',
-                    'data' => [
-                        'confirm' => 'Are you sure you want to downgrade store to older codebase?',
-                        'method' => 'post',
-                    ],
-                ]);
+            echo Html::a('Downgrade', ['downgrade', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to downgrade store to older codebase?',
+                    'method' => 'post',
+                ],
+            ]);
 
-            } else if($model->site_id) {
+            //if(str_contains($model->restaurant_domain, ".plugn.site")) {
+
+            ///} else
+            if($model->site_id) {
 
                 echo Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-danger',
