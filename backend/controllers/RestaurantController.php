@@ -80,7 +80,8 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
 
-        $url = Yii::$app->params['newDashboardAppUrl']. '?auth_key='.$model->agent_auth_key;
+        $url = Yii::$app->params['newDashboardAppUrl']. '?auth_key='.$model->agent_auth_key .'&store_id=' .
+            $store->restaurant_uuid;
 
         return $this->redirect($url);
     }
