@@ -370,6 +370,46 @@ class CronController extends \yii\console\Controller
     }
 
     /**
+     * fix platform fee as previous implementation was not resetting platform fee
+     * @return void
+     */
+    public function actionFixPlatformFee() {
+
+        $storeQuery = Restaurant::find()
+            ->andWhere(['platform_fee' => 0])
+            ->andWhere(['restaurant.is_deleted' => 0]);
+
+        $i = 0;
+        $sc = 0;
+
+        foreach ($storeQuery->batch() as $stores) {
+
+            foreach ($stores as $store) {
+
+                $subscription = $store->getSubscriptions()
+                    ->andWhere(['plan_id' => 2, "subscription_status" => \agent\models\Subscription::STATUS_ACTIVE])
+                    ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"));
+
+                if ($subscription) {
+                    $sc++;
+                    continue;
+                }
+
+                $store->platform_fee = 0.05;
+                if(!$store->save(false)) {
+                    print_r($store->getErrors());
+                    Yii::error($store->getErrors());
+                    die();
+                }
+
+                $i++;
+            }
+        }
+
+        echo $i. " store fixed, " . $sc . " subscription validated";
+    }
+
+    /**
      * @return void
      */
     public function actionDowngradedStoreSubscription()
@@ -444,6 +484,15 @@ class CronController extends \yii\console\Controller
                     Yii::error($subscription->getErrors());
                     die();
                 }
+
+                //restore platform fee
+                $subscription->restaurant->platform_fee = 0.05;
+                if(!$subscription->restaurant->save(false)) {
+                    print_r($subscription->restaurant->getErrors());
+                    Yii::error($subscription->restaurant->getErrors());
+                    die();
+                }
+
                 //}
             }
         }
