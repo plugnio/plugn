@@ -388,7 +388,8 @@ class CronController extends \yii\console\Controller
 
                 $subscription = $store->getSubscriptions()
                     ->andWhere(['plan_id' => 2, "subscription_status" => \agent\models\Subscription::STATUS_ACTIVE])
-                    ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"));
+                    ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"))
+                    ->one();
 
                 if ($subscription) {
                     $sc++;
