@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use agent\models\Subscription;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Restaurant;
@@ -22,6 +23,9 @@ class RestaurantSearch extends Restaurant
     public $notActive90Days;
     public $customDomain;
 
+    public $activeSubscription;
+    public $noActiveSubscription;
+
     /**
      * {@inheritdoc}
      */
@@ -35,7 +39,8 @@ class RestaurantSearch extends Restaurant
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
                  'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders',
-                 'customDomain', 'noItem', 'notActive', 'ip_address', 'notActive90Days'], 'safe'],
+                 'customDomain', 'noItem', 'notActive', 'ip_address', 'notActive90Days', "activeSubscription",
+                 "noActiveSubscription"], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee','version', 'total_orders'], 'number'],
          ];
@@ -106,6 +111,10 @@ class RestaurantSearch extends Restaurant
             ]);
 
         $query->andFilterWhere(['restaurant_status' => $this->restaurant_status]);
+
+        if ($this->platform_fee) {
+            $query->andFilterWhere(['platform_fee' => $this->platform_fee]);
+        }
 
         if($this->is_tap_enable)
             $query->andFilterWhere(['is_tap_enable' => $this->is_tap_enable]);
@@ -191,6 +200,27 @@ class RestaurantSearch extends Restaurant
 
         if($this->enable_gift_message) {
             $query->andFilterWhere(['enable_gift_message' => $this->enable_gift_message]);
+        }
+
+        if($this->app_id) {
+            $query->andFilterWhere(['app_id' => $this->app_id]);
+        }
+
+        if($this->restaurant_email) {
+            $query->andFilterWhere(['restaurant_email' => $this->restaurant_email]);
+        }
+
+        if ($this->noActiveSubscription) {
+            $query->andFilterWhere(['platform_fee' => 0.05]);
+            /*$query->joinWith(['subscriptions'])
+                ->andWhere(new Expression("plan_id=1 OR subscription_status=".Subscription::STATUS_INACTIVE." OR 
+                    DATE(NOW()) < DATE(subscription_end_at)"));*/
+        }
+
+        if ($this->activeSubscription) {
+            $query->joinWith(['subscriptions'])
+                ->andWhere(['plan_id' => 2, "subscription_status" => Subscription::STATUS_ACTIVE])
+                ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"));
         }
 
         $query->andFilterWhere(['like', 'country_id', $this->country_id])

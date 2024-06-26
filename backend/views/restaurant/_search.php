@@ -164,6 +164,7 @@ use common\models\Restaurant;
             <div class="col-md-3">
                 <?php echo $form->field($model, 'is_sandbox')->checkbox([]) ?>
             </div>
+
             <div class="col-md-3">
                 <?php echo $form->field($model, 'is_under_maintenance')->checkbox([]) ?>
             </div>
@@ -175,7 +176,14 @@ use common\models\Restaurant;
             <div class="col-md-3">
                 <?php echo $form->field($model, 'is_deleted')->checkbox([]) ?>
             </div>
-
+            <div class="col-md-3">
+                <?php echo $form->field($model, 'activeSubscription')->checkbox([]) ?>
+            </div>
+<!--
+            <div class="col-md-3">
+                <?php echo $form->field($model, 'noActiveSubscription')->checkbox([]) ?>
+            </div>
+-->
         </div>
     </div>
 
