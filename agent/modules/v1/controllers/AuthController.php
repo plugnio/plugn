@@ -230,9 +230,11 @@ class AuthController extends BaseController {
     public function actionLoginByKey() {
 
         $auth_key = Yii::$app->request->getBodyParam('auth_key');
+        $store_id = Yii::$app->request->getBodyParam('store_id');
 
         $model = Agent::find()
             ->andWhere(['agent_auth_key' => $auth_key])
+            //->andWhere(['deleted' => 0])
             ->one();
 
         if (!$model) {
@@ -252,7 +254,7 @@ class AuthController extends BaseController {
         $model->agent_auth_key = "";
         $model->save(false);
 
-        return $this->_loginResponse($model);
+        return $this->_loginResponse($model, $store_id);
     }
 
     /**
@@ -993,13 +995,19 @@ class AuthController extends BaseController {
      * @param type $agent
      * @return type
      */
-    private function _loginResponse($agent)
+    private function _loginResponse($agent, $store_id = null)
     {
         // Return Agent access token if everything valid
 
         $accessToken = $agent->accessToken->token_value;
 
-        $assignment = $agent->getAgentAssignments()->one();
+        $assignmentQuery = $agent->getAgentAssignments();
+
+        if($store_id) {
+            $assignmentQuery->andWhere(['agent_assignment.restaurant_uuid' => $store_id]);
+        }
+
+        $assignment = $assignmentQuery->one();
 
         /*if(!$assignment) {
           return [
