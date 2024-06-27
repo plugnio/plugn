@@ -33,10 +33,23 @@ $this->registerJs($js);
 <div class="restaurant-view">
     <h1>
         <?= Html::encode($this->title) ?>
+
+        <?php if($model->activeSubscription && $model->activeSubscription->plan_id == 2) { ?>
+            <span class="badge badge-success">Premium</span>
+        <?php } ?>
+
         <?php if($model->is_deleted) { ?>
         <span class="badge badge-danger">Deleted</span>
         <?php } ?>
     </h1>
+
+    <?php if($model->platform_fee == 0 && (!$model->activeSubscription || $model->activeSubscription->plan_id == 1)) { ?>
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h5><i class="icon fa fa-ban"></i> Error!</h5>
+            Platform fee should not be zero for non-premium stores.
+        </div>
+    <?php } ?>
 
     <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
 
@@ -45,6 +58,7 @@ $this->registerJs($js);
         <h5><i class="icon fa fa-ban"></i> Error!</h5>
         <?= (Yii::$app->session->getFlash('errorResponse')) ?>
     </div>
+
     <?php } elseif (Yii::$app->session->getFlash('successResponse') != null) { ?>
     <div class="alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -122,6 +136,7 @@ $this->registerJs($js);
         <li id="restaurantType"><a href="#">Restaurant Type</a></li>
         <li id="payment"><a href="#">Tap payment</a></li>
         <li id="fees"><a href="#">Our Fees</a></li>
+        <li id="subscription"><a href="#">Subscription</a></li>
         <li id="theme"><a href="#">Theme color</a></li>
         <li id="seo"><a href="#">SEO</a></li>
         <li id="analytics"><a href="#">Analytics</a></li>
@@ -131,9 +146,40 @@ $this->registerJs($js);
         <li id="invoices" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['restaurant-invoice/index', 'RestaurantInvoice[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Invoices</a></li>
         <li id="orders" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['order/index', 'OrderSearch[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Orders</a></li>
         <li id="settings"><a href="#">Settings</a></li>
+
     </ul>
 
     <br />
+
+    <div id="tab-subscription" class="tab-content hidden">
+
+        <?php if($model->activeSubscription->plan_id == 2) { ?>
+
+            <h5>Subscription </h5>
+            <?= DetailView::widget([
+                'model' => $model->activeSubscription,
+                'attributes' => [
+                    'status',
+                    'subscription_start_at',
+                    'subscription_end_at',
+                ],
+            ]); ?>
+
+        <?php } ?>
+
+        <h5>Active plan </h5>
+
+        <?=  DetailView::widget([
+            'model' => $model->activeSubscription->plan,
+            'attributes' => [
+                'plan_id',
+                'name',
+                'description',
+                'price',
+                'platform_fee',
+            ],
+        ]) ?>
+    </div>
 
     <div id="tab-analytics" class="tab-content hidden">
         <?=
