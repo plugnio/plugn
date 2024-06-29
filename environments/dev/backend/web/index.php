@@ -1,4 +1,22 @@
 <?php
+
+function isHeadlessChrome() {
+    if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        // Check for the 'HeadlessChrome' keyword in the User-Agent string
+        if (strpos($userAgent, 'Headless') !== false) {
+            //HeadlessChrome
+            return true;
+        }
+    }
+    return false;
+}
+
+if (isHeadlessChrome()) {
+    echo "fuck off, motherfucker.";
+    die();
+}
+
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');
 
