@@ -191,7 +191,9 @@ class ApplePayController extends BaseController
      */
     protected function findModel($store_uuid =  null)
     {
-        $model = Restaurant::find()->andWhere(['restaurant_uuid' => $store_uuid]);
+        $model = Restaurant::find()
+            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->one();
 
         if ($model !== null) {
             return $model;
