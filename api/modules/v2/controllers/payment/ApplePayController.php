@@ -149,14 +149,14 @@ class ApplePayController extends BaseController
                 'json' => $body,
             ]);
 
-            return json_decode($response->getBody()->getContents());
+            return $response->getBody()->getContents();
 
         } catch (RequestException $e) {
 
             Yii::error($e->getMessage());
 
             //header('Content-Type: application/json', true, 500);
-            return json_encode(['error' => $e->getMessage()]);
+            return ['error' => $e->getMessage()];
         }
     }
 
