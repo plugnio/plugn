@@ -66,6 +66,9 @@ class ApplePayController extends BaseController
         $order_uuid = Yii::$app->request->getBodyParam ('order_uuid');
         $token = \Yii::$app->request->getBodyParam ('token');
 
+        Yii::error("apple order", $order_uuid);
+        Yii::error("apple token", $token);
+
         //$paymentMethod = PaymentMethod::findOne(['payment_method_code' => 'Moyasar']);
 
         $order = $this->findOrder($order_uuid);
@@ -73,7 +76,7 @@ class ApplePayController extends BaseController
         Yii::$app->tapPayments->setApiKeys(
             $order->restaurant->live_api_key,
             $order->restaurant->test_api_key,
-            false
+            $order->restaurant->is_sandbox
         );
 
         //convert apple pay token to Tap apple pay token
@@ -130,7 +133,7 @@ class ApplePayController extends BaseController
             "initiativeContext" => str_replace("https://", "", $store->restaurant_domain),//"dash.plugn.io"
         ];
 
-        Yii::error($body);
+        //Yii::error($body);
 
         //try {
             $client = new \GuzzleHttp\Client([
@@ -151,7 +154,7 @@ class ApplePayController extends BaseController
                 'json' => $body,
             ]);
 
-            return $response->getBody()->getContents();
+            return json_encode($response->getBody()->getContents());
 
         /*} catch (RequestException $e) {
 
