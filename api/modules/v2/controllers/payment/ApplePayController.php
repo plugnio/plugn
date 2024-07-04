@@ -124,11 +124,13 @@ class ApplePayController extends BaseController
 
         $body = [
             "merchantIdentifier" => 'merchant.io.plugn.dashboard',
-            "domainName" => $store->restaurant_domain,// 'dash.plugn.io',
+            "domainName" => str_replace("https://", "", $store->restaurant_domain),// 'dash.plugn.io',
             "displayName" => $store->name,//'Plugn',
-          //  "initiative" => "web",
-          //  "initiativeContext" => $store->restaurant_domain,//"dash.plugn.io"
+            "initiative" => "web",
+            "initiativeContext" => str_replace("https://", "", $store->restaurant_domain),//"dash.plugn.io"
         ];
+
+        Yii::error($body);
 
         //try {
             $client = new \GuzzleHttp\Client([
