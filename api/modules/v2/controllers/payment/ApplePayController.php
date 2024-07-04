@@ -154,7 +154,7 @@ class ApplePayController extends BaseController
                 'json' => $body,
             ]);
 
-            return json_encode($response->getBody()->getContents());
+            return json_decode($response->getBody()->getContents());
 
         /*} catch (RequestException $e) {
 
