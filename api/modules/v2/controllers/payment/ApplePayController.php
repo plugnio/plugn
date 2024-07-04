@@ -126,11 +126,11 @@ class ApplePayController extends BaseController
             "merchantIdentifier" => 'merchant.io.plugn.dashboard',
             "domainName" => $store->restaurant_domain,// 'dash.plugn.io',
             "displayName" => $store->name,//'Plugn',
-            "initiative" => "web",
-            "initiativeContext" => $store->restaurant_domain,//"dash.plugn.io"
+          //  "initiative" => "web",
+          //  "initiativeContext" => $store->restaurant_domain,//"dash.plugn.io"
         ];
 
-        try {
+        //try {
             $client = new \GuzzleHttp\Client([
                 'base_uri' => "",
                 'timeout' => 10.0,
@@ -151,13 +151,13 @@ class ApplePayController extends BaseController
 
             return $response->getBody()->getContents();
 
-        } catch (RequestException $e) {
+        /*} catch (RequestException $e) {
 
             Yii::error($e->getMessage());
 
             //header('Content-Type: application/json', true, 500);
             return ['error' => $e->getMessage()];
-        }
+        }*/
     }
 
     /**
