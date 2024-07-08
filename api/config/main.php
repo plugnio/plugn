@@ -422,6 +422,7 @@ return [
                         'POST apply-promo-code/<order_uuid>' => 'apply-promo-code',
                         'POST instruction/<order_uuid>' => 'instruction',
                         'POST <id>' => 'place-an-order',
+                        'PATCH <id>' => 'update-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
                         'GET my-fatoorah-callback' => 'my-fatoorah-callback',

@@ -75,6 +75,51 @@ class OrderController extends BaseController
     }
 
     /**
+     * @param $id
+     * @return array|string[]|void
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateOrder($id) {
+
+        $order = $this->findModel($id);
+
+        if (
+            !in_array($order->order_status, [
+                Order::STATUS_DRAFT,
+                Order::STATUS_ABANDONED_CHECKOUT
+            ])
+        ) {
+            return [
+                "operation" => "error",
+                "message" => "Processed order can not be changed!"
+            ];
+        }
+
+        $response = $this->_updateOrderData($order, $order->restaurant);
+
+        if ($response && isset($response['operation'])) {
+            return $response;
+        }
+
+        \common\models\Restaurant::updateAll([
+            'last_order_at' => new Expression('NOW()'),
+        ], [
+            'restaurant_uuid' => $order->restaurant_uuid
+        ]);
+
+        Yii::$app->eventManager->track('Order Updated', $order->attributes,
+            null,
+            $order->restaurant_uuid
+        );
+
+        return [
+            "operation" => "success",
+            "order_uuid" => $order->order_uuid,
+            "message" => "Order data updated successfully!"
+        ];
+    }
+
+    /**
      * initialize order without payment details
      * @param $id
      * @return array
@@ -93,11 +138,38 @@ class OrderController extends BaseController
             ];
         }
 
-        $transaction = Yii::$app->db->beginTransaction();
-
         $order = new Order();
-
         $order->setScenario(Order::SCENARIO_INIT_ORDER);
+
+        $response = $this->_updateOrderData($order, $restaurant);
+
+        if ($response && isset($response['operation'])) {//&& $response['operation'] == 'error'
+           return $response;
+        }
+
+        //for https://pogi.sentry.io/issues/3889482226/?project=5220572&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
+        
+        \common\models\Restaurant::updateAll([
+            'last_order_at' => new Expression('NOW()'),
+            'total_orders' => $restaurant->total_orders + 1
+        ], [
+            'restaurant_uuid' => $restaurant->restaurant_uuid
+        ]);
+
+            Yii::$app->eventManager->track('Order Initiated', $order->attributes,
+                null,
+                $restaurant->restaurant_uuid
+            );
+
+        return [
+            'operation' => 'success',
+            'order' => $order
+        ];
+    }
+
+    private function _updateOrderData($order, $restaurant) {
+
+        $transaction = Yii::$app->db->beginTransaction();
 
         //as we will calculate after items get saved
         $order->total_price = 0;
@@ -154,50 +226,50 @@ class OrderController extends BaseController
         //if the order mode = 1 => Delivery
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-                $city = Yii::$app->request->getBodyParam("city");
+            $city = Yii::$app->request->getBodyParam("city");
 
-                if($city && isset($city['city_id'])) {
-                    $order->city = Yii::$app->language == "ar" && !empty($city['city_name_ar']) ? $city['city_name_ar']:  $city['city_name'];
-                } else {
-                    $order->city = $city;
-                }
+            if($city && isset($city['city_id'])) {
+                $order->city = Yii::$app->language == "ar" && !empty($city['city_name_ar']) ? $city['city_name_ar']:  $city['city_name'];
+            } else {
+                $order->city = $city;
+            }
 
-                $order->area_id = Yii::$app->request->getBodyParam("area_id");
-                $order->state_id = Yii::$app->request->getBodyParam("state_id");
+            $order->area_id = Yii::$app->request->getBodyParam("area_id");
+            $order->state_id = Yii::$app->request->getBodyParam("state_id");
 
-                if($order->area_id && !$order->city) {
+            if($order->area_id && !$order->city) {
 
-                    $area = Area::find()
-                        ->andWhere(['area_id' => $order->area_id])
-                        ->one();
+                $area = Area::find()
+                    ->andWhere(['area_id' => $order->area_id])
+                    ->one();
 
-                    if($area && $area->city)
-                        $order->city = Yii::$app->language == "ar" ? $area->city['city_name_ar']: $area->city['city_name'];
-                }
+                if($area && $area->city)
+                    $order->city = Yii::$app->language == "ar" ? $area->city['city_name_ar']: $area->city['city_name'];
+            }
 
-                $order->address_1 = Yii::$app->request->getBodyParam('address_1');
-                $order->address_2 = Yii::$app->request->getBodyParam('address_2');
-                $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
+            $order->address_1 = Yii::$app->request->getBodyParam('address_1');
+            $order->address_2 = Yii::$app->request->getBodyParam('address_2');
+            $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
 
-                if(!$order->postalcode) {
-                    $order->postalcode = Yii::$app->request->getBodyParam('postalcode');
-                }
+            if(!$order->postalcode) {
+                $order->postalcode = Yii::$app->request->getBodyParam('postalcode');
+            }
 
-                $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
-                $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
-                $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
-                $order->block = Yii::$app->request->getBodyParam("block");
-                $order->street = Yii::$app->request->getBodyParam("street");
-                $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
-                $order->house_number = Yii::$app->request->getBodyParam("house_number");
+            $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
+            $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
+            $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
+            $order->block = Yii::$app->request->getBodyParam("block");
+            $order->street = Yii::$app->request->getBodyParam("street");
+            $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
+            $order->house_number = Yii::$app->request->getBodyParam("house_number");
             $order->floor = Yii::$app->request->getBodyParam("floor");
             $order->building = Yii::$app->request->getBodyParam("building");
 
-                if (strtolower($order->unit_type) == Order::UNIT_TYPE_APARTMENT)
-                    $order->apartment = Yii::$app->request->getBodyParam("apartment");
+            if (strtolower($order->unit_type) == Order::UNIT_TYPE_APARTMENT)
+                $order->apartment = Yii::$app->request->getBodyParam("apartment");
 
-                if (strtolower($order->unit_type) == Order::UNIT_TYPE_OFFICE)
-                    $order->office = Yii::$app->request->getBodyParam("office");
+            if (strtolower($order->unit_type) == Order::UNIT_TYPE_OFFICE)
+                $order->office = Yii::$app->request->getBodyParam("office");
 
             $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
 
@@ -396,25 +468,6 @@ class OrderController extends BaseController
         }
 
         $transaction->commit();
-
-        //for https://pogi.sentry.io/issues/3889482226/?project=5220572&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
-        
-        \common\models\Restaurant::updateAll([
-            'last_order_at' => new Expression('NOW()'),
-            'total_orders' => $restaurant->total_orders + 1
-        ], [
-            'restaurant_uuid' => $restaurant->restaurant_uuid
-        ]);
-
-            Yii::$app->eventManager->track('Order Initiated', $order->attributes,
-                null,
-                $restaurant->restaurant_uuid
-            );
-
-        return [
-            'operation' => 'success',
-            'order' => $order
-        ];
     }
 
     /**
