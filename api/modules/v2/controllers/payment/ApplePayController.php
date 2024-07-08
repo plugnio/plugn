@@ -66,6 +66,9 @@ class ApplePayController extends BaseController
         $order_uuid = Yii::$app->request->getBodyParam ('order_uuid');
         $token = \Yii::$app->request->getBodyParam ('token');
 
+        Yii::error("apple order", $order_uuid);
+        Yii::error("apple token", $token);
+
         //$paymentMethod = PaymentMethod::findOne(['payment_method_code' => 'Moyasar']);
 
         $order = $this->findOrder($order_uuid);
@@ -73,7 +76,7 @@ class ApplePayController extends BaseController
         Yii::$app->tapPayments->setApiKeys(
             $order->restaurant->live_api_key,
             $order->restaurant->test_api_key,
-            false
+            $order->restaurant->is_sandbox
         );
 
         //convert apple pay token to Tap apple pay token
@@ -124,13 +127,15 @@ class ApplePayController extends BaseController
 
         $body = [
             "merchantIdentifier" => 'merchant.io.plugn.dashboard',
-            "domainName" => $store->restaurant_domain,// 'dash.plugn.io',
+            "domainName" => str_replace("https://", "", $store->restaurant_domain),// 'dash.plugn.io',
             "displayName" => $store->name,//'Plugn',
             "initiative" => "web",
-            "initiativeContext" => $store->restaurant_domain,//"dash.plugn.io"
+            "initiativeContext" => str_replace("https://", "", $store->restaurant_domain),//"dash.plugn.io"
         ];
 
-        try {
+        //Yii::error($body);
+
+        //try {
             $client = new \GuzzleHttp\Client([
                 'base_uri' => "",
                 'timeout' => 10.0,
@@ -151,13 +156,13 @@ class ApplePayController extends BaseController
 
             return json_decode($response->getBody()->getContents());
 
-        } catch (RequestException $e) {
+        /*} catch (RequestException $e) {
 
             Yii::error($e->getMessage());
 
             //header('Content-Type: application/json', true, 500);
-            return json_encode(['error' => $e->getMessage()]);
-        }
+            return ['error' => $e->getMessage()];
+        }*/
     }
 
     /**
@@ -191,7 +196,9 @@ class ApplePayController extends BaseController
      */
     protected function findModel($store_uuid =  null)
     {
-        $model = Restaurant::find()->andWhere(['restaurant_uuid' => $store_uuid]);
+        $model = Restaurant::find()
+            ->andWhere(['restaurant_uuid' => $store_uuid])
+            ->one();
 
         if ($model !== null) {
             return $model;
