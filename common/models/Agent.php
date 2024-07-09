@@ -198,7 +198,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                         ->andWhere("DATE(agent_created_at) = DATE('".date('Y-m-d')."')")
                         ->count();
 
-                    if ($count > 1) {
+                    if ($count > 10) {
                         Yii::error("too may agent signup from same ip");
 
                         //block ip
