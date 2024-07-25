@@ -153,32 +153,38 @@ $this->registerJs($js);
 
     <div id="tab-subscription" class="tab-content hidden">
 
-        <?php if($model->activeSubscription->plan_id == 2) { ?>
+        <?php if ($model->activeSubscription) { ?>
 
-            <h5>Subscription </h5>
-            <?= DetailView::widget([
-                'model' => $model->activeSubscription,
-                'attributes' => [
-                    'status',
-                    'subscription_start_at',
-                    'subscription_end_at',
-                ],
-            ]); ?>
+            <?php if($model->activeSubscription->plan_id == 2) { ?>
 
+                <h5>Subscription </h5>
+
+                <?= DetailView::widget([
+                    'model' => $model->activeSubscription,
+                    'attributes' => [
+                        'status',
+                        'subscription_start_at',
+                        'subscription_end_at',
+                    ],
+                ]); ?>
+
+            <?php } ?>
+
+            <?php if ($model->activeSubscription->plan) { ?>
+                <h5>Active plan </h5>
+
+                <?=  DetailView::widget([
+                    'model' => $model->activeSubscription->plan,
+                    'attributes' => [
+                        'plan_id',
+                        'name',
+                        'description',
+                        'price',
+                        'platform_fee',
+                    ],
+                ]) ?>
+            <?php } ?>
         <?php } ?>
-
-        <h5>Active plan </h5>
-
-        <?=  DetailView::widget([
-            'model' => $model->activeSubscription->plan,
-            'attributes' => [
-                'plan_id',
-                'name',
-                'description',
-                'price',
-                'platform_fee',
-            ],
-        ]) ?>
     </div>
 
     <div id="tab-analytics" class="tab-content hidden">
@@ -399,7 +405,8 @@ $this->registerJs($js);
                     'attribute' => 'status',
                     'filter' => RestaurantDomainRequest::arrStatus(),
                     'value' => function($data) {
-                        return RestaurantDomainRequest::arrStatus()[$data->status];
+                        $arrStatus = RestaurantDomainRequest::arrStatus();
+                        return isset($arrStatus[$data->status])? $arrStatus[$data->status]: null;
                     }
                 ],
                 //'created_by',
