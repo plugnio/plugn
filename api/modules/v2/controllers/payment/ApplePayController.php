@@ -95,6 +95,11 @@ class ApplePayController extends BaseController
 
             $responseContent = json_decode($response->content);
 
+            return [
+                "response" => $response,
+                "responseContent" => $responseContent,
+            ];
+
             $token = $responseContent->id;
 
             return [
