@@ -293,6 +293,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'POST process-payment' => 'process-payment',
+                        'PATCH process-payment' => 'process-payment',
                         'POST validate-merchant' => 'validate-merchant',
                         // OPTIONS VERBS
                         'OPTIONS process-payment' => 'options',
