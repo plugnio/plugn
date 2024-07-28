@@ -63,11 +63,15 @@ class ApplePayController extends BaseController
      */
     public function actionProcessPayment()
     {
-        $order_uuid = Yii::$app->request->getBodyParam ('order_uuid');
+        $order_uuid = \Yii::$app->request->getBodyParam ('order_uuid');
         $token = \Yii::$app->request->getBodyParam ('token');
 
-        Yii::error("apple order", $order_uuid);
-        Yii::error("apple token", $token);
+        if (empty($token)) {
+            return [
+                "success" => false,
+                "message" => "empty token"
+            ];
+        }
 
         //$paymentMethod = PaymentMethod::findOne(['payment_method_code' => 'Moyasar']);
 
@@ -83,10 +87,19 @@ class ApplePayController extends BaseController
         //https://developers.tap.company/docs/apple-pay-token
 
         if($token) {
-            $response = \Yii::$app->tapPayments->fromApplePayToken($token);
+
+            $response = \Yii::$app->tapPayments->fromApplePayToken($token);//['paymentData']
+
             $responseContent = json_decode($response->content);
 
-            \Yii::error($responseContent);
+            if (!empty($responseContent->errors)) {
+
+                return [
+                    "success" => false,
+                    "message" => $responseContent->errors,
+                    "data" => $token['paymentData']
+                ];
+            }
 
             $token = $responseContent->id;
 
