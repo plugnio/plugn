@@ -222,7 +222,6 @@ class AuthController extends BaseController {
         return $this->_loginResponse($agent);
     }
 
-
     /**
      * @return array
      * @throws NotFoundHttpException
