@@ -66,8 +66,6 @@ class ApplePayController extends BaseController
         $order_uuid = \Yii::$app->request->getBodyParam ('order_uuid');
         $token = \Yii::$app->request->getBodyParam ('token');
 
-        Yii::error("apple token", $token);
-
         if (empty($token)) {
             return [
                 "success" => false,
@@ -89,16 +87,19 @@ class ApplePayController extends BaseController
         //https://developers.tap.company/docs/apple-pay-token
 
         if($token) {
-            $response = \Yii::$app->tapPayments->fromApplePayToken($token);
 
-            \Yii::error($response);
+            $response = \Yii::$app->tapPayments->fromApplePayToken($token);//['paymentData']
 
             $responseContent = json_decode($response->content);
 
-            return [
-                "response" => $response,
-                "responseContent" => $responseContent,
-            ];
+            if (!empty($responseContent->errors)) {
+
+                return [
+                    "success" => false,
+                    "message" => $responseContent->errors,
+                    "data" => $token['paymentData']
+                ];
+            }
 
             $token = $responseContent->id;
 
