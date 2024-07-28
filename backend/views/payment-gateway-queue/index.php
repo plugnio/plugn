@@ -1,5 +1,6 @@
 <?php
 
+use yii\db\Expression;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -29,6 +30,20 @@ $this->params['breadcrumbs'][] = $this->title;
             [
               'attribute' => 'store_name',
               'value' =>     'restaurant.name'
+            ],
+            [
+                'attribute' => 'storeStatus',
+                'filter' => [
+                    1 => "Active",
+                    2 => "In-Active"
+                ],
+              'value' =>  function($model) {
+                   if ($model->restaurant->last_order_at && $model->getItems()->count() > 0) {
+                     return "Active";
+                   }  else {
+                       return "In-Active";
+                   }
+              }
             ],
             'payment_gateway',
             [

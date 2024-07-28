@@ -359,8 +359,8 @@ $this->registerJs($js);
 
             //if(str_contains($model->restaurant_domain, ".plugn.site")) {
 
-
-            //} else
+            ///} else
+            /// 
             if($model->site_id) {
 
                 echo Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [

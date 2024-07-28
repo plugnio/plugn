@@ -123,10 +123,25 @@ class ApplePayController extends BaseController
         $validationURL = \Yii::$app->request->getBodyParam("validationURL");
         $restaurant_uuid = \Yii::$app->request->getBodyParam("restaurant_uuid");
 
-        $store = $this->findModel($restaurant_uuid);
+        \Yii::error("apple pay request for #" . $restaurant_uuid .' url:' . $validationURL);
+
+        if (!$restaurant_uuid) {
+            \Yii::error("no store id in post body, setting manually");
+
+            $restaurant_uuid = "rest_20d68ab9-1c62-11ec-973b-069e9504599a";
+        }
+
+        $store = $this->findModel($restaurant_uuid);/*[
+            "name" => "barrak",
+            "restaurant_domain" => "https://order.barrakali.com"
+        ];*/
 
         if (!$validationURL) {
-            $validationURL = "https://apple-pay-gateway.apple.com/paymentservices/paymentSession";
+
+            \Yii::error("setting apple pay validation url manually");
+
+            $validationURL = "https://apple-pay-gateway.apple.com/paymentservices/startSession";
+            //$validationURL = "https://apple-pay-gateway.apple.com/paymentservices/paymentSession";
             //https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/requesting_an_apple_pay_payment_session
 
             /*return [
@@ -138,12 +153,14 @@ class ApplePayController extends BaseController
         $certPath = Yii::getAlias('@common') . '/certificates/cert.pem';//merchant_id.cer';
         $pemPath = Yii::getAlias('@common') . '/certificates/key.pem';
 
+        $domain = str_replace("https://", "", $store['restaurant_domain']);
+
         $body = [
             "merchantIdentifier" => 'merchant.io.plugn.dashboard',
-            "domainName" => str_replace("https://", "", $store->restaurant_domain),// 'dash.plugn.io',
-            "displayName" => $store->name,//'Plugn',
+            "domainName" => $domain,// 'dash.plugn.io',
+            "displayName" => $store['name'],//'Plugn',
             "initiative" => "web",
-            "initiativeContext" => str_replace("https://", "", $store->restaurant_domain),//"dash.plugn.io"
+            "initiativeContext" => str_replace("https://", "", $store['restaurant_domain']),//"dash.plugn.io"
         ];
 
         //Yii::error($body);
@@ -156,7 +173,9 @@ class ApplePayController extends BaseController
                 'cert' => $certPath,
                 'ssl_key' => $pemPath,
                 'headers' => [
+                //    'User-Agent' => "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
                     'Content-Type' => 'application/json',
+                    //"Host" => $domain
                 ],
                 'curl' => [
                     CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
@@ -166,6 +185,8 @@ class ApplePayController extends BaseController
             $response = $client->post($validationURL, [
                 'json' => $body,
             ]);
+
+            //\Yii::error($response->getHeaders());
 
             return json_decode($response->getBody()->getContents());
 

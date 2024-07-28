@@ -175,4 +175,12 @@ class PaymentGatewayQueue extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Restaurant::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItems()
+    {
+        return $this->hasOne(Item::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
 }

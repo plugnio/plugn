@@ -136,6 +136,28 @@ class StaffController extends Controller {
     }
 
     /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionLogin($id)
+    {
+        $model = $this->findModel($id);
+
+        $model->generateAuthKey();
+
+        if(!$model->save(false)) {
+            Yii::$app->session->setFlash('errorResponse', $model->errors);
+
+            return $this->redirect(['view', 'id' => $model->staff_id]);
+        }
+
+        $url = Yii::$app->params['crmAppUrl']. '?auth_key='.$model->staff_auth_key;
+
+        return $this->redirect($url);
+    }
+
+    /**
      * Finds the Staff model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
