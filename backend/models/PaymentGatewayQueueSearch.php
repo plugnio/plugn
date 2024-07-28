@@ -5,14 +5,14 @@ namespace backend\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\PaymentGatewayQueue;
+use yii\db\Expression;
 
 /**
  * PaymentGatewayQueueSearch represents the model behind the search form of `common\models\PaymentGatewayQueue`.
  */
 class PaymentGatewayQueueSearch extends PaymentGatewayQueue
 {
-
-
+    public $storeStatus;
     public $store_name;
 
     /**
@@ -22,7 +22,7 @@ class PaymentGatewayQueueSearch extends PaymentGatewayQueue
     {
         return [
             [['payment_gateway_queue_id', 'queue_status'], 'integer'],
-            [['restaurant_uuid', 'store_name','payment_gateway', 'queue_created_at', 'queue_updated_at', 'queue_start_at', 'queue_end_at'], 'safe'],
+            [["storeStatus", 'restaurant_uuid', 'store_name','payment_gateway', 'queue_created_at', 'queue_updated_at', 'queue_start_at', 'queue_end_at'], 'safe'],
         ];
     }
 
@@ -45,7 +45,8 @@ class PaymentGatewayQueueSearch extends PaymentGatewayQueue
     public function search($params)
     {
         $query = PaymentGatewayQueue::find()
-        ->joinWith(['restaurant'])->orderBy(['queue_status' => SORT_ASC]);
+            ->joinWith(['restaurant'])
+            ->orderBy(['queue_status' => SORT_ASC]);
 
         // add conditions that should always apply here
 
@@ -53,13 +54,10 @@ class PaymentGatewayQueueSearch extends PaymentGatewayQueue
             'query' => $query,
         ]);
 
-
-
         $dataProvider->sort->attributes['store_name'] = [
             'asc' => ['restaurant.name' => SORT_ASC],
             'desc' => ['restaurant.name' => SORT_DESC],
         ];
-
 
         $this->load($params);
 
@@ -78,6 +76,16 @@ class PaymentGatewayQueueSearch extends PaymentGatewayQueue
             'queue_start_at' => $this->queue_start_at,
             'queue_end_at' => $this->queue_end_at,
         ]);
+
+        if ($this->storeStatus) {//&& in_array([1, 0], $this->storeStatus)
+            $query->joinWith(['items']);
+
+            if($this->storeStatus == 1) {
+                $query->andWhere(new Expression("restaurant.last_order_at IS NOT NULL OR item.item_uuid IS NOT NULL"));
+            } else if($this->storeStatus == 2) {
+                $query->andWhere( new Expression("restaurant.last_order_at IS NULL AND item.item_uuid IS NULL"));
+            }
+        }
 
         $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
             ->andFilterWhere(['like', 'restaurant.name', $this->store_name])

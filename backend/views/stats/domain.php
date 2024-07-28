@@ -110,7 +110,7 @@ $this->title = 'Domain';
         <div class="grid">
             <h3>Stats</h3>
 
-            <?= Html::beginForm(['/stats/index'], 'GET', ['class' => "form-inline form-filter"]); ?>
+            <?= Html::beginForm(['/stats/domain'], 'GET', ['class' => "form-inline form-filter"]); ?>
 
             <div class="form-group mb-2">
                 <label for="date_start">Start Date</label>

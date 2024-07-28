@@ -42,7 +42,7 @@ class RestaurantSearch extends Restaurant
                  'customDomain', 'noItem', 'notActive', 'ip_address', 'notActive90Days', "activeSubscription",
                  "noActiveSubscription"], 'safe'],
              [['restaurant_status'], 'integer'],
-             [['platform_fee','version', 'total_orders'], 'number'],
+             [['platform_fee','version'], 'number'],//'total_orders'
          ];
      }
 
@@ -242,8 +242,18 @@ class RestaurantSearch extends Restaurant
             ->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'version', $this->version])
             ->andFilterWhere(['like', 'currency.title', $this->currency_title])
-            ->andFilterWhere(['like', 'total_orders', $this->total_orders])
+            //->andFilterWhere(['like', 'total_orders', $this->total_orders])
             ->andFilterWhere(['like', 'name_ar', $this->name_ar]);
+
+        if ($this->total_orders) {
+            if(str_contains($this->total_orders, ">") || str_contains($this->total_orders, "<")) {
+                $query->andWhere(new Expression("total_orders " . $this->total_orders));
+            } else if(str_contains($this->total_orders, "=")) {
+                $query->andWhere(["total_orders" => str_replace(["=", " "], ["",""], $this->total_orders)]);
+            } else {
+                $query->andWhere(["total_orders" => $this->total_orders]);
+            }
+        }
 
         if($this->country_name)
             $query->andFilterWhere(['like', 'country.country_name',
