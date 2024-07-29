@@ -69,6 +69,9 @@ class AddressController extends BaseController
         ]);
     }
 
+    /**
+     * @return array
+     */
     public function actionAdd()
     {
         $address = new CustomerAddress();
@@ -91,6 +94,10 @@ class AddressController extends BaseController
         $address->address_2 = Yii::$app->request->getBodyParam('address_2');
         $address->special_directions = Yii::$app->request->getBodyParam('special_directions');
         $address->delivery_instructions = Yii::$app->request->getBodyParam('delivery_instructions');
+
+        if (!$address->city_id && $address->area) {
+            $address->city_id = $address->area->city_id;
+        }
 
         if(!$address->save()) {
             return [
@@ -125,6 +132,10 @@ class AddressController extends BaseController
         $address->address_2 = Yii::$app->request->getBodyParam('address_2');
         $address->special_directions = Yii::$app->request->getBodyParam('special_directions');
         $address->delivery_instructions = Yii::$app->request->getBodyParam('delivery_instructions');
+
+        if (!$address->city_id && $address->area) {
+            $address->city_id = $address->area->city_id;
+        }
 
         if(!$address->save()) {
             return [
