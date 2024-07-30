@@ -391,6 +391,11 @@ class StatsController extends Controller
         ]);
     }
 
+    /**
+     * @return string
+     * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
+     */
     public function actionStoreRetention()
     {
         $date_start = Yii::$app->request->get('date_start');

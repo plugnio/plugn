@@ -41,6 +41,11 @@ class RestaurantQuery extends \yii\db\ActiveQuery
             DATE(restaurant.last_order_at) < DATE(NOW() - INTERVAL ".$days." DAY)"));
     }
 
+    public function filterByOrderInDays($days)
+    {
+        return $this->andWhere (new Expression("DATE(restaurant.last_order_at) > DATE(NOW() - INTERVAL ".($days - 1)." DAY)"));
+    }
+
     /**
      * @return RestaurantQuery
      */

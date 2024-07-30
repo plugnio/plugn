@@ -12,6 +12,11 @@ use yii\db\Expression;
  */
 class OrderSearch extends Order
 {
+    public $country_id;
+    public $date_start;
+    public $date_end;
+    public $type;
+
     /**
      * {@inheritdoc}
      */
@@ -19,7 +24,7 @@ class OrderSearch extends Order
     {
         return [
             [['area_id', 'payment_method_id', 'order_status','customer_id'], 'integer'],
-            [["total_price", 'payment_uuid', 'order_mode', 'currency_code', 'payment_method_id ', 'country_name', 'order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name','payment_method_name_ar','restaurant_uuid'], 'safe'],
+            [["type", "country_id", "date_start", "date_end", "total_price", 'payment_uuid', 'order_mode', 'currency_code', 'payment_method_id ', 'country_name', 'order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name','payment_method_name_ar','restaurant_uuid'], 'safe'],
         ];
     }
 
@@ -49,14 +54,30 @@ class OrderSearch extends Order
             'query' => $query,
         ]);
 
-        print_r($params);
-
         $this->load($params);
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        //->activeOrders()
+
+        if ($this->country_id) {
+            $query->filterByCountry($this->country_id);
+        }
+
+        if ($this->date_start && $this->date_end) {
+            $query->filterByDateRange($this->date_start, $this->date_end);
+        }
+
+        if ($this->type == "checkout-completed") {
+            $query->checkoutCompleted();
+        }
+
+        if ($this->type == "filter-completed") {
+            $query->filterCompleted();
         }
 
         // grid filtering conditions

@@ -54,7 +54,7 @@ class OrderController extends Controller
     {
         $searchModel = new OrderSearch();
 
-        $count = $searchModel->search([])->getCount();
+        $count = $searchModel->search(Yii::$app->request->queryParams)->getCount();
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -65,6 +65,10 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * @param $storeUuid
+     * @return \yii\web\Response
+     */
     public function actionDownloadPendingOrdersForMashkor($storeUuid)
     {
         $store = Yii::$app->accountManager->getManagedAccount($storeUuid);
