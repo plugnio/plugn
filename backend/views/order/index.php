@@ -215,7 +215,8 @@ white-space: nowrap !important;
                 <p>
                     This is where you’ll fulfill orders, collect payments, and track order progress.
                 </p>
-    <?= Html::a('Create order', ['create', 'storeUuid' => $restaurant->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+
+                    <?= Html::a('Create order', ['create'], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
 

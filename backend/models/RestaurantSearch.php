@@ -13,6 +13,9 @@ use yii\db\Expression;
  */
 class RestaurantSearch extends Restaurant
 {
+    public $date_start;
+    public $date_end;
+
     public $country_name;
     public $currency_title;
 
@@ -22,6 +25,10 @@ class RestaurantSearch extends Restaurant
     public $notActive;
     public $notActive90Days;
     public $customDomain;
+    public $plugnDomain;
+
+    public $active15Days;
+    public $notActive15Days;
 
     public $activeSubscription;
     public $noActiveSubscription;
@@ -32,7 +39,7 @@ class RestaurantSearch extends Restaurant
      public function rules()
      {
          return [
-             [['country_id', 'currency_id', 'license_number', 'vendor_sector', 'store_layout', 'enable_gift_message',
+             [["active15Days", "notActive15Days", 'country_id', 'currency_id', 'license_number', 'vendor_sector', 'store_layout', 'enable_gift_message',
                  'retention_email_sent', 'referral_code', 'is_public', 'accept_order_247', 'iban', 'business_id',
                  'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                 'restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
@@ -40,7 +47,7 @@ class RestaurantSearch extends Restaurant
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
                  'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders',
                  'customDomain', 'noItem', 'notActive', 'ip_address', 'notActive90Days', "activeSubscription",
-                 "noActiveSubscription"], 'safe'],
+                 "noActiveSubscription", "plugnDomain", "date_start", "date_end", ], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee','version'], 'number'],//'total_orders'
          ];
@@ -96,6 +103,10 @@ class RestaurantSearch extends Restaurant
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if ($this->date_start && $this->date_end) {
+            $query->filterByDateRange($this->date_start, $this->date_end);
         }
 
         // grid filtering conditions
@@ -160,6 +171,14 @@ class RestaurantSearch extends Restaurant
                 date('Y-m-d', strtotime("-30 days"))."')");
         }
 
+        if($this->active15Days) {
+            $query->filterByOrderInDays(15);
+        }
+
+        if($this->notActive15Days) {
+            $query->filterByNoOrderInDays(15);
+        }
+
         if($this->notActive90Days) {
             $query->andWhere("last_active_at IS NULL OR DATE(last_active_at) < DATE('".
                 date('Y-m-d', strtotime("-90 days"))."')");
@@ -196,6 +215,10 @@ class RestaurantSearch extends Restaurant
 
         if($this->customDomain) {
             $query->andFilterWhere(['not like', 'restaurant_domain', ".plugn."]);
+        }
+
+        if($this->plugnDomain) {
+            $query->andFilterWhere(['like', 'restaurant_domain', ".plugn."]);
         }
 
         if($this->enable_gift_message) {
