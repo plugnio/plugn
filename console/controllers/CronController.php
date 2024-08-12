@@ -1238,4 +1238,10 @@ class CronController extends \yii\console\Controller
 
         $this->stdout($i . ' Total' . PHP_EOL);
     }
+
+    public function actionGenerateGptFile() {
+        $store = Restaurant::findOne("rest_20219f60-3eda-11eb-b97d-0673128d0c9c");
+
+        $store->generateGPTTrainingData();
+    }
 }

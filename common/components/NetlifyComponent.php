@@ -39,7 +39,6 @@ class NetlifyComponent extends Component {
             }
         }
 
-
         parent::init();
     }
 
