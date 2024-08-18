@@ -450,7 +450,10 @@ class Restaurant extends ActiveRecord
 
             [["owner_date_of_birth"], "string"],
 
-            [['authorized_signature_file'], 'required'],
+            [['authorized_signature_file'], 'required', 'on' => [
+                self::SCENARIO_CREATE_TAP_ACCOUNT,
+                self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT
+            ]],
     /*, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
                 return $model->business_type == 'corp';
             }*/
