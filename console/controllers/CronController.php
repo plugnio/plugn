@@ -48,7 +48,7 @@ class CronController extends \yii\console\Controller
             ->setSubject ('Test aws config')
             ->setTo ("kathrechakrushn@gmail.com")
             //->setCc($contactEmails)
-            //->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
+            ->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
             ->send ();*/
     }
 
