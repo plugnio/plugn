@@ -291,7 +291,7 @@ class RestaurantController extends Controller {
         $store->test_public_key = null;
 
         if(!$store->save()) {
-            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors));
+            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors, true));
         }
         else
         {
@@ -301,6 +301,11 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $id]);
     }
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionResetTap($id)
     {
         $store = $this->findModel($id);
@@ -319,7 +324,6 @@ class RestaurantController extends Controller {
 
         $store->live_public_key = null;
         $store->test_public_key = null;
-
 
         $store->license_number = null;
 
@@ -342,15 +346,12 @@ class RestaurantController extends Controller {
         //$store->identification_file_purpose = null;
         $store->restaurant_email_notification = null;
 
-
         $store->commercial_license_issuing_date = null;
         $store->commercial_license_expiry_date = null;
         //$store->commercial_license_title = null;
         $store->commercial_license_file = null;
         $store->commercial_license_file_id = null;
         //$store->commercial_license_file_purpose = null;
-
-
 
         $store->is_tap_enable = null;
         $store->is_tap_created = null;
@@ -363,7 +364,7 @@ class RestaurantController extends Controller {
         $store->tap_queue_id = null;
 
         if(!$store->save()) {
-            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors));
+            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors, true));
         }
         else 
         {
