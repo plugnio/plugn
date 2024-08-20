@@ -747,6 +747,36 @@ class RestaurantController extends Controller {
     }
 
     /**
+     * @param $id
+     * @return void|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionConfigureDns($id)
+    {
+        $store = $this->findModel($id);
+
+        //if custom domain
+
+        $response = Yii::$app->netlifyComponent->createDnsZone($store);//configureDNSForSite($store->site_id);
+
+        if ($response->isOk) {
+            Yii::$app->session->setFlash('successResponse', "Success: DNS configured!");
+
+            if (isset($response->data['dns_servers'])) {
+                Yii::$app->session->setFlash('successResponse', "DNS Servers: " . implode(",", $response->data['dns_servers']));
+            }
+
+        }else
+        {
+            Yii::error('[Error while publishing site]' . json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            Yii::$app->session->setFlash('errorResponse', json_encode($response->data));
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
+
+    /**
      * publish store
      * @param $id
      * @return \yii\web\Response

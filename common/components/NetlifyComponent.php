@@ -139,6 +139,62 @@ class NetlifyComponent extends Component {
         return $response;
     }
 
+    public function getSiteDns($site_id) {
+
+        $deploySiteEndpoint = $this->apiEndpoint . "/sites/" . $site_id . "/dns";
+
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('GET')
+            ->setUrl($deploySiteEndpoint)
+            ->addHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'User-Agent' => 'request',
+            ])
+            ->send();
+
+        return $response;
+    }
+
+    public function createDnsZone($store) {
+
+        $deploySiteEndpoint = $this->apiEndpoint . "/dns_zones";
+
+        $url = parse_url($store->restaurant_domain);
+
+        $client = new Client();
+        return $client->createRequest()
+            ->setMethod('POST')
+            ->setUrl($deploySiteEndpoint)
+            ->setData([
+                "account_slug" => "plugn",
+                "site_id" => $store->site_id,
+                "name" => $url["host"] //$store->name
+            ])
+            ->addHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'User-Agent' => 'request',
+            ])
+            ->send();
+    }
+
+    public function configureDNSForSite($site_id) {
+
+        $deploySiteEndpoint = $this->apiEndpoint . "/sites/" . $site_id . "/dns";
+
+        $client = new Client();
+        $response = $client->createRequest()
+            ->setMethod('PUT')
+            ->setUrl($deploySiteEndpoint)
+            ->addHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'User-Agent' => 'request',
+            ])
+            ->send();
+
+        return $response;
+    }
+
     /**
      *  Provision SSL for a site
      * @param type $site_id

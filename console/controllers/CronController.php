@@ -23,9 +23,6 @@ use common\models\Item;
 use common\models\Refund;
 use common\models\Order;
 use common\models\Subscription;
-use \DateTime;
-use yii\db\Exception;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\db\Expression;
 
@@ -50,6 +47,14 @@ class CronController extends \yii\console\Controller
             //->setCc($contactEmails)
             ->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
             ->send ();*/
+
+        //6296937a-2bed-44d7-808a-2285e5c2bb22
+        //bd7e752d-0fd4-45a5-98f1-b67eaff454fa
+        //$response = Yii::$app->netlifyComponent->getSiteDns("6296937a-2bed-44d7-808a-2285e5c2bb22");
+//getSiteData
+        //print_r($response->data);//[sizeof($response->data) - 1]['dns_servers']
+     //   records hostname
+
     }
 
     public function actionFixDuplicateAreas() {
