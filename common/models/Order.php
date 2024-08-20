@@ -832,7 +832,8 @@ class Order extends \yii\db\ActiveRecord
 
         if($host && $username && $password && $port && $encryption)
         {
-            $fromEmail = $this->restaurant->restaurant_email? $this->restaurant->restaurant_email: \Yii::$app->params['noReplyEmail'];
+            $fromEmail = empty($this->restaurant->restaurant_email)?
+                \Yii::$app->params['noReplyEmail']: $this->restaurant->restaurant_email;
 
             \Yii::$app->mailer->setTransport([
                 'class' => 'Swift_SmtpTransport',

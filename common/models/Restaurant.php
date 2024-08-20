@@ -1854,11 +1854,19 @@ class Restaurant extends ActiveRecord
 
             //$merchantApiResponse->data['errors'][0]['code'] == 2109
 
-            if(
-                isset($merchantApiResponse->data['errors'][0]['error']) &&
-                $merchantApiResponse->data['errors'][0]['error'] == "Api_key_unauthorised"
-            ) {
-                return $this->fetchMerchantWithStoreKey($notifyVendor);
+            try {
+
+                if(
+                    isset($merchantApiResponse->data['errors']) &&
+                    isset($merchantApiResponse->data['errors'][0]['error']) &&
+                    $merchantApiResponse->data['errors'][0]['error'] == "Api_key_unauthorised"
+                ) {
+                    return $this->fetchMerchantWithStoreKey($notifyVendor);
+                }
+
+            } catch (\Exception $e) {
+                // Handle the exception
+                Yii::error('Error while decoding fetch merchant response [' . $this->name . '] ' . $e->getMessage());
             }
 
             Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
@@ -2887,6 +2895,8 @@ class Restaurant extends ActiveRecord
      */
     public function pollTapStatus()
     {
+        //todo: need something to avoid store with errors from Tap
+
         if(!$this->is_tap_business_active) {
             $this->pollTapBusinessStatus();
         }

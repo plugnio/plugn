@@ -47,7 +47,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php
             $response = Yii::$app->netlifyComponent->getSiteDns($model->restaurant->site_id);
 
-            if (sizeof($response->data) > 0) {
+            if (isset($response->data['message'])) {
+                echo "<p class='alert alert-danger'>Error from netlify: " . $response->data['message'] . "</p>";
+            } else if (sizeof($response->data) > 0) {
                 $arr = $response->data[sizeof($response->data) - 1];
 
                 echo "<p>DNS Servers: " . implode(", ", $arr['dns_servers']) . "</p>";
