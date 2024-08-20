@@ -127,10 +127,13 @@ class RestaurantDomainRequest extends \yii\db\ActiveRecord
         parent::afterSave ($insert, $changedAttributes);
 
         if (!$insert && isset($changedAttributes['status']) && $this->status == self::STATUS_ASSIGNED) {
+
+            $oldDomain = $this->restaurant->restaurant_domain;
+
             $this->restaurant->restaurant_domain = $this->domain;
             $this->restaurant->save(false);
 
-            $this->restaurant->notifyDomainUpdated();
+            $this->restaurant->notifyDomainUpdated($oldDomain, $this);
         }
 
         return true;

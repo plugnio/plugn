@@ -1091,9 +1091,8 @@ class Restaurant extends ActiveRecord
      * @param $old_domain
      * @return array
      */
-    public function notifyDomainUpdated($old_domain)
+    public function notifyDomainUpdated($old_domain, $restaurantDomainRequest = null)
     {
-
         if(!str_contains($this->restaurant_domain, '.plugn.')) {
             Yii::$app->eventManager->track('Custom Domain Activated', [
                     "old_domain" => $old_domain,
@@ -1106,13 +1105,14 @@ class Restaurant extends ActiveRecord
             );
         }
 
-
-        $model = new RestaurantDomainRequest;
-        $model->restaurant_uuid = $this->restaurant_uuid;
-        $model->created_by = Yii::$app->user->getId();
-        $model->domain = $this->restaurant_domain;
-        $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
-        $model->save(false);
+        if (!$restaurantDomainRequest) {
+            $restaurantDomainRequest = new RestaurantDomainRequest;
+            $restaurantDomainRequest->restaurant_uuid = $this->restaurant_uuid;
+            $restaurantDomainRequest->created_by = Yii::$app->user->getId();
+            $restaurantDomainRequest->domain = $this->restaurant_domain;
+            $restaurantDomainRequest->status = RestaurantDomainRequest::STATUS_ASSIGNED;
+            $restaurantDomainRequest->save(false);
+        }
 
         Yii::info("[Store Domain Updated] " . $this->name . " changed domain from " .
             $old_domain . " to " . $this->restaurant_domain, __METHOD__);
@@ -1161,7 +1161,7 @@ class Restaurant extends ActiveRecord
             }
         }
 
-        return self::message("success", "Congratulations you have successfully changed your domain name");
+        return self::message("success", "Domain assigned to store. Don't forgot to point A record to 75.2.60.5 if you connecting existing domain (domain managed by you). Please contact customer care if facing any issue.");
     }
 
     /**
@@ -1854,11 +1854,19 @@ class Restaurant extends ActiveRecord
 
             //$merchantApiResponse->data['errors'][0]['code'] == 2109
 
-            if(
-                isset($merchantApiResponse->data['errors'][0]['error']) &&
-                $merchantApiResponse->data['errors'][0]['error'] == "Api_key_unauthorised"
-            ) {
-                return $this->fetchMerchantWithStoreKey($notifyVendor);
+            try {
+
+                if(
+                    isset($merchantApiResponse->data['errors']) &&
+                    isset($merchantApiResponse->data['errors'][0]['error']) &&
+                    $merchantApiResponse->data['errors'][0]['error'] == "Api_key_unauthorised"
+                ) {
+                    return $this->fetchMerchantWithStoreKey($notifyVendor);
+                }
+
+            } catch (\Exception $e) {
+                // Handle the exception
+                Yii::error('Error while decoding fetch merchant response [' . $this->name . '] ' . $e->getMessage());
             }
 
             Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
@@ -2887,6 +2895,8 @@ class Restaurant extends ActiveRecord
      */
     public function pollTapStatus()
     {
+        //todo: need something to avoid store with errors from Tap
+
         if(!$this->is_tap_business_active) {
             $this->pollTapBusinessStatus();
         }
@@ -3309,6 +3319,8 @@ class Restaurant extends ActiveRecord
      */
     public function afterSave($insert, $changedAttributes)
     {
+        Yii::info($changedAttributes, "store after save called", );
+
         parent::afterSave($insert, $changedAttributes);
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
@@ -3410,11 +3422,41 @@ class Restaurant extends ActiveRecord
 
                 //call api
 
-                Yii::$app->netlifyComponent->updateSite($this->site_id, [
+                $response = Yii::$app->netlifyComponent->updateSite($this->site_id, [
                     'domain_aliases' => $domain,
                     'ssl' => true,
-                    'force_ssl' => true
+                   // 'force_ssl' => true
                 ]);
+
+                if ($response->isOk)
+                {
+                    Yii::info($response->data, "store netlify update site called");
+                } else {
+                    Yii::error(print_r($response->data, true), "netlify update site api error:");
+                }
+
+            } else if
+            (
+                !str_contains($this->restaurant_domain, ".plugn.site") &&
+                !str_contains($this->restaurant_domain, ".plugn.store")
+            ) //check if custom domain then publish to netlify as need ssl
+            {
+                $response = Yii::$app->netlifyComponent->createSite($this);
+
+                if ($response->isOk)
+                {
+                    self::updateAll([
+                        "version" => Yii::$app->params['storeVersion'],
+                        "site_id" => $response->data['site_id']
+                    ], [
+                       "restaurant_uuid" => $this->restaurant_uuid
+                    ]);
+
+                    Yii::info($response->data, "store netlify create site called");
+
+                } else {
+                    Yii::error(print_r($response->data, true), "netlify create site api error:");
+                }
             }
 
             /*$model = new RestaurantDomainRequest();

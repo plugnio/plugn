@@ -246,27 +246,27 @@ class RestaurantSearch extends Restaurant
                 ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"));
         }
 
-        $query->andFilterWhere(['like', 'country_id', $this->country_id])
-            ->andFilterWhere(['like', 'currency_id', $this->currency_id])
-            ->andFilterWhere(['like', 'license_number', $this->license_number])
-            ->andFilterWhere(['like', 'vendor_sector', $this->vendor_sector])
-            ->andFilterWhere(['like', 'store_layout', $this->store_layout])
-            ->andFilterWhere(['like', 'retention_email_sent', $this->retention_email_sent])
-            ->andFilterWhere(['like', 'referral_code', $this->referral_code])
-            ->andFilterWhere(['like', 'iban', $this->iban])
-            ->andFilterWhere(['business_entity_id', 'business_entity_id', $this->business_entity_id])
-            ->andFilterWhere(['like', 'wallet_id', $this->wallet_id])
-            ->andFilterWhere(['like', 'merchant_id', $this->merchant_id])
-            ->andFilterWhere(['like', 'operator_id', $this->operator_id])
-            ->andFilterWhere(['like', 'business_id', $this->business_id]);
+        $query->andFilterWhere(['like', 'restaurant.country_id', $this->country_id])
+            ->andFilterWhere(['like', 'restaurant.currency_id', $this->currency_id])
+            ->andFilterWhere(['like', 'restaurant.license_number', $this->license_number])
+            ->andFilterWhere(['like', 'restaurant.vendor_sector', $this->vendor_sector])
+            ->andFilterWhere(['like', 'restaurant.store_layout', $this->store_layout])
+            ->andFilterWhere(['like', 'restaurant.retention_email_sent', $this->retention_email_sent])
+            ->andFilterWhere(['like', 'restaurant.referral_code', $this->referral_code])
+            ->andFilterWhere(['like', 'restaurant.iban', $this->iban])
+            ->andFilterWhere(['business_entity_id', 'restaurant.business_entity_id', $this->business_entity_id])
+            ->andFilterWhere(['like', 'restaurant.wallet_id', $this->wallet_id])
+            ->andFilterWhere(['like', 'restaurant.merchant_id', $this->merchant_id])
+            ->andFilterWhere(['like', 'restaurant.operator_id', $this->operator_id])
+            ->andFilterWhere(['like', 'restaurant.business_id', $this->business_id]);
 
-        $query->andFilterWhere(['like', 'restaurant_uuid', $this->restaurant_uuid])
-            ->andFilterWhere(['like', 'restaurant_domain', $this->restaurant_domain])
-            ->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'version', $this->version])
+        $query->andFilterWhere(['like', 'restaurant.restaurant_uuid', $this->restaurant_uuid])
+            ->andFilterWhere(['like', 'restaurant.restaurant_domain', $this->restaurant_domain])
+            ->andFilterWhere(['like', 'restaurant.name', $this->name])
+            ->andFilterWhere(['like', 'restaurant.version', $this->version])
             ->andFilterWhere(['like', 'currency.title', $this->currency_title])
             //->andFilterWhere(['like', 'total_orders', $this->total_orders])
-            ->andFilterWhere(['like', 'name_ar', $this->name_ar]);
+            ->andFilterWhere(['like', 'restaurant.name_ar', $this->name_ar]);
 
         if ($this->total_orders) {
             if(str_contains($this->total_orders, ">") || str_contains($this->total_orders, "<")) {
