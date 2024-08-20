@@ -1,5 +1,6 @@
 <?php
 return [
+    "Domain assigned to store. Don't forgot to point A record to 75.2.60.5 if you connecting existing domain (domain managed by you). Please contact customer care if facing any issue." => "تم تعيين المجال للتخزين. لا تنس توجيه السجل A إلى 75.2.60.5 إذا كنت تقوم بتوصيل مجال موجود (domain تديره أنت). يرجى الاتصال بخدمة العملاء إذا واجهت أي مشكلة.",
     "Method not found!" => "لم يتم العثور على الطريقة!",
     "Invalid access token" => "تصريح الدخول غير صالح",
     "We've faced a problem creating your account, please contact us for assistance." => "لقد واجهنا مشكلة في إنشاء حسابك، يرجى الاتصال بنا للحصول على المساعدة.",
