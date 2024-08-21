@@ -314,6 +314,10 @@ class StoreController extends BaseController
         $domain = Yii::$app->request->getBodyParam('domain');
         $purchase = Yii::$app->request->getBodyParam('purchase');
 
+        if (!str_contains($domain, "http")) {
+            $domain = "https://" . $domain;
+        }
+
         $store = $this->findModel();// Yii::$app->accountManager->getManagedAccount();
 
         if ($store->restaurant_domain == $domain) {
