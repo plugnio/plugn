@@ -502,7 +502,9 @@ class Restaurant extends ActiveRecord
 // 'owner_number',
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
-            ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/',
+                'message' => 'Your store url can only contain alphanumeric characters',
+                'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
