@@ -432,6 +432,9 @@ class Restaurant extends ActiveRecord
     public function rules()
     {
         return [
+
+            [['is_deleted'], "default", "value" => 0],
+
             [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [
                 [
@@ -526,7 +529,7 @@ class Restaurant extends ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
-            [['is_public', 'is_deleted', 'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox', 'enable_cod_fee'], 'boolean'],
+            [['is_public',  'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox', 'enable_cod_fee'], 'boolean'],
             [['platform_fee', 'warehouse_fee', 'warehouse_delivery_charges'], 'number'],
             [['instagram_url'], 'url'],
             [['export_orders_data_in_specific_date_range', 'export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'google_tag_id', 'google_tag_manager_id', 'tiktok_pixel_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
@@ -615,14 +618,19 @@ class Restaurant extends ActiveRecord
             [['restaurant_email_notification', 'demand_delivery', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_tap_created', 'is_tap_business_active', 'is_myfatoorah_enable', 'supplierCode'], 'integer'],
             [['schedule_interval'], 'required', 'when' => function ($model) {
                 return $model->schedule_order;
-            }
-            ],
+            }],
             [['custom_subscription_price'], 'number', 'min' => 0],
             [['referral_code'], 'string', 'max' => 6],
             [['referral_code'], 'default', 'value' => null],
             ['restaurant_email', 'email'],
             [['enable_guest_checkout'], 'boolean'],
-            [['restaurant_uuid', 'restaurant_domain', 'name', 'owner_email'], 'unique'],
+            [['restaurant_uuid'], 'unique'],
+
+            //name, owner_email
+
+            [['restaurant_domain'], 'unique', 'comboNotUnique' => 'Domain already exist.',  'targetAttribute' => [
+                'restaurant_domain', 'is_deleted']],
+
             [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
             [['referral_code'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['referral_code' => 'referral_code']],
@@ -631,6 +639,9 @@ class Restaurant extends ActiveRecord
         ];
     }
 
+    /**
+     * @return array|array[]
+     */
     public function scenarios()
     {
         $scenarios = parent::scenarios();
