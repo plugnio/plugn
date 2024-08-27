@@ -2995,11 +2995,11 @@ class Restaurant extends ActiveRecord
             }
 
             if (!$imageURL) {
-                /*return [
-                    "operation" => "error",
-                    "message" => "Image not provided"
-                ];*/
-                return true;
+                return [
+                    "operation" => "success",
+                    "message" => "No image to upload"
+                ];
+                //return true;
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
@@ -3103,11 +3103,14 @@ class Restaurant extends ActiveRecord
             }
 
             if (!$imageURL) {
+                return [
+                    "operation" => "success",
+                    "message" => "No image to upload"
+                ];
                 /*return [
                     "operation" => "error",
                     "message" => "Image not provided"
                 ];*/
-                return true;
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
