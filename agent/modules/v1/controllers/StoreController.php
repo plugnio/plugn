@@ -1381,6 +1381,7 @@ class StoreController extends BaseController
         $transaction = Yii::$app->db->beginTransaction ();
 
         if($model->logo != $logo) {
+
             $response = $model->uploadLogo($logo, false);
 
             if($response['operation'] != "success") {

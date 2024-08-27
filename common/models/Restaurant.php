@@ -2995,11 +2995,11 @@ class Restaurant extends ActiveRecord
             }
 
             if (!$imageURL) {
-                return [
+                /*return [
                     "operation" => "error",
                     "message" => "Image not provided"
-                ];
-                //return true;
+                ];*/
+                return true;
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
@@ -3103,10 +3103,11 @@ class Restaurant extends ActiveRecord
             }
 
             if (!$imageURL) {
-                return [
+                /*return [
                     "operation" => "error",
                     "message" => "Image not provided"
-                ];
+                ];*/
+                return true;
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
@@ -3332,8 +3333,6 @@ class Restaurant extends ActiveRecord
      */
     public function afterSave($insert, $changedAttributes)
     {
-        Yii::info($changedAttributes, "store after save called", );
-
         parent::afterSave($insert, $changedAttributes);
 
         if ($this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT && $insert) {
