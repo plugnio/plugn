@@ -17,6 +17,13 @@ return [
                  // for the mailer to send real emails.
                  'useFileTransport' => true,
         ],
+        'eventManager' => [
+            'class' => 'common\components\EventManager',
+            "sqsRagion" => "eu-west-2",
+            "sqsKey" => "AKIAWMITDJRKXNWDOBNJ",
+            "sqsSecret" => "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",
+            "sqsQueue" => "438663597141/PlugnDev"
+        ],
         'walletManager' => [
             'class' => 'common\components\WalletManager',
             'apiKey' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
