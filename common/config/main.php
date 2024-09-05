@@ -141,9 +141,6 @@ return [
         'httpclient' => [
             'class' => 'yii\httpclient\Client',
         ],
-        'eventManager' => [
-            'class' => 'common\components\EventManager',
-        ],
         'jwt' => [
             'class' => 'common\components\JWT'
         ],

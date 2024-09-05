@@ -29,6 +29,13 @@ return [
             'schemaCache' => 'cache',
 
         ],
+        'eventManager' => [
+            'class' => 'common\components\EventManager',
+            "sqsRagion" => "eu-west-2",
+            "sqsKey" => "AKIAWMITDJRKXNWDOBNJ",
+            "sqsSecret" => "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",
+            "sqsQueue" => "438663597141/Plugn"
+        ],
         'walletManager' => [
             'class' => 'common\components\WalletManager',
             'apiKey' => 'imx4kpyVCXbi7sVy-zEvEITL63sQWisn',//QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG
