@@ -2,6 +2,8 @@
 namespace common\components;
 
 use agent\models\AgentAssignment;
+use Aws\Exception\AwsException;
+use Aws\Sqs\SqsClient;
 use Mpdf\Tag\P;
 use Yii;
 use yii\base\Component;
@@ -10,6 +12,12 @@ use yii\base\InvalidConfigException;
 class EventManager extends Component
 {
     private $_client;
+    private $_sqsClient;
+
+    public $sqsRagion;
+    public $sqsKey;
+    public $sqsSecret;
+    public $sqsQueue;
 
     /**
      * @var string Mixpanel key
@@ -86,8 +94,25 @@ class EventManager extends Component
             if($this->segmentKey)
                 \Segment::init($this->segmentKey);
         }
+
+        // Create an SQS client
+        if ($this->sqsSecret && $this->sqsKey && $this->sqsRagion)
+        {
+            $this->_sqsClient = new SqsClient([
+                'region' => $this->sqsRagion, // Replace with your region
+                'version' => 'latest',
+                'credentials' => [
+                    'key'    => $this->sqsKey, // Replace with your access key
+                    'secret' => $this->sqsSecret, // Replace with your secret key
+                ],
+            ]);
+        }
     }
 
+    /**
+     * @param $key
+     * @return void
+     */
     public function initSegment($key) {
 
         $this->segmentKey = $key;
@@ -253,6 +278,39 @@ class EventManager extends Component
             \Segment::track($data);
 
             \Segment::flush();
+        }
+
+        // send to queue
+
+        if ($this->_sqsClient && $this->sqsQueue) {
+            $queueUrl = 'https://sqs.' . $this->sqsRagion . '.amazonaws.com/' . $this->sqsQueue; // Replace with your queue URL
+
+            //if login and userId not provided
+
+            if(is_null($userId) && isset(Yii::$app->user) && !Yii::$app->user->isGuest) {
+                $userId = Yii::$app->user->getId();
+            }
+
+            if(!$userId) {
+                $userId = "anonymous";
+            }
+
+            $data = array_merge($eventData, [
+                "login_user_id" => $userId
+            ]);
+
+            try {
+                $result = $this->_sqsClient->sendMessage([
+                    'QueueUrl' => $queueUrl,
+                    'MessageBody' => json_encode($data),
+                ]);
+
+                Yii::debug("Message sent! Message ID: " . $result->get('MessageId'));
+
+            } catch (AwsException $e) {
+                echo $e->getMessage();
+                Yii::debug("Error sending message: " . $e->getMessage());
+            }
         }
     }
 

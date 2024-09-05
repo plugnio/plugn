@@ -55,6 +55,11 @@ class CronController extends \yii\console\Controller
         //print_r($response->data);//[sizeof($response->data) - 1]['dns_servers']
      //   records hostname
 
+        Yii::$app->eventManager->track(
+            'Test event',
+            [
+                'hello' => "world"
+            ]);
     }
 
     public function actionFixDuplicateAreas() {
