@@ -159,7 +159,7 @@ class RestaurantSearch extends Restaurant
         if($this->is_deleted) {
             $query->andFilterWhere(['restaurant.is_deleted' => $this->is_deleted]);
         } else {
-            $query->andFilterWhere(['restaurant.is_deleted' => 0]);
+        //    $query->andFilterWhere(['restaurant.is_deleted' => 0]);
         }
 
         if($this->ip_address) {
