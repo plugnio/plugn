@@ -22,6 +22,7 @@ class RestaurantSearch extends Restaurant
     public $has_not_deployed;
     public $noOrder;
     public $noItem;
+    public $active;
     public $notActive;
     public $notActive90Days;
     public $customDomain;
@@ -29,6 +30,7 @@ class RestaurantSearch extends Restaurant
 
     public $active15Days;
     public $notActive15Days;
+    public $notActive30Days;
 
     public $activeSubscription;
     public $noActiveSubscription;
@@ -37,13 +39,15 @@ class RestaurantSearch extends Restaurant
 
     public $storesWithPaymentGateway;
 
+    public  $notDeleted;
+
     /**
      * {@inheritdoc}
      */
      public function rules()
      {
          return [
-             [["active15Days", "notActive15Days", 'country_id', 'currency_id', 'license_number', 'vendor_sector', 'store_layout', 'enable_gift_message',
+             [["notDeleted", "active15Days", "notActive15Days", 'country_id', 'currency_id', 'license_number', 'vendor_sector', 'store_layout', 'enable_gift_message',
                  'retention_email_sent', 'referral_code', 'is_public', 'accept_order_247', 'iban', 'business_id',
                  'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                 'restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
@@ -51,6 +55,7 @@ class RestaurantSearch extends Restaurant
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
                  'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders',
                  'customDomain', 'noItem', 'notActive', 'ip_address', 'notActive90Days', "activeSubscription",
+                 "active",
                  "noActiveSubscription", "plugnDomain", "date_start", "date_end", "payment_method_id", "storesWithPaymentGateway"], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee','version'], 'number'],//'total_orders'
@@ -170,7 +175,7 @@ class RestaurantSearch extends Restaurant
             $query->andFilterWhere(['restaurant.ip_address' => $this->ip_address]);
         }
 
-        if($this->notActive) {
+        if($this->notActive30Days) {
             $query->andWhere("last_active_at IS NULL OR DATE(last_active_at) < DATE('".
                 date('Y-m-d', strtotime("-30 days"))."')");
         }
@@ -238,16 +243,21 @@ class RestaurantSearch extends Restaurant
         }
 
         if ($this->noActiveSubscription) {
-            $query->andFilterWhere(['platform_fee' => 0.05]);
-            /*$query->joinWith(['subscriptions'])
-                ->andWhere(new Expression("plan_id=1 OR subscription_status=".Subscription::STATUS_INACTIVE." OR 
-                    DATE(NOW()) < DATE(subscription_end_at)"));*/
+            $query->filterFree();
+
+           // $query->andWhere(new Expression('platform_fee=0.05'));
+            //$query->joinWith(['activeSubscription'])
+             //   ->andWhere(['plan_id' => 1]);
+                //->andWhere(new Expression("plan_id=1 OR subscription_status=".Subscription::STATUS_INACTIVE." OR
+                //    DATE(NOW()) < DATE(subscription_end_at)"));
         }
 
         if ($this->activeSubscription) {
-            $query->joinWith(['subscriptions'])
+            $query->filterPremium();
+
+            /*->joinWith(['subscriptions'])
                 ->andWhere(['plan_id' => 2, "subscription_status" => Subscription::STATUS_ACTIVE])
-                ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"));
+                ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"));*/
         }
 
         if ($this->payment_method_id) {
@@ -289,6 +299,18 @@ class RestaurantSearch extends Restaurant
 
         if ($this->storesWithPaymentGateway) {
             $query->filterStoresWithPaymentGateway();
+        }
+
+        if ($this->notDeleted) {
+            $query->andFilterWhere(['restaurant.is_deleted' => 0]);
+        }
+
+        if ($this->notActive) {
+            $query->inActive();
+        }
+
+        if ($this->active) {
+            $query->active();
         }
 
         if($this->country_name)

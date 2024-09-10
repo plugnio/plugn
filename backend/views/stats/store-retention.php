@@ -150,7 +150,7 @@ $this->title = 'Store Closer & Retention';
                         <div class="card-body">
 
                             <h5 class="card-title text-uppercase text-muted mb-0">Active Stores</h5>
-                            <span class="h2 font-weight-bold mb-0"><?= $totalStores - $inActiveStores ?></span>
+                            <span class="h2 font-weight-bold mb-0"><?= $totalStores - $noOrderIn15Days ?></span>
                             <p>Active store means having orders in last 15 days</p>
                             <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                                 <i class="fas fa-chart-bar"></i>

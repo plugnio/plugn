@@ -146,7 +146,29 @@ $this->title = 'Summary';
                     'RestaurantSearch[country_id]' => $country_id,
                     'RestaurantSearch[date_start]' => $date_start,
                     'RestaurantSearch[date_end]' => $date_end,
-                    'RestaurantSearch[notActive15Days]' => 1
+                    'RestaurantSearch[notActive15Days]' => 1,
+                ]) ?>">
+                    <div class="card card-stats mb-4 mb-xl-0">
+                        <div class="card-body">
+
+                            <h5 class="card-title text-uppercase text-muted mb-0">No order in 15 days</h5>
+                            <span class="h2 font-weight-bold mb-0"><?= $noOrderIn15Days ?></span>
+
+                            <p>Stores not having orders in last 15 days</p>
+                            <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div><!-- END .col-xl-3 -->
+
+            <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[country_id]' => $country_id,
+                    'RestaurantSearch[date_start]' => $date_start,
+                    'RestaurantSearch[date_end]' => $date_end,
+                    'RestaurantSearch[notActive]' => 1,
                 ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
@@ -154,7 +176,7 @@ $this->title = 'Summary';
                         <h5 class="card-title text-uppercase text-muted mb-0">In-active Stores</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $inActiveStores ?></span>
 
-                        <p>In-active means not having orders in last 15 days</p>
+                        <p>In-active means not having orders, items</p>
                         <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                             <i class="fas fa-chart-bar"></i>
                         </div>
@@ -168,14 +190,14 @@ $this->title = 'Summary';
                     'RestaurantSearch[country_id]' => $country_id,
                     'RestaurantSearch[date_start]' => $date_start,
                     'RestaurantSearch[date_end]' => $date_end,
-                    'RestaurantSearch[active15Days]' => 1
+                    'RestaurantSearch[active]' => 1,
                 ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
 
                         <h5 class="card-title text-uppercase text-muted mb-0">Active Stores</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $activeStores ?></span>
-                        <p>Active store means having orders in last 15 days</p>
+                        <p>Active store means having orders and/or items</p>
                         <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                             <i class="fas fa-chart-bar"></i>
                         </div>
@@ -202,7 +224,8 @@ $this->title = 'Summary';
                 <a href="<?= \yii\helpers\Url::to(['restaurant/index',
                     'RestaurantSearch[country_id]' => $country_id,
                     'RestaurantSearch[date_start]' => $date_start,
-                    'RestaurantSearch[date_end]' => $date_end
+                    'RestaurantSearch[date_end]' => $date_end,
+
                 ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
@@ -223,7 +246,8 @@ $this->title = 'Summary';
                     'RestaurantSearch[country_id]' => $country_id,
                     'RestaurantSearch[date_start]' => $date_start,
                     'RestaurantSearch[date_end]' => $date_end,
-                    "activeSubscription" => 1
+                    "RestaurantSearch[activeSubscription]" => 1,
+
                 ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
@@ -244,7 +268,8 @@ $this->title = 'Summary';
                     'RestaurantSearch[country_id]' => $country_id,
                     'RestaurantSearch[date_start]' => $date_start,
                     'RestaurantSearch[date_end]' => $date_end,
-                    "platform_fee" => 0.05
+                    "RestaurantSearch[noActiveSubscription]" => 1,
+
                 ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
@@ -265,7 +290,8 @@ $this->title = 'Summary';
                     'RestaurantSearch[country_id]' => $country_id,
                     'RestaurantSearch[date_start]' => $date_start,
                     'RestaurantSearch[date_end]' => $date_end,
-                    "storesWithPaymentGateway" => true
+                    "RestaurantSearch[storesWithPaymentGateway]" => true,
+
                 ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">

@@ -349,6 +349,12 @@ class Item extends \yii\db\ActiveRecord
             }
         }
 
+        if ($insert) {
+            $this->restaurant->updateCounters([
+                'total_items' => 1
+            ]);
+        }
+
         //Send event to Segment
 
         //not firing on insert as it will not have all data yet
@@ -358,8 +364,6 @@ class Item extends \yii\db\ActiveRecord
         }
 
         //if stock_qty changed
-
-        Yii::info($changedAttributes);
 
         if (
             !$insert &&
@@ -588,6 +592,10 @@ class Item extends \yii\db\ActiveRecord
 
             $variant->delete();
         }
+
+        $this->restaurant->updateCounters([
+            'total_items' => -1
+        ]);
 
         return parent::beforeDelete();
     }
