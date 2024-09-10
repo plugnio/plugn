@@ -16,6 +16,6 @@ class RestaurantPaymentMethodQuery  extends \yii\db\ActiveQuery
     }
 
     public function filterActive() {
-        return $this->andWhere(['status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
+        return $this->andWhere(['restaurant_payment_method.status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
     }
 }

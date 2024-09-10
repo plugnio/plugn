@@ -4,6 +4,10 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use common\models\Restaurant;
 
+$paymentMethodQuery = \common\models\PaymentMethod::find()->asArray()->all();
+$paymentMethodArray = \yii\helpers\ArrayHelper::map($paymentMethodQuery, 'payment_method_id', 'payment_method_name');
+$paymentMethodArray = [null => 'All'] + $paymentMethodArray;
+
 /* @var $this yii\web\View */
 /* @var $model backend\models\RestaurantSearch */
 /* @var $form yii\widgets\ActiveForm */
@@ -129,6 +133,12 @@ use common\models\Restaurant;
 
             <div class="col-md-3">
                 <?= $form->field($model, 'ip_address') ?>
+            </div>
+
+            <div class="col-md-3">
+                <?= $form->field($model, 'payment_method_id')
+                    ->label("Payment Method")
+                    ->dropDownList($paymentMethodArray); ?>
             </div>
 
             <div class="col-md-3">
