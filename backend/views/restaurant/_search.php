@@ -119,10 +119,13 @@ $paymentMethodArray = [null => 'All'] + $paymentMethodArray;
                 <?= $form->field($model, 'name_ar') ?>
             </div>
             <div class="col-md-3">
-                <?= $form->field($model, 'platform_fee') ?>
+                <?= $form->field($model, 'platform_fee')
+                    ->hint("Our commission") ?>
             </div>
             <div class="col-md-3">
-            <?= $form->field($model, 'has_deployed')->dropDownList([
+            <?= $form->field($model, 'has_deployed')
+                ->hint("Deployed to netlify")
+                ->dropDownList([
                 null => 'All',
                 1 => 'Yes',
                 0 =>'No',
@@ -144,39 +147,66 @@ $paymentMethodArray = [null => 'All'] + $paymentMethodArray;
             <div class="col-md-3">
                 <?php echo $form->field($model, 'noOrder')->checkbox(['label' => 'No order in last 30 days']) ?>
             </div>
+
             <div class="col-md-3">
-                <?php echo $form->field($model, 'noItem')->checkbox(['label' => 'No item added yet']) ?>
+                <?php echo $form->field($model, 'noItem')
+                    ->checkbox(['label' => 'No item added yet']) ?>
             </div>
+
             <div class="col-md-3">
-                <?php echo $form->field($model, 'notActive')->checkbox(['label' => 'In-active for last 30 days']) ?>
+                <?php echo $form->field($model, 'notActive')
+                    ->hint("No order and items")
+                    ->checkbox(['label' => 'In-active']) ?>
             </div>
+
+            <div class="col-md-3">
+                <?php echo $form->field($model, 'active')
+                    ->hint("Having order and/or items")
+                    ->checkbox(['label' => 'Active stores']) ?>
+            </div>
+
             <div class="col-md-3">
                 <?php echo $form->field($model, 'notActive90Days')
+                    ->hint("Dashboard not accessed in 90 days")
                     ->checkbox(['label' => 'In-active for last 90 days']) ?>
             </div>
             <div class="col-md-3">
-                <?php echo $form->field($model, 'is_tap_enable')->checkbox([]) ?>
+                <?php echo $form->field($model, 'is_tap_enable')
+                    ->hint("Tap payment enabled")
+                    ->checkbox([]) ?>
             </div>
             <div class="col-md-3">
-                <?php echo $form->field($model, 'is_myfatoorah_enable')->checkbox([]) ?>
+                <?php echo $form->field($model, 'is_myfatoorah_enable')
+                    ->hint("Myfatoorah delivery enabled")
+                    ->checkbox([]) ?>
             </div>
             <div class="col-md-3">
-                <?php echo $form->field($model, 'customDomain')->checkbox([]) ?>
+                <?php echo $form->field($model, 'customDomain')
+                    ->hint("With custom domain/ url")
+                    ->checkbox([]) ?>
             </div>
             <!--
             <div class="col-md-3">
-                <?php echo $form->field($model, 'has_deployed')->checkbox([]) ?>
+                <?php echo $form->field($model, 'has_deployed')
+                    ->hint("Hosted on netlify")
+                    ->checkbox([]) ?>
             </div>
             <div class="col-md-3">
-                <?php echo $form->field($model, 'has_not_deployed')->checkbox([]) ?>
+                <?php echo $form->field($model, 'has_not_deployed')
+                    ->hint("Not hosted on netlify")
+                    ->checkbox([]) ?>
             </div>-->
 
             <div class="col-md-3">
-                <?php echo $form->field($model, 'is_sandbox')->checkbox([]) ?>
+                <?php echo $form->field($model, 'is_sandbox')
+                    ->hint("Store under testing")
+                    ->checkbox([]) ?>
             </div>
 
             <div class="col-md-3">
-                <?php echo $form->field($model, 'is_under_maintenance')->checkbox([]) ?>
+                <?php echo $form->field($model, 'is_under_maintenance')
+                    ->hint("Store flagged under maintenance")
+                    ->checkbox([]) ?>
             </div>
             <div class="col-md-3">
                 <?php echo $form->field($model, 'enable_debugger')->checkbox([
@@ -184,16 +214,29 @@ $paymentMethodArray = [null => 'All'] + $paymentMethodArray;
                 ]) ?>
             </div>
             <div class="col-md-3">
-                <?php echo $form->field($model, 'is_deleted')->checkbox([]) ?>
+                <?php echo $form->field($model, 'is_deleted')
+                    ->hint("Deleted by user or for inactivity")
+                    ->checkbox([]) ?>
             </div>
+
             <div class="col-md-3">
-                <?php echo $form->field($model, 'activeSubscription')->checkbox([]) ?>
+                <?php echo $form->field($model, 'notDeleted')
+                    ->hint("Store not deleted")
+                    ->checkbox([]) ?>
             </div>
-<!--
+
             <div class="col-md-3">
-                <?php echo $form->field($model, 'noActiveSubscription')->checkbox([]) ?>
+                <?php echo $form->field($model, 'activeSubscription')
+                    ->hint("Having premium plan")
+                    ->checkbox([]) ?>
             </div>
--->
+
+            <div class="col-md-3">
+                <?php echo $form->field($model, 'noActiveSubscription')
+                    ->hint("No premium plan")
+                    ->checkbox([]) ?>
+            </div>
+
         </div>
     </div>
 

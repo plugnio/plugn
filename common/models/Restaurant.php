@@ -137,6 +137,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $last_active_at
  * @property string|null $last_order_at
  * @property number $total_orders
+ * @property number $total_items
  * @property boolean $enable_guest_checkout
  * @property string $owner_name_title
  * @property string $owner_middle_name
@@ -471,7 +472,7 @@ class Restaurant extends ActiveRecord
                 self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT
             ]],
 
-            [['not_for_profit', 'total_orders'], 'number'],
+            [['not_for_profit', 'total_orders', "total_items"], 'number'],
 
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             ['owner_email', 'email'],

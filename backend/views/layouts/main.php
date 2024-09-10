@@ -53,7 +53,7 @@ AppAsset::register($this);
                     ['label' => 'Countries', 'url' => ['/stats/countries']],
                     ['label' => 'Payment Gateways', 'url' => ['/stats/payment-gateways']],
                     ['label' => 'Sales & Revenue', 'url' => ['/stats/sales']],
-                    ['label' => 'Store Closer & Retention', 'url' => ['/stats/store-retention']],
+                    //['label' => 'Store Closer & Retention', 'url' => ['/stats/store-retention']],
                     ['label' => 'Customer Funnel', 'url' => ['/stats/customer-funnel']],
                     ['label' => 'Business Category', 'url' => ['/stats/graph-category']],
                     ['label' => 'Clear Cache', 'url' => ['/stats/clear-cache']],

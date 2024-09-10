@@ -147,6 +147,16 @@ class StatsController extends Controller
 
         }, $cacheDuration, $storeCacheDependency);
 
+        $totalFreeStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->filterByDateRange($date_start, $date_end)
+                ->filterFree()
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
+
         $totalStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
             return Restaurant::find()
@@ -156,19 +166,38 @@ class StatsController extends Controller
 
         }, $cacheDuration, $storeCacheDependency);
 
-        $totalFreeStores = $totalStores - $totalPremium;
+        //$totalFreeStores = $totalStores - $totalPremium;
 
-        $inActiveStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+        $noOrderIn15Days = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
             return Restaurant::find()
                 ->filterByCountry($country_id)
-                ->filterByNoOrderIn30Days()
+                ->filterByNoOrderInDays(15)
                 ->filterByDateRange($date_start, $date_end)
                 ->count();
 
         }, $cacheDuration, $storeCacheDependency);
 
-        $activeStores = $totalStores - $inActiveStores;
+        $inActiveStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                //->filterByNoOrderIn30Days()
+                ->inActive()
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
+
+        }, $cacheDuration, $storeCacheDependency);
+
+        $activeStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->active()
+                ->filterByDateRange($date_start, $date_end)
+                ->count();//new Expression("DISTINCT('restaurant_uuid')")
+
+        }, $cacheDuration, $storeCacheDependency);
 
         $totalStoresWithPaymentGateway = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
@@ -203,6 +232,7 @@ class StatsController extends Controller
         return $this->render('index', [
             "date_start" => $date_start,
             "date_end" => $date_end,
+                 "noOrderIn15Days" => $noOrderIn15Days,
                  "inActiveStores" => $inActiveStores,
                  "activeStores" => $activeStores,
                  "country_id" => $country_id,
@@ -419,11 +449,21 @@ class StatsController extends Controller
 
         }, $cacheDuration, $cacheDependency);
 
-        $inActiveStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+        $noOrderIn15Days = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
 
             return Restaurant::find()
                 ->filterByCountry($country_id)
                 ->filterByNoOrderInDays(15)
+                ->filterByDateRange($date_start, $date_end)
+                ->count();
+
+        }, $cacheDuration, $cacheDependency);
+
+        $inActiveStores = Restaurant::getDb()->cache(function($db) use($country_id, $date_start, $date_end) {
+
+            return Restaurant::find()
+                ->filterByCountry($country_id)
+                ->inActive()
                 ->filterByDateRange($date_start, $date_end)
                 ->count();
 
@@ -435,6 +475,8 @@ class StatsController extends Controller
         return $this->render('store-retention', [
             "totalStores" => $totalStores,
             "inActiveStores" => $inActiveStores,
+            "activeStores" => $totalStores - $inActiveStores,
+            "noOrderIn15Days" => $noOrderIn15Days,
             "date_start" => $date_start,
             "date_end" => $date_end,
             "country_id" => $country_id,
