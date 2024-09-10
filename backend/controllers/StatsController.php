@@ -301,7 +301,7 @@ class StatsController extends Controller
 
             return  RestaurantPaymentMethod::find()
                 ->joinWith(['paymentMethod'])
-                ->select(new Expression('payment_method.payment_method_name, COUNT(*) as total'))
+                ->select(new Expression('payment_method.payment_method_id, payment_method.payment_method_name, COUNT(*) as total'))
                 ->filterByCountry($country_id)
                 ->filterActive()
                 ->groupBy('restaurant_payment_method.payment_method_id')

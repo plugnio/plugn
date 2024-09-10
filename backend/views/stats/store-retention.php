@@ -69,6 +69,9 @@ $this->title = 'Store Closer & Retention';
     .icon {
         width: 3rem;
         height: 3rem;
+        position: absolute;
+        right: 25px;
+        top: 25px;
     }
 
     .icon i {
@@ -148,7 +151,7 @@ $this->title = 'Store Closer & Retention';
 
                             <h5 class="card-title text-uppercase text-muted mb-0">Active Stores</h5>
                             <span class="h2 font-weight-bold mb-0"><?= $totalStores - $inActiveStores ?></span>
-                            <p>Having orders in last 15 days</p>
+                            <p>Active store means having orders in last 15 days</p>
                             <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                                 <i class="fas fa-chart-bar"></i>
                             </div>
@@ -169,7 +172,7 @@ $this->title = 'Store Closer & Retention';
 
                             <h5 class="card-title text-uppercase text-muted mb-0">In-active Stores</h5>
                             <span class="h2 font-weight-bold mb-0"><?= $inActiveStores ?></span>
-                            <p>Not having orders in last 15 days</p>
+                            <p>In-active store means not having orders in last 15 days</p>
 
                             <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                                 <i class="fas fa-chart-bar"></i>

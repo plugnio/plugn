@@ -69,6 +69,9 @@ $this->title = 'Stores with Payment Gateways';
     .icon {
         width: 3rem;
         height: 3rem;
+        position: absolute;
+        right: 25px;
+        top: 25px;
     }
 
     .icon i {
@@ -137,6 +140,9 @@ $this->title = 'Stores with Payment Gateways';
 
             <?php foreach ($storesByPaymentMethods as $storesByPaymentMethod) { ?>
                 <div class="col-xl-3 col-lg-4">
+                    <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                        'RestaurantSearch[payment_method_id]' => $storesByPaymentMethod['payment_method_id']
+                    ]) ?>">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
                             <h5 class="card-title text-uppercase text-muted mb-0"><?= $storesByPaymentMethod['payment_method_name'] ?></h5>
@@ -147,10 +153,14 @@ $this->title = 'Stores with Payment Gateways';
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div>
             <?php } ?>
 
             <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[is_tap_enable]' => true
+                ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-muted mb-0">
@@ -162,6 +172,7 @@ $this->title = 'Stores with Payment Gateways';
                         </div>
                     </div>
                 </div>
+                </a>
             </div>
 
         </div>

@@ -2869,7 +2869,7 @@ class Restaurant extends ActiveRecord
     public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
     {
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere(['status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
+            ->andWhere(['restaurant_payment_method.status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
     }
 
     public function onTapCreated()

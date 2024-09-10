@@ -33,6 +33,10 @@ class RestaurantSearch extends Restaurant
     public $activeSubscription;
     public $noActiveSubscription;
 
+    public $payment_method_id;
+
+    public $storesWithPaymentGateway;
+
     /**
      * {@inheritdoc}
      */
@@ -47,7 +51,7 @@ class RestaurantSearch extends Restaurant
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
                  'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders',
                  'customDomain', 'noItem', 'notActive', 'ip_address', 'notActive90Days', "activeSubscription",
-                 "noActiveSubscription", "plugnDomain", "date_start", "date_end", ], 'safe'],
+                 "noActiveSubscription", "plugnDomain", "date_start", "date_end", "payment_method_id", "storesWithPaymentGateway"], 'safe'],
              [['restaurant_status'], 'integer'],
              [['platform_fee','version'], 'number'],//'total_orders'
          ];
@@ -246,6 +250,11 @@ class RestaurantSearch extends Restaurant
                 ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"));
         }
 
+        if ($this->payment_method_id) {
+            $query->joinWith(['restaurantPaymentMethods'])
+                ->andWhere(['restaurant_payment_method.payment_method_id' => $this->payment_method_id]);//, "restaurant_payment_method.status" => 1
+        }
+
         $query->andFilterWhere(['like', 'restaurant.country_id', $this->country_id])
             ->andFilterWhere(['like', 'restaurant.currency_id', $this->currency_id])
             ->andFilterWhere(['like', 'restaurant.license_number', $this->license_number])
@@ -276,6 +285,10 @@ class RestaurantSearch extends Restaurant
             } else {
                 $query->andWhere(["total_orders" => $this->total_orders]);
             }
+        }
+
+        if ($this->storesWithPaymentGateway) {
+            $query->filterStoresWithPaymentGateway();
         }
 
         if($this->country_name)
