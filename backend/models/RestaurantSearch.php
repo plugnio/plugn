@@ -41,13 +41,15 @@ class RestaurantSearch extends Restaurant
 
     public  $notDeleted;
 
+    public $haveArmada;
+
     /**
      * {@inheritdoc}
      */
      public function rules()
      {
          return [
-             [["notDeleted", "active15Days", "notActive15Days", 'country_id', 'currency_id', 'license_number', 'vendor_sector', 'store_layout', 'enable_gift_message',
+             [["haveArmada", "notDeleted", "active15Days", "notActive15Days", 'country_id', 'currency_id', 'license_number', 'vendor_sector', 'store_layout', 'enable_gift_message',
                  'retention_email_sent', 'referral_code', 'is_public', 'accept_order_247', 'iban', 'business_id',
                  'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
                 'restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
@@ -311,6 +313,10 @@ class RestaurantSearch extends Restaurant
 
         if ($this->active) {
             $query->active();
+        }
+
+        if ($this->haveArmada) {
+            $query->andWhere(new Expression('armada_api_key IS NOT NULL'));
         }
 
         if($this->country_name)

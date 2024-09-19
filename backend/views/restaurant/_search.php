@@ -237,6 +237,14 @@ $paymentMethodArray = [null => 'All'] + $paymentMethodArray;
                     ->checkbox([]) ?>
             </div>
 
+            <div class="col-md-3">
+                <?php echo $form->field($model, 'haveArmada')
+                    ->hint("Have armada delivery")
+                    ->checkbox([]) ?>
+            </div>
+
+
+
         </div>
     </div>
 
