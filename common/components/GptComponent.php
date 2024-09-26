@@ -2,12 +2,14 @@
 
 namespace common\components;
 
+use Yii;
+use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\httpclient\Client;
 
-class GptComponent
+class GptComponent extends Component
 {
-    public $apiEndpoint = 'http://localhost:3000/api/';
+    public $apiEndpoint = 'http://localhost:8083/';
 
     public $token;
 
@@ -40,7 +42,7 @@ class GptComponent
             ->setFormat(Client::FORMAT_JSON)
             ->setData($data)
             ->addHeaders([
-                'Authorization' => $this->token,//'Bearer ' .
+                'Authorization' =>'Bearer ' . $this->token,
                 'User-Agent' => 'request',
             ])
             ->send();

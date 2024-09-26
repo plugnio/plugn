@@ -35,6 +35,11 @@ return [
                 ],
             ],
         ],
+        'gpt' => [
+            'class' => 'common\components\GptComponent',
+            'token' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+            'apiEndpoint' => 'http://localhost:8083/'
+        ],
         'mailer' => [
                  'class' => 'yii\swiftmailer\Mailer',
                  'viewPath' => '@common/mail',

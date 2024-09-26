@@ -175,6 +175,17 @@ class RestaurantController extends Controller {
         ]);
     }
 
+    public function actionSyncAI($id)
+    {
+        $store = $this->findModel($id);
+
+        $store->generateGPTTrainingData();
+
+        Yii::$app->session->addFlash('success', "Item data synced!");
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
+
     public function actionFilter() {
 
         $searchModel = new RestaurantSearch();

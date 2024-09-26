@@ -27,11 +27,15 @@ return [
             'schemaCacheDuration' => 300, // 5 mnts
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
-
         ],
         'walletManager' => [
             'class' => 'common\components\WalletManager',
             'apiKey' => 'imx4kpyVCXbi7sVy-zEvEITL63sQWisn',//QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG
+        ],
+        'gpt' => [
+            'class' => 'common\components\GptComponent',
+            'token' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+            'apiEndpoint' => 'http://ec2-18-169-243-163.eu-west-2.compute.amazonaws.com:8083/'
         ],
         'resourceManager' => [
             'class' => 'common\components\S3ResourceManager',

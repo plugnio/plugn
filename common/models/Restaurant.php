@@ -929,18 +929,21 @@ class Restaurant extends ActiveRecord
 
     public function generateGPTTrainingData() {
 
-        $query = $this->getItems()->filterPublished()->limit(2);
+        $query = $this->getItems()->filterPublished();
+        //->limit(2);
 
         $jsonItems = [];
 
-        foreach ($query->batch() as $items) {
+        foreach ($query->batch(100) as $items) {
             foreach ($items as $item) {
                 $jsonItems[] = [
                     "item_uuid" => $item->item_uuid,
-                    "name" => $item->item_name,
-                    "name_arabic" => $item->item_name_ar,
+                    "item_name" => $item->item_name,
+                    "item_name_ar" => $item->item_name_ar,
                     "item_description" => $item->item_description,
-                    "item_description_arabic" => $item->item_description_ar,
+                    "item_description_ar" => $item->item_description_ar,
+                    "slug" => $item->slug,
+                    //"itemImages" => $item->getItemImages()->all()
                 ];
             }
         }
@@ -954,7 +957,7 @@ class Restaurant extends ActiveRecord
         and start sending message to thread
          */
 
-        Yii::$app->gpt->call($method, $url, $data = []);
+        Yii::$app->gpt->call("POST", "sync/" . $this->restaurant_uuid, $jsonItems);
 
         //echo json_encode($jsonItems, JSON_UNESCAPED_UNICODE);
         //$this->uploadChatGPTTrainingData($jsonItems);

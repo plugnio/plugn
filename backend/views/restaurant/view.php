@@ -126,6 +126,8 @@ $this->registerJs($js);
         <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
 -->
 
+        <?= Html::a('Sync AI', ['sync-ai', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+
     </p>
 
     <ul class="nav nav-tabs" id="tabs">
