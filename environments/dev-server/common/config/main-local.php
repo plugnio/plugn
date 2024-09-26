@@ -28,6 +28,11 @@ return [
             "sqsSecret" => "1iP9n9PlN2TkZrpYrHjYDa8uv45kFKnFQaGUATZo",
             "sqsQueue" => "438663597141/PlugnDev"
         ],
+        'gpt' => [
+            'class' => 'common\components\GptComponent',
+            'token' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+            'apiEndpoint' => 'http://localhost:8083/'
+        ],
         'resourceManager' => [
             'class' => 'common\components\S3ResourceManager',
             'region' => 'eu-west-2', // Bucket based in London

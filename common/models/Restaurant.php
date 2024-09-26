@@ -944,6 +944,84 @@ class Restaurant extends ActiveRecord
         return "Couldnt find a status";
     }
 
+    public function generateGPTTrainingData() {
+
+        $query = $this->getItems()->filterPublished();
+        //->limit(2);
+
+        $jsonItems = [];
+
+        foreach ($query->batch(100) as $items) {
+            foreach ($items as $item) {
+                $jsonItems[] = [
+                    "item_uuid" => $item->item_uuid,
+                    "item_name" => $item->item_name,
+                    "item_name_ar" => $item->item_name_ar,
+                    "item_description" => $item->item_description,
+                    "item_description_ar" => $item->item_description_ar,
+                    "slug" => $item->slug,
+                    //"itemImages" => $item->getItemImages()->all()
+                ];
+            }
+        }
+
+        /**
+        - create json file from database
+        - call create assistant api and save assistant id for reference
+        - call create vector api with file paths (from first step), assistant_id, restaurant_uuid. This will attach vector to assistant.
+        - start message thread
+        - listen to thread and assistant at /api/thread/stream/<asst_id>/<thread_id> from client app
+        and start sending message to thread
+         */
+
+        Yii::$app->gpt->call("POST", "sync/" . $this->restaurant_uuid, $jsonItems);
+
+        //echo json_encode($jsonItems, JSON_UNESCAPED_UNICODE);
+        //$this->uploadChatGPTTrainingData($jsonItems);
+    }
+
+    public function uploadChatGPTTrainingData($content) {
+
+        try {
+
+            $output = Yii::$app->security->generateRandomString();
+
+            $extension = "jsonl";
+            $content_type = "application/jsonl";
+
+            $file_s3_path = 'training-data/' . $output . '.' . $extension;;
+
+            Yii::$app->resourceManager->saveContent($file_s3_path, $content, [], $content_type);
+
+            $attachment = new RestaurantTrainingFiles;
+            $attachment->restaurant_uuid = $this->restaurant_uuid;
+            $attachment->file_path = $file_s3_path;
+            // $attachment->gpt_file_id = null;
+            // $attachment->gpt_fine_tuning_job_id = null;
+            // $attachment->gpt_fine_tuning_job_status = null;
+            // $attachment->gpt_fine_tuned_model = null;
+            $attachment->save();
+
+            //todo: remove old model + file?
+
+        } catch (\Aws\S3\Exception\S3Exception $e) {
+
+            Yii::error($e->getMessage(), 'agent');
+
+            //$this->addError('attachments', Yii::t('app', 'Please try again.'));
+
+            return false;
+
+        } catch (\Exception $e) {
+
+            Yii::error($e->getMessage(), 'agent');
+
+            //$this->addError('candidate_video', Yii::t('app', 'Video not available to save.'));
+
+            return false;
+        }
+    }
+
     /**
      * Upload a File from AWS to cloudinary
      * @param $file_path
