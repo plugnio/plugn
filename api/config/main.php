@@ -477,6 +477,17 @@ return [
                         'OPTIONS get-latest-order/<restaurant_uuid>' => 'options',
                     ]
                 ],
+                [//ChatController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/chat',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST <id>' => 'chat',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options'
+                    ]
+                ],
             ],
         ],
     ],
