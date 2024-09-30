@@ -115,15 +115,18 @@ class OrderItem extends \yii\db\ActiveRecord {
 
         if($this->item->item_type == Item::TYPE_SIMPLE) {
             if($this->qty > $this->item->stock_qty) {
-                $this->addError($attribute, Yii::t('app', 'Item out of stock'));
+                $this->addError($attribute, Yii::t('app', 'Item out of stock:'));
+                $this->addError($attribute, Yii::$app->language == "ar"? $this->item->item_name_ar :  $this->item->item_name);
             }
         } else {
             if(!$this->variant) {
-                $this->addError($attribute, Yii::t('app', 'Variant detail missing'));
+                $this->addError($attribute, Yii::t('app', 'Variant detail missing:'));
+                $this->addError($attribute, Yii::$app->language == "ar"? $this->item->item_name_ar :  $this->item->item_name);
             }
             else if($this->qty > $this->variant->stock_qty)
             {
-                $this->addError($attribute, Yii::t('app', 'Variant out of stock'));
+                $this->addError($attribute, Yii::t('app', 'Variant out of stock:'));
+                $this->addError($attribute, Yii::$app->language == "ar"? $this->item->item_name_ar :  $this->item->item_name);
             }
         }
     }

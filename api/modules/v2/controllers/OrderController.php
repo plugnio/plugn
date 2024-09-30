@@ -4,6 +4,8 @@ namespace api\modules\v2\controllers;
 
 use agent\models\PaymentMethod;
 use common\models\Area;
+use common\models\Item;
+use common\models\ItemVariant;
 use common\models\PaymentFailed;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -167,6 +169,13 @@ class OrderController extends BaseController
         ];
     }
 
+    /**
+     * @param $order
+     * @param $restaurant
+     * @return array|void
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\db\Exception
+     */
     private function _updateOrderData($order, $restaurant) {
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -1626,6 +1635,66 @@ class OrderController extends BaseController
                 'message' => 'Invalid Delivery code',
             ];
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function actionValidateCart() {
+        $cart_items = Yii::$app->request->getBodyParam("cart_items");
+
+        $errors = [];
+
+        $items = [];
+
+        foreach ($cart_items as $cart_item) {
+
+            $item = Item::find()
+                ->andWhere(['item_uuid' => $cart_item['item_uuid']])
+                ->one();
+
+            if (!$item) {
+                $errors[$cart_item['item_uuid']] = Yii::t('app', 'Item no more available.');
+                continue;
+            }
+
+            $items[$item->item_uuid] = $item;
+
+            if(!$item->track_quantity) {
+                continue;
+            }
+
+            if ($item->item_type == Item::TYPE_SIMPLE) {
+                if ($cart_item['qty'] > $item->stock_qty) {
+                    $errors[$cart_item['item_uuid']] = Yii::t('app', 'Item out of stock.');
+                }
+            } else {
+                if (empty($cart_item['item_variant_uuid'])) {
+                    $errors[$cart_item['item_uuid']] = Yii::t('app', 'Variant detail missing.');
+                    continue;
+                }
+
+                $variant = ItemVariant::find()
+                    ->andWhere(['item_variant_uuid' => $cart_item['item_variant_uuid']])
+                    ->one();
+
+                $items[$item->item_uuid]['variant'] = $variant;
+
+                if (!$variant) {
+                    $errors[$cart_item['item_uuid']] = Yii::t('app', 'Variant detail missing.');
+                    continue;
+                }
+
+                if ($cart_item['qty'] > $variant->stock_qty) {
+                    $errors[$cart_item['item_uuid']] = Yii::t('app', 'Variant out of stock.');
+                }
+            }
+        }
+
+        return [
+            "errors" => $errors,
+            "items" => $items
+        ];
     }
 
     /**
