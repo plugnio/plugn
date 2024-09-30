@@ -175,7 +175,7 @@ class RestaurantController extends Controller {
         ]);
     }
 
-    public function actionSyncAI($id)
+    public function actionSyncAi($id)
     {
         $store = $this->findModel($id);
 

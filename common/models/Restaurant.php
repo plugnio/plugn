@@ -965,6 +965,19 @@ class Restaurant extends ActiveRecord
             }
         }
 
+        $customerCare = "Email:" . $this->restaurant_email;
+
+        if ($this->phone_number_display && $this->phone_number) {
+            $customerCare .= " Contact number: " . $this->phone_number_country_code ." " . $this->phone_number;
+        }
+
+        //todo: admin and/or vendor defined data 
+
+        $jsonItems[] = [
+            "key" => "customer care details",
+            "value" => $customerCare
+        ];
+
         /**
         - create json file from database
         - call create assistant api and save assistant id for reference
