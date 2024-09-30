@@ -365,6 +365,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET download-invoice/<id>' => "download-invoice",
+                        "POST validate-cart" => "validate-cart",
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST init-order/<id>' => 'init-order',
                         'POST apply-promo-code/<order_uuid>' => 'apply-promo-code',
@@ -378,7 +379,8 @@ return [
                         'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS download-invoice/<id>' =>'options',
+                        "OPTIONS validate-cart" => 'options',
+                        'OPTIONS download-invoice/<id>' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS init-order/<id>' => 'options',
                         'OPTIONS instruction/<order_uuid>' => 'options',
@@ -419,6 +421,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET download-invoice/<id>' => "download-invoice",
+                        "POST validate-cart" => "validate-cart",
                         'POST payment-webhook' => 'payment-webhook',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST update-armada-order-status' => 'update-armada-order-status',
@@ -435,6 +438,7 @@ return [
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        "OPTIONS validate-cart" => "options",
                         'OPTIONS download-invoice/<id>' => 'options',
                         'OPTIONS payment-webhook' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
