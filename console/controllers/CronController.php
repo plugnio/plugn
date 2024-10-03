@@ -8,6 +8,7 @@ use api\models\City;
 use common\models\Agent;
 use common\models\CustomerAddress;
 use common\models\MailLog;
+use common\models\RestaurantChatBotQueue;
 use Yii;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
@@ -1062,6 +1063,26 @@ class CronController extends \yii\console\Controller
      * @return void
      */
     public function actionHour() {
+
+       /* if (YII_ENV != 'prod') {
+            return null;
+        }*/
+
+        $query = RestaurantChatBotQueue::find([
+                'status' => RestaurantChatBotQueue::STATUS_PENDING,
+            ])
+            ->joinWith(['restaurant']);
+
+        foreach ($query->batch() as $rows) {
+            foreach ($rows as $row) {
+                //$row->status = RestaurantChatBotQueue::STATUS_PROCESSING;
+                //$row->save();
+
+                $row->restaurant->generateGPTTrainingData();
+
+                $row->delete();
+            }
+        }
     }
 
     /**

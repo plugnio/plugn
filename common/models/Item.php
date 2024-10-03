@@ -349,6 +349,40 @@ class Item extends \yii\db\ActiveRecord
             }
         }
 
+        //check if chatbot enabled
+
+        $isChatbotActivated = RestaurantAddon::find()
+            ->joinWith(['addon'])
+            ->andWhere([
+                'restaurant_addon.restaurant_uuid' => $this->restaurant_uuid,
+                "addon.slug" => "chatbot"
+            ])
+            ->one();
+
+        if (
+            $isChatbotActivated && (
+                $insert ||
+                isset($changedAttributes['item_name']) ||
+                isset($changedAttributes['item_name_ar']) ||
+                isset($changedAttributes['item_description']) ||
+                isset($changedAttributes['item_description_ar'])
+            )
+        ) {
+            $botQueue = RestaurantChatBotQueue::find()
+                ->andWhere([
+                    'status' => RestaurantChatBotQueue::STATUS_PENDING,
+                    'restaurant_uuid' => $this->restaurant_uuid
+                ])
+                ->one();
+
+            if (!$botQueue) {
+                $botQueue = new RestaurantChatBotQueue;
+                $botQueue->status = RestaurantChatBotQueue::STATUS_PENDING;
+                $botQueue->restaurant_uuid = $this->restaurant_uuid;
+                $botQueue->save();
+            }
+        }
+
         if ($insert) {
             $this->restaurant->updateCounters([
                 'total_items' => 1
