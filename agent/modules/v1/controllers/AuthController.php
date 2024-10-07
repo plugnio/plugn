@@ -232,7 +232,11 @@ class AuthController extends BaseController {
         $store_id = Yii::$app->request->getBodyParam('store_id');
 
         $model = Agent::find()
-            ->andWhere(['agent_auth_key' => $auth_key])
+            ->andWhere([
+                'agent_auth_key' => $auth_key,
+             //   'agent_email_verification' => true,
+            ])
+
             //->andWhere(['deleted' => 0])
             ->one();
 
@@ -244,6 +248,27 @@ class AuthController extends BaseController {
                 "code" => 1,
                 "message" => Yii::t('agent',"Account not found")
             ];*/
+        }
+
+        if($model->agent_status != \common\models\Agent::STATUS_ACTIVE) {
+
+            return [
+                "operation" => "error",
+                "errorType" => "account-deactivated",
+                "message" => Yii::t('agent',"This account is not active, please contact us if you think this is error, Thank you!"),
+            ];
+        }
+
+        // Email and password are correct, check if his email has been verified
+        // If agent email has been verified, then allow him to log in
+        if($model->agent_email_verification != \common\models\Agent::EMAIL_VERIFIED) {
+
+            return [
+                "operation" => "error",
+                "errorType" => "email-not-verified",
+                "message" => Yii::t('agent',"Please click the verification link sent to you by email to activate your account"),
+                "unVerifiedToken" => $this->_loginResponse($model)
+            ];
         }
 
         Yii::$app->eventManager->track('Log In', [
