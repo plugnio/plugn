@@ -18,9 +18,14 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->agent_id], ['class' => 'btn btn-primary btn-update']) ?>
 
-        <?= Html::a('Delete', ['delete', 'id' => $model->agent_id], [
+        <?php if($model->agent_status == \common\models\Agent::STATUS_ACTIVE) { ?>
+            <?= Html::a('Login <i class="fa fa-sign-in-alt"></i>', ['login', 'id' => $model->agent_id], ['class' => 'btn btn-primary', "target" => "_blank"]) ?>
+        <?php } ?>
+
+        <?= Html::a('Update <i class="fa fa-pen"></i>', ['update', 'id' => $model->agent_id], ['class' => 'btn btn-primary btn-update']) ?>
+
+        <?= Html::a('Delete <i class="fa fa-trash"></i>', ['delete', 'id' => $model->agent_id], [
             'class' => 'btn btn-danger btn-delete',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -28,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
 
-        <?= Html::a('Remove Store Assignments', ['delete-assignments', 'id' => $model->agent_id], [
+        <?= Html::a('Remove Store Assignments <i class="fa fa-user-times"></i>', ['delete-assignments', 'id' => $model->agent_id], [
             'class' => 'btn btn-danger btn-delete',
             'data' => [
                 'confirm' => 'Are you sure you want to remove agent from all stores?',
@@ -37,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
 
         <?php if(!$model->agent_email_verification) {
-            echo Html::a('Send verification email', ['send-verification-email', 'id' => $model->agent_id], [
+            echo Html::a('Send verification email <i class="fa fa-envelope"></i>', ['send-verification-email', 'id' => $model->agent_id], [
                 'class' => 'btn btn-danger'
             ]);
 

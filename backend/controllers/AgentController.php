@@ -124,6 +124,28 @@ class AgentController extends Controller
     }
 
     /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionLogin($id)
+    {
+        $model = $this->findModel($id);
+
+        $model->generateAuthKey();
+
+        if(!$model->save(false)) {
+            Yii::$app->session->setFlash('errorResponse', $model->errors);
+
+            return $this->redirect(['view', 'id' => $id]);
+        }
+
+        $url = Yii::$app->params['newDashboardAppUrl']. '?auth_key='.$model->agent_auth_key;
+
+        return $this->redirect($url);
+    }
+
+    /**
      * Creates a new Agent model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
