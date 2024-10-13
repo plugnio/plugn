@@ -29,6 +29,24 @@ $js = "
 
 $this->registerJs($js);
 
+$css = "
+.restaurant-view .btn {
+    margin-bottom: 5px;
+}
+
+.restaurant-view .btn small {
+    clear: both;
+    display: block;
+    width: 100%;
+}
+";
+
+$this->registerCss($css);
+
+$tapLatestError = $model->getApiLogs()
+    ->orderBy("created_at DESC")
+    ->one();
+
 ?>
 <div class="restaurant-view">
     <h1>
@@ -49,6 +67,18 @@ $this->registerJs($js);
             <h5><i class="icon fa fa-ban"></i> Error!</h5>
             Platform fee should not be zero for non-premium stores.
         </div>
+    <?php } ?>
+
+    <?php if ($tapLatestError && str_contains($tapLatestError->response_body, "error") && !$model->is_tap_enable) { ?>
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fa fa-ban"></i> Latest Tap Error!</h5>
+        <p><?= $tapLatestError->endpoint ?></p>
+        <p><?= $tapLatestError->response_body ?></p>
+        <p>
+            <?= Html::a('View', ['api-log/view', 'id' => $tapLatestError->log_uuid]); ?>
+        </p>
+    </div>
     <?php } ?>
 
     <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
@@ -536,6 +566,16 @@ $this->registerJs($js);
 
     <div id="tab-payment" class="tab-content hidden">
 
+        <h5>Debug </h5>
+        <?php
+
+        echo Html::a('View API Logs', ['api-log/index', 'ApiLogSearch[restaurant_uuid]' => $model->restaurant_uuid], [
+            'class' => 'btn btn-primary btn-process-queue',
+            "target"=> "_blank",
+        ]). '&nbsp;&nbsp;'; ?>
+
+        <h5>Register with tap </h5>
+
         <?php
 
         if (($model->logo && !$model->logo_file_id) ||
@@ -546,7 +586,7 @@ $this->registerJs($js);
             ($model->identification_file_back_side && !$model->identification_file_id_back_side)
         ) {//|| !$model->developer_id
 
-            echo Html::a('Upload Documents', ['upload-documents-to-tap', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Upload Documents <small>Licence, bank statements etc,.. to tap</small>', ['upload-documents-to-tap', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -559,7 +599,7 @@ $this->registerJs($js);
 
         //if (!$model->merchant_id && (!$model->business_id || !$model->business_entity_id)) {//|| !$model->developer_id
 
-            echo Html::a('Create Business', ['create-business', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Create Business <small>Register business with tap</small>', ['create-business', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -572,7 +612,7 @@ $this->registerJs($js);
 
         //if (!$model->merchant_id) {
 
-            echo Html::a('Create Merchant', ['create-merchant', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Create Merchant <small>Create Merchant/ outlet in generated business account</small>', ['create-merchant', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -594,7 +634,7 @@ $this->registerJs($js);
 
         //if ($model->wallet_id && $model->developer_id && !$model->operator_id) {
 
-            echo Html::a('Create An Operator', ['create-an-operator', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Create An Operator <small>Generate API keys if not provided in merchant details</small>', ['create-an-operator', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -602,7 +642,11 @@ $this->registerJs($js);
                 ],
             ]). '&nbsp;&nbsp;';
        // }
+        ?>
 
+        <h5>Check status </h5>
+
+        <?php
        // if($model->business_id ) {///&& !$model->is_tap_business_active
             echo Html::a('Check Tap Business Status', ['poll-tap-business-status', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-primary btn-process-queue',
@@ -624,6 +668,8 @@ $this->registerJs($js);
       //  }
 
         ?>
+
+        <h5>Reset </h5>
 
         <?=
         Html::a('Force Create Tap Account', ['force-create-tap-account', 'id' => $model->restaurant_uuid], [
@@ -678,7 +724,9 @@ $this->registerJs($js);
             ?>
         <?php } ?>
 
+
         <?php if($model->is_tap_enable) { ?>
+            <h5>Test</h5>
             <?= Html::a('Test tap integration', ['restaurant/test-tap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-default']) ?>
         <?php } ?>
         <br/>

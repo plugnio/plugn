@@ -1120,6 +1120,16 @@ class Restaurant extends ActiveRecord
     }
 
     /**
+     * Gets query for [[ApiLogs]].
+     *
+     * @return ActiveQuery
+     */
+    public function getApiLogs($modelClass = "\common\models\ApiLog")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[RestaurantDomainRequest]].
      *
      * @return ActiveQuery
