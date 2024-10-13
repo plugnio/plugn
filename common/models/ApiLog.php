@@ -20,7 +20,7 @@ use yii\db\Expression;
  * @property string|null $response_body
  * @property string|null $created_at
  *
- * @property Restaurant $restaurantUu
+ * @property Restaurant $restaurant
  */
 class ApiLog extends \yii\db\ActiveRecord
 {
@@ -93,6 +93,10 @@ class ApiLog extends \yii\db\ActiveRecord
             'response_body' => Yii::t('app', 'Response Body'),
             'created_at' => Yii::t('app', 'Created At'),
         ];
+    }
+
+    public function getRestaurantName() {
+        return $this->restaurant? $this->restaurant->name: null;
     }
 
     /**
