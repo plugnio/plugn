@@ -762,7 +762,8 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getExtraOptions($modelClass = "\common\models\ExtraOption")
     {
-        return $this->hasMany($modelClass::className(), ['option_id' => 'option_id'])->via('options');
+        return $this->hasMany($modelClass::className(), ['option_id' => 'option_id'])
+            ->via('options');
     }
 
     /**
