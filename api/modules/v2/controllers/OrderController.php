@@ -4,8 +4,10 @@ namespace api\modules\v2\controllers;
 
 use agent\models\PaymentMethod;
 use common\models\Area;
+use common\models\ExtraOption;
 use common\models\Item;
 use common\models\ItemVariant;
+use common\models\Option;
 use common\models\PaymentFailed;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -1641,6 +1643,7 @@ class OrderController extends BaseController
      * @return array
      */
     public function actionValidateCart() {
+
         $cart_items = Yii::$app->request->getBodyParam("cart_items");
 
         $errors = [];
@@ -1651,26 +1654,90 @@ class OrderController extends BaseController
 
             $item = Item::find()
                 ->andWhere(['item_uuid' => $cart_item['item_uuid']])
+                ->filterPublished()
+                //->asArray()
                 ->one();
 
             if (!$item) {
-                $errors[$cart_item['item_uuid']] = Yii::t('app', 'Item no more available.');
+                $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
                 continue;
             }
 
-            $items[$item->item_uuid] = $item;
+            $items[$cart_item['cart_index']] = $item->attributes; //  $item->item_uuid
+            //$items[$cart_item['cart_index']]['cart_index'] = $cart_item['cart_index'];
+            $items[$cart_item['cart_index']]['itemImage']  = $item->itemImage;
+            //$items[$cart_item['cart_index']]['itemImage'] =
 
-            if(!$item->track_quantity) {
-                continue;
+            if (empty($cart_item['extraOptions']) || !is_array($cart_item['extraOptions'])) {
+                $cart_item['extraOptions'] = [];
             }
+
+            $variant = null;
 
             if ($item->item_type == Item::TYPE_SIMPLE) {
-                if ($cart_item['qty'] > $item->stock_qty) {
-                    $errors[$cart_item['item_uuid']] = Yii::t('app', 'Item out of stock.');
+
+                if ($item->track_quantity && $cart_item['qty'] > $item->stock_qty) {
+                    $errors[$cart_item['cart_index']] = Yii::t('app', 'Item out of stock.');
                 }
+
+                $item_price = (float) $item->item_price;
+
+                foreach($cart_item['extraOptions'] as $extraOption) {
+
+                    if (isset($extraOption['extra_option_id'])) {
+
+                        $extraOptionModel = ExtraOption::find()
+                            ->andWhere(['extra_option_id' => $extraOption['extra_option_id']])
+                            ->one();
+
+                        //validate exist
+
+                        if (!$extraOptionModel) {
+                            $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                            continue;
+                        }
+
+                        //validate stock
+
+                        if (
+                            $item->track_quantity &&
+                            !empty($extraOption['stock_qty']) &&
+                            $extraOption['stock_qty'] < $extraOptionModel->stock_qty
+                        ) {
+                            $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                        }
+
+                        //update price
+
+                        $item_price += $extraOptionModel->extra_option_price;// * $extraOption['qty'];
+
+                    } else {
+
+                        $optionModel = Option::find()
+                            ->andWhere(['option_id' => $extraOption['option_id']])
+                            ->one();
+
+                        //validate exist
+
+                        if (!$optionModel) {
+                            $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                            continue;
+                        }
+
+                        //update price
+
+                        $item_price += $optionModel->option_price;
+                    }
+                }
+
+                $items[$cart_item['cart_index']]['extraOptions']  = $cart_item['extraOptions'];
+
+                $items[$cart_item['cart_index']]['item_price'] = $item_price;
+
             } else {
+
                 if (empty($cart_item['item_variant_uuid'])) {
-                    $errors[$cart_item['item_uuid']] = Yii::t('app', 'Variant detail missing.');
+                    $errors[$cart_item['cart_index']] = Yii::t('app', 'Variant detail missing.');
                     continue;
                 }
 
@@ -1678,22 +1745,45 @@ class OrderController extends BaseController
                     ->andWhere(['item_variant_uuid' => $cart_item['item_variant_uuid']])
                     ->one();
 
-                $items[$item->item_uuid]['variant'] = $variant;
-
                 if (!$variant) {
-                    $errors[$cart_item['item_uuid']] = Yii::t('app', 'Variant detail missing.');
+                    $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
                     continue;
                 }
 
-                if ($cart_item['qty'] > $variant->stock_qty) {
-                    $errors[$cart_item['item_uuid']] = Yii::t('app', 'Variant out of stock.');
+                if ($item->track_quantity && $cart_item['qty'] > $variant->stock_qty) {
+                    $errors[$cart_item['cart_index']] = Yii::t('app', 'Variant out of stock.');
                 }
+
+                $items[$cart_item['cart_index']]['variant'] = $variant;
+
+                $item_price = (float) $variant->price;
+
+                foreach($variant->itemVariantExtraOptions as $extraOption) {
+
+                    $extraOptionModel = ExtraOption::find()
+                        ->andWhere(['extra_option_id' => $extraOption['extra_option_id']])
+                        ->one();
+
+                    //validate stock
+
+                    if (
+                        $item->track_quantity &&
+                        !empty($extraOption['stock_qty']) &&
+                        $extraOption['stock_qty'] < $extraOptionModel->stock_qty
+                    ) {
+                        $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                    }
+                }
+
+                $items[$cart_item['cart_index']]['extraOptions']  = $variant->itemVariantExtraOptions;
+
+                $items[$cart_item['cart_index']]['item_price'] = $item_price;
             }
         }
 
         return [
             "errors" => $errors,
-            "items" => $items
+            "items" => $items,
         ];
     }
 

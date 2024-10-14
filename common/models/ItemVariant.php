@@ -283,6 +283,16 @@ class ItemVariant extends \yii\db\ActiveRecord
     }
 
     /**
+     * @param $modelClass
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItemVariantExtraOptions($modelClass = "\common\models\ExtraOption")
+    {
+        return $this->hasMany($modelClass::className(), ['extra_option_id' => 'extra_option_id'])
+            ->via('itemVariantOptions');
+    }
+
+    /**
      * Gets query for [[ItemVariantOptions]].
      *
      * @return \yii\db\ActiveQuery
