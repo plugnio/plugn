@@ -137,12 +137,12 @@ jobs:
           destination: report
 
       - slack/notify:
-          channel: C01FNR0K2H0
+          channel: C07RX9NEUMV
           event: fail
           template: basic_fail_1
           
       - slack/notify:
-          channel: C01FNR0K2H0
+          channel: C07RX9NEUMV
           event: pass
           template: success_tagged_deploy_1    
 
