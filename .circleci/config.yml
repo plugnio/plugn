@@ -138,11 +138,13 @@ jobs:
 
       - slack/notify:
           channel: C07RX9NEUMV
+          debug: true
           event: fail
           template: basic_fail_1
           
       - slack/notify:
           channel: C07RX9NEUMV
+          debug: true
           event: pass
           template: success_tagged_deploy_1    
 
