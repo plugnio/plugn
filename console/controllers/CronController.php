@@ -1151,7 +1151,7 @@ class CronController extends \yii\console\Controller
 
         //alert inactive stores
 
-        $query = Restaurant::find()
+        /*$query = Restaurant::find()
             ->andWhere(['!=', 'restaurant.is_deleted', 1])
             ->andWhere(new Expression("site_id IS NOT NULL"))
             ->inActive()
@@ -1177,7 +1177,7 @@ class CronController extends \yii\console\Controller
             foreach ($stores as $store) {
                 $store->deleteSite();
             }
-        }
+        }*/
 
         //send today's bestselling
 
