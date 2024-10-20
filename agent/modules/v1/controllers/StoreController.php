@@ -6,6 +6,7 @@ use agent\models\Currency;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantTheme;
 use common\models\RestaurantByCampaign;
+use common\models\RestaurantCurrency;
 use common\models\RestaurantUpload;
 use common\models\Setting;
 use common\models\VendorCampaign;
@@ -161,6 +162,21 @@ class StoreController extends BaseController
             return self::message("error",$store->getErrors());
         }
 
+        //check if store currency
+
+        $storeCurrency = RestaurantCurrency::find()
+            ->andWhere(['currency_id' => $store->currency_id, "restaurant_uuid" => $store->restaurant_uuid])
+            ->one();
+
+        if (!$storeCurrency) {
+            $storeCurrency = new RestaurantCurrency;
+            $storeCurrency->currency_id = $store->currency_id;
+            $storeCurrency->restaurant_uuid = $store->restaurant_uuid;
+            if (!$storeCurrency->save()) {
+                return self::message("error", $storeCurrency->getErrors());
+            }
+        }
+
         return self::message("success",'Store details updated successfully');
     }
 
@@ -297,6 +313,10 @@ class StoreController extends BaseController
     {
         $domain = Yii::$app->request->getBodyParam('domain');
         $purchase = Yii::$app->request->getBodyParam('purchase');
+
+        if (!str_contains($domain, "http")) {
+            $domain = "https://" . $domain;
+        }
 
         $store = $this->findModel();// Yii::$app->accountManager->getManagedAccount();
 
@@ -1361,6 +1381,7 @@ class StoreController extends BaseController
         $transaction = Yii::$app->db->beginTransaction ();
 
         if($model->logo != $logo) {
+
             $response = $model->uploadLogo($logo, false);
 
             if($response['operation'] != "success") {

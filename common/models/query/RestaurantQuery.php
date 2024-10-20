@@ -41,6 +41,11 @@ class RestaurantQuery extends \yii\db\ActiveQuery
             DATE(restaurant.last_order_at) < DATE(NOW() - INTERVAL ".$days." DAY)"));
     }
 
+    public function filterByOrderInDays($days)
+    {
+        return $this->andWhere (new Expression("DATE(restaurant.last_order_at) > DATE(NOW() - INTERVAL ".($days - 1)." DAY)"));
+    }
+
     /**
      * @return RestaurantQuery
      */
@@ -60,7 +65,7 @@ class RestaurantQuery extends \yii\db\ActiveQuery
     {
         return $this
             ->joinWith(['items'])
-            ->andWhere( new Expression("item_uuid IS NULL AND last_order_at IS NULL"));
+            ->andWhere( new Expression("total_items = 0 AND last_order_at IS NULL"));
     }
 
     /**
@@ -70,8 +75,10 @@ class RestaurantQuery extends \yii\db\ActiveQuery
     public function active($db = null)
     {
         return $this
-            ->joinWith(['items'])
-            ->andWhere( new Expression("item_uuid IS NOT NULL OR last_order_at IS NOT NULL"));
+            //->joinWith(['items'])
+            ->andWhere( new Expression("total_items > 0 OR last_order_at IS NOT NULL"));
+            //item_uuid IS NOT NULL OR
+           // ->groupBy("restaurant_uuid");
     }
 
     public function filterByDateRange($date_start, $date_end) {
@@ -92,16 +99,34 @@ class RestaurantQuery extends \yii\db\ActiveQuery
         //return $this->andWhere(['between', 'restaurant_created_at', $start, $end]);
     }
 
-    public function filterPremium()
+    public function filterFree()
     {
-        return $this
+        return $this->joinWith(['activeSubscription'])
+                ->andWhere(['plan_id' => 1]);
+
+        /*return $this
             ->joinWith(['subscriptions'])
             ->andWhere(['IN', 'plan_id', Plan::find()->select('plan_id')->andWhere(['>', 'price', 0])])
             ->andWhere([
                 'AND',
                 ['subscription_status' => Subscription::STATUS_ACTIVE],
                 new Expression('subscription_end_at IS NULL || DATE(subscription_end_at) >= DATE(NOW())')
-            ]);
+            ]);*/
+    }
+
+    public function filterPremium()
+    {
+        return $this->joinWith(['activeSubscription'])
+            ->andWhere(['plan_id' => 2]);
+
+        /*return $this
+            ->joinWith(['subscriptions'])
+            ->andWhere(['IN', 'plan_id', Plan::find()->select('plan_id')->andWhere(['>', 'price', 0])])
+            ->andWhere([
+                'AND',
+                ['subscription_status' => Subscription::STATUS_ACTIVE],
+                new Expression('subscription_end_at IS NULL || DATE(subscription_end_at) >= DATE(NOW())')
+            ]);*/
     }
 
     public function filterStoresWithPaymentGateway()

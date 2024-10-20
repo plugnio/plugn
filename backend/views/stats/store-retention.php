@@ -69,6 +69,9 @@ $this->title = 'Store Closer & Retention';
     .icon {
         width: 3rem;
         height: 3rem;
+        position: absolute;
+        right: 25px;
+        top: 25px;
     }
 
     .icon i {
@@ -137,34 +140,55 @@ $this->title = 'Store Closer & Retention';
             <div class="row">
 
                 <div class="col-xl-3 col-lg-4">
+                    <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                        'RestaurantSearch[country_id]' => $country_id,
+                        'RestaurantSearch[date_start]' => $date_start,
+                        'RestaurantSearch[date_end]' => $date_end,
+                        'RestaurantSearch[active15Days]' => 1
+                    ]) ?>">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
 
                             <h5 class="card-title text-uppercase text-muted mb-0">Active Stores</h5>
-                            <span class="h2 font-weight-bold mb-0"><?= $totalStores - $inActiveStores ?></span>
-
+                            <span class="h2 font-weight-bold mb-0"><?= $totalStores - $noOrderIn15Days ?></span>
+                            <p>Active store means having orders in last 15 days</p>
                             <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                                 <i class="fas fa-chart-bar"></i>
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div><!-- END .col-xl-3 -->
 
                 <div class="col-xl-3 col-lg-4">
+                    <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                        'RestaurantSearch[country_id]' => $country_id,
+                        'RestaurantSearch[date_start]' => $date_start,
+                        'RestaurantSearch[date_end]' => $date_end,
+                        'RestaurantSearch[notActive15Days]' => 1
+                    ]) ?>">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
 
                             <h5 class="card-title text-uppercase text-muted mb-0">In-active Stores</h5>
                             <span class="h2 font-weight-bold mb-0"><?= $inActiveStores ?></span>
+                            <p>In-active store means not having orders in last 15 days</p>
 
                             <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                                 <i class="fas fa-chart-bar"></i>
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div><!-- END .col-xl-3 -->
 
                 <div class="col-xl-3 col-lg-4">
+                    <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                        'RestaurantSearch[country_id]' => $country_id,
+                        'RestaurantSearch[date_start]' => $date_start,
+                        'RestaurantSearch[date_end]' => $date_end,
+
+                    ]) ?>">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
 
@@ -176,6 +200,7 @@ $this->title = 'Store Closer & Retention';
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div><!-- END .col-xl-3 -->
 
             </div>

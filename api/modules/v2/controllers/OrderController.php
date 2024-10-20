@@ -4,6 +4,10 @@ namespace api\modules\v2\controllers;
 
 use agent\models\PaymentMethod;
 use common\models\Area;
+use common\models\ExtraOption;
+use common\models\Item;
+use common\models\ItemVariant;
+use common\models\Option;
 use common\models\PaymentFailed;
 use kartik\mpdf\Pdf;
 use Yii;
@@ -75,6 +79,51 @@ class OrderController extends BaseController
     }
 
     /**
+     * @param $id
+     * @return array|string[]|void
+     * @throws NotFoundHttpException
+     */
+    public function actionUpdateOrder($id) {
+
+        $order = $this->findModel($id);
+
+        if (
+            !in_array($order->order_status, [
+                Order::STATUS_DRAFT,
+                Order::STATUS_ABANDONED_CHECKOUT
+            ])
+        ) {
+            return [
+                "operation" => "error",
+                "message" => "Processed order can not be changed!"
+            ];
+        }
+
+        $response = $this->_updateOrderData($order, $order->restaurant);
+
+        if ($response && isset($response['operation'])) {
+            return $response;
+        }
+
+        \common\models\Restaurant::updateAll([
+            'last_order_at' => new Expression('NOW()'),
+        ], [
+            'restaurant_uuid' => $order->restaurant_uuid
+        ]);
+
+        Yii::$app->eventManager->track('Order Updated', $order->attributes,
+            null,
+            $order->restaurant_uuid
+        );
+
+        return [
+            "operation" => "success",
+            "order_uuid" => $order->order_uuid,
+            "message" => "Order data updated successfully!"
+        ];
+    }
+
+    /**
      * initialize order without payment details
      * @param $id
      * @return array
@@ -93,11 +142,45 @@ class OrderController extends BaseController
             ];
         }
 
-        $transaction = Yii::$app->db->beginTransaction();
-
         $order = new Order();
-
         $order->setScenario(Order::SCENARIO_INIT_ORDER);
+
+        $response = $this->_updateOrderData($order, $restaurant);
+
+        if ($response && isset($response['operation'])) {//&& $response['operation'] == 'error'
+           return $response;
+        }
+
+        //for https://pogi.sentry.io/issues/3889482226/?project=5220572&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
+        
+        \common\models\Restaurant::updateAll([
+            'last_order_at' => new Expression('NOW()'),
+            'total_orders' => $restaurant->total_orders + 1
+        ], [
+            'restaurant_uuid' => $restaurant->restaurant_uuid
+        ]);
+
+            Yii::$app->eventManager->track('Order Initiated', $order->attributes,
+                null,
+                $restaurant->restaurant_uuid
+            );
+
+        return [
+            'operation' => 'success',
+            'order' => $order
+        ];
+    }
+
+    /**
+     * @param $order
+     * @param $restaurant
+     * @return array|void
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\db\Exception
+     */
+    private function _updateOrderData($order, $restaurant) {
+
+        $transaction = Yii::$app->db->beginTransaction();
 
         //as we will calculate after items get saved
         $order->total_price = 0;
@@ -138,7 +221,8 @@ class OrderController extends BaseController
 
         //payment method
 
-        //$order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+        $order->payment_method_id = Yii::$app->request->getBodyParam("payment_method_id");
+
         $order->order_mode = Yii::$app->request->getBodyParam("order_mode");
         $order->currency_code = Yii::$app->currency->getCode();
 
@@ -153,50 +237,50 @@ class OrderController extends BaseController
         //if the order mode = 1 => Delivery
         if ($order->order_mode == Order::ORDER_MODE_DELIVERY) {
 
-                $city = Yii::$app->request->getBodyParam("city");
+            $city = Yii::$app->request->getBodyParam("city");
 
-                if($city && isset($city['city_id'])) {
-                    $order->city = Yii::$app->language == "ar" && !empty($city['city_name_ar']) ? $city['city_name_ar']:  $city['city_name'];
-                } else {
-                    $order->city = $city;
-                }
+            if($city && isset($city['city_id'])) {
+                $order->city = Yii::$app->language == "ar" && !empty($city['city_name_ar']) ? $city['city_name_ar']:  $city['city_name'];
+            } else {
+                $order->city = $city;
+            }
 
-                $order->area_id = Yii::$app->request->getBodyParam("area_id");
-                $order->state_id = Yii::$app->request->getBodyParam("state_id");
+            $order->area_id = Yii::$app->request->getBodyParam("area_id");
+            $order->state_id = Yii::$app->request->getBodyParam("state_id");
 
-                if($order->area_id && !$order->city) {
+            if($order->area_id && !$order->city) {
 
-                    $area = Area::find()
-                        ->andWhere(['area_id' => $order->area_id])
-                        ->one();
+                $area = Area::find()
+                    ->andWhere(['area_id' => $order->area_id])
+                    ->one();
 
-                    if($area && $area->city)
-                        $order->city = Yii::$app->language == "ar" ? $area->city['city_name_ar']: $area->city['city_name'];
-                }
+                if($area && $area->city)
+                    $order->city = Yii::$app->language == "ar" ? $area->city['city_name_ar']: $area->city['city_name'];
+            }
 
-                $order->address_1 = Yii::$app->request->getBodyParam('address_1');
-                $order->address_2 = Yii::$app->request->getBodyParam('address_2');
-                $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
+            $order->address_1 = Yii::$app->request->getBodyParam('address_1');
+            $order->address_2 = Yii::$app->request->getBodyParam('address_2');
+            $order->postalcode = Yii::$app->request->getBodyParam('postal_code');
 
-                if(!$order->postalcode) {
-                    $order->postalcode = Yii::$app->request->getBodyParam('postalcode');
-                }
+            if(!$order->postalcode) {
+                $order->postalcode = Yii::$app->request->getBodyParam('postalcode');
+            }
 
-                $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
-                $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
-                $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
-                $order->block = Yii::$app->request->getBodyParam("block");
-                $order->street = Yii::$app->request->getBodyParam("street");
-                $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
-                $order->house_number = Yii::$app->request->getBodyParam("house_number");
+            $order->delivery_zone_id = Yii::$app->request->getBodyParam("delivery_zone_id");
+            $order->shipping_country_id = Yii::$app->request->getBodyParam("country_id");
+            $order->unit_type = Yii::$app->request->getBodyParam("unit_type");
+            $order->block = Yii::$app->request->getBodyParam("block");
+            $order->street = Yii::$app->request->getBodyParam("street");
+            $order->avenue = Yii::$app->request->getBodyParam("avenue"); //optional
+            $order->house_number = Yii::$app->request->getBodyParam("house_number");
             $order->floor = Yii::$app->request->getBodyParam("floor");
             $order->building = Yii::$app->request->getBodyParam("building");
 
-                if (strtolower($order->unit_type) == Order::UNIT_TYPE_APARTMENT)
-                    $order->apartment = Yii::$app->request->getBodyParam("apartment");
+            if (strtolower($order->unit_type) == Order::UNIT_TYPE_APARTMENT)
+                $order->apartment = Yii::$app->request->getBodyParam("apartment");
 
-                if (strtolower($order->unit_type) == Order::UNIT_TYPE_OFFICE)
-                    $order->office = Yii::$app->request->getBodyParam("office");
+            if (strtolower($order->unit_type) == Order::UNIT_TYPE_OFFICE)
+                $order->office = Yii::$app->request->getBodyParam("office");
 
             $order->special_directions = Yii::$app->request->getBodyParam("special_directions"); //optional
 
@@ -395,25 +479,6 @@ class OrderController extends BaseController
         }
 
         $transaction->commit();
-
-        //for https://pogi.sentry.io/issues/3889482226/?project=5220572&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
-        
-        \common\models\Restaurant::updateAll([
-            'last_order_at' => new Expression('NOW()'),
-            'total_orders' => $restaurant->total_orders + 1
-        ], [
-            'restaurant_uuid' => $restaurant->restaurant_uuid
-        ]);
-
-            Yii::$app->eventManager->track('Order Initiated', $order->attributes,
-                null,
-                $restaurant->restaurant_uuid
-            );
-
-        return [
-            'operation' => 'success',
-            'order' => $order
-        ];
     }
 
     /**
@@ -1572,6 +1637,154 @@ class OrderController extends BaseController
                 'message' => 'Invalid Delivery code',
             ];
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function actionValidateCart() {
+
+        $cart_items = Yii::$app->request->getBodyParam("cart_items");
+
+        $errors = [];
+
+        $items = [];
+
+        foreach ($cart_items as $cart_item) {
+
+            $item = Item::find()
+                ->andWhere(['item_uuid' => $cart_item['item_uuid']])
+                ->filterPublished()
+                //->asArray()
+                ->one();
+
+            if (!$item) {
+                $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                continue;
+            }
+
+            $items[$cart_item['cart_index']] = $item->attributes; //  $item->item_uuid
+            //$items[$cart_item['cart_index']]['cart_index'] = $cart_item['cart_index'];
+            $items[$cart_item['cart_index']]['itemImage']  = $item->itemImage;
+            //$items[$cart_item['cart_index']]['itemImage'] =
+
+            if (empty($cart_item['extraOptions']) || !is_array($cart_item['extraOptions'])) {
+                $cart_item['extraOptions'] = [];
+            }
+
+            $variant = null;
+
+            if ($item->item_type == Item::TYPE_SIMPLE) {
+
+                if ($item->track_quantity && $cart_item['qty'] > $item->stock_qty) {
+                    $errors[$cart_item['cart_index']] = Yii::t('app', 'Item out of stock.');
+                }
+
+                $item_price = (float) $item->item_price;
+
+                foreach($cart_item['extraOptions'] as $extraOption) {
+
+                    if (isset($extraOption['extra_option_id'])) {
+
+                        $extraOptionModel = ExtraOption::find()
+                            ->andWhere(['extra_option_id' => $extraOption['extra_option_id']])
+                            ->one();
+
+                        //validate exist
+
+                        if (!$extraOptionModel) {
+                            $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                            continue;
+                        }
+
+                        //validate stock
+
+                        if (
+                            $item->track_quantity &&
+                            !empty($extraOption['stock_qty']) &&
+                            $extraOption['stock_qty'] < $extraOptionModel->stock_qty
+                        ) {
+                            $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                        }
+
+                        //update price
+
+                        $item_price += $extraOptionModel->extra_option_price;// * $extraOption['qty'];
+
+                    } else {
+
+                        $optionModel = Option::find()
+                            ->andWhere(['option_id' => $extraOption['option_id']])
+                            ->one();
+
+                        //validate exist
+
+                        if (!$optionModel) {
+                            $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                            continue;
+                        }
+
+                        //update price
+
+                        $item_price += $optionModel->option_price;
+                    }
+                }
+
+                $items[$cart_item['cart_index']]['extraOptions']  = $cart_item['extraOptions'];
+
+                $items[$cart_item['cart_index']]['item_price'] = $item_price;
+
+            } else {
+
+                if (empty($cart_item['item_variant_uuid'])) {
+                    $errors[$cart_item['cart_index']] = Yii::t('app', 'Variant detail missing.');
+                    continue;
+                }
+
+                $variant = ItemVariant::find()
+                    ->andWhere(['item_variant_uuid' => $cart_item['item_variant_uuid']])
+                    ->one();
+
+                if (!$variant) {
+                    $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                    continue;
+                }
+
+                if ($item->track_quantity && $cart_item['qty'] > $variant->stock_qty) {
+                    $errors[$cart_item['cart_index']] = Yii::t('app', 'Variant out of stock.');
+                }
+
+                $items[$cart_item['cart_index']]['variant'] = $variant;
+
+                $item_price = (float) $variant->price;
+
+                foreach($variant->itemVariantExtraOptions as $extraOption) {
+
+                    $extraOptionModel = ExtraOption::find()
+                        ->andWhere(['extra_option_id' => $extraOption['extra_option_id']])
+                        ->one();
+
+                    //validate stock
+
+                    if (
+                        $item->track_quantity &&
+                        !empty($extraOption['stock_qty']) &&
+                        $extraOption['stock_qty'] < $extraOptionModel->stock_qty
+                    ) {
+                        $errors[$cart_item['cart_index']] = Yii::t('app', 'Item no more available.');
+                    }
+                }
+
+                $items[$cart_item['cart_index']]['extraOptions']  = $variant->itemVariantExtraOptions;
+
+                $items[$cart_item['cart_index']]['item_price'] = $item_price;
+            }
+        }
+
+        return [
+            "errors" => $errors,
+            "items" => $items,
+        ];
     }
 
     /**

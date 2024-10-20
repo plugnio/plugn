@@ -13,6 +13,8 @@ class RestaurantDomainRequestSearch extends RestaurantDomainRequest
 {
     public $storeName;
     public $agentName;
+    public $date_start;
+    public $date_end;
 
     /**
      * {@inheritdoc}
@@ -21,7 +23,7 @@ class RestaurantDomainRequestSearch extends RestaurantDomainRequest
     {
         return [
             [['request_uuid', 'domain', 'created_at', 'updated_at'], 'safe'],
-            [['agentName','storeName','restaurant_uuid','status', 'created_by'], 'integer'],
+            [["date_start", "date_end", 'agentName','storeName','restaurant_uuid','status', 'created_by'], 'integer'],
         ];
     }
 
@@ -68,6 +70,10 @@ class RestaurantDomainRequestSearch extends RestaurantDomainRequest
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if ($this->date_start && $this->date_end) {
+            $query->filterByDateRange($this->date_start, $this->date_end);
         }
 
         // grid filtering conditions

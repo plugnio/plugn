@@ -349,6 +349,46 @@ class Item extends \yii\db\ActiveRecord
             }
         }
 
+        //check if chatbot enabled
+
+        $isChatbotActivated = RestaurantAddon::find()
+            ->joinWith(['addon'])
+            ->andWhere([
+                'restaurant_addon.restaurant_uuid' => $this->restaurant_uuid,
+                "addon.slug" => "chatbot"
+            ])
+            ->one();
+
+        if (
+            $isChatbotActivated && (
+                $insert ||
+                isset($changedAttributes['item_name']) ||
+                isset($changedAttributes['item_name_ar']) ||
+                isset($changedAttributes['item_description']) ||
+                isset($changedAttributes['item_description_ar'])
+            )
+        ) {
+            $botQueue = RestaurantChatBotQueue::find()
+                ->andWhere([
+                    'status' => RestaurantChatBotQueue::STATUS_PENDING,
+                    'restaurant_uuid' => $this->restaurant_uuid
+                ])
+                ->one();
+
+            if (!$botQueue) {
+                $botQueue = new RestaurantChatBotQueue;
+                $botQueue->status = RestaurantChatBotQueue::STATUS_PENDING;
+                $botQueue->restaurant_uuid = $this->restaurant_uuid;
+                $botQueue->save();
+            }
+        }
+
+        if ($insert) {
+            $this->restaurant->updateCounters([
+                'total_items' => 1
+            ]);
+        }
+
         //Send event to Segment
 
         //not firing on insert as it will not have all data yet
@@ -358,8 +398,6 @@ class Item extends \yii\db\ActiveRecord
         }
 
         //if stock_qty changed
-
-        Yii::info($changedAttributes);
 
         if (
             !$insert &&
@@ -589,6 +627,10 @@ class Item extends \yii\db\ActiveRecord
             $variant->delete();
         }
 
+        $this->restaurant->updateCounters([
+            'total_items' => -1
+        ]);
+
         return parent::beforeDelete();
     }
 
@@ -720,7 +762,8 @@ class Item extends \yii\db\ActiveRecord
      */
     public function getExtraOptions($modelClass = "\common\models\ExtraOption")
     {
-        return $this->hasMany($modelClass::className(), ['option_id' => 'option_id'])->via('options');
+        return $this->hasMany($modelClass::className(), ['option_id' => 'option_id'])
+            ->via('options');
     }
 
     /**

@@ -261,3 +261,9 @@ att1_name=attachment_file_name&att1_content=encoded_to_base64_binary_data
 att2_name=attachment_file_name&att2_content=encoded_to_base64_binary_data
  
 You can also receive any custom postback header as described in the previous section.
+
+## apple pay 
+
+### merchant validation endpoint 
+
+`http://api.plugn.io/v2/payment/apple-pay/validate-merchant`

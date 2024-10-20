@@ -5,12 +5,18 @@ namespace backend\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Order;
+use yii\db\Expression;
 
 /**
  * OrderSearch represents the model behind the search form of `common\models\Order`.
  */
 class OrderSearch extends Order
 {
+    public $country_id;
+    public $date_start;
+    public $date_end;
+    public $type;
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +24,7 @@ class OrderSearch extends Order
     {
         return [
             [['area_id', 'payment_method_id', 'order_status','customer_id'], 'integer'],
-            [['payment_uuid', 'order_mode', 'currency_code', 'payment_method_id ', 'country_name', 'order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name','payment_method_name_ar','restaurant_uuid'], 'safe'],
+            [["type", "country_id", "date_start", "date_end", "total_price", 'payment_uuid', 'order_mode', 'currency_code', 'payment_method_id ', 'country_name', 'order_uuid', 'area_name', 'area_name_ar', 'unit_type', 'block', 'street', 'avenue', 'house_number', 'special_directions', 'customer_name', 'customer_phone_number', 'customer_email', 'payment_method_name','payment_method_name_ar','restaurant_uuid'], 'safe'],
         ];
     }
 
@@ -56,6 +62,24 @@ class OrderSearch extends Order
             return $dataProvider;
         }
 
+        //->activeOrders()
+
+        if ($this->country_id) {
+            $query->filterByCountry($this->country_id);
+        }
+
+        if ($this->date_start && $this->date_end) {
+            $query->filterByDateRange($this->date_start, $this->date_end);
+        }
+
+        if ($this->type == "checkout-completed") {
+            $query->checkoutCompleted();
+        }
+
+        if ($this->type == "filter-completed") {
+            $query->filterCompleted();
+        }
+
         // grid filtering conditions
         $query->andFilterWhere([
             'order_uuid' => $this->order_uuid,
@@ -65,6 +89,16 @@ class OrderSearch extends Order
             'payment_method_id' => $this->payment_method_id,
             'order_status' => $this->order_status,
         ]);
+
+        if ($this->total_price) {
+            if(str_contains($this->total_price, ">") || str_contains($this->total_price, "<")) {
+                $query->andWhere(new Expression("total_price " . $this->total_price));
+            } else if(str_contains($this->total_price, "=")) {
+                $query->andWhere(["total_price" => str_replace(["=", " "], ["",""], $this->total_price)]);
+            } else {
+                $query->andWhere(["total_price" => $this->total_price]);
+            }
+        }
 
         $query->andFilterWhere(['like', 'area_name', $this->area_name])
             ->andFilterWhere(['like', 'area_name_ar', $this->area_name_ar])

@@ -69,6 +69,9 @@ $this->title = 'Customer Funnel ';
     .icon {
         width: 3rem;
         height: 3rem;
+        position: absolute;
+        right: 25px;
+        top: 25px;
     }
 
     .icon i {
@@ -137,6 +140,14 @@ $this->title = 'Customer Funnel ';
             <div class="row">
 
                 <div class="col-xl-3 col-lg-4">
+                    <a href="<?= \yii\helpers\Url::to(['order/index',
+
+                           // 'country_id' => $country_id,
+                            'OrderSearch[country_id]' => $country_id,
+                            'OrderSearch[date_start]' => $date_start,
+                            'OrderSearch[date_end]' => $date_end,
+                        'OrderSearch[type]' => "checkout-completed",
+                    ]) ?>">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
 
@@ -148,9 +159,18 @@ $this->title = 'Customer Funnel ';
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div><!-- END .col-xl-3 -->
 
                 <div class="col-xl-3 col-lg-4">
+                    <a href="<?= \yii\helpers\Url::to(['order/index',
+
+                        // 'country_id' => $country_id,
+                        'OrderSearch[country_id]' => $country_id,
+                        'OrderSearch[date_start]' => $date_start,
+                        'OrderSearch[date_end]' => $date_end,
+                        'OrderSearch[type]' => "filter-completed",
+                    ]) ?>">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
 
@@ -162,6 +182,7 @@ $this->title = 'Customer Funnel ';
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div><!-- END .col-xl-3 -->
 
             </div>

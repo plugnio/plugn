@@ -29,14 +29,57 @@ $js = "
 
 $this->registerJs($js);
 
+$css = "
+.restaurant-view .btn {
+    margin-bottom: 5px;
+}
+
+.restaurant-view .btn small {
+    clear: both;
+    display: block;
+    width: 100%;
+}
+";
+
+$this->registerCss($css);
+
+$tapLatestError = $model->getApiLogs()
+    ->orderBy("created_at DESC")
+    ->one();
+
 ?>
 <div class="restaurant-view">
     <h1>
         <?= Html::encode($this->title) ?>
+
+        <?php if($model->activeSubscription && $model->activeSubscription->plan_id == 2) { ?>
+            <span class="badge badge-success">Premium</span>
+        <?php } ?>
+
         <?php if($model->is_deleted) { ?>
         <span class="badge badge-danger">Deleted</span>
         <?php } ?>
     </h1>
+
+    <?php if($model->platform_fee == 0 && (!$model->activeSubscription || $model->activeSubscription->plan_id == 1)) { ?>
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h5><i class="icon fa fa-ban"></i> Error!</h5>
+            Platform fee should not be zero for non-premium stores.
+        </div>
+    <?php } ?>
+
+    <?php if ($tapLatestError && str_contains($tapLatestError->response_body, "error") && !$model->is_tap_enable) { ?>
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h5><i class="icon fa fa-ban"></i> Latest Tap Error!</h5>
+        <p><?= $tapLatestError->endpoint ?></p>
+        <p><?= $tapLatestError->response_body ?></p>
+        <p>
+            <?= Html::a('View', ['api-log/view', 'id' => $tapLatestError->log_uuid]); ?>
+        </p>
+    </div>
+    <?php } ?>
 
     <?php if (Yii::$app->session->getFlash('errorResponse') != null) { ?>
 
@@ -45,6 +88,7 @@ $this->registerJs($js);
         <h5><i class="icon fa fa-ban"></i> Error!</h5>
         <?= (Yii::$app->session->getFlash('errorResponse')) ?>
     </div>
+
     <?php } elseif (Yii::$app->session->getFlash('successResponse') != null) { ?>
     <div class="alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -67,7 +111,7 @@ $this->registerJs($js);
 
     <p>
 
-        <?= Html::a('Login', ['login', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Login', ['login', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary', "target" => "_blank"]) ?>
 
         <?= Html::a('Update', ['update', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary btn-update']) ?>
 
@@ -112,6 +156,8 @@ $this->registerJs($js);
         <?= Html::a('Update sitemap', ['update-sitemap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-warning']) ?>
 -->
 
+        <?= Html::a('Sync AI', ['sync-ai', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-primary']) ?>
+
     </p>
 
     <ul class="nav nav-tabs" id="tabs">
@@ -122,6 +168,7 @@ $this->registerJs($js);
         <li id="restaurantType"><a href="#">Restaurant Type</a></li>
         <li id="payment"><a href="#">Tap payment</a></li>
         <li id="fees"><a href="#">Our Fees</a></li>
+        <li id="subscription"><a href="#">Subscription</a></li>
         <li id="theme"><a href="#">Theme color</a></li>
         <li id="seo"><a href="#">SEO</a></li>
         <li id="analytics"><a href="#">Analytics</a></li>
@@ -131,9 +178,46 @@ $this->registerJs($js);
         <li id="invoices" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['restaurant-invoice/index', 'RestaurantInvoice[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Invoices</a></li>
         <li id="orders" class="link"><a target="_blank" href="<?= \yii\helpers\Url::to( ['order/index', 'OrderSearch[restaurant_uuid]' => $model->restaurant_uuid]) ?>">Orders</a></li>
         <li id="settings"><a href="#">Settings</a></li>
+
     </ul>
 
     <br />
+
+    <div id="tab-subscription" class="tab-content hidden">
+
+        <?php if ($model->activeSubscription) { ?>
+
+            <?php if($model->activeSubscription->plan_id == 2) { ?>
+
+                <h5>Subscription </h5>
+
+                <?= DetailView::widget([
+                    'model' => $model->activeSubscription,
+                    'attributes' => [
+                        'status',
+                        'subscription_start_at',
+                        'subscription_end_at',
+                    ],
+                ]); ?>
+
+            <?php } ?>
+
+            <?php if ($model->activeSubscription->plan) { ?>
+                <h5>Active plan </h5>
+
+                <?=  DetailView::widget([
+                    'model' => $model->activeSubscription->plan,
+                    'attributes' => [
+                        'plan_id',
+                        'name',
+                        'description',
+                        'price',
+                        'platform_fee',
+                    ],
+                ]) ?>
+            <?php } ?>
+        <?php } ?>
+    </div>
 
     <div id="tab-analytics" class="tab-content hidden">
         <?=
@@ -297,17 +381,19 @@ $this->registerJs($js);
 
             //if(str_contains($model->restaurant_domain, ".plugn.store")) {
 
-            if(str_contains($model->restaurant_domain, ".plugn.site")) {
+            echo Html::a('Downgrade', ['downgrade', 'id' => $model->restaurant_uuid], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Are you sure you want to downgrade store to older codebase?',
+                    'method' => 'post',
+                ],
+            ]);
 
-                echo Html::a('Downgrade', ['downgrade', 'id' => $model->restaurant_uuid], [
-                    'class' => 'btn btn-danger',
-                    'data' => [
-                        'confirm' => 'Are you sure you want to downgrade store to older codebase?',
-                        'method' => 'post',
-                    ],
-                ]);
+            //if(str_contains($model->restaurant_domain, ".plugn.site")) {
 
-            } else if($model->site_id) {
+            ///} else
+            /// 
+            if($model->site_id) {
 
                 echo Html::a('Upgrade', ['upgrade', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-danger',
@@ -351,7 +437,8 @@ $this->registerJs($js);
                     'attribute' => 'status',
                     'filter' => RestaurantDomainRequest::arrStatus(),
                     'value' => function($data) {
-                        return RestaurantDomainRequest::arrStatus()[$data->status];
+                        $arrStatus = RestaurantDomainRequest::arrStatus();
+                        return isset($arrStatus[$data->status])? $arrStatus[$data->status]: null;
                     }
                 ],
                 //'created_by',
@@ -479,6 +566,16 @@ $this->registerJs($js);
 
     <div id="tab-payment" class="tab-content hidden">
 
+        <h5>Debug </h5>
+        <?php
+
+        echo Html::a('View API Logs', ['api-log/index', 'ApiLogSearch[restaurant_uuid]' => $model->restaurant_uuid], [
+            'class' => 'btn btn-primary btn-process-queue',
+            "target"=> "_blank",
+        ]). '&nbsp;&nbsp;'; ?>
+
+        <h5>Register with tap </h5>
+
         <?php
 
         if (($model->logo && !$model->logo_file_id) ||
@@ -489,7 +586,7 @@ $this->registerJs($js);
             ($model->identification_file_back_side && !$model->identification_file_id_back_side)
         ) {//|| !$model->developer_id
 
-            echo Html::a('Upload Documents', ['upload-documents-to-tap', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Upload Documents <small>Licence, bank statements etc,.. to tap</small>', ['upload-documents-to-tap', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -502,7 +599,7 @@ $this->registerJs($js);
 
         //if (!$model->merchant_id && (!$model->business_id || !$model->business_entity_id)) {//|| !$model->developer_id
 
-            echo Html::a('Create Business', ['create-business', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Create Business <small>Register business with tap</small>', ['create-business', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -515,7 +612,7 @@ $this->registerJs($js);
 
         //if (!$model->merchant_id) {
 
-            echo Html::a('Create Merchant', ['create-merchant', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Create Merchant <small>Create Merchant/ outlet in generated business account</small>', ['create-merchant', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -537,7 +634,7 @@ $this->registerJs($js);
 
         //if ($model->wallet_id && $model->developer_id && !$model->operator_id) {
 
-            echo Html::a('Create An Operator', ['create-an-operator', 'id' => $model->restaurant_uuid], [
+            echo Html::a('Create An Operator <small>Generate API keys if not provided in merchant details</small>', ['create-an-operator', 'id' => $model->restaurant_uuid], [
                 'class' => 'btn btn-primary btn-process-queue',
                 'data' => [
                     'confirm' => 'Are you sure?',
@@ -545,7 +642,11 @@ $this->registerJs($js);
                 ],
             ]). '&nbsp;&nbsp;';
        // }
+        ?>
 
+        <h5>Check status </h5>
+
+        <?php
        // if($model->business_id ) {///&& !$model->is_tap_business_active
             echo Html::a('Check Tap Business Status', ['poll-tap-business-status', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-primary btn-process-queue',
@@ -567,6 +668,8 @@ $this->registerJs($js);
       //  }
 
         ?>
+
+        <h5>Reset </h5>
 
         <?=
         Html::a('Force Create Tap Account', ['force-create-tap-account', 'id' => $model->restaurant_uuid], [
@@ -621,7 +724,9 @@ $this->registerJs($js);
             ?>
         <?php } ?>
 
+
         <?php if($model->is_tap_enable) { ?>
+            <h5>Test</h5>
             <?= Html::a('Test tap integration', ['restaurant/test-tap', 'id' => $model->restaurant_uuid], ['class' => 'btn btn-default']) ?>
         <?php } ?>
         <br/>

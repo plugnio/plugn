@@ -71,6 +71,9 @@ $this->title = 'Domain';
     .icon {
         width: 3rem;
         height: 3rem;
+        position: absolute;
+        right: 25px;
+        top: 25px;
     }
 
     .icon i {
@@ -110,7 +113,7 @@ $this->title = 'Domain';
         <div class="grid">
             <h3>Stats</h3>
 
-            <?= Html::beginForm(['/stats/index'], 'GET', ['class' => "form-inline form-filter"]); ?>
+            <?= Html::beginForm(['/stats/domain'], 'GET', ['class' => "form-inline form-filter"]); ?>
 
             <div class="form-group mb-2">
                 <label for="date_start">Start Date</label>
@@ -138,7 +141,13 @@ $this->title = 'Domain';
 
             <div class="row">
 
+
                 <div class="col-xl-3 col-lg-4">
+                    <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                        'RestaurantSearch[date_start]' => $date_start,
+                        'RestaurantSearch[date_end]' => $date_end,
+                        'RestaurantSearch[customDomain]' => 1
+                    ]) ?>">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
                             <h5 class="card-title text-uppercase text-muted mb-0">Custom domain</h5>
@@ -148,9 +157,16 @@ $this->title = 'Domain';
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div><!-- END .col-xl-3 -->
 
                 <div class="col-xl-3 col-lg-4">
+
+                    <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                        'RestaurantSearch[date_start]' => $date_start,
+                        'RestaurantSearch[date_end]' => $date_end,
+                        'RestaurantSearch[plugnDomain]' => 1
+                    ]) ?>">
                     <div class="card card-stats mb-4 mb-xl-0">
                         <div class="card-body">
                             <h5 class="card-title text-uppercase text-muted mb-0">Free plugn domain</h5>
@@ -160,11 +176,15 @@ $this->title = 'Domain';
                             </div>
                         </div>
                     </div>
+                    </a>
                 </div><!-- END .col-xl-3 -->
 
 
                 <div class="col-xl-3 col-lg-4">
-                    <a href="<?= Url::to(['restaurant-domain-request/index']) ?>">
+                    <a href="<?= Url::to(['restaurant-domain-request/index',
+                        'RestaurantDomainRequestSearch[date_start]' => $date_start,
+                        'RestaurantDomainRequestSearch[date_end]' => $date_end
+                    ]) ?>">
                         <div class="card card-stats mb-4 mb-xl-0">
                             <div class="card-body">
                                 <h5 class="card-title text-uppercase text-muted mb-0">Domain Requests</h5>
@@ -179,7 +199,11 @@ $this->title = 'Domain';
                 </div><!-- END .col-xl-3 -->
 
                 <div class="col-xl-3 col-lg-4">
-                    <a href="<?= Url::to(['restaurant-domain-request/index', 'RestaurantDomainRequestSearch[status]' => '2']) ?>">
+                    <a href="<?= Url::to(['restaurant-domain-request/index',
+                        'RestaurantDomainRequestSearch[date_start]' => $date_start,
+                        'RestaurantDomainRequestSearch[date_end]' => $date_end,
+                        'RestaurantDomainRequestSearch[status]' => '2'
+                    ]) ?>">
                         <div class="card card-stats mb-4 mb-xl-0">
                             <div class="card-body">
                                 <h5 class="card-title text-uppercase text-muted mb-0">Pending Domain Requests</h5>

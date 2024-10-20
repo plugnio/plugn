@@ -72,6 +72,9 @@ $this->title = 'Summary';
     .icon {
         width: 3rem;
         height: 3rem;
+        position: absolute;
+        right: 25px;
+        top: 25px;
     }
 
     .icon i {
@@ -139,31 +142,68 @@ $this->title = 'Summary';
         <div class="row">
 
             <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[country_id]' => $country_id,
+                    'RestaurantSearch[date_start]' => $date_start,
+                    'RestaurantSearch[date_end]' => $date_end,
+                    'RestaurantSearch[notActive15Days]' => 1,
+                ]) ?>">
+                    <div class="card card-stats mb-4 mb-xl-0">
+                        <div class="card-body">
+
+                            <h5 class="card-title text-uppercase text-muted mb-0">No order in 15 days</h5>
+                            <span class="h2 font-weight-bold mb-0"><?= $noOrderIn15Days ?></span>
+
+                            <p>Stores not having orders in last 15 days</p>
+                            <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div><!-- END .col-xl-3 -->
+
+            <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[country_id]' => $country_id,
+                    'RestaurantSearch[date_start]' => $date_start,
+                    'RestaurantSearch[date_end]' => $date_end,
+                    'RestaurantSearch[notActive]' => 1,
+                ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
 
                         <h5 class="card-title text-uppercase text-muted mb-0">In-active Stores</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $inActiveStores ?></span>
 
+                        <p>In-active means not having orders, items</p>
                         <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                             <i class="fas fa-chart-bar"></i>
                         </div>
                     </div>
                 </div>
+                </a>
             </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[country_id]' => $country_id,
+                    'RestaurantSearch[date_start]' => $date_start,
+                    'RestaurantSearch[date_end]' => $date_end,
+                    'RestaurantSearch[active]' => 1,
+                ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
 
                         <h5 class="card-title text-uppercase text-muted mb-0">Active Stores</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $activeStores ?></span>
-
+                        <p>Active store means having orders and/or items</p>
                         <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                             <i class="fas fa-chart-bar"></i>
                         </div>
                     </div>
                 </div>
+                </a>
             </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
@@ -172,7 +212,7 @@ $this->title = 'Summary';
                         <div class="card-body">
                             <h5 class="card-title text-uppercase text-muted mb-0">Total Orders Received</h5>
                             <span class="h2 font-weight-bold mb-0"><?= $totalOrders ?></span>
-
+                            <p>Total order received by stores</p>
                             <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
                                 <i class="fas fa-chart-bar"></i>
                             </div>
@@ -181,53 +221,90 @@ $this->title = 'Summary';
             </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[country_id]' => $country_id,
+                    'RestaurantSearch[date_start]' => $date_start,
+                    'RestaurantSearch[date_end]' => $date_end,
+
+                ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-muted mb-0">Number of stores created</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $totalStores ?></span>
+                        <p>Total store created/ signups</p>
+
                         <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
                             <i class="fas fa-users"></i>
                         </div>
                     </div>
                 </div>
+                </a>
             </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[country_id]' => $country_id,
+                    'RestaurantSearch[date_start]' => $date_start,
+                    'RestaurantSearch[date_end]' => $date_end,
+                    "RestaurantSearch[activeSubscription]" => 1,
+
+                ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-muted mb-0">Number of premium stores</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $totalPremium ?></span>
+                        <p>Stores with active subscription</p>
+
                         <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
                             <i class="fas fa-users"></i>
                         </div>
                     </div>
                 </div>
+                </a>
             </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[country_id]' => $country_id,
+                    'RestaurantSearch[date_start]' => $date_start,
+                    'RestaurantSearch[date_end]' => $date_end,
+                    "RestaurantSearch[noActiveSubscription]" => 1,
+
+                ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-muted mb-0">Number of free stores</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $totalFreeStores ?></span>
+                        <p>Total store without subscription</p>
 
                         <div class="icon icon-shape bg-info text-white rounded-circle shadow">
                             <i class="fas fa-chart-bar"></i>
                         </div>
                     </div>
                 </div>
+                </a>
             </div><!-- END .col-xl-3 -->
 
             <div class="col-xl-3 col-lg-4">
+                <a href="<?= \yii\helpers\Url::to(['restaurant/index',
+                    'RestaurantSearch[country_id]' => $country_id,
+                    'RestaurantSearch[date_start]' => $date_start,
+                    'RestaurantSearch[date_end]' => $date_end,
+                    "RestaurantSearch[storesWithPaymentGateway]" => true,
+
+                ]) ?>">
                 <div class="card card-stats mb-4 mb-xl-0">
                     <div class="card-body">
                         <h5 class="card-title text-uppercase text-muted mb-0">Stores with payment method usage</h5>
                         <span class="h2 font-weight-bold mb-0"><?= $totalStoresWithPaymentGateway ?></span>
+                        <p>Stores with online payment option</p>
 
                         <div class="icon icon-shape bg-info text-white rounded-circle shadow">
                             <i class="fas fa-chart-bar"></i>
                         </div>
                     </div>
                 </div>
+                </a>
             </div><!-- END .col-xl-3 -->
 
         </div>

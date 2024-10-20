@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Admin */
+/* @var $model backend\models\Staff */
 
 $this->title = $model->staff_name;
 $this->params['breadcrumbs'][] = ['label' => 'Staffs', 'url' => ['index']];
@@ -15,6 +15,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
+        <?php if ($model->staff_status == \common\models\Staff::STATUS_ACTIVE) { ?>
+            <?= Html::a('Login to CRM', ['login', 'id' => $model->staff_id], ['class' => 'btn btn-primary']) ?>
+        <?php } ?>
+
         <?= Html::a('Update', ['update', 'id' => $model->staff_id], ['class' => 'btn btn-primary btn-update']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->staff_id], [
             'class' => 'btn btn-danger btn-delete',
@@ -37,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => 'Status',
-                'value' => $model->status == \common\models\Staff::STATUS_ACTIVE? "Active": "Deleted",
+                'value' => $model->staff_status == \common\models\Staff::STATUS_ACTIVE? "Active": "Deleted",
             ],
             'staff_created_at:datetime',
             'staff_updated_at:datetime',

@@ -80,7 +80,8 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
 
-        $url = Yii::$app->params['newDashboardAppUrl']. '?auth_key='.$model->agent_auth_key;
+        $url = Yii::$app->params['newDashboardAppUrl']. '?auth_key='.$model->agent_auth_key .'&store_id=' .
+            $store->restaurant_uuid;
 
         return $this->redirect($url);
     }
@@ -172,6 +173,17 @@ class RestaurantController extends Controller {
                 'restaurant_created_at:datetime'
             ]
         ]);
+    }
+
+    public function actionSyncAi($id)
+    {
+        $store = $this->findModel($id);
+
+        $store->generateGPTTrainingData();
+
+        Yii::$app->session->addFlash('success', "Item data synced!");
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
     }
 
     public function actionFilter() {
@@ -290,7 +302,7 @@ class RestaurantController extends Controller {
         $store->test_public_key = null;
 
         if(!$store->save()) {
-            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors));
+            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors, true));
         }
         else
         {
@@ -300,6 +312,11 @@ class RestaurantController extends Controller {
         return $this->redirect(['view', 'id' => $id]);
     }
 
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws NotFoundHttpException
+     */
     public function actionResetTap($id)
     {
         $store = $this->findModel($id);
@@ -318,7 +335,6 @@ class RestaurantController extends Controller {
 
         $store->live_public_key = null;
         $store->test_public_key = null;
-
 
         $store->license_number = null;
 
@@ -341,15 +357,12 @@ class RestaurantController extends Controller {
         //$store->identification_file_purpose = null;
         $store->restaurant_email_notification = null;
 
-
         $store->commercial_license_issuing_date = null;
         $store->commercial_license_expiry_date = null;
         //$store->commercial_license_title = null;
         $store->commercial_license_file = null;
         $store->commercial_license_file_id = null;
         //$store->commercial_license_file_purpose = null;
-
-
 
         $store->is_tap_enable = null;
         $store->is_tap_created = null;
@@ -362,7 +375,7 @@ class RestaurantController extends Controller {
         $store->tap_queue_id = null;
 
         if(!$store->save()) {
-            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors));
+            Yii::$app->session->setFlash('errorResponse', "Error: " . print_r($store->errors, true));
         }
         else 
         {
@@ -739,6 +752,36 @@ class RestaurantController extends Controller {
         else
         {
             Yii::$app->session->setFlash('errorResponse', $store->getErrors());
+        }
+
+        return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+    }
+
+    /**
+     * @param $id
+     * @return void|\yii\web\Response
+     * @throws NotFoundHttpException
+     */
+    public function actionConfigureDns($id)
+    {
+        $store = $this->findModel($id);
+
+        //if custom domain
+
+        $response = Yii::$app->netlifyComponent->createDnsZone($store);//configureDNSForSite($store->site_id);
+
+        if ($response->isOk) {
+            Yii::$app->session->setFlash('successResponse', "Success: DNS configured!");
+
+            if (isset($response->data['dns_servers'])) {
+                Yii::$app->session->setFlash('successResponse', "DNS Servers: " . implode(",", $response->data['dns_servers']));
+            }
+
+        }else
+        {
+            Yii::error('[Error while publishing site]' . json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
+
+            Yii::$app->session->setFlash('errorResponse', json_encode($response->data));
         }
 
         return $this->redirect(['view', 'id' => $store->restaurant_uuid]);

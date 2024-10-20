@@ -1,7 +1,10 @@
 <?php
 
 $params = array_merge(
-        require(__DIR__ . '/../../common/config/params.php'), require(__DIR__ . '/../../common/config/params-local.php'), require(__DIR__ . '/params.php'), require(__DIR__ . '/params-local.php')
+        require(__DIR__ . '/../../common/config/params.php'),
+        require(__DIR__ . '/../../common/config/params-local.php'),
+        require(__DIR__ . '/params.php'),
+        require(__DIR__ . '/params-local.php')
 );
 
 return [
@@ -293,6 +296,7 @@ return [
                     'pluralize' => false,
                     'patterns' => [
                         'POST process-payment' => 'process-payment',
+                        'PATCH process-payment' => 'process-payment',
                         'POST validate-merchant' => 'validate-merchant',
                         // OPTIONS VERBS
                         'OPTIONS process-payment' => 'options',
@@ -361,6 +365,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET download-invoice/<id>' => "download-invoice",
+                        "POST validate-cart" => "validate-cart",
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST init-order/<id>' => 'init-order',
                         'POST apply-promo-code/<order_uuid>' => 'apply-promo-code',
@@ -374,7 +379,8 @@ return [
                         'GET <id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS download-invoice/<id>' =>'options',
+                        "OPTIONS validate-cart" => 'options',
+                        'OPTIONS download-invoice/<id>' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
                         'OPTIONS init-order/<id>' => 'options',
                         'OPTIONS instruction/<order_uuid>' => 'options',
@@ -415,6 +421,7 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET download-invoice/<id>' => "download-invoice",
+                        "POST validate-cart" => "validate-cart",
                         'POST payment-webhook' => 'payment-webhook',
                         'POST status-update-webhook' => 'update-mashkor-order-status',
                         'POST update-armada-order-status' => 'update-armada-order-status',
@@ -422,6 +429,7 @@ return [
                         'POST apply-promo-code/<order_uuid>' => 'apply-promo-code',
                         'POST instruction/<order_uuid>' => 'instruction',
                         'POST <id>' => 'place-an-order',
+                        'PATCH <id>' => 'update-order',
                         'GET check-for-pending-orders/<restaurant_uuid>' => 'check-pending-orders',
                         'GET callback' => 'callback',
                         'GET my-fatoorah-callback' => 'my-fatoorah-callback',
@@ -430,6 +438,7 @@ return [
                         'GET order-details/<id>/<restaurant_uuid>' => 'order-details',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        "OPTIONS validate-cart" => "options",
                         'OPTIONS download-invoice/<id>' => 'options',
                         'OPTIONS payment-webhook' => 'options',
                         'OPTIONS status-update-webhook' => 'options',
@@ -470,6 +479,17 @@ return [
                         'OPTIONS' => 'options',
                         'OPTIONS get-store-list' => 'options',
                         'OPTIONS get-latest-order/<restaurant_uuid>' => 'options',
+                    ]
+                ],
+                [//ChatController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/chat',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST <id>' => 'chat',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options'
                     ]
                 ],
             ],

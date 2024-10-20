@@ -8,6 +8,7 @@ use api\models\City;
 use common\models\Agent;
 use common\models\CustomerAddress;
 use common\models\MailLog;
+use common\models\RestaurantChatBotQueue;
 use Yii;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
@@ -23,9 +24,6 @@ use common\models\Item;
 use common\models\Refund;
 use common\models\Order;
 use common\models\Subscription;
-use \DateTime;
-use yii\db\Exception;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
 use yii\db\Expression;
 
@@ -48,8 +46,21 @@ class CronController extends \yii\console\Controller
             ->setSubject ('Test aws config')
             ->setTo ("kathrechakrushn@gmail.com")
             //->setCc($contactEmails)
-            //->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
+            ->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool'])
             ->send ();*/
+
+        //6296937a-2bed-44d7-808a-2285e5c2bb22
+        //bd7e752d-0fd4-45a5-98f1-b67eaff454fa
+        //$response = Yii::$app->netlifyComponent->getSiteDns("6296937a-2bed-44d7-808a-2285e5c2bb22");
+//getSiteData
+        //print_r($response->data);//[sizeof($response->data) - 1]['dns_servers']
+     //   records hostname
+
+        Yii::$app->eventManager->track(
+            'Test event',
+            [
+                'hello' => "world"
+            ]);
     }
 
     public function actionFixDuplicateAreas() {
@@ -177,7 +188,8 @@ class CronController extends \yii\console\Controller
      */
     public function actionWeeklyReport()
     {
-        $query = Restaurant::find();
+        $query = Restaurant::find()
+            ->andWhere(['is_deleted' => false]);
 
         foreach ($query->batch(100) as $stores) {
             foreach ($stores as $key => $store) {
@@ -369,67 +381,135 @@ class CronController extends \yii\console\Controller
     }
 
     /**
+     * fix platform fee as previous implementation was not resetting platform fee
+     * @return void
+     */
+    public function actionFixPlatformFee() {
+
+        $storeQuery = Restaurant::find()
+            ->andWhere(['platform_fee' => 0])
+            ->andWhere(['restaurant.is_deleted' => 0]);
+
+        $i = 0;
+        $sc = 0;
+
+        foreach ($storeQuery->batch() as $stores) {
+
+            foreach ($stores as $store) {
+
+                $subscription = $store->getSubscriptions()
+                    ->andWhere(['plan_id' => 2, "subscription_status" => \agent\models\Subscription::STATUS_ACTIVE])
+                    ->andWhere(new Expression("DATE(NOW()) <= DATE(subscription_end_at)"))
+                    ->one();
+
+                if ($subscription) {
+                    $sc++;
+                    continue;
+                }
+
+                $store->platform_fee = 0.05;
+                if(!$store->save(false)) {
+                    print_r($store->getErrors());
+                    Yii::error($store->getErrors());
+                    die();
+                }
+
+                $i++;
+            }
+        }
+
+        echo $i. " store fixed, " . $sc . " subscription validated";
+    }
+
+    /**
      * @return void
      */
     public function actionDowngradedStoreSubscription()
     {
-        $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d")));
-        $end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d")));
+        //$start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"), date("d")));
+        //$end_date = date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"), date("d")));
 
         $query = Subscription::find()
-            ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
+            ->andWhere([
+                "plan_id" => 2,
+                'subscription_status' => Subscription::STATUS_ACTIVE
+            ])
+            ->andWhere(new Expression("DATE(NOW()) > DATE(subscription_end_at)"))
             // ->andWhere(['notified_email' => 1])
-            ->andWhere(['not', ['subscription_end_at' => null]])
-            ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])//todo: try DATE mysql function
+            //->andWhere(['not', ['subscription_end_at' => null]])
+            //->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
             ->with(['plan', 'restaurant']);
 
+        $i = 0;
+
         foreach ($query->batch() as $subscriptions) {
+
             foreach ($subscriptions as $subscription) {
 
-                if (date('Y-m-d', strtotime($subscription->subscription_end_at)) == date('Y-m-d')) {
+                $i++;
 
-                    foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
+                //if (date('Y-m-d', strtotime($subscription->subscription_end_at)) < date('Y-m-d')) {
 
-                        $ml = new MailLog();
-                        $ml->to = $agent->agent_email;
-                        $ml->from = \Yii::$app->params['noReplyEmail'];
-                        $ml->subject = $subscription->restaurant->name . ' has been downgraded to our free plan';
-                        $ml->save();
+                $agents = $subscription->restaurant->getOwnerAgent()->all();
 
-                        $mailer = \Yii::$app->mailer->compose([
-                            'html' => 'subscription-expired',
-                        ], [
-                            'subscription' => $subscription,
-                            'store' => $subscription->restaurant,
-                            'plan' => $subscription->plan->name,
-                            'agent_name' => $agent->agent_name,
-                        ])
-                            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
-                            ->setReplyTo(\Yii::$app->params['supportEmail'])
-                            ->setTo($agent->agent_email)
-                            ->setBcc(\Yii::$app->params['supportEmail'])
-                            ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan');
+                foreach ($agents as $agent) {
 
-                        if(\Yii::$app->params['elasticMailIpPool'])
-                            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                    $ml = new MailLog();
+                    $ml->to = $agent->agent_email;
+                    $ml->from = \Yii::$app->params['noReplyEmail'];
+                    $ml->subject = $subscription->restaurant->name . ' has been downgraded to our free plan';
+                    $ml->save();
 
-                        try {
+                    $mailer = \Yii::$app->mailer->compose([
+                        'html' => 'subscription-expired',
+                    ], [
+                        'subscription' => $subscription,
+                        'store' => $subscription->restaurant,
+                        'plan' => $subscription->plan->name,
+                        'agent_name' => $agent->agent_name,
+                    ])
+                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                        ->setReplyTo(\Yii::$app->params['supportEmail'])
+                        ->setTo($agent->agent_email)
+                        ->setBcc(\Yii::$app->params['supportEmail'])
+                        ->setSubject($subscription->restaurant->name . ' has been downgraded to our free plan');
 
-                            $result = $mailer->send();
+                    if(\Yii::$app->params['elasticMailIpPool'])
+                        $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
 
-                            if (!$result)
-                                Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
+                    try {
 
-                        } catch (\Swift_TransportException $e) {
-                            Yii::error($e->getMessage(), "email");
-                        }
+                        $result = $mailer->send();
+
+                        if (!$result)
+                            Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
+
+                    } catch (\Swift_TransportException $e) {
+                        Yii::error($e->getMessage(), "email");
                     }
-
-                    $subscription->subscription_status = Subscription::STATUS_INACTIVE;
-                    $subscription->save();
                 }
+
+                $subscription->subscription_status = Subscription::STATUS_INACTIVE;
+
+                if(!$subscription->save()) {
+                    print_r($subscription->getErrors());
+                    Yii::error($subscription->getErrors());
+                    die();
+                }
+
+                //restore platform fee
+                $subscription->restaurant->platform_fee = 0.05;
+                if(!$subscription->restaurant->save(false)) {
+                    print_r($subscription->restaurant->getErrors());
+                    Yii::error($subscription->restaurant->getErrors());
+                    die();
+                }
+
+                //}
             }
         }
+
+        echo $i . " subscription deactivated";
     }
 
     /**
@@ -983,6 +1063,26 @@ class CronController extends \yii\console\Controller
      * @return void
      */
     public function actionHour() {
+
+       /* if (YII_ENV != 'prod') {
+            return null;
+        }*/
+
+        $query = RestaurantChatBotQueue::find([
+                'status' => RestaurantChatBotQueue::STATUS_PENDING,
+            ])
+            ->joinWith(['restaurant']);
+
+        foreach ($query->batch() as $rows) {
+            foreach ($rows as $row) {
+                //$row->status = RestaurantChatBotQueue::STATUS_PROCESSING;
+                //$row->save();
+
+                $row->restaurant->generateGPTTrainingData();
+
+                $row->delete();
+            }
+        }
     }
 
     /**
@@ -1051,7 +1151,7 @@ class CronController extends \yii\console\Controller
 
         //alert inactive stores
 
-        $query = Restaurant::find()
+        /*$query = Restaurant::find()
             ->andWhere(['!=', 'restaurant.is_deleted', 1])
             ->andWhere(new Expression("site_id IS NOT NULL"))
             ->inActive()
@@ -1077,7 +1177,7 @@ class CronController extends \yii\console\Controller
             foreach ($stores as $store) {
                 $store->deleteSite();
             }
-        }
+        }*/
 
         //send today's bestselling
 
@@ -1168,5 +1268,11 @@ class CronController extends \yii\console\Controller
         }
 
         $this->stdout($i . ' Total' . PHP_EOL);
+    }
+
+    public function actionGenerateGptFile() {
+        $store = Restaurant::findOne("rest_20219f60-3eda-11eb-b97d-0673128d0c9c");
+
+        $store->generateGPTTrainingData();
     }
 }

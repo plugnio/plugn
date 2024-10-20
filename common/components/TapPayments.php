@@ -953,7 +953,9 @@ class TapPayments extends Component
             ->setData([
                 "type" => "applepay",
                 "token_data" => $token,
-            ]);
+
+            ])
+            ->send();
     }
 
     /**

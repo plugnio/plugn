@@ -22,15 +22,16 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'log_uuid',
+           // 'log_uuid',
             'restaurant_uuid',
+            'restaurantName',
             'endpoint',
-            'method',
-            'request_headers:ntext',
-            'request_body:ntext',
+           // 'method',
+            //'request_headers:ntext',
+            //'request_body:ntext',
             //'response_headers:ntext',
             //'response_body:ntext',
-            //'created_at',
+            'created_at',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

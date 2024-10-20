@@ -17,13 +17,25 @@ return [
             // for the mailer to send real emails.
             'useFileTransport' => true,
         ],
+        'eventManager' => [
+            'class' => 'common\components\EventManager',
+            "sqsRagion" => "eu-west-2",
+            "sqsKey" => "AKIAWMITDJRKXNWDOBNJ",
+            "sqsSecret" => "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",
+            "sqsQueue" => "438663597141/PlugnDev"
+        ],
+
         'walletManager' => [
             'class' => 'common\components\WalletManager',
             'apiKey' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
             'apiEndpoint' => 'http://localhost/wallet/webhook/web/v1',
             'companyWalletUserID' => 'user_fcac8a5f-52a2-11ed-a68e-d85ed3a264df'
         ],
-
+        'gpt' => [
+            'class' => 'common\components\GptComponent',
+            'token' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+            'apiEndpoint' => 'http://localhost:8083/'
+        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [

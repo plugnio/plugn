@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use backend\models\Admin;
 use Yii;
 use common\models\BlockedIp;
 use common\models\BlockedIPSearch;
@@ -24,6 +25,15 @@ class BlockedIpController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [//allow authenticated users only
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
                 ],
             ],
         ];

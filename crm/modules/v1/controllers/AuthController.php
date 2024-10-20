@@ -15,6 +15,7 @@ use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
 use crm\models\Staff;
 use crm\models\PasswordResetRequestForm;
+use yii\web\NotFoundHttpException;
 
 
 /**
@@ -91,6 +92,9 @@ class AuthController extends Controller {
             'verify-email',
             'is-email-verified',
             'login-auth0',
+            'login-by-key',
+            'login-by-apple',
+            'login-by-google',
         ];
 
         return $behaviors;
@@ -112,6 +116,80 @@ class AuthController extends Controller {
         ];
 
         return $actions;
+    }
+
+    /**
+     * @return array|type
+     * @throws NotFoundHttpException
+     */
+    public function actionLoginByGoogle() {
+
+        $token = Yii::$app->request->getBodyParam("idToken");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" . $token);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = json_decode(curl_exec($ch));
+
+        if (empty($response->email)) {
+            return [
+                'operation' => 'error',
+                "code" => 1,
+                'message' => Yii::t('agent',"Invalid access token")
+            ];
+        }
+
+        $model = Staff::find()
+            ->andWhere(['staff_email' => $response->email])
+            ->one();
+
+
+        if (!$model) {
+            return [
+                "operation" => "error",
+                "code" => 1,
+                "message" => Yii::t('agent',"Account not found")
+            ];
+        }
+
+        Yii::$app->eventManager->track('Log In', [
+            "login_method" => "Google"
+        ]);
+
+        return $this->_loginResponse($model);
+    }
+
+    /**
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionLoginByKey() {
+
+        $auth_key = Yii::$app->request->getBodyParam('auth_key');
+
+        $model = Staff::find()
+            ->andWhere(['staff_auth_key' => $auth_key])
+            //->andWhere(['deleted' => 0])
+            ->one();
+
+        if (!$model) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+
+            /*return [
+                "operation" => "error",
+                "code" => 1,
+                "message" => Yii::t('agent',"Account not found")
+            ];*/
+        }
+
+        Yii::$app->eventManager->track('Log In', [
+            "login_method" => "Admin"
+        ]);
+
+        $model->staff_auth_key = "";
+        $model->save(false);
+
+        return $this->_loginResponse($model);
     }
 
     /**
@@ -188,7 +266,7 @@ class AuthController extends Controller {
     /**
      * Re-send manual verification email to staff
      * @return array
-     */
+     *
     public function actionResendVerificationEmail()
     {
         $emailInput = Yii::$app->request->getBodyParam("email");
@@ -249,12 +327,12 @@ class AuthController extends Controller {
             'operation' => 'success',
             'message' => Yii::t('staff', 'Please click on the link sent to you by email to verify your account'),
         ];
-    }
+    }*/
 
     /**
      * Process email verification
      * @return array
-     */
+     *
     public function actionVerifyEmail() {
 
         $code = Yii::$app->request->getBodyParam("code");
@@ -315,7 +393,7 @@ class AuthController extends Controller {
                 'message' => Yii::t('staff', 'Invalid email verification code.')
             ];
         }
-    }
+    }*/
 
     /**
      * Sends password reset email to user
@@ -418,7 +496,7 @@ class AuthController extends Controller {
          * from that link so if user have token he have valid email
          */
 
-        $staff->staff_email_verification = Staff::EMAIL_VERIFIED;
+        //$staff->staff_email_verification = Staff::EMAIL_VERIFIED;
 
         $staff->save(false);
 

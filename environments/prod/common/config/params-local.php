@@ -4,6 +4,7 @@ return [
   'frontendUrl' => 'https://dash.plugn.io',
   'dashboardAppUrl' => 'https://dash.plugn.io',
   'newDashboardAppUrl' => 'https://dash.plugn.io',
+    'crmAppUrl' => 'https://crm.plugn.io',
   'dashboardCookieDomain' => 'dash.plugn.io',
     'oneSignalStoreAPPID' => '',
     'oneSignalStoreAPIKey' => '',

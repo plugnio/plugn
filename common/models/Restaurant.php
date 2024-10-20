@@ -137,6 +137,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $last_active_at
  * @property string|null $last_order_at
  * @property number $total_orders
+ * @property number $total_items
  * @property boolean $enable_guest_checkout
  * @property string $owner_name_title
  * @property string $owner_middle_name
@@ -432,6 +433,9 @@ class Restaurant extends ActiveRecord
     public function rules()
     {
         return [
+
+            [['is_deleted'], "default", "value" => 0],
+
             [['owner_first_name', 'owner_last_name', 'owner_email', 'owner_number'], 'required', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             [
                 [
@@ -450,7 +454,10 @@ class Restaurant extends ActiveRecord
 
             [["owner_date_of_birth"], "string"],
 
-            [['authorized_signature_file'], 'required'],
+            [['authorized_signature_file'], 'required', 'on' => [
+                self::SCENARIO_CREATE_TAP_ACCOUNT,
+                self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT
+            ]],
     /*, 'on' => self::SCENARIO_UPLOAD_STORE_DOCUMENT, 'when' => function ($model) {
                 return $model->business_type == 'corp';
             }*/
@@ -465,7 +472,7 @@ class Restaurant extends ActiveRecord
                 self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT
             ]],
 
-            [['not_for_profit', 'total_orders'], 'number'],
+            [['not_for_profit', 'total_orders', "total_items"], 'number'],
 
             [['authorized_signature_issuing_date', 'authorized_signature_expiry_date', 'commercial_license_issuing_date', 'commercial_license_expiry_date', 'identification_issuing_date', 'identification_expiry_date'], 'safe', 'on' => [self::SCENARIO_CREATE_TAP_ACCOUNT, self::SCENARIO_CREATE_MYFATOORAH_ACCOUNT]],
             ['owner_email', 'email'],
@@ -499,7 +506,9 @@ class Restaurant extends ActiveRecord
 // 'owner_number',
             ['name', 'match', 'pattern' => '/^[a-zA-Z0-9-\s]+$/', 'message' => 'Your store name can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
-            ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/', 'message' => 'Your store url can only contain alphanumeric characters', 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
+            ['restaurant_domain', 'match', 'pattern' => '/^[a-zA-Z0-9-]+$/',
+                'message' => 'Your store url can only contain alphanumeric characters',
+                'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
             [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
@@ -521,7 +530,7 @@ class Restaurant extends ActiveRecord
             [['restaurant_uuid'], 'string', 'max' => 60],
             [['default_language'], 'string', 'max' => 2],
             [['custom_css'], 'string'],
-            [['is_public', 'is_deleted', 'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox', 'enable_cod_fee'], 'boolean'],
+            [['is_public',  'is_under_maintenance', 'accept_order_247', 'enable_debugger', 'is_sandbox', 'enable_cod_fee'], 'boolean'],
             [['platform_fee', 'warehouse_fee', 'warehouse_delivery_charges'], 'number'],
             [['instagram_url'], 'url'],
             [['export_orders_data_in_specific_date_range', 'export_sold_items_data_in_specific_date_range', 'google_analytics_id', 'facebook_pixil_id', 'google_tag_id', 'google_tag_manager_id', 'tiktok_pixel_id', 'snapchat_pixil_id', 'site_id'], 'safe'],
@@ -610,14 +619,19 @@ class Restaurant extends ActiveRecord
             [['restaurant_email_notification', 'demand_delivery', 'schedule_order', 'phone_number_display', 'store_layout', 'show_opening_hours', 'is_tap_enable', 'is_tap_created', 'is_tap_business_active', 'is_myfatoorah_enable', 'supplierCode'], 'integer'],
             [['schedule_interval'], 'required', 'when' => function ($model) {
                 return $model->schedule_order;
-            }
-            ],
+            }],
             [['custom_subscription_price'], 'number', 'min' => 0],
             [['referral_code'], 'string', 'max' => 6],
             [['referral_code'], 'default', 'value' => null],
             ['restaurant_email', 'email'],
             [['enable_guest_checkout'], 'boolean'],
-            [['restaurant_uuid', 'restaurant_domain', 'name', 'owner_email'], 'unique'],
+            [['restaurant_uuid'], 'unique'],
+
+            //name, owner_email
+
+            [['restaurant_domain'], 'unique', 'comboNotUnique' => 'Domain already exist.',  'targetAttribute' => [
+                'restaurant_domain', 'is_deleted']],
+
             [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
             [['referral_code'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['referral_code' => 'referral_code']],
@@ -626,6 +640,9 @@ class Restaurant extends ActiveRecord
         ];
     }
 
+    /**
+     * @return array|array[]
+     */
     public function scenarios()
     {
         $scenarios = parent::scenarios();
@@ -927,6 +944,97 @@ class Restaurant extends ActiveRecord
         return "Couldnt find a status";
     }
 
+    public function generateGPTTrainingData() {
+
+        $query = $this->getItems()->filterPublished();
+        //->limit(2);
+
+        $jsonItems = [];
+
+        foreach ($query->batch(100) as $items) {
+            foreach ($items as $item) {
+                $jsonItems[] = [
+                    "item_uuid" => $item->item_uuid,
+                    "item_name" => $item->item_name,
+                    "item_name_ar" => $item->item_name_ar,
+                    "item_description" => $item->item_description,
+                    "item_description_ar" => $item->item_description_ar,
+                    "slug" => $item->slug,
+                    //"itemImages" => $item->getItemImages()->all()
+                ];
+            }
+        }
+
+        $customerCare = "Email:" . $this->restaurant_email;
+
+        if ($this->phone_number_display && $this->phone_number) {
+            $customerCare .= " Contact number: " . $this->phone_number_country_code ." " . $this->phone_number;
+        }
+
+        //todo: admin and/or vendor defined data 
+
+        $jsonItems[] = [
+            "key" => "customer care details",
+            "value" => $customerCare
+        ];
+
+        /**
+        - create json file from database
+        - call create assistant api and save assistant id for reference
+        - call create vector api with file paths (from first step), assistant_id, restaurant_uuid. This will attach vector to assistant.
+        - start message thread
+        - listen to thread and assistant at /api/thread/stream/<asst_id>/<thread_id> from client app
+        and start sending message to thread
+         */
+
+        Yii::$app->gpt->call("POST", "sync/" . $this->restaurant_uuid, $jsonItems);
+
+        //echo json_encode($jsonItems, JSON_UNESCAPED_UNICODE);
+        //$this->uploadChatGPTTrainingData($jsonItems);
+    }
+
+    public function uploadChatGPTTrainingData($content) {
+
+        try {
+
+            $output = Yii::$app->security->generateRandomString();
+
+            $extension = "jsonl";
+            $content_type = "application/jsonl";
+
+            $file_s3_path = 'training-data/' . $output . '.' . $extension;;
+
+            Yii::$app->resourceManager->saveContent($file_s3_path, $content, [], $content_type);
+
+            $attachment = new RestaurantTrainingFiles;
+            $attachment->restaurant_uuid = $this->restaurant_uuid;
+            $attachment->file_path = $file_s3_path;
+            // $attachment->gpt_file_id = null;
+            // $attachment->gpt_fine_tuning_job_id = null;
+            // $attachment->gpt_fine_tuning_job_status = null;
+            // $attachment->gpt_fine_tuned_model = null;
+            $attachment->save();
+
+            //todo: remove old model + file?
+
+        } catch (\Aws\S3\Exception\S3Exception $e) {
+
+            Yii::error($e->getMessage(), 'agent');
+
+            //$this->addError('attachments', Yii::t('app', 'Please try again.'));
+
+            return false;
+
+        } catch (\Exception $e) {
+
+            Yii::error($e->getMessage(), 'agent');
+
+            //$this->addError('candidate_video', Yii::t('app', 'Video not available to save.'));
+
+            return false;
+        }
+    }
+
     /**
      * Upload a File from AWS to cloudinary
      * @param $file_path
@@ -1012,6 +1120,16 @@ class Restaurant extends ActiveRecord
     }
 
     /**
+     * Gets query for [[ApiLogs]].
+     *
+     * @return ActiveQuery
+     */
+    public function getApiLogs($modelClass = "\common\models\ApiLog")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[RestaurantDomainRequest]].
      *
      * @return ActiveQuery
@@ -1088,9 +1206,8 @@ class Restaurant extends ActiveRecord
      * @param $old_domain
      * @return array
      */
-    public function notifyDomainUpdated($old_domain)
+    public function notifyDomainUpdated($old_domain, $restaurantDomainRequest = null)
     {
-
         if(!str_contains($this->restaurant_domain, '.plugn.')) {
             Yii::$app->eventManager->track('Custom Domain Activated', [
                     "old_domain" => $old_domain,
@@ -1103,13 +1220,14 @@ class Restaurant extends ActiveRecord
             );
         }
 
-
-        $model = new RestaurantDomainRequest;
-        $model->restaurant_uuid = $this->restaurant_uuid;
-        $model->created_by = Yii::$app->user->getId();
-        $model->domain = $this->restaurant_domain;
-        $model->status = RestaurantDomainRequest::STATUS_ASSIGNED;
-        $model->save(false);
+        if (!$restaurantDomainRequest) {
+            $restaurantDomainRequest = new RestaurantDomainRequest;
+            $restaurantDomainRequest->restaurant_uuid = $this->restaurant_uuid;
+            $restaurantDomainRequest->created_by = Yii::$app->user->getId();
+            $restaurantDomainRequest->domain = $this->restaurant_domain;
+            $restaurantDomainRequest->status = RestaurantDomainRequest::STATUS_ASSIGNED;
+            $restaurantDomainRequest->save(false);
+        }
 
         Yii::info("[Store Domain Updated] " . $this->name . " changed domain from " .
             $old_domain . " to " . $this->restaurant_domain, __METHOD__);
@@ -1158,7 +1276,7 @@ class Restaurant extends ActiveRecord
             }
         }
 
-        return self::message("success", "Congratulations you have successfully changed your domain name");
+        return self::message("success", "Domain assigned to store. Don't forgot to point A record to 75.2.60.5 if you connecting existing domain (domain managed by you). Please contact customer care if facing any issue.");
     }
 
     /**
@@ -1207,6 +1325,9 @@ class Restaurant extends ActiveRecord
             ->with('agent');
     }
 
+    /**
+     * @return void
+     */
     public function alertInActive()
     {
         $mailer = Yii::$app->mailer->compose([
@@ -1848,11 +1969,19 @@ class Restaurant extends ActiveRecord
 
             //$merchantApiResponse->data['errors'][0]['code'] == 2109
 
-            if(
-                isset($merchantApiResponse->data['errors'][0]['error']) &&
-                $merchantApiResponse->data['errors'][0]['error'] == "Api_key_unauthorised"
-            ) {
-                return $this->fetchMerchantWithStoreKey($notifyVendor);
+            try {
+
+                if(
+                    isset($merchantApiResponse->data['errors']) &&
+                    isset($merchantApiResponse->data['errors'][0]['error']) &&
+                    $merchantApiResponse->data['errors'][0]['error'] == "Api_key_unauthorised"
+                ) {
+                    return $this->fetchMerchantWithStoreKey($notifyVendor);
+                }
+
+            } catch (\Exception $e) {
+                // Handle the exception
+                Yii::error('Error while decoding fetch merchant response [' . $this->name . '] ' . $e->getMessage());
             }
 
             Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
@@ -2842,7 +2971,7 @@ class Restaurant extends ActiveRecord
     public function getRestaurantPaymentMethods($modelClass = "\common\models\RestaurantPaymentMethod")
     {
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid'])
-            ->andWhere(['status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
+            ->andWhere(['restaurant_payment_method.status' => RestaurantPaymentMethod::STATUS_ACTIVE]);
     }
 
     public function onTapCreated()
@@ -2881,6 +3010,8 @@ class Restaurant extends ActiveRecord
      */
     public function pollTapStatus()
     {
+        //todo: need something to avoid store with errors from Tap
+
         if(!$this->is_tap_business_active) {
             $this->pollTapBusinessStatus();
         }
@@ -2967,8 +3098,8 @@ class Restaurant extends ActiveRecord
 
             if (!$imageURL) {
                 return [
-                    "operation" => "error",
-                    "message" => "Image not provided"
+                    "operation" => "success",
+                    "message" => "No image to upload"
                 ];
                 //return true;
             }
@@ -3075,9 +3206,13 @@ class Restaurant extends ActiveRecord
 
             if (!$imageURL) {
                 return [
+                    "operation" => "success",
+                    "message" => "No image to upload"
+                ];
+                /*return [
                     "operation" => "error",
                     "message" => "Image not provided"
-                ];
+                ];*/
             }
 
             $result = Yii::$app->cloudinaryManager->upload(
@@ -3404,11 +3539,41 @@ class Restaurant extends ActiveRecord
 
                 //call api
 
-                Yii::$app->netlifyComponent->updateSite($this->site_id, [
+                $response = Yii::$app->netlifyComponent->updateSite($this->site_id, [
                     'domain_aliases' => $domain,
                     'ssl' => true,
-                    'force_ssl' => true
+                   // 'force_ssl' => true
                 ]);
+
+                if ($response->isOk)
+                {
+                    Yii::info($response->data, "store netlify update site called");
+                } else {
+                    Yii::error(print_r($response->data, true), "netlify update site api error:");
+                }
+
+            } else if
+            (
+                !str_contains($this->restaurant_domain, ".plugn.site") &&
+                !str_contains($this->restaurant_domain, ".plugn.store")
+            ) //check if custom domain then publish to netlify as need ssl
+            {
+                $response = Yii::$app->netlifyComponent->createSite($this);
+
+                if ($response->isOk)
+                {
+                    self::updateAll([
+                        "version" => Yii::$app->params['storeVersion'],
+                        "site_id" => $response->data['site_id']
+                    ], [
+                       "restaurant_uuid" => $this->restaurant_uuid
+                    ]);
+
+                    Yii::info($response->data, "store netlify create site called");
+
+                } else {
+                    Yii::error(print_r($response->data, true), "netlify create site api error:");
+                }
             }
 
             /*$model = new RestaurantDomainRequest();
@@ -3933,6 +4098,9 @@ class Restaurant extends ActiveRecord
         return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
 
+    /**
+     * @return bool|void
+     */
     public function beforeDelete()
     {
         $transaction = Yii::$app->db->beginTransaction();
@@ -4065,6 +4233,11 @@ class Restaurant extends ActiveRecord
             ->via('orders');
     }
 
+    /**
+     * @return array
+     * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
+     */
     public function getTotalRevenueByWeek()
     {
         $cacheDuration = 60 * 60 * 24;// 1 day then delete from cache
@@ -4854,7 +5027,6 @@ class Restaurant extends ActiveRecord
             $ordersReceivedPercentage = $decrease / $lastWeekOrdersReceived * -100;
         }
 
-
         //Customer gained
         $customerGainedPercentage = 0;
 
@@ -4872,55 +5044,76 @@ class Restaurant extends ActiveRecord
             $customerGainedPercentage = $decrease / $lastWeekCustomerGained * -100;
         }
 
-        if ($lastWeekOrdersReceived > 0 || $thisWeekOrdersReceived > 0) {
 
-            $agentAssignments = $this->getAgentAssignments()
+        $data = [
+            'store' => $this,
+            'revenuePercentage' => $revenuePercentage,
+            'ordersReceivedPercentage' => $ordersReceivedPercentage,
+            'customerGainedPercentage' => $customerGainedPercentage,
+            'thisWeekRevenue' => $thisWeekRevenue,
+            'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
+            'thisWeekCustomerGained' => $thisWeekCustomerGained,
+        ];
+
+        /*if ($lastWeekOrdersReceived == 0 && $thisWeekOrdersReceived == 0) {
+            return Yii::$app->eventManager->track(
+                'Store Weekly Summary',
+                $data,
+                null,
+                $this->restaurant_uuid);
+        }*/
+
+            $agentAssignmentQuery = $this->getAgentAssignments()
                 ->andWhere([
                     'role' => AgentAssignment::AGENT_ROLE_OWNER,
-                    'receive_weekly_stats' => 1
-                ])
-                ->all();
+                    // 'receive_weekly_stats' => 1
+                ]);
+                //->all();
 
-            foreach ($agentAssignments as $key => $agentAssignment) {
+            foreach ($agentAssignmentQuery->batch(100) as $agentAssignments) {
 
-                if ($agentAssignment->receive_weekly_stats) {
+                foreach ($agentAssignments as $key => $agentAssignment) {
 
-                    $ml = new MailLog();
-                    $ml->to = $agentAssignment->agent->agent_email;
-                    $ml->from = \Yii::$app->params['noReplyEmail'];
-                    $ml->subject = "Weekly Store Summary";
-                    $ml->save();
+                    $data['agent_name'] = $agentAssignment->agent->agent_name;
 
-                    $weeklyStoreSummaryEmail = Yii::$app->mailer->compose([
-                        'html' => 'weekly-summary',
-                    ], [
-                        'store' => $this,
-                        'agent_name' => $agentAssignment->agent->agent_name,
-                        'revenuePercentage' => $revenuePercentage,
-                        'ordersReceivedPercentage' => $ordersReceivedPercentage,
-                        'customerGainedPercentage' => $customerGainedPercentage,
-                        'thisWeekRevenue' => $thisWeekRevenue,
-                        'thisWeekOrdersReceived' => $thisWeekOrdersReceived,
-                        'thisWeekCustomerGained' => $thisWeekCustomerGained,
-                    ])
-                        ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
-                        ->setTo([$agentAssignment->agent->agent_email])
-                        ->setReplyTo(\Yii::$app->params['supportEmail'])
-                        ->setSubject('Weekly Store Summary');
+                    if ($agentAssignment->receive_weekly_stats) {
 
-                    $weeklyStoreSummaryEmail->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+                        $ml = new MailLog();
+                        $ml->to = $agentAssignment->agent->agent_email;
+                        $ml->from = \Yii::$app->params['noReplyEmail'];
+                        $ml->subject = "Weekly Store Summary";
+                        $ml->save();
 
-                    if ($key == 0)
-                        $weeklyStoreSummaryEmail->setBcc(Yii::$app->params['supportEmail']);
+                        $weeklyStoreSummaryEmail = Yii::$app->mailer->compose([
+                            'html' => 'weekly-summary',
+                        ], $data)
+                            ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
+                            ->setTo([$agentAssignment->agent->agent_email])
+                            ->setReplyTo(\Yii::$app->params['supportEmail'])
+                            ->setSubject('Weekly Store Summary');
 
-                    try {
-                        $weeklyStoreSummaryEmail->send();
-                    } catch (Swift_TransportException $e) {
-                        Yii::error($e->getMessage(), "email");
+                        $weeklyStoreSummaryEmail->setHeader("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+                        //if ($key == 0)
+                        //    $weeklyStoreSummaryEmail->setBcc(Yii::$app->params['supportEmail']);
+
+                        try {
+                            $weeklyStoreSummaryEmail->send();
+                        } catch (Swift_TransportException $e) {
+                            Yii::error($e->getMessage(), "email");
+                        }
+                    }
+
+                    if ($key == 0) {
+                        Yii::$app->eventManager->track(
+                            'Store Weekly Summary',
+                            $data,
+                            null,
+                            $this->restaurant_uuid);
                     }
                 }
             }
-        }
+        //}
     }
 
     /**
@@ -5066,11 +5259,15 @@ class Restaurant extends ActiveRecord
         }
     }
 
-
+    /**
+     * @param $modelClass
+     * @return ActiveQuery
+     */
     public function getStoreKyc($modelClass = "\common\models\StoreKyc")
     {
         return $this->hasOne($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
     }
+
     /**
      * Gets query for [[StoreBillingAddress]].
      *

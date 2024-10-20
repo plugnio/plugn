@@ -3,6 +3,7 @@ return [
   'apiEndpoint' => 'http://localhost:8888/plugn/api/web',
   'frontendUrl' => 'http://localhost:8888/plugn/frontend/web',
   'dashboardAppUrl' => 'http://localhost:8100',
+    "crmAppUrl"  => 'http://localhost:8100',
   'dashboardCookieDomain' => 'localhost',
     'newDashboardAppUrl' => 'https://dash.dev.plugn.io',
   'oneSignalStoreAPPID' => '',

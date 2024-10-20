@@ -222,7 +222,6 @@ class AuthController extends BaseController {
         return $this->_loginResponse($agent);
     }
 
-
     /**
      * @return array
      * @throws NotFoundHttpException
@@ -230,9 +229,15 @@ class AuthController extends BaseController {
     public function actionLoginByKey() {
 
         $auth_key = Yii::$app->request->getBodyParam('auth_key');
+        $store_id = Yii::$app->request->getBodyParam('store_id');
 
         $model = Agent::find()
-            ->andWhere(['agent_auth_key' => $auth_key])
+            ->andWhere([
+                'agent_auth_key' => $auth_key,
+             //   'agent_email_verification' => true,
+            ])
+
+            //->andWhere(['deleted' => 0])
             ->one();
 
         if (!$model) {
@@ -245,6 +250,27 @@ class AuthController extends BaseController {
             ];*/
         }
 
+        if($model->agent_status != \common\models\Agent::STATUS_ACTIVE) {
+
+            return [
+                "operation" => "error",
+                "errorType" => "account-deactivated",
+                "message" => Yii::t('agent',"This account is not active, please contact us if you think this is error, Thank you!"),
+            ];
+        }
+
+        // Email and password are correct, check if his email has been verified
+        // If agent email has been verified, then allow him to log in
+        if($model->agent_email_verification != \common\models\Agent::EMAIL_VERIFIED) {
+
+            return [
+                "operation" => "error",
+                "errorType" => "email-not-verified",
+                "message" => Yii::t('agent',"Please click the verification link sent to you by email to activate your account"),
+                "unVerifiedToken" => $this->_loginResponse($model)
+            ];
+        }
+
         Yii::$app->eventManager->track('Log In', [
             "login_method" => "Admin"
         ]);
@@ -252,7 +278,7 @@ class AuthController extends BaseController {
         $model->agent_auth_key = "";
         $model->save(false);
 
-        return $this->_loginResponse($model);
+        return $this->_loginResponse($model, $store_id);
     }
 
     /**
@@ -993,13 +1019,19 @@ class AuthController extends BaseController {
      * @param type $agent
      * @return type
      */
-    private function _loginResponse($agent)
+    private function _loginResponse($agent, $store_id = null)
     {
         // Return Agent access token if everything valid
 
         $accessToken = $agent->accessToken->token_value;
 
-        $assignment = $agent->getAgentAssignments()->one();
+        $assignmentQuery = $agent->getAgentAssignments();
+
+        if($store_id) {
+            $assignmentQuery->andWhere(['agent_assignment.restaurant_uuid' => $store_id]);
+        }
+
+        $assignment = $assignmentQuery->one();
 
         /*if(!$assignment) {
           return [

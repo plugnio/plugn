@@ -76,17 +76,20 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
+            [['deleted'], "default", "value" => 0],
             [['agent_name', 'agent_email'], 'required'],//'agent_password_hash'
             ['tempPassword', 'required', 'on' => [
                 self::SCENARIO_CHANGE_PASSWORD, self::SCENARIO_CREATE_NEW_AGENT]],
             [['agent_status', 'email_notification', 'reminder_email', 'receive_weekly_stats'], 'integer'],
             [['agent_created_at', 'agent_updated_at', 'agent_deleted_at'], 'safe'],
             [['agent_phone_country_code', 'agent_number'], 'number'],
-            [['agent_number'], 'unique', 'comboNotUnique' => 'Phone no. already exist.',  'targetAttribute' => ['agent_phone_country_code', 'agent_number', 'deleted']],
             [['agent_name', 'agent_email', 'agent_password_hash', 'agent_password_reset_token'], 'string', 'max' => 255],
             ['agent_language_pref', 'string', 'max' => 2],
             [['agent_auth_key'], 'string', 'max' => 32],
-            [['agent_email'], 'unique'],
+            [['agent_number'], 'unique', 'comboNotUnique' => 'Phone no. already exist.',  'targetAttribute' => [
+                'agent_phone_country_code', 'agent_number', 'deleted']],
+            [['agent_email'], 'unique', 'comboNotUnique' => 'Email already exist.',  'targetAttribute' => [
+              'agent_email', 'deleted']],
             [['agent_email'], 'email'],
             [['ip_address'], 'string', 'max' => 45],
             [['tempPassword'], 'required', 'on' => 'create'],
@@ -112,7 +115,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
 
         $scenarios[self::SCENARIO_CREATE_NEW_AGENT] = [
             "utm_uuid", "agent_name", "agent_email", "agent_number", "agent_phone_country_code",
-            "agent_email_verification", "agent_password_hash"
+            "agent_email_verification", "agent_password_hash", "deleted"
         ];
 
         return $scenarios;
@@ -198,7 +201,7 @@ class Agent extends \yii\db\ActiveRecord implements IdentityInterface
                         ->andWhere("DATE(agent_created_at) = DATE('".date('Y-m-d')."')")
                         ->count();
 
-                    if ($count > 1) {
+                    if ($count > 10) {
                         Yii::error("too may agent signup from same ip");
 
                         //block ip

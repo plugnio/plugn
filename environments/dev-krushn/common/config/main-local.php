@@ -9,7 +9,13 @@ return [
             'password' => 'root',
             'charset' => 'utf8mb4',
         ],
-
+        'eventManager' => [
+            'class' => 'common\components\EventManager',
+            "sqsRagion" => "eu-west-2",
+            "sqsKey" => "AKIAWMITDJRKXNWDOBNJ",
+            "sqsSecret" => "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",
+            "sqsQueue" => "438663597141/PlugnDev"
+        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -18,6 +24,11 @@ return [
                     'levels' => ['error', 'warning'],
                 ],
             ],
+        ],
+        'gpt' => [
+            'class' => 'common\components\GptComponent',
+            'token' => 'QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG',
+            'apiEndpoint' => 'http://localhost:8083/'
         ],
         'mailer' => [
                  'class' => 'yii\swiftmailer\Mailer',
