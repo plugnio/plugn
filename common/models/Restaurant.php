@@ -5722,13 +5722,40 @@ class Restaurant extends ActiveRecord
     }
 
     /**
+     * Gets query for [[RestaurantIngredients]].
+     * @return ActiveQuery
+     */
+    public function getRestaurantInventories($modelClass = "\common\models\RestaurantInventory")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[RestaurantIngredients]].
+     * @return ActiveQuery
+     */
+    public function getRestaurantIngredients($modelClass = "\common\models\RestaurantIngredient")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
+     * Gets query for [[Suppliers]].
+     * @return ActiveQuery
+     */
+    public function getSuppliers($modelClass = "\common\models\Supplier")
+    {
+        return $this->hasMany($modelClass::className(), ['restaurant_uuid' => 'restaurant_uuid']);
+    }
+
+    /**
      * Gets query for [[Partner]].
      *
      * @return ActiveQuery
      */
-    public function getPartner()
+    public function getPartner($modelClass = "\common\models\Partner")
     {
-        return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])
+        return $this->hasOne($modelClass::className(), ['referral_code' => 'referral_code'])
             ->where(['partner_status' => Partner::STATUS_ACTIVE]);
     }
 

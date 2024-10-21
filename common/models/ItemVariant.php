@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 
 /**
@@ -209,7 +210,11 @@ class ItemVariant extends \yii\db\ActiveRecord
 
         //if stock_qty changed
 
-        if(!$insert && isset($changedAttributes['stock_qty']))  {
+        if(
+            !$insert &&
+            $this->item->track_quantity &&
+            isset($changedAttributes['stock_qty'])
+        )  {
             Yii::$app->eventManager->track('Inventory Updated', [
                 'product_id' => $this->item_uuid,
                 'item_variant_uuid' => $this->item_variant_uuid,
@@ -217,6 +222,18 @@ class ItemVariant extends \yii\db\ActiveRecord
                 'previous_stock' => $changedAttributes['stock_qty'],
                 'updated_stock' => $this->stock_qty
             ], null, $this->item->restaurant_uuid);
+
+            $this->settleStock();
+
+            /*$model = new RestockHistory;
+            $model->restaurant_uuid = $this->item->restaurant_uuid;
+            $model->inventory_uuid = $inventory->inventory_uuid;
+            $model->restocked_quantity = $this->stock_qty - $changedAttributes['stock_qty'];
+            $model->restocked_at = date("Y-m-d");
+
+            if (!$model->save()) {
+                Yii::error(print_r($model->errors, true));
+            }*/
         }
     }
 
@@ -239,6 +256,16 @@ class ItemVariant extends \yii\db\ActiveRecord
         ], [
             'item_variant_uuid' => $this->item_variant_uuid
         ]);
+
+        Yii::$app->eventManager->track('Inventory Updated', [
+            'product_id' => $this->item_uuid,
+            'item_variant_uuid' => $this->item_variant_uuid,
+            'item_uuid' => $this->item_uuid,
+            'previous_stock' => $qty,
+            'updated_stock' => $this->stock_qty
+        ], null, $this->item->restaurant_uuid);
+
+        $this->settleStock();
     }
 
     /**
@@ -260,16 +287,60 @@ class ItemVariant extends \yii\db\ActiveRecord
         ], [
             'item_variant_uuid' => $this->item_variant_uuid
         ]);
+
+        Yii::$app->eventManager->track('Inventory Updated', [
+            'product_id' => $this->item_uuid,
+            'item_variant_uuid' => $this->item_variant_uuid,
+            'item_uuid' => $this->item_uuid,
+            'previous_stock' => $qty,
+            'updated_stock' => $this->stock_qty
+        ], null, $this->item->restaurant_uuid);
+
+        $this->settleStock();
     }
 
     /**
-     * Gets query for [[ItemUu]].
+     * @return false|void
+     */
+    public function settleStock() {
+
+        //find inventory
+
+        $inventory = RestaurantInventory::find()
+            ->andWhere(['item_variant_uuid' => $this->item_variant_uuid])
+            ->one();
+
+        if (!$inventory) {
+            $inventory = new RestaurantInventory;
+            $inventory->restaurant_uuid = $this->item->restaurant_uuid;
+            $inventory->item_variant_uuid = $this->item_variant_uuid;
+        }
+
+        $inventory->stock_quantity = $this->stock_qty;
+        $inventory->restocked_at = date("Y-m-d");
+        if (!$inventory->save()) {
+            Yii::error(print_r($inventory->errors, true));
+            return false;
+        }
+    }
+
+    /**
+     * Gets query for [[Item]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItem()
+    public function getItem($modelClass = "\common\models\Item")
     {
-        return $this->hasOne(Item::className(), ['item_uuid' => 'item_uuid']);
+        return $this->hasOne($modelClass::className(), ['item_uuid' => 'item_uuid']);
+    }
+
+    /**
+     * @param $model
+     * @return ActiveQuery
+     */
+    public function getRestaurantInventory($model = 'common\models\RestaurantInventory')
+    {
+        return $this->hasOne($model::className(), ['item_variant_uuid' => 'item_variant_uuid']);
     }
 
     /**
@@ -277,9 +348,9 @@ class ItemVariant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemVariantOptions()
+    public function getItemVariantOptions($modelClass = "\common\models\ItemVariantOption")
     {
-        return $this->hasMany(ItemVariantOption::className(), ['item_variant_uuid' => 'item_variant_uuid']);
+        return $this->hasMany($modelClass::className(), ['item_variant_uuid' => 'item_variant_uuid']);
     }
 
     /**
@@ -297,9 +368,9 @@ class ItemVariant extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getItemVariantImages()
+    public function getItemVariantImages($modelClass = "\common\models\ItemVariantImage")
     {
-        return $this->hasMany(ItemVariantImage::className(), ['item_variant_uuid' => 'item_variant_uuid'])
-            ->orderBy('sort_number');;
+        return $this->hasMany($modelClass::className(), ['item_variant_uuid' => 'item_variant_uuid'])
+            ->orderBy('sort_number');
     }
 }
