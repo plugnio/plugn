@@ -135,7 +135,8 @@ return [
         ],
         'slack' => [
             'class' => 'understeam\slack\Client',
-            'url' => "https://hooks.slack.com/services/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",
+            'url' => "https://hooks.slack.com/services/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",
+                //"https://hooks.slack.com/services/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",
              //   "https://hooks.slack.com/services/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",
             // plugn-activity
             'username' => 'Plugn',
