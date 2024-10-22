@@ -81,7 +81,13 @@ return [
                 [
                     'class' => 'common\components\SlackLogger',
                     'logVars' => [],
-                    'levels' => ['info', 'warning','error'],
+                    'levels' => [ 'warning','error'],
+                    'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','crm\*','api\*','agent\*'],
+                ],
+                [
+                    'class' => 'common\components\SlackLogger',
+                    'logVars' => [],
+                    'levels' => ['info'],
                     'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','crm\*','api\*','agent\*'],
                 ],
             ],

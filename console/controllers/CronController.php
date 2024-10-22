@@ -24,6 +24,7 @@ use common\models\Item;
 use common\models\Refund;
 use common\models\Order;
 use common\models\Subscription;
+use yii\console\Exception;
 use yii\helpers\Console;
 use yii\db\Expression;
 
@@ -56,11 +57,44 @@ class CronController extends \yii\console\Controller
         //print_r($response->data);//[sizeof($response->data) - 1]['dns_servers']
      //   records hostname
 
-        Yii::$app->eventManager->track(
+        /*Yii::$app->eventManager->track(
             'Test event',
             [
                 'hello' => "world"
-            ]);
+            ]);*/
+
+        Yii::info("info test", "backend");
+        Yii::error("error test", "backend");
+
+       // throw new Exception("test");
+
+        /*Yii::$app->slackError->send(
+            Yii::$app->formatter->asDatetime(new \DateTime("now")),
+            ":thumb-up:",
+            [
+                [
+                    'fallback' => "test",
+                    'title' => "test",
+                    'text' => "test",
+                    'color' => "green",
+                    'footer' => 'Environment: '.ucfirst(YII_ENV)
+                ]
+            ]
+        );
+
+        Yii::$app->slack->send(
+            Yii::$app->formatter->asDatetime(new \DateTime("now")),
+            ":thumb-up:",
+            [
+                [
+                    'fallback' => "test",
+                    'title' => "test",
+                    'text' => "test",
+                    'color' => "green",
+                    'footer' => 'Environment: '.ucfirst(YII_ENV)
+                ]
+            ]
+        );*/
     }
 
     public function actionFixDuplicateAreas() {
