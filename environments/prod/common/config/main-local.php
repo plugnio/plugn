@@ -78,16 +78,16 @@ return [
                     ],
                     'context' => true // Write the context information. The default is true.
                 ],
-                [
+               /* [
                     'class' => 'common\components\SlackLogger',
                     'logVars' => [],
                     'levels' => [ 'warning','error'],
                     'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','crm\*','api\*','agent\*'],
-                ],
+                ],*/
                 [
                     'class' => 'common\components\SlackLogger',
                     'logVars' => [],
-                    'levels' => ['info'],
+                    'levels' => ['info', 'warning','error'],
                     'categories' => ['backend\*', 'frontend\*', 'common\*', 'console\*','crm\*','api\*','agent\*'],
                 ],
             ],

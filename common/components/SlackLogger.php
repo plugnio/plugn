@@ -64,18 +64,10 @@ class SlackLogger extends LogTarget
     public function export()
     {
         //info logger
-        if (in_array("info", $this->levels)) {
             $this->slack->send(
                 Yii::$app->formatter->asDatetime(new \DateTime("now")),
                 $this->emoji,
                 $this->getAttachments()
             );
-        } else {
-            Yii::$app->slackError->send(
-                Yii::$app->formatter->asDatetime(new \DateTime("now")),
-                $this->emoji,
-                $this->getAttachments()
-            );
-        }
     }
 }

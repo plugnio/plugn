@@ -63,12 +63,26 @@ class CronController extends \yii\console\Controller
                 'hello' => "world"
             ]);*/
 
-        Yii::info("info test", "backend");
-        Yii::error("error test", "backend");
+        Yii::info("info test", __METHOD__);
+        Yii::error("error test", __METHOD__);
 
        // throw new Exception("test");
 
         /*Yii::$app->slackError->send(
+            Yii::$app->formatter->asDatetime(new \DateTime("now")),
+            ":thumb-up:",
+            [
+                [
+                    'fallback' => "test",
+                    'title' => "test",
+                    'text' => "test",
+                    'color' => "green",
+                    'footer' => 'Environment: '.ucfirst(YII_ENV)
+                ]
+            ]
+        );
+
+        Yii::$app->slack->send(
             Yii::$app->formatter->asDatetime(new \DateTime("now")),
             ":thumb-up:",
             [
