@@ -324,9 +324,12 @@ class PlanController extends BaseController
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
         }
 
-        if (isset($reference)){
-            $gateway_reference = $reference['gateway'];
-            $payment_reference = $reference['payment'];
+        $gateway_reference = null;
+        $payment_reference = null;
+
+        if (isset($reference)) {
+            $gateway_reference = isset($reference['gateway'])? $reference['gateway']: null;
+            $payment_reference = isset($reference['payment'])? $reference['payment']: null;
         }
 
         if(isset($transaction)){
@@ -340,6 +343,7 @@ class PlanController extends BaseController
 
         //Check If Enabled Secret Key and If The header has request
         if ($headerSignature != null)  {
+
             $response_message  = null;
 
             if(isset($acquirer) && isset($acquirer['response'])){
