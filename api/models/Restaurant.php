@@ -644,9 +644,9 @@ class Restaurant extends \common\models\Restaurant {
      *
      * @return ActiveQuery
      */
-    public function getPartner()
+    public function getPartner($modelClass = "\common\models\Partner")
     {
-        return $this->hasOne(Partner::className(), ['referral_code' => 'referral_code'])
+        return $this->hasOne($modelClass::className(), ['referral_code' => 'referral_code'])
             ->where(['partner_status' => Partner::STATUS_ACTIVE]);
     }
 

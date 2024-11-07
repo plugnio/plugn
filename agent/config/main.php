@@ -472,6 +472,34 @@ return [
                         'OPTIONS create' => 'options'
                     ]
                 ],
+                [// SupplierController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/supplier',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <id>' => 'update',
+                        'DELETE <id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
+                [// IngredientController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/ingredient',
+                    'patterns' => [
+                        'GET' => 'list',
+                        'GET <id>' => 'detail',
+                        'POST' => 'create',
+                        'PATCH <id>' => 'update',
+                        'DELETE <id>' => 'delete',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// DeliveryZoneController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/delivery-zone',

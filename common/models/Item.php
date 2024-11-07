@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\behaviors\SluggableBehavior;
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\behaviors\TimestampBehavior;
 
@@ -387,6 +388,17 @@ class Item extends \yii\db\ActiveRecord
             $this->restaurant->updateCounters([
                 'total_items' => 1
             ]);
+
+            if ($this->item_type == self::TYPE_SIMPLE) {
+                $inventory = new RestaurantInventory;
+                $inventory->restaurant_uuid = $this->restaurant_uuid;
+                $inventory->item_uuid = $this->item_uuid;
+                $inventory->stock_quantity = $this->stock_qty;
+                if (!$inventory->save()) {
+                    Yii::error(print_r($inventory->errors, true));
+                    return false;
+                }
+            }
         }
 
         //Send event to Segment
@@ -401,8 +413,10 @@ class Item extends \yii\db\ActiveRecord
 
         if (
             !$insert &&
-            isset($changedAttributes['stock_qty']) &&
-            isset($changedAttributes['track_quantity'])
+            $this->track_quantity && (
+                isset($changedAttributes['stock_qty']) ||
+                isset($changedAttributes['track_quantity'])
+            )
         ) {
             Yii::$app->eventManager->track('Inventory Updated', [
                 'product_id' => $this->item_uuid,
@@ -410,6 +424,20 @@ class Item extends \yii\db\ActiveRecord
                 'previous_stock' => $changedAttributes['stock_qty'],
                 'updated_stock' => $this->stock_qty
             ], null, $this->restaurant_uuid);
+
+            if ($this->item_type == self::TYPE_SIMPLE) {
+                $this->settleStock();
+            }
+
+            /*$model = new RestockHistory;
+            $model->restaurant_uuid = $this->restaurant_uuid;
+            $model->inventory_uuid = $inventory->inventory_uuid;
+            $model->restocked_quantity = $this->stock_qty - $changedAttributes['stock_qty'];
+            $model->restocked_at = date("Y-m-d");
+
+            if (!$model->save()) {
+                Yii::error(print_r($model->errors, true));
+            }*/
         }
 
         return true;
@@ -500,6 +528,7 @@ class Item extends \yii\db\ActiveRecord
                 "previous_stock" => $this->stock_qty,
                 "updated_stock" => $this->stock_qty + $qty
             ];
+
             Yii::$app->eventManager->track("Inventory Updated", $props, null, $this->restaurant_uuid);
         }
 
@@ -514,6 +543,8 @@ class Item extends \yii\db\ActiveRecord
         ], [
             'item_uuid' => $this->item_uuid
         ]);
+
+        $this->settleStock();
     }
 
     /**
@@ -542,6 +573,29 @@ class Item extends \yii\db\ActiveRecord
         ], [
             'item_uuid' => $this->item_uuid
         ]);
+
+        $this->settleStock();
+    }
+
+    public function settleStock() {
+        //find inventory
+
+        $inventory = RestaurantInventory::find()
+            ->andWhere(['item_uuid' => $this->item_uuid])
+            ->one();
+
+        if (!$inventory) {
+            $inventory = new RestaurantInventory;
+            $inventory->restaurant_uuid = $this->restaurant_uuid;
+            $inventory->item_uuid = $this->item_uuid;
+        }
+
+        $inventory->stock_quantity = $this->stock_qty;
+        $inventory->restocked_at = date("Y-m-d");
+        if (!$inventory->save()) {
+            Yii::error(print_r($inventory->errors, true));
+            return false;
+        }
     }
 
     /**
@@ -634,11 +688,24 @@ class Item extends \yii\db\ActiveRecord
         return parent::beforeDelete();
     }
 
+    /**
+     * @param $file_name
+     * @return array|\yii\db\ActiveRecord|null
+     */
     public function findItemImageByFileName($file_name)
     {
         return ItemImage::find()
             ->andWhere(['item_uuid' => $this->item_uuid, 'product_file_name' => $file_name])
             ->one();
+    }
+
+    /**
+     * @param $model
+     * @return ActiveQuery
+     */
+    public function getRestaurantInventory($model = 'common\models\RestaurantInventory')
+    {
+        return $this->hasOne($model::className(), ['item_uuid' => 'item_uuid']);
     }
 
     /**

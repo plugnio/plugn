@@ -46,8 +46,10 @@ class ItemController extends BaseController
                     'or',
                     ['like', 'item_name', $keyword],
                     ['like', 'item_name_ar', $keyword],
-                    ['like', 'item_description', $keyword],
-                    ['like', 'item_description_ar', $keyword]
+                //https://bawes-co.sentry.io/issues/6046426048/events/7def2926637a433aa29ba62366ed14a0/?project=5220572
+                //SQLSTATE[HY000]: General error: 1267 Illegal mix of collations (utf8_unicode_ci,IMPLICIT) and (utf8mb4_bin,COERCIBLE) for operation 'like'
+                //    ['like', 'item_description', $keyword],
+                //    ['like', 'item_description_ar', $keyword]
                 ]);
         }
 
