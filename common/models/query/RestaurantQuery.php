@@ -64,7 +64,7 @@ class RestaurantQuery extends \yii\db\ActiveQuery
     public function inActive($db = null)
     {
         return $this
-            ->joinWith(['items'])
+            //->joinWith(['items'])
             ->andWhere( new Expression("total_items = 0 AND last_order_at IS NULL"));
     }
 
