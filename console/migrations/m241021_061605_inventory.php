@@ -39,7 +39,8 @@ class m241021_061605_inventory extends Migration
 
         // add foreign key for table `restaurant`
         $this->addForeignKey(
-            'fk-restaurant_ingredient-restaurant_uuid', 'restaurant_ingredient', 'restaurant_uuid', 'restaurant', 'restaurant_uuid'
+            'fk-restaurant_ingredient-restaurant_uuid', 'restaurant_ingredient', 'restaurant_uuid',
+            'restaurant', 'restaurant_uuid',"CASCADE", "CASCADE"
         );
 
         //inventory
@@ -65,7 +66,8 @@ class m241021_061605_inventory extends Migration
 
         // add foreign key for table `item`
         $this->addForeignKey(
-            'fk-restaurant_inventory-item_uuid', 'restaurant_inventory', 'item_uuid', 'item', 'item_uuid'
+            'fk-restaurant_inventory-item_uuid', 'restaurant_inventory', 'item_uuid',
+            'item', 'item_uuid', "CASCADE", "CASCADE"
         );
 
         // creates index for column `item_variant_uuid`
@@ -75,7 +77,8 @@ class m241021_061605_inventory extends Migration
 
         // add foreign key for table `item_variant`
         $this->addForeignKey(
-            'fk-restaurant_inventory-item_variant_uuid', 'restaurant_inventory', 'item_variant_uuid', 'item_variant', 'item_variant_uuid'
+            'fk-restaurant_inventory-item_variant_uuid', 'restaurant_inventory', 'item_variant_uuid', 'item_variant', 'item_variant_uuid',
+            "CASCADE", "CASCADE"
         );
 
         // creates index for column `restaurant_uuid`
@@ -85,7 +88,9 @@ class m241021_061605_inventory extends Migration
 
         // add foreign key for table `restaurant`
         $this->addForeignKey(
-            'fk-restaurant_inventory-restaurant_uuid', 'restaurant_inventory', 'restaurant_uuid', 'restaurant', 'restaurant_uuid'
+            'fk-restaurant_inventory-restaurant_uuid', 'restaurant_inventory', 'restaurant_uuid',
+            'restaurant', 'restaurant_uuid',
+            "CASCADE", "CASCADE"
         );
 
         // creates index for column `ingredient_uuid`
@@ -95,7 +100,9 @@ class m241021_061605_inventory extends Migration
 
         // add foreign key for table `ingredient_uuid`
         $this->addForeignKey(
-            'fk-restaurant_inventory-ingredient_uuid', 'restaurant_inventory', 'ingredient_uuid', 'restaurant_ingredient', 'ingredient_uuid'
+            'fk-restaurant_inventory-ingredient_uuid', 'restaurant_inventory',
+            'ingredient_uuid', 'restaurant_ingredient', 'ingredient_uuid',
+            "CASCADE", "CASCADE"
         );
 
         //restock_history Table
@@ -119,7 +126,8 @@ class m241021_061605_inventory extends Migration
 
         // add foreign key for table `restaurant`
         $this->addForeignKey(
-            'fk-restock_history-restaurant_uuid', 'restock_history', 'restaurant_uuid', 'restaurant', 'restaurant_uuid'
+            'fk-restock_history-restaurant_uuid', 'restock_history', 'restaurant_uuid', 'restaurant', 'restaurant_uuid',
+            "CASCADE", "CASCADE"
         );
 
         // creates index for column `inventory_uuid`
@@ -129,7 +137,8 @@ class m241021_061605_inventory extends Migration
 
         // add foreign key for table `inventory`
         $this->addForeignKey(
-            'fk-restock_history-inventory_uuid', 'restock_history', 'inventory_uuid', 'restaurant_inventory', 'inventory_uuid'
+            'fk-restock_history-inventory_uuid', 'restock_history', 'inventory_uuid', 'restaurant_inventory', 'inventory_uuid',
+            "CASCADE", "CASCADE"
         );
 
         //supplier
@@ -152,9 +161,9 @@ class m241021_061605_inventory extends Migration
 
         // add foreign key for table `restaurant`
         $this->addForeignKey(
-            'fk-supplier-restaurant_uuid', 'supplier', 'restaurant_uuid', 'restaurant', "restaurant_uuid"
+            'fk-supplier-restaurant_uuid', 'supplier', 'restaurant_uuid', 'restaurant', "restaurant_uuid",
+            "CASCADE", "CASCADE"
         );
-
     }
 
     /**
