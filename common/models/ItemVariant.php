@@ -238,6 +238,20 @@ class ItemVariant extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return bool
+     */
+    public function beforeDelete()
+    {
+        if (!parent::beforeDelete()) {
+            return false;
+        }
+
+        //RestaurantInventory::deleteAll(['item_variant_uuid' => $this->item_variant_uuid]);
+
+        return true;
+    }
+
+    /**
      * increase stock_qty
      * @param type $qty
      */

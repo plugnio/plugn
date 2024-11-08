@@ -665,6 +665,8 @@ class Item extends \yii\db\ActiveRecord
      */
     public function beforeDelete()
     {
+        //RestaurantInventory::deleteAll(['item_uuid' => $this->item_uuid]);
+
         ItemImage::deleteAll(['item_uuid' => $this->item_uuid]);
 
         ItemVideo::deleteAll(['item_uuid' => $this->item_uuid]);
