@@ -63,8 +63,8 @@ class CronController extends \yii\console\Controller
                 'hello' => "world"
             ]);*/
 
-        Yii::info("info test", __METHOD__);
-        Yii::error("error test", __METHOD__);
+       // Yii::info("info test", __METHOD__);
+       // Yii::error("error test", __METHOD__);
 
        // throw new Exception("test");
 

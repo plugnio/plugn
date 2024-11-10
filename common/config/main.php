@@ -141,6 +141,11 @@ return [
             // plugn-activity
             'username' => 'Plugn',
         ],
+        'slackTapOperation' => [
+            'class' => 'understeam\slack\Client',
+            'url' => "https://hooks.slack.com/services/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",
+            'username' => 'Plugn',
+        ],
         'slackError' => [
             'class' => 'understeam\slack\Client',
             'url' => "https://hooks.slack.com/services/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",
