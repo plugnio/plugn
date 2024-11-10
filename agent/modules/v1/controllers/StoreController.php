@@ -866,7 +866,10 @@ class StoreController extends BaseController
         //check if already in Queue
 
         $payment_gateway_queue = PaymentGatewayQueue::find()
-            ->andWhere(['restaurant_uuid' => $model->restaurant_uuid, "queue_status" => PaymentGatewayQueue::QUEUE_STATUS_PENDING])
+            ->andWhere([
+                'restaurant_uuid' => $model->restaurant_uuid,
+                "queue_status" => PaymentGatewayQueue::QUEUE_STATUS_PENDING
+            ])
             ->one();
 
         if($payment_gateway_queue) {
@@ -887,6 +890,9 @@ class StoreController extends BaseController
         if(!$model->save(false)) {
             return self::message("error", $model->errors);
         }
+
+        //process to give them instant response/ feedback
+        //return $model->processQueue();
 
         return self::message("success", "Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
     }

@@ -1684,6 +1684,20 @@ class Restaurant extends ActiveRecord
 
         if ($response['operation'] == "error") {
 
+            Yii::$app->slackTapOperation->send(
+                "Vendor faced error while creating account [" . $this->name . "]",// Yii::$app->formatter->asDatetime(new \DateTime("now")),
+                ":thumb-up:",
+                [
+                    [
+                        'fallback' => "test",
+                        'title' => 'Error while uploading doc for Business [' . $this->name . ']',
+                        'text' => json_encode($response),
+                        'color' => "red",
+                        'footer' => 'Environment: '.ucfirst(YII_ENV)
+                    ]
+                ]
+            );
+
             Yii::error('Error while uploading doc for Business [' . $this->name . '] ' . json_encode($response));
 
             return $response;
@@ -1774,6 +1788,21 @@ class Restaurant extends ActiveRecord
 
         } else {
 
+            Yii::$app->slackTapOperation->send(
+                "Vendor faced error while creating account [" . $this->name . "]",
+              //  Yii::$app->formatter->asDatetime(new \DateTime("now")),
+                ":thumb-up:",
+                [
+                    [
+                        'fallback' => "test",
+                        'title' => 'Error while create Business [' . $this->name . ']',
+                        'text' => json_encode($businessApiResponse->data),
+                        'color' => "red",
+                        'footer' => 'Environment: '.ucfirst(YII_ENV)
+                    ]
+                ]
+            );
+
             Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
 
             if (isset(Yii::$app->session->id)) {
@@ -1843,6 +1872,21 @@ class Restaurant extends ActiveRecord
             ];
 
         } else {
+
+            Yii::$app->slackTapOperation->send(
+                "Vendor faced error while creating account [" . $this->name . "]",
+                //Yii::$app->formatter->asDatetime(new \DateTime("now")),
+                ":thumb-up:",
+                [
+                    [
+                        'fallback' => "test",
+                        'title' => 'Error while create Merchant [' . $this->name . ']',
+                        'text' => json_encode($merchantApiResponse->data),
+                        'color' => "red",
+                        'footer' => 'Environment: '.ucfirst(YII_ENV)
+                    ]
+                ]
+            );
 
             Yii::error('Error while create Merchant [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
 
@@ -1979,10 +2023,40 @@ class Restaurant extends ActiveRecord
                     return $this->fetchMerchantWithStoreKey($notifyVendor);
                 }
 
-            } catch (\Exception $e) {
-                // Handle the exception
+            } catch (\Exception $e) { // Handle the exception
+
+                Yii::$app->slackTapOperation->send(
+                    "Vendor faced error while creating account [" . $this->name . "]",
+                    //Yii::$app->formatter->asDatetime(new \DateTime("now")),
+                    ":thumb-up:",
+                    [
+                        [
+                            'fallback' => "test",
+                            'title' => 'Error while Fetching Merchant [' . $this->name . ']',
+                            'text' => $e->getMessage(),
+                            'color' => "red",
+                            'footer' => 'Environment: '.ucfirst(YII_ENV)
+                        ]
+                    ]
+                );
+
                 Yii::error('Error while decoding fetch merchant response [' . $this->name . '] ' . $e->getMessage());
             }
+
+            Yii::$app->slackTapOperation->send(
+                "Vendor faced error while creating account [" . $this->name . "]",
+               // Yii::$app->formatter->asDatetime(new \DateTime("now")),
+                ":thumb-up:",
+                [
+                    [
+                        'fallback' => "test",
+                        'title' => 'Error while Fetching Merchant [' . $this->name . ']',
+                        'text' => json_encode($merchantApiResponse->data),
+                        'color' => "red",
+                        'footer' => 'Environment: '.ucfirst(YII_ENV)
+                    ]
+                ]
+            );
 
             Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
 
@@ -2130,6 +2204,21 @@ class Restaurant extends ActiveRecord
 
         } else {
 
+            Yii::$app->slackTapOperation->send(
+                "Vendor faced error while creating account [" . $this->name . "]",
+                //Yii::$app->formatter->asDatetime(new \DateTime("now")),
+                ":thumb-up:",
+                [
+                    [
+                        'fallback' => "test",
+                        'title' => 'Error while Fetching Merchant [' . $this->name . ']',
+                        'text' => json_encode($merchantApiResponse->data),
+                        'color' => "red",
+                        'footer' => 'Environment: '.ucfirst(YII_ENV)
+                    ]
+                ]
+            );
+
             Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
 
             if (isset(Yii::$app->session->id))
@@ -2232,6 +2321,21 @@ class Restaurant extends ActiveRecord
             ];
 
         } else {
+
+            Yii::$app->slackTapOperation->send(
+                "Vendor faced error while creating account [" . $this->name . "]",
+                //Yii::$app->formatter->asDatetime(new \DateTime("now")),
+                ":thumb-up:",
+                [
+                    [
+                        'fallback' => "test",
+                        'title' => 'Error while create Operator [' . $this->name . ']',
+                        'text' => json_encode($operatorApiResponse->data),
+                        'color' => "red",
+                        'footer' => 'Environment: '.ucfirst(YII_ENV)
+                    ]
+                ]
+            );
 
             Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
 
