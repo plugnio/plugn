@@ -9,6 +9,7 @@ use common\models\RestaurantByCampaign;
 use common\models\RestaurantCurrency;
 use common\models\RestaurantUpload;
 use common\models\Setting;
+use common\models\TabbyTransaction;
 use common\models\VendorCampaign;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -1108,6 +1109,72 @@ class StoreController extends BaseController
             ]);
 
         return self::message("success", "Moyasar disabled successfully");
+    }
+
+    /**
+     *  Enable Tabby
+     */
+    public function actionEnableTabby($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_TABBY])
+            ->exists();
+
+        if ($payment_method) {
+            return self::message("error",'Tabby already enabled');
+        }
+
+        $codPaymentMethod = PaymentMethod::find()
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_TABBY])
+            ->one();
+
+        if(!$codPaymentMethod) {
+            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+        }
+
+        $payments_method = new RestaurantPaymentMethod();
+        $payments_method->payment_method_id = $codPaymentMethod->payment_method_id;
+        $payments_method->restaurant_uuid = $model->restaurant_uuid;
+
+        if (!$payments_method->save()) {
+            return self::message("error",$payments_method->getErrors());
+        }
+
+        TabbyTransaction::registerWebhooks($model->restaurant_uuid);
+
+        return self::message("success","Tabby enabled successfully");
+    }
+
+    /**
+     *  Disable Moyasar
+     */
+    public function actionDisableTabby($id = null)
+    {
+        $model = $this->findModel($id);
+
+        $payment_method = $model->getRestaurantPaymentMethods()
+            ->joinWith('paymentMethod')
+            ->andWhere(['payment_method_code' => PaymentMethod::CODE_TABBY])
+            ->one();
+
+        if (!$payment_method) {
+            return self::message("success", "Tabby disabled already!");
+            // throw new BadRequestHttpException('The requested record does not exist.');
+        }
+
+        if (!$payment_method->delete()) {
+            return self::message("error", $payment_method->getErrors());
+        }
+
+        Setting::deleteAll([
+            'restaurant_uuid' => $model->restaurant_uuid,
+            'code' => PaymentMethod::CODE_TABBY
+        ]);
+
+        return self::message("success", "Tabby disabled successfully");
     }
 
     /**

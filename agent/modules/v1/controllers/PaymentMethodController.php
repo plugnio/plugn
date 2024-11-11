@@ -31,7 +31,42 @@ class PaymentMethodController extends BaseController
             return $this->_configStripe($model, $store, $code);
         } else if($code == "UPayment") {
             return $this->_configUPayment($model, $store, $code);
+        }else if($code == "Tabby") {
+            return $this->_configTabby($model, $store, $code);
         }
+    }
+
+    private function _configTabby($model, $store, $code) {
+
+        $model->payment_tabby_public_key = Yii::$app->request->getBodyParam('payment_tabby_public_key');
+        $model->payment_tabby_secret_key = Yii::$app->request->getBodyParam('payment_tabby_secret_key');
+
+        if ($model->save())
+        {
+            $payment_method = $store->getRestaurantPaymentMethods()
+                ->joinWith('paymentMethod')
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_TABBY])
+                ->exists();
+
+            if (!$payment_method) {
+
+                $upayPaymentMethod = PaymentMethod::find()
+                    ->andWhere(['payment_method_code' => PaymentMethod::CODE_TABBY])
+                    ->one();
+
+                $payments_method = new RestaurantPaymentMethod();
+                $payments_method->payment_method_id = $upayPaymentMethod->payment_method_id;
+                $payments_method->restaurant_uuid = $store->restaurant_uuid;
+
+                if (!$payments_method->save()) {
+                    return self::message("error", $payments_method->getErrors());
+                }
+            }
+
+            return self::message('success', "Extension $code updated.");
+        }
+
+        return self::message('error', $model->errors);
     }
 
     private function _configUPayment($model, $store, $code) {
@@ -65,7 +100,6 @@ class PaymentMethodController extends BaseController
 
         return self::message('error', $model->errors);
     }
-
 
     private function _configStripe($model, $store, $code) {
 

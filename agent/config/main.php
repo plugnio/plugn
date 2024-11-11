@@ -772,6 +772,12 @@ return [
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
                         'POST disable-cod/<id>' => 'disable-cod',
+
+                        'POST enable-tabby' => 'enable-tabby',
+                        'POST disable-tabby' => 'disable-tabby',
+                        'POST enable-tabby/<id>' => 'enable-tabby',
+                        'POST disable-tabby/<id>' => 'disable-tabby',
+
                         'POST enable-moyasar' => 'enable-moyasar',
                         'POST disable-moyasar' => 'disable-moyasar',
                         'POST enable-moyasar/<id>' => 'enable-moyasar',

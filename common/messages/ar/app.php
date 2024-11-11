@@ -17,6 +17,7 @@
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
+    "No transaction information available" => "",
     "Sorry not able to find your city!" => "آسف لم أتمكن من العثور على مدينتك!",
     "No more than 100 invoices can be downloaded on single request" => "لا يمكن تنزيل أكثر من 100 فاتورة عند الطلب الواحد",
     "Emojis are not allowed." => "الرموز التعبيرية غير مسموح بها.",
