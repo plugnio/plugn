@@ -329,6 +329,30 @@ return [
                         'OPTIONS callback' => 'options',
                     ]
                 ],
+                [// TabbyController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/payment/tabby',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'GET create' => 'create',
+                        'GET callback' => 'callback',
+                        'POST callback' => 'callback',
+                        'GET confirm' => 'confirm',
+                        'POST confirm' => 'confirm',
+                        "PATCH capture" => "capture",
+                        "PATCH refund" => "refund",
+                        "PATCH close" => "close",
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        "OPTIONS create" => 'options',
+                        'OPTIONS callback' => 'options',
+                        'OPTIONS confirm' => 'options',
+                        'OPTIONS capture' => 'options',
+                        'OPTIONS refund' => 'options',
+                        'OPTIONS close' => 'options',
+                    ]
+                ],
                 [// StripeController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/payment/stripe',

@@ -267,3 +267,8 @@ You can also receive any custom postback header as described in the previous sec
 ### merchant validation endpoint 
 
 `http://api.plugn.io/v2/payment/apple-pay/validate-merchant`
+
+# Tabby 
+
+https://github.com/orgs/tabby-ai/repositories
+https://api-docs.tabby.ai/

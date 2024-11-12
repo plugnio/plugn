@@ -19,7 +19,7 @@ class m241111_094001_tabby extends Migration
         }
 
         $this->createTable('{{%tabby_transaction}}', [
-            'id' => $this->integer(11),
+            'id' => $this->primaryKey(11),
             "body" => $this->text(),
             "order_uuid" => $this->char(40)->notNull(),
             "status" => $this->string(16)->notNull(),
@@ -29,7 +29,7 @@ class m241111_094001_tabby extends Migration
             'updated_at' => $this->dateTime()->notNull(),
         ], $tableOptions);
 
-        $this->addPrimaryKey('PK', 'tabby_transaction', ['id', "order_uuid", "transaction_id"]);
+       // $this->addPrimaryKey('PK', 'tabby_transaction', ['id', "order_uuid", "transaction_id"]);
 
         // creates index for column "order_uuid"
         $this->createIndex(
@@ -48,6 +48,29 @@ class m241111_094001_tabby extends Migration
         $pm->vat = 0;
         $pm->payment_method_code = \common\models\PaymentMethod::CODE_TABBY;
         $pm->save();
+
+        $this->createTable('{{%order_history}}', [
+            'order_history_uuid' => $this->char(60),
+            "order_uuid" => $this->char(40)->notNull(),
+            "order_status" => $this->tinyInteger(1)->notNull(),
+            "notify" => $this->boolean()->defaultValue(false),
+            "comment" => $this->text(),
+            'created_at' => $this->dateTime()->notNull(),
+            'updated_at' => $this->dateTime()->notNull(),
+        ], $tableOptions);
+
+        $this->addPrimaryKey('PK', 'order_history', "order_history_uuid");
+
+        // creates index for column "order_uuid"
+        $this->createIndex(
+            'idx-order_history-order_uuid', 'order_history', 'order_uuid'
+        );
+
+        // add foreign key for table "order"
+        $this->addForeignKey(
+            'fk-order_history-order_uuid', 'order_history', 'order_uuid',
+            'order', 'order_uuid',"CASCADE", "CASCADE"
+        );
     }
 
     /**

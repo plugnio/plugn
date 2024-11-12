@@ -38,7 +38,7 @@ class TabbyTransaction extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'order_uuid', 'status', 'source', 'transaction_id'], 'required'],
+            [['order_uuid', 'status', 'source', 'transaction_id'], 'required'],
             [['id'], 'integer'],
             [['body'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
@@ -83,35 +83,35 @@ class TabbyTransaction extends \yii\db\ActiveRecord
     }
 
     public static function getIsConfigured($restaurant_uuid) {
-        $status = trim(Setting::getConfig($restaurant_uuid, PaymentMethod::CODE_TABBY, 'payment_tabby_status'));
+        //$status = trim(Setting::getConfig($restaurant_uuid, PaymentMethod::CODE_TABBY, 'payment_tabby_status'));
         $public_key = trim(Setting::getConfig($restaurant_uuid, PaymentMethod::CODE_TABBY, 'payment_tabby_public_key'));
         $secret_key = trim(Setting::getConfig($restaurant_uuid, PaymentMethod::CODE_TABBY, 'payment_tabby_secret_key'));
 
         return (
-            $status == 1 &&
-            !$public_key &&
-            !$secret_key
+          //  $status == 1 &&
+            $public_key &&
+            $secret_key
         );
     }
 
     /**
-     * @param $order_id
+     * @param $order_uuid
      * @return array|\yii\db\ActiveRecord|null
      */
-    public static function getTransaction($order_id) {
+    public static function getTransaction($order_uuid) {
         return self::find()
             ->orderBy("created_at DESC")
-            ->andWhere(['order_uuid' => $order_id])
+            ->andWhere(['order_uuid' => $order_uuid])
             ->one();
     }
 
     /**
-     * @param $order_id
+     * @param $order_uuid
      * @return array
      */
-    public function getTransactions($order_id) {
+    public function getTransactions($order_uuid) {
 
-        $txn = self::getTransaction($order_id);
+        $txn = self::getTransaction($order_uuid);
 
         $transactions = [];
 
@@ -119,7 +119,7 @@ class TabbyTransaction extends \yii\db\ActiveRecord
             $txn = json_decode($txn['body']);
             $transactions[] = [
                 "id"        => $txn->id,
-                "order_id"  => $order_id,
+                "order_uuid"  => $order_uuid,
                 "type"      => 'AUTH',
                 "amount"    => $txn->amount,
                 "currency"  => $txn->currency,
@@ -129,7 +129,7 @@ class TabbyTransaction extends \yii\db\ActiveRecord
                 $transactions[] = [
                     "id"        => $capture->id,
                     "payment_id"=> $txn->id,
-                    "order_id"  => $order_id,
+                    "order_uuid"  => $order_uuid,
                     "type"      => 'CAPTURE',
                     "amount"    => $capture->amount,
                     "currency"  => $txn->currency,
@@ -141,7 +141,7 @@ class TabbyTransaction extends \yii\db\ActiveRecord
                     "id"        => $refund->id,
                     "payment_id"=> $txn->id,
                     "capture_id"=> $refund->capture_id,
-                    "order_id"  => $order_id,
+                    "order_uuid"  => $order_uuid,
                     "type"      => 'REFUND',
                     "amount"    => $refund->amount,
                     "currency"  => $txn->currency,
@@ -158,6 +158,7 @@ class TabbyTransaction extends \yii\db\ActiveRecord
      * @return void
      */
     public static function registerWebhooks($restaurant_uuid) {
+        
         $key = Setting::getConfig($restaurant_uuid, PaymentMethod::CODE_TABBY, 'payment_tabby_secret_key');
 
         $sk =  trim($key);
@@ -169,7 +170,7 @@ class TabbyTransaction extends \yii\db\ActiveRecord
         $is_test = (bool)preg_match("#^sk_test_#", $sk);
         foreach ($codes as $code) {
             $check_webhook = false;
-            $webhooks = json_decode(self::exec('GET', $code), true);
+            $webhooks = json_decode(self::exec($restaurant_uuid, 'GET', $code), true);
             self::ddlog('info', 'Checking webhooks for ' . $code, null, ['webhooks' => $webhooks]);
             if (array_key_exists('status', $webhooks) && $webhooks['status'] == 'error') continue;
             foreach ($webhooks as $webhook) {
@@ -181,7 +182,7 @@ class TabbyTransaction extends \yii\db\ActiveRecord
                             'is_test'   => $is_test,
                             'id'        => $webhook['id']
                         ]);
-                        self::exec('PUT', $code, ['url' => $url, 'is_test' => $is_test], $webhook['id']);
+                        self::exec($restaurant_uuid, 'PUT', $code, ['url' => $url, 'is_test' => $is_test], $webhook['id']);
                     }
                     $check_webhook = true;
                 }
@@ -192,7 +193,7 @@ class TabbyTransaction extends \yii\db\ActiveRecord
                     'url'       => $url,
                     'is_test'   => $is_test
                 ]);
-                self::exec('POST', $code, ['url' => $url, 'is_test' => $is_test]);
+                self::exec($restaurant_uuid, 'POST', $code, ['url' => $url, 'is_test' => $is_test]);
             }
         }
     }
