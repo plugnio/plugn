@@ -40,6 +40,23 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+
+                [ // TabbyController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment/tabby',
+                    'pluralize' => false,
+                    'patterns' => [
+                        "GET <id>" => "order",
+                        "POST install" => "install",
+                        "PATCH refund" => "refund",
+                        "PATCH close" => "close",
+                        // OPTIONS VERBS
+                        'OPTIONS install' => 'options',
+                        'OPTIONS refund' => 'options',
+                        'OPTIONS close' => 'options',
+                    ]
+                ],
+
                 [ // PingController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/ping',
@@ -772,6 +789,12 @@ return [
                         'POST disable-online-payment/<id>' => 'disable-online-payment',
                         'POST enable-cod/<id>' => 'enable-cod',
                         'POST disable-cod/<id>' => 'disable-cod',
+
+                        'POST enable-tabby' => 'enable-tabby',
+                        'POST disable-tabby' => 'disable-tabby',
+                        'POST enable-tabby/<id>' => 'enable-tabby',
+                        'POST disable-tabby/<id>' => 'disable-tabby',
+
                         'POST enable-moyasar' => 'enable-moyasar',
                         'POST disable-moyasar' => 'disable-moyasar',
                         'POST enable-moyasar/<id>' => 'enable-moyasar',

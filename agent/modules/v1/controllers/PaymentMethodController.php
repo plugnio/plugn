@@ -5,6 +5,7 @@ namespace agent\modules\v1\controllers;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantPaymentMethod;
 use common\models\RestaurantUpload;
+use common\models\Setting;
 use Yii;
 use agent\models\Restaurant;
 use yii\web\NotFoundHttpException;
@@ -31,7 +32,56 @@ class PaymentMethodController extends BaseController
             return $this->_configStripe($model, $store, $code);
         } else if($code == "UPayment") {
             return $this->_configUPayment($model, $store, $code);
+        }else if($code == "Tabby") {
+            return $this->_configTabby($model, $store, $code);
         }
+    }
+
+    private function _configTabby($model, $store, $code) {
+
+        $model->payment_tabby_public_key = Yii::$app->request->getBodyParam('payment_tabby_public_key');
+        $model->payment_tabby_secret_key = Yii::$app->request->getBodyParam('payment_tabby_secret_key');
+        $model->payment_tabby_capture_on = Yii::$app->request->getBodyParam('payment_tabby_capture_on');
+        $model->payment_tabby_order_status = Yii::$app->request->getBodyParam( 'payment_tabby_order_status');
+        $model->payment_tabby_promo = Yii::$app->request->getBodyParam( 'payment_tabby_promo');
+        $model->payment_tabby_capture_status = Yii::$app->request->getBodyParam('payment_tabby_capture_status');
+        $model->payment_tabby_cc_installments_status = Yii::$app->request->getBodyParam('payment_tabby_cc_installments_status');
+
+        $model->payment_tabby_promo_theme = Yii::$app->request->getBodyParam('payment_tabby_promo_theme');
+        $model->payment_tabby_installments_status = Yii::$app->request->getBodyParam('payment_tabby_installments_status');
+        $model->payment_tabby_paylater_status = Yii::$app->request->getBodyParam('payment_tabby_paylater_status');
+
+        $model->payment_tabby_promo_limit = Yii::$app->request->getBodyParam('payment_tabby_promo_limit');//max limit
+        $model->payment_tabby_promo_min_price = Yii::$app->request->getBodyParam( 'payment_tabby_promo_min_price');
+        $model->payment_tabby_cancel_status_id = Yii::$app->request->getBodyParam( 'payment_tabby_cancel_status_id');
+        $model->payment_tabby_debug = Yii::$app->request->getBodyParam('payment_tabby_debug');
+
+        if ($model->save())
+        {
+            $payment_method = $store->getRestaurantPaymentMethods()
+                ->joinWith('paymentMethod')
+                ->andWhere(['payment_method_code' => PaymentMethod::CODE_TABBY])
+                ->exists();
+
+            if (!$payment_method) {
+
+                $upayPaymentMethod = PaymentMethod::find()
+                    ->andWhere(['payment_method_code' => PaymentMethod::CODE_TABBY])
+                    ->one();
+
+                $payments_method = new RestaurantPaymentMethod();
+                $payments_method->payment_method_id = $upayPaymentMethod->payment_method_id;
+                $payments_method->restaurant_uuid = $store->restaurant_uuid;
+
+                if (!$payments_method->save()) {
+                    return self::message("error", $payments_method->getErrors());
+                }
+            }
+
+            return self::message('success', "Extension $code updated.");
+        }
+
+        return self::message('error', $model->errors);
     }
 
     private function _configUPayment($model, $store, $code) {
@@ -65,7 +115,6 @@ class PaymentMethodController extends BaseController
 
         return self::message('error', $model->errors);
     }
-
 
     private function _configStripe($model, $store, $code) {
 

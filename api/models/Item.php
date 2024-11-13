@@ -4,6 +4,8 @@ namespace api\models;
 
 use common\models\ItemImage;
 use common\models\Option;
+use common\models\PaymentMethod;
+use common\models\Setting;
 use Yii;
 use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
