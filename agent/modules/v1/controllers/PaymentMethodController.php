@@ -5,6 +5,7 @@ namespace agent\modules\v1\controllers;
 use agent\models\PaymentMethod;
 use agent\models\RestaurantPaymentMethod;
 use common\models\RestaurantUpload;
+use common\models\Setting;
 use Yii;
 use agent\models\Restaurant;
 use yii\web\NotFoundHttpException;
@@ -40,6 +41,20 @@ class PaymentMethodController extends BaseController
 
         $model->payment_tabby_public_key = Yii::$app->request->getBodyParam('payment_tabby_public_key');
         $model->payment_tabby_secret_key = Yii::$app->request->getBodyParam('payment_tabby_secret_key');
+        $model->payment_tabby_capture_on = Yii::$app->request->getBodyParam('payment_tabby_capture_on');
+        $model->payment_tabby_order_status = Yii::$app->request->getBodyParam( 'payment_tabby_order_status');
+        $model->payment_tabby_promo = Yii::$app->request->getBodyParam( 'payment_tabby_promo');
+        $model->payment_tabby_capture_status = Yii::$app->request->getBodyParam('payment_tabby_capture_status');
+        $model->payment_tabby_cc_installments_status = Yii::$app->request->getBodyParam('payment_tabby_cc_installments_status');
+
+        $model->payment_tabby_promo_theme = Yii::$app->request->getBodyParam('payment_tabby_promo_theme');
+        $model->payment_tabby_installments_status = Yii::$app->request->getBodyParam('payment_tabby_installments_status');
+        $model->payment_tabby_paylater_status = Yii::$app->request->getBodyParam('payment_tabby_paylater_status');
+
+        $model->payment_tabby_promo_limit = Yii::$app->request->getBodyParam('payment_tabby_promo_limit');//max limit
+        $model->payment_tabby_promo_min_price = Yii::$app->request->getBodyParam( 'payment_tabby_promo_min_price');
+        $model->payment_tabby_cancel_status_id = Yii::$app->request->getBodyParam( 'payment_tabby_cancel_status_id');
+        $model->payment_tabby_debug = Yii::$app->request->getBodyParam('payment_tabby_debug');
 
         if ($model->save())
         {

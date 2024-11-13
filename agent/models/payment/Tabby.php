@@ -62,7 +62,7 @@ class Tabby extends Model
                 'payment_tabby_capture_status', 'payment_tabby_cc_installments_status',
                 'payment_tabby_installments_status', 'payment_tabby_paylater_status', 'payment_tabby_promo_limit',
                 'payment_tabby_promo_theme', 'payment_tabby_promo_min_price','payment_tabby_cancel_status_id',
-                'payment_tabby_debug'], "safe"]
+                'payment_tabby_debug'], "string"]
         ];
     }
 
@@ -76,17 +76,17 @@ class Tabby extends Model
 
         Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_capture_on', $this->payment_tabby_capture_on);
         Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_order_status', $this->payment_tabby_order_status);
-        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_promo', $this->payment_tabby_promo);
+        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_promo', $this->payment_tabby_promo? "1": null);
         Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_capture_status', $this->payment_tabby_capture_status);
-        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_cc_installments_status', $this->payment_tabby_cc_installments_status);
-        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_installments_status', $this->payment_tabby_installments_status);
-        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_paylater_status', $this->payment_tabby_paylater_status);
+        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_cc_installments_status', $this->payment_tabby_cc_installments_status? "1": null);
+        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_installments_status', $this->payment_tabby_installments_status?"1": null);
+        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_paylater_status', $this->payment_tabby_paylater_status?"1": null);
         Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_promo_limit', $this->payment_tabby_promo_limit);
         Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_promo_theme', $this->payment_tabby_promo_theme);
 
         Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_promo_min_price', $this->payment_tabby_promo_min_price);
         Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_cancel_status_id', $this->payment_tabby_cancel_status_id);
-        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_debug', $this->payment_tabby_debug);
+        Setting::setConfig($this->restaurant_uuid, 'Tabby', 'payment_tabby_debug', $this->payment_tabby_debug?"1": null);
 
         return true;
     }

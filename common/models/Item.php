@@ -252,75 +252,6 @@ class Item extends \yii\db\ActiveRecord
           return (boolean) $data->track_quantity;
       };
 
-      //todo: cache config for single api call
-
-      $tabby_promo = Setting::getConfig($this->restaurant_uuid,
-          PaymentMethod::CODE_TABBY,
-          'payment_tabby_promo');
-
-      if ($tabby_promo) {
-
-          $tabby_promo_theme = Setting::getConfig($this->restaurant_uuid,
-              PaymentMethod::CODE_TABBY,
-              'payment_tabby_promo_theme');
-
-          $fields['tabby_promo_enabled'] = true;
-
-          /*$max_price = Setting::getConfig($this->restaurant_uuid,
-              PaymentMethod::CODE_TABBY,
-              'payment_tabby_promo_limit');
-
-          $min_price = Setting::getConfig($this->restaurant_uuid,
-              PaymentMethod::CODE_TABBY,
-              'payment_tabby_promo_min_price');
-
-          $data['price_amount'] = $data['price']
-              ? $this->tax->calculate($data['special'] ? $product_info['special'] : $product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax'))
-              : false;
-
-          if ($data['price_amount'])
-              $data['price_amount'] = $this->currency->format($data['price_amount'], $this->session->data['currency'], '', false);
-
-          if ($max_price && $max_price < $data['price_amount']) {
-              $data['tabby_promo_enabled'] = false;
-          }
-
-          if ($min_price && $min_price >= $data['price_amount']) {
-              $data['tabby_promo_enabled'] = false;
-          }*/
-
-          $tabby_promo_theme = explode(':', $tabby_promo_theme);
-
-          $fields['promo_theme'] = array_shift($tabby_promo_theme);
-          $fields['tabby_installmentsCount'] = !empty($tabby_promo_theme) ? 0 : 4;
-          $fields['productType'] = function($data) {
-
-              $payment_tabby_cc_installments_status = Setting::getConfig($data->restaurant_uuid,
-                  PaymentMethod::CODE_TABBY,
-                  'payment_tabby_cc_installments_status');
-
-              $payment_tabby_installments_status = Setting::getConfig($data->restaurant_uuid,
-                  PaymentMethod::CODE_TABBY,
-                  'payment_tabby_installments_status');
-
-              $payment_tabby_paylater_status = Setting::getConfig($data->restaurant_uuid,
-                  PaymentMethod::CODE_TABBY,
-                  'payment_tabby_paylater_status');
-
-              return (
-                  ($payment_tabby_cc_installments_status == 1) &&
-                  !(
-                      $payment_tabby_installments_status == 1 ||
-                      $payment_tabby_paylater_status == 1
-                  )
-              ) ? 'creditCardInstallments' : 'installments';;
-          };
-      } else {
-          $fields['tabby_promo_enabled'] = function() {
-            return false;
-          };
-      }
-
       return $fields;
   }
 
@@ -339,8 +270,85 @@ class Item extends \yii\db\ActiveRecord
             'itemVideos',
             'extraOptions',
             'itemVariants',
-            'itemSchema'
+            'itemSchema',
+            "tabbyPromo"
         ]);
+    }
+
+    public function getTabbyPromo() {
+
+        $fields = [];
+
+        //todo: cache config for single api call
+
+        $tabby_promo = Setting::getConfig($this->restaurant_uuid,
+            PaymentMethod::CODE_TABBY,
+            'payment_tabby_promo');
+
+        if ($tabby_promo) {
+
+            $tabby_promo_theme = Setting::getConfig($this->restaurant_uuid,
+                PaymentMethod::CODE_TABBY,
+                'payment_tabby_promo_theme');
+
+            $fields['tabby_promo_enabled'] = true;
+
+            /*$max_price = Setting::getConfig($this->restaurant_uuid,
+                PaymentMethod::CODE_TABBY,
+                'payment_tabby_promo_limit');
+
+            $min_price = Setting::getConfig($this->restaurant_uuid,
+                PaymentMethod::CODE_TABBY,
+                'payment_tabby_promo_min_price');
+
+            $data['price_amount'] = $data['price']
+                ? $this->tax->calculate($data['special'] ? $product_info['special'] : $product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax'))
+                : false;
+
+            if ($data['price_amount'])
+                $data['price_amount'] = $this->currency->format($data['price_amount'], $this->session->data['currency'], '', false);
+
+            if ($max_price && $max_price < $data['price_amount']) {
+                $data['tabby_promo_enabled'] = false;
+            }
+
+            if ($min_price && $min_price >= $data['price_amount']) {
+                $data['tabby_promo_enabled'] = false;
+            }*/
+
+            $tabby_promo_theme = explode(':', $tabby_promo_theme);
+
+            $fields['promo_theme'] = array_shift($tabby_promo_theme);
+
+            $fields['tabby_installmentsCount'] = !empty($tabby_promo_theme) ? 0 : 4;
+
+
+            $payment_tabby_cc_installments_status = Setting::getConfig($this->restaurant_uuid,
+                PaymentMethod::CODE_TABBY,
+                'payment_tabby_cc_installments_status');
+
+            $payment_tabby_installments_status = Setting::getConfig($this->restaurant_uuid,
+                PaymentMethod::CODE_TABBY,
+                'payment_tabby_installments_status');
+
+            $payment_tabby_paylater_status = Setting::getConfig($this->restaurant_uuid,
+                PaymentMethod::CODE_TABBY,
+                'payment_tabby_paylater_status');
+
+
+            $fields['productType'] = (
+                    ($payment_tabby_cc_installments_status == 1) &&
+                    !(
+                        $payment_tabby_installments_status == 1 ||
+                        $payment_tabby_paylater_status == 1
+                    )
+                ) ? 'creditCardInstallments' : 'installments';
+
+        } else {
+            $fields['tabby_promo_enabled'] = false;
+        }
+
+        return $fields;
     }
 
     public function getItemSchema()

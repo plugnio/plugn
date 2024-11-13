@@ -162,7 +162,9 @@ class Setting extends \yii\db\ActiveRecord
         }
 
         $model->value = $value;
-        $model->save();
+        if(!$model->save()) {
+            Yii::error($model->errors);
+        }
     }
 
     /**
