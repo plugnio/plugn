@@ -162,10 +162,13 @@ class TabbyTransaction extends \yii\db\ActiveRecord
         $key = Setting::getConfig($restaurant_uuid, PaymentMethod::CODE_TABBY, 'payment_tabby_secret_key');
 
         $sk =  trim($key);
-        if (empty($sk)) return;
+        if (empty($sk))
+            return;
+
         $codes = array('AE', 'SA', 'KW', 'BH', 'QA');
 
-        $url = Url::to(['payment/tabby/callback'], true);
+        $url = Yii::$app->agentApiUrlManager->baseUrl . '/v2/payment/tabby/callback';
+            //Url::to(['payment/tabby/callback'], true);
 
         $is_test = (bool)preg_match("#^sk_test_#", $sk);
         foreach ($codes as $code) {

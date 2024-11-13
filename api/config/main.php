@@ -341,8 +341,8 @@ return [
                         'GET confirm' => 'confirm',
                         'POST confirm' => 'confirm',
                         "PATCH capture" => "capture",
-                        "PATCH refund" => "refund",
-                        "PATCH close" => "close",
+                       // "PATCH refund" => "refund",
+                       // "PATCH close" => "close",
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
                         "OPTIONS create" => 'options',

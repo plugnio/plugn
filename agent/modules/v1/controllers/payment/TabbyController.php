@@ -4,6 +4,7 @@ namespace agent\modules\v1\controllers\payment;
 
 use agent\models\Restaurant;
 use agent\modules\v1\controllers\BaseController;
+use common\models\Tabby;
 use common\models\TabbyTransaction;
 use yii\web\NotFoundHttpException;
 
@@ -18,6 +19,10 @@ class TabbyController extends BaseController
         return $behaviors;
     }
 
+    /**
+     * @return void
+     * @throws NotFoundHttpException
+     */
     public function actionInstall() {
         $store = $this->findStore();
 
@@ -59,6 +64,51 @@ class TabbyController extends BaseController
         }
 
         return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function actionRefund() {
+        $json = array();
+
+        $transaction_id = Yii::$app->request->get("transaction_id");
+        $amount = Yii::$app->request->getBodyParam('amount');
+
+        $tabby = new Tabby();
+        $result = $tabby->refund($transaction_id, $amount);
+
+        if ($result['error']) {
+            $json['success'] = false;
+            $json['error'] = $result['message'];
+        } else {
+            $json['success'] = "Transaction updated successfully!";
+            $json['error'] = false;
+        }
+
+        return $json;
+    }
+
+    /**
+     * @return array
+     */
+    public function actionClose() {
+        $json = array();
+
+        $transaction_id = Yii::$app->request->get("transaction_id");
+
+        $tabby = new Tabby();
+        $result = $tabby->close($transaction_id);
+
+        if ($result['error']) {
+            $json['success'] = false;
+            $json['error'] = $result['message'];
+        } else {
+            $json['success'] = "Transaction updated successfully!";
+            $json['error'] = false;
+        }
+
+        return $json;
     }
 
     /**

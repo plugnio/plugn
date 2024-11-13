@@ -40,6 +40,23 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+
+                [ // TabbyController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v1/payment/tabby',
+                    'pluralize' => false,
+                    'patterns' => [
+                        "GET <id>" => "order",
+                        "POST install" => "install",
+                        "PATCH refund" => "refund",
+                        "PATCH close" => "close",
+                        // OPTIONS VERBS
+                        'OPTIONS install' => 'options',
+                        'OPTIONS refund' => 'options',
+                        'OPTIONS close' => 'options',
+                    ]
+                ],
+
                 [ // PingController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/ping',
