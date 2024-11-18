@@ -854,6 +854,7 @@ return [
                         'OPTIONS disable-moyasar/<id>' => 'options',
                         'OPTIONS enable-upayment/<id>' => 'options',
                         'OPTIONS disable-upayment/<id>' => 'options',
+
                         'OPTIONS create' => 'options',
                         'OPTIONS enable-stripe' => 'options',
                         'OPTIONS disable-stripe' => 'options',
@@ -892,7 +893,13 @@ return [
                         'OPTIONS update-delivery-integration' => 'options',
                         'OPTIONS process-gateway-queue' => 'options',
                         'OPTIONS remove-gateway-queue' => 'options',
-                        "OPTIONS update-kyc/<id>" => 'options'
+                        "OPTIONS update-kyc/<id>" => 'options',
+
+
+                        'OPTIONS enable-tabby' => 'options',
+                        'OPTIONS disable-tabby' => 'options',
+                        'OPTIONS enable-tabby/<id>' => 'options',
+                        'OPTIONS disable-tabby/<id>' => 'options',
                     ]
                 ],
                 [ // StatsController
