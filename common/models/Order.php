@@ -1878,7 +1878,7 @@ failed: the order has failed to find a driver */
                 }
             } catch (\Exception $err) {
                 //todo: show notification to customer to update number?
-                //    Yii::error('Error while Sending SMS.' . json_encode($err));
+                Yii::error('Error while Sending SMS.' . json_encode($err));
             }
         }
 
