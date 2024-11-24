@@ -469,6 +469,9 @@ class OrderController extends BaseController
                 $order->bank_discount_id = $bank_discount_model->bank_discount_id;
 
                 if (!$order->updateOrderTotalPrice()) {
+
+                    $transaction->rollBack();
+
                     return [
                         'operation' => 'error',
                         'message' => $order->getErrors(),
@@ -1165,8 +1168,8 @@ class OrderController extends BaseController
             throw new ForbiddenHttpException('Invalid Currency code');
 
         if (isset($reference)) {
-            $gateway_reference = $reference['gateway'];
-            $payment_reference = $reference['payment'];
+            $gateway_reference = isset($reference['gateway'])? $reference['gateway']: null;
+            $payment_reference = isset($reference['payment'])? $reference['payment']: null;
         }
 
         if (isset($transaction)) {

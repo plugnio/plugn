@@ -5200,6 +5200,10 @@ class Restaurant extends ActiveRecord
 
                 foreach ($agentAssignments as $key => $agentAssignment) {
 
+                    if (!$agentAssignment->agent) {
+                        continue;
+                    }
+                    
                     $data['agent_name'] = $agentAssignment->agent->agent_name;
 
                     if ($agentAssignment->receive_weekly_stats) {
