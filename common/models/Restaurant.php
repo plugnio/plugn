@@ -2036,7 +2036,7 @@ class Restaurant extends ActiveRecord
             } catch (\Exception $e) { // Handle the exception
 
                 Yii::$app->slackTapOperation->send(
-                    "Vendor faced error while creating account [" . $this->name . "]",
+                    "Vendor faced error while fetching merchant details [" . $this->name . "]",
                     //Yii::$app->formatter->asDatetime(new \DateTime("now")),
                     ":thumb-up:",
                     [
@@ -2225,7 +2225,7 @@ class Restaurant extends ActiveRecord
                 [
                     [
                         'fallback' => "test",
-                        'title' => 'Error while Fetching Merchant [' . $this->name . ']',
+                        'title' => 'Error while fetching merchant with store key [' . $this->name . ']',
                         'text' => $merchantApiResponse->data? json_encode($merchantApiResponse->data): null,
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
