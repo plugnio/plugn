@@ -105,11 +105,11 @@ class OrderController extends BaseController
             return $response;
         }
 
-        \common\models\Restaurant::updateAll([
+        /*\common\models\Restaurant::updateAll([
             'last_order_at' => new Expression('NOW()'),
         ], [
             'restaurant_uuid' => $order->restaurant_uuid
-        ]);
+        ]);*/
 
         Yii::$app->eventManager->track('Order Updated', $order->attributes,
             null,
@@ -152,18 +152,13 @@ class OrderController extends BaseController
         }
 
         //for https://pogi.sentry.io/issues/3889482226/?project=5220572&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
-        
-        \common\models\Restaurant::updateAll([
-            'last_order_at' => new Expression('NOW()'),
-            'total_orders' => $restaurant->total_orders + 1
-        ], [
-            'restaurant_uuid' => $restaurant->restaurant_uuid
-        ]);
 
-            Yii::$app->eventManager->track('Order Initiated', $order->attributes,
-                null,
-                $restaurant->restaurant_uuid
-            );
+        $restaurant->updateStats();
+
+        Yii::$app->eventManager->track('Order Initiated', $order->attributes,
+            null,
+            $restaurant->restaurant_uuid
+        );
 
         return [
             'operation' => 'success',
@@ -434,8 +429,10 @@ class OrderController extends BaseController
             }
         }
 
-        if ($order->order_mode == Order::ORDER_MODE_DELIVERY && $order->subtotal < $order->deliveryZone->min_charge) {
-
+        if (
+            $order->order_mode == Order::ORDER_MODE_DELIVERY &&
+            $order->subtotal < $order->deliveryZone->min_charge
+        ) {
             $transaction->rollBack();
 
             return [
