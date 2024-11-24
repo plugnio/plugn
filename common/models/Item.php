@@ -498,7 +498,7 @@ class Item extends \yii\db\ActiveRecord
             Yii::$app->eventManager->track('Inventory Updated', [
                 'product_id' => $this->item_uuid,
                 'item_uuid' => $this->item_uuid,
-                'previous_stock' => $changedAttributes['stock_qty'],
+                'previous_stock' => isset($changedAttributes['stock_qty'])?$changedAttributes['stock_qty']: null,
                 'updated_stock' => $this->stock_qty
             ], null, $this->restaurant_uuid);
 
