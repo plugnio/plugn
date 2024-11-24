@@ -46,7 +46,7 @@ class SmsComponent extends Component
 
         $smsParams = [
             "UID" => "usrbawes",
-            "p" => "bawes1452",
+            "p" => "B@wes!81928",//"bawes1452",
             "S" => "Plugn",
             "G" => $phone_number,
             "M" => 'Order #'.  $orderUuid .' has been accepted. Get order status updates at '. $urlShortner,
