@@ -4202,6 +4202,28 @@ class Restaurant extends ActiveRecord
     }
 
     /**
+     * @return void
+     */
+    public function updateStats() {
+        try {
+            self::updateAll([
+                'last_order_at' => new Expression('NOW()'),
+                // 'total_orders' => $this->total_orders + 1
+            ], [
+                'restaurant_uuid' => $this->restaurant_uuid
+            ]);
+        } catch (\Exception $e) {
+            Yii::error("[". $this->name."] Error updating store last_order_at: " .  $e->getMessage());
+        }
+
+        try {
+            $this->updateCounters(["total_orders" => 1]);
+        } catch (\Exception $e) {
+            Yii::error("[". $this->name."] Error updating store total_orders: " .  $e->getMessage());
+        }
+    }
+
+    /**
      * @return array|ActiveRecord[]
      */
     public function getBestseller()
