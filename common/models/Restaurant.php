@@ -1881,19 +1881,29 @@ class Restaurant extends ActiveRecord
                     [
                         'fallback' => "test",
                         'title' => 'Error while create Merchant [' . $this->name . ']',
-                        'text' => json_encode($merchantApiResponse->data),
+                        'text' => $merchantApiResponse->data? json_encode($merchantApiResponse->data): "",
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
                     ]
                 ]
             );
 
-            Yii::error('Error while create Merchant [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+            $message = 'Error while create Merchant [' . $this->name . '] ';
 
-            if (isset(Yii::$app->session->id))
-                Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
+            if ($merchantApiResponse->data) {
+                $message .= json_encode($merchantApiResponse->data);
+            }
 
-            $this->addError('merchant_id', json_encode($merchantApiResponse->data));
+            Yii::error($message);
+
+            if ($merchantApiResponse->data) {
+                if (isset(Yii::$app->session->id))
+                    Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
+
+                $this->addError('merchant_id', json_encode($merchantApiResponse->data));
+            } else {
+                $this->addError('merchant_id', "No data");
+            }
 
             return [
                 "operation" => 'error',
@@ -2051,19 +2061,23 @@ class Restaurant extends ActiveRecord
                     [
                         'fallback' => "test",
                         'title' => 'Error while Fetching Merchant [' . $this->name . ']',
-                        'text' => json_encode($merchantApiResponse->data),
+                        'text' => $merchantApiResponse->data? json_encode($merchantApiResponse->data): null,
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
                     ]
                 ]
             );
 
-            Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+            if ($merchantApiResponse->data) {
+                Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
 
-            if (isset(Yii::$app->session->id))
-                Yii::$app->session->setFlash('errorResponse',  json_encode($merchantApiResponse->data));
+                if (isset(Yii::$app->session->id))
+                    Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
 
-            $this->addError('operator_id', json_encode($merchantApiResponse->data));
+                $this->addError('operator_id', json_encode($merchantApiResponse->data));
+            } else {
+                $this->addError('operator_id', "no data");
+            }
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -2212,19 +2226,23 @@ class Restaurant extends ActiveRecord
                     [
                         'fallback' => "test",
                         'title' => 'Error while Fetching Merchant [' . $this->name . ']',
-                        'text' => json_encode($merchantApiResponse->data),
+                        'text' => $merchantApiResponse->data? json_encode($merchantApiResponse->data): null,
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
                     ]
                 ]
             );
 
-            Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+            if ($merchantApiResponse->data) {
+                Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
 
-            if (isset(Yii::$app->session->id))
-                Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
+                if (isset(Yii::$app->session->id))
+                    Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
 
-            $this->addError('operator_id', json_encode($merchantApiResponse->data));
+                $this->addError('operator_id', json_encode($merchantApiResponse->data));
+            } else {
+                $this->addError('operator_id', "No data");
+            }
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -2977,6 +2995,10 @@ class Restaurant extends ActiveRecord
 
     public function notifyTapApproved()
     {
+        if (!$this->restaurant_email) {
+            return null;
+        }
+
         $paymentGateway = 'Tap Payments';
 
         $subject = 'Your ' . $paymentGateway . ' account data has been approved';
