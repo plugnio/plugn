@@ -10,16 +10,14 @@ use yii\base\InvalidConfigException;
 
 /**
  * SmsComponent class to send SMS
- *
- * @author Saoud Al-Turki <saoud@plugn.io>
- * @link http://www.plugn.io
  */
 class SmsComponent extends Component
 {
     /**
      * @var string Variable for test api key to be stored in
      */
-    private $apiEndpoint = "http://62.215.226.164/fccsms.aspx";
+    private $apiEndpoint = "https://api.future-club.com/falconapi/fccsms.aspx";
+    //http://62.215.226.164/fccsms.aspx";
 
     /**
      * @inheritdoc
@@ -32,11 +30,16 @@ class SmsComponent extends Component
     /**
      * Send SMS
      */
-    public function sendSms($phone_number,$orderUuid)
+    public function sendSms($phone_number, $orderUuid)
     {
-
         $phone_number = str_replace('+', '', $phone_number);
         $phone_number = str_replace(' ', '', $phone_number);
+
+        //check if phone number contain country code
+
+        if (strpos($phone_number, '965') !== 0) {
+            $phone_number = "965" . $phone_number;
+        }
 
         $urlShortner = 'https://i.plugn.io/' . $orderUuid;
 
@@ -44,19 +47,26 @@ class SmsComponent extends Component
           Order #'.  $orderUuid .' has been accepted. Get order status updates at '. $urlShortner .'.
         ';
 
+        //?IID=accountiid&UID=username&P=apikey&S=senderid&G=965********&M=message&L=L
+//96598765432 96598773607
         $smsParams = [
+            "IID" => "1993",
             "UID" => "usrbawes",
-            "p" => "B@wes!81928",//"bawes1452",
             "S" => "Plugn",
             "G" => $phone_number,
             "M" => 'Order #'.  $orderUuid .' has been accepted. Get order status updates at '. $urlShortner,
             "L" => "L",
         ];
 
+        //https://api.future-club.com/falconapi/fccsms.aspx?IID=1993&UID=usrbawes&S=Plugn&G=96594424722&M=Test-1 by FCC1&L=L
+
         $client = new Client();
 
         $response = $client->createRequest()
-                ->setMethod('POST')
+                ->setMethod('GET')
+                ->setHeaders([
+                    "X-API-KEY" => "886ea93b-20a0-4b2f-9883-9cf251d038b7"
+                ])
                 ->setUrl($this->apiEndpoint)
                 ->setData($smsParams)
                 ->send();

@@ -34,7 +34,8 @@ use yii\db\Expression;
  */
 class CronController extends \yii\console\Controller
 {
-    public function actionIndex() {
+    public function actionIndex()
+    {
 
         //UPDATE agent SET deleted=1 where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20');
 
@@ -55,7 +56,7 @@ class CronController extends \yii\console\Controller
         //$response = Yii::$app->netlifyComponent->getSiteDns("6296937a-2bed-44d7-808a-2285e5c2bb22");
 //getSiteData
         //print_r($response->data);//[sizeof($response->data) - 1]['dns_servers']
-     //   records hostname
+        //   records hostname
 
         /*Yii::$app->eventManager->track(
             'Test event',
@@ -63,10 +64,10 @@ class CronController extends \yii\console\Controller
                 'hello' => "world"
             ]);*/
 
-       // Yii::info("info test", __METHOD__);
-       // Yii::error("error test", __METHOD__);
+        // Yii::info("info test", __METHOD__);
+        // Yii::error("error test", __METHOD__);
 
-       // throw new Exception("test");
+        // throw new Exception("test");
 
         /*Yii::$app->slackError->send(
             Yii::$app->formatter->asDatetime(new \DateTime("now")),
