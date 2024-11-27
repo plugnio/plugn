@@ -46,7 +46,7 @@ class ShortenerController extends Controller
         if($model)
           $this->redirect($model->restaurant->restaurant_domain . '/order-status/' . $orderId);
         else
-        $this->redirect('https://www.plugn.io');
+          $this->redirect('https://www.plugn.io');
     }
 
 }

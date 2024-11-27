@@ -1852,7 +1852,7 @@ failed: the order has failed to find a driver */
         }
 
         //Send SMS To customer
-/*
+
         if ($this->customer_phone_country_code == 965 && !$insert &&
             $this->restaurant_uuid != 'rest_7351b2ff-c73d-11ea-808a-0673128d0c9c' &&
             !$this->sms_sent &&
@@ -1881,7 +1881,7 @@ failed: the order has failed to find a driver */
                 //todo: show notification to customer to update number?
                 Yii::error('Error while Sending SMS.' . json_encode($err));
             }
-        }*/
+        }
 
         //Update delivery area
 
