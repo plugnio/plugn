@@ -143,9 +143,9 @@ class RestaurantSearch extends Restaurant
 
         if ($this->tap_merchant_status) {
             if ($this->tap_merchant_status == "Unknown") {
-                $query->andWhere(new Expression( 'is_tap_enable IS NULL OR is_tap_enable=""'));
+                $query->andWhere(new Expression( 'tap_merchant_status IS NULL OR tap_merchant_status=""'));
             } else {
-                $query->andFilterWhere(['is_tap_enable' => $this->is_tap_enable]);
+                $query->andFilterWhere(['tap_merchant_status' => $this->tap_merchant_status]);
             }
         }
 

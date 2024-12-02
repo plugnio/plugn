@@ -150,6 +150,20 @@ $this->params['breadcrumbs'][] = $this->title;
                                 "New Pending Approval" => 'New Pending Approval',
                                 "Closed" => "Closed"
                             ],
+                            'format' => 'raw',
+                            "value" => function($data) {
+                                return $data->tap_merchant_status. '&nbsp;&nbsp;' .
+                                    Html::a('<i class="glyphicon glyphicon-refresh"></i> ', ['poll-tap-merchant-status',
+                                        'id' => $data->restaurant_uuid], [
+
+                                        //'class' => 'btn btn-primary btn-process-queue',
+                                        'data' => [
+                                            'confirm' => 'Are you sure?',
+                                            'method' => 'post',
+                                            "tooltip" => "Check Tap Merchant Status"
+                                        ],
+                                    ]);
+                            }
                         ],
                         'last_order_at',
                         [
