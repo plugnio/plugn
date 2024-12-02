@@ -1175,6 +1175,7 @@ class CronController extends \yii\console\Controller
             ->andWhere([
                 "OR",
                 ['tap_merchant_status' => 'New Pending Approval'],
+                ['tap_merchant_status' => ''],
                 new Expression("tap_merchant_status IS NULL")
             ])
             ->andWhere(['is_tap_created' => true]);
