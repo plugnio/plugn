@@ -94,7 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $name;
                             }
                         ],
-                        [
+                       /* [
 
                             'label' => "Category",
                             //'filter' => \common\models\BusinessCategory::arrFilter(),
@@ -102,7 +102,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 if($data->businessCategory)
                                     return $data->businessCategory->business_category_en;
                             }
-                        ],
+                        ],*/
                         [
                             'attribute' => 'restaurant_domain',
                             'label' => "URL",
@@ -112,7 +112,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
 
-                        'ip_address',
+                     //   'ip_address',
 
                         //'country_name',
                         'total_orders',
@@ -132,6 +132,39 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'restaurant_created_at:datetime',
                         //'referral_code',
                         //'last_active_at',
+                        [
+                               "attribute" => "is_tap_enable",
+                            "filter" => [
+                                1 => 'Yes',
+                                0 => 'No',
+                            ],
+                            "value" => function ($data) {
+                                return $data->is_tap_enable ? "Yes": "No";
+                            }
+                        ],
+                        [
+                               "attribute"=> "tap_merchant_status",
+                            'filter' => [
+                                "Unknown" => "Unknown",
+                                "Active" => 'Active',
+                                "New Pending Approval" => 'New Pending Approval',
+                                "Closed" => "Closed"
+                            ],
+                            'format' => 'raw',
+                            "value" => function($data) {
+                                return $data->tap_merchant_status. '&nbsp;&nbsp;' .
+                                    Html::a('<i class="glyphicon glyphicon-refresh"></i> ', ['poll-tap-merchant-status',
+                                        'id' => $data->restaurant_uuid], [
+
+                                        //'class' => 'btn btn-primary btn-process-queue',
+                                        'data' => [
+                                            'confirm' => 'Are you sure?',
+                                            'method' => 'post',
+                                            "tooltip" => "Check Tap Merchant Status"
+                                        ],
+                                    ]);
+                            }
+                        ],
                         'last_order_at',
                         [
                             'attribute' => 'restaurant_status',

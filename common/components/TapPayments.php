@@ -1143,4 +1143,20 @@ class TapPayments extends Component
 
          return $signature == $headerSignature;
      }
+
+    public function isJson($response) {
+        $contentType = $response->getHeaders()->get("content-type");
+
+        return !str_contains($contentType, "text/html");
+    }
+
+    public function stringify($response) {
+        $contentType = $response->getHeaders()->get("content-type");
+
+        if (str_contains($contentType, "text/html")) {
+            return $response->content;
+        } else {
+            return $response->data;
+        }
+     }
 }

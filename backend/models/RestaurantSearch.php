@@ -52,7 +52,7 @@ class RestaurantSearch extends Restaurant
              [["haveArmada", "notDeleted", "active15Days", "notActive15Days", 'country_id', 'currency_id', 'license_number', 'vendor_sector', 'store_layout', 'enable_gift_message',
                  'retention_email_sent', 'referral_code', 'is_public', 'accept_order_247', 'iban', 'business_id',
                  'business_entity_id', 'wallet_id', 'merchant_id', 'operator_id',
-                'restaurant_uuid', 'is_tap_enable', 'name', 'name_ar' ,'app_id', 'has_not_deployed',
+                'restaurant_uuid', 'is_tap_enable', "tap_merchant_status", 'name', 'name_ar' ,'app_id', 'has_not_deployed',
                  'last_active_at', 'last_order_at', 'restaurant_email', 'restaurant_created_at', 'restaurant_updated_at',
                  'restaurant_domain', 'country_name', 'currency_title', 'is_myfatoorah_enable', 'has_deployed',
                  'is_sandbox', 'is_under_maintenance', 'enable_debugger', 'is_deleted', 'noOrder', 'total_orders',
@@ -140,6 +140,14 @@ class RestaurantSearch extends Restaurant
 
         if($this->is_tap_enable)
             $query->andFilterWhere(['is_tap_enable' => $this->is_tap_enable]);
+
+        if ($this->tap_merchant_status) {
+            if ($this->tap_merchant_status == "Unknown") {
+                $query->andWhere(new Expression( 'tap_merchant_status IS NULL OR tap_merchant_status=""'));
+            } else {
+                $query->andFilterWhere(['tap_merchant_status' => $this->tap_merchant_status]);
+            }
+        }
 
         if($this->is_myfatoorah_enable)
             $query->andFilterWhere(['is_myfatoorah_enable' => $this->is_myfatoorah_enable]);

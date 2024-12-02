@@ -1476,7 +1476,6 @@ class Restaurant extends ActiveRecord
 
     public function uploadDocumentsToMyFatoorah()
     {
-
         //Upload Authorized Signature file
         if ($this->authorized_signature_file) {
 
@@ -1698,7 +1697,8 @@ class Restaurant extends ActiveRecord
                 ]
             );
 
-            Yii::error('Error while uploading doc for Business [' . $this->name . '] ' . json_encode($response));
+            Yii::error('Error while uploading doc for Business [' . $this->name . '] '
+                . json_encode($response));
 
             return $response;
         }
@@ -1756,9 +1756,9 @@ class Restaurant extends ActiveRecord
         $businessApiResponse = Yii::$app->tapPayments->createBusiness($this);
 
         //&& isset($businessApiResponse->data['entity']['operator'])
-        if ($businessApiResponse->isOk) {
+        if ($businessApiResponse->isOk && Yii::$app->tapPayments->isJson($businessApiResponse)) {
 
-            //Yii::info('Create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
+            //Yii::info('Create Business [' . $this->name . '] ' . Yii::$app->tapPayments->stringify($businessApiResponse));
 
             $this->business_id = $businessApiResponse->data['id'];
             $this->business_entity_id = $businessApiResponse->data['entity']['id'];
@@ -1796,24 +1796,24 @@ class Restaurant extends ActiveRecord
                     [
                         'fallback' => "test",
                         'title' => 'Error while create Business [' . $this->name . ']',
-                        'text' => json_encode($businessApiResponse->data),
+                        'text' => Yii::$app->tapPayments->stringify($businessApiResponse),
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
                     ]
                 ]
             );
 
-            Yii::error('Error while create Business [' . $this->name . '] ' . json_encode($businessApiResponse->data));
+            Yii::error('Error while create Business [' . $this->name . '] ' . Yii::$app->tapPayments->stringify($businessApiResponse));
 
             if (isset(Yii::$app->session->id)) {
-                Yii::$app->session->setFlash('errorResponse', json_encode($businessApiResponse->data));
+                Yii::$app->session->setFlash('errorResponse', Yii::$app->tapPayments->stringify($businessApiResponse));
             }
 
-            $this->addError('business_id', json_encode($businessApiResponse->data));
+            $this->addError('business_id', Yii::$app->tapPayments->stringify($businessApiResponse));
 
             return [
                 "operation" => 'error',
-                "message" => $businessApiResponse->data
+                "message" => Yii::$app->tapPayments->stringify($businessApiResponse)
             ];
         }
     }
@@ -1832,7 +1832,7 @@ class Restaurant extends ActiveRecord
             $this
         );
 
-        if ($merchantApiResponse->isOk) {
+        if ($merchantApiResponse->isOk && Yii::$app->tapPayments->isJson($merchantApiResponse)) {
 
             $this->merchant_id = $merchantApiResponse->data['id'];
             $this->wallet_id = $merchantApiResponse->data['wallets']['id'];
@@ -1881,7 +1881,7 @@ class Restaurant extends ActiveRecord
                     [
                         'fallback' => "test",
                         'title' => 'Error while create Merchant [' . $this->name . ']',
-                        'text' => $merchantApiResponse->data? json_encode($merchantApiResponse->data): "",
+                        'text' => Yii::$app->tapPayments->stringify($merchantApiResponse),
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
                     ]
@@ -1890,19 +1890,17 @@ class Restaurant extends ActiveRecord
 
             $message = 'Error while create Merchant [' . $this->name . '] ';
 
-            if ($merchantApiResponse->data) {
-                $message .= json_encode($merchantApiResponse->data);
-            }
+            $message .= Yii::$app->tapPayments->stringify($merchantApiResponse);
 
             Yii::error($message);
 
-            if ($merchantApiResponse->data) {
+            if (Yii::$app->tapPayments->isJson($merchantApiResponse)) {
                 if (isset(Yii::$app->session->id))
-                    Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
+                    Yii::$app->session->setFlash('errorResponse', Yii::$app->tapPayments->stringify($merchantApiResponse));
 
-                $this->addError('merchant_id', json_encode($merchantApiResponse->data));
+                $this->addError('merchant_id', Yii::$app->tapPayments->stringify($merchantApiResponse));
             } else {
-                $this->addError('merchant_id', "No data");
+                $this->addError('merchant_id', $merchantApiResponse->content);
             }
 
             return [
@@ -1923,7 +1921,8 @@ class Restaurant extends ActiveRecord
             $this->is_sandbox? $this->test_api_key: $this->live_api_key
         );
 
-        if ($merchantApiResponse->isOk && isset($merchantApiResponse->data['operator'])) {
+        if ($merchantApiResponse->isOk && Yii::$app->tapPayments->isJson($merchantApiResponse)
+            && isset($merchantApiResponse->data['operator'])) {
 
             if($this->country && $this->country->iso == "SA") {
                 if (
@@ -2051,6 +2050,7 @@ class Restaurant extends ActiveRecord
                 );
 
                 Yii::error('Error while decoding fetch merchant response [' . $this->name . '] ' . $e->getMessage());
+
             }
 
             Yii::$app->slackTapOperation->send(
@@ -2061,23 +2061,24 @@ class Restaurant extends ActiveRecord
                     [
                         'fallback' => "test",
                         'title' => 'Error while Fetching Merchant [' . $this->name . ']',
-                        'text' => $merchantApiResponse->data? json_encode($merchantApiResponse->data): null,
+                        'text' => Yii::$app->tapPayments->stringify($merchantApiResponse),
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
                     ]
                 ]
             );
 
-            if ($merchantApiResponse->data) {
-                Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+            //if ($merchantApiResponse->data) {
+                Yii::error('Error while Fetching Merchant  [' . $this->name . '] '
+                    .Yii::$app->tapPayments->stringify($merchantApiResponse));
 
                 if (isset(Yii::$app->session->id))
-                    Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
+                    Yii::$app->session->setFlash('errorResponse', Yii::$app->tapPayments->stringify($merchantApiResponse));
 
-                $this->addError('operator_id', json_encode($merchantApiResponse->data));
-            } else {
+                $this->addError('operator_id', Yii::$app->tapPayments->stringify($merchantApiResponse));
+            /*} else {
                 $this->addError('operator_id', "no data");
-            }
+            }*/
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -2098,7 +2099,7 @@ class Restaurant extends ActiveRecord
 
             return [
                 "operation" => 'error',
-                "message" => $merchantApiResponse->data
+                "message" => Yii::$app->tapPayments->stringify($merchantApiResponse)
             ];
         }
     }
@@ -2120,7 +2121,11 @@ class Restaurant extends ActiveRecord
             $this->is_sandbox? $this->test_api_key: $this->live_api_key
         );
 
-        if ($merchantApiResponse->isOk && isset($merchantApiResponse->data['operator'])) {
+        if (
+            $merchantApiResponse->isOk &&
+            Yii::$app->tapPayments->isJson($merchantApiResponse) &&
+            isset($merchantApiResponse->data['operator'])
+        ) {
 
             if($this->country && $this->country->iso == "SA") {
                 if (
@@ -2213,7 +2218,8 @@ class Restaurant extends ActiveRecord
             return [
                 "operation" => 'success',
                 "tap_merchant_status" => $this->tap_merchant_status,
-                "message" => "Merchant status is: " . $merchantApiResponse->data['status']
+                "message" => Yii::$app->tapPayments->isJson($merchantApiResponse)?
+                    "Merchant status is: " . $merchantApiResponse->data['status']: $merchantApiResponse->content
             ];
 
         } else {
@@ -2226,23 +2232,24 @@ class Restaurant extends ActiveRecord
                     [
                         'fallback' => "test",
                         'title' => 'Error while fetching merchant with store key [' . $this->name . ']',
-                        'text' => $merchantApiResponse->data? json_encode($merchantApiResponse->data): null,
+                        'text' => Yii::$app->tapPayments->stringify($merchantApiResponse),
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
                     ]
                 ]
             );
 
-            if ($merchantApiResponse->data) {
-                Yii::error('Error while Fetching Merchant  [' . $this->name . '] ' . json_encode($merchantApiResponse->data));
+            //if ($merchantApiResponse->data) {
+                Yii::error('Error while Fetching Merchant  [' . $this->name . '] '
+                    . Yii::$app->tapPayments->stringify($merchantApiResponse));
 
                 if (isset(Yii::$app->session->id))
-                    Yii::$app->session->setFlash('errorResponse', json_encode($merchantApiResponse->data));
+                    Yii::$app->session->setFlash('errorResponse', Yii::$app->tapPayments->stringify($merchantApiResponse));
 
-                $this->addError('operator_id', json_encode($merchantApiResponse->data));
-            } else {
+                $this->addError('operator_id', Yii::$app->tapPayments->stringify($merchantApiResponse));
+            /*} else {
                 $this->addError('operator_id', "No data");
-            }
+            }*/
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -2263,7 +2270,7 @@ class Restaurant extends ActiveRecord
 
             return [
                 "operation" => 'error',
-                "message" => $merchantApiResponse->data
+                "message" => Yii::$app->tapPayments->stringify($merchantApiResponse)
             ];
         }
     }
@@ -2280,7 +2287,7 @@ class Restaurant extends ActiveRecord
             $this
         );
 
-        if ($operatorApiResponse->isOk) {
+        if ($operatorApiResponse->isOk && Yii::$app->tapPayments->isJson($operatorApiResponse)) {
 
             $this->operator_id = $operatorApiResponse->data['id'];
             $this->test_api_key = $operatorApiResponse->data['api_credentials']['test']['secret'];
@@ -2348,19 +2355,19 @@ class Restaurant extends ActiveRecord
                     [
                         'fallback' => "test",
                         'title' => 'Error while create Operator [' . $this->name . ']',
-                        'text' => json_encode($operatorApiResponse->data),
+                        'text' => Yii::$app->tapPayments->stringify($operatorApiResponse),
                         'color' => "red",
                         'footer' => 'Environment: '.ucfirst(YII_ENV)
                     ]
                 ]
             );
 
-            Yii::error('Error while create Operator  [' . $this->name . '] ' . json_encode($operatorApiResponse->data));
+            Yii::error('Error while create Operator  [' . $this->name . '] ' . Yii::$app->tapPayments->stringify($operatorApiResponse));
 
             if (isset(Yii::$app->session->id))
-                Yii::$app->session->setFlash('errorResponse', json_encode($operatorApiResponse->data));
+                Yii::$app->session->setFlash('errorResponse', Yii::$app->tapPayments->stringify($operatorApiResponse));
 
-            $this->addError('operator_id', json_encode($operatorApiResponse->data));
+            $this->addError('operator_id', Yii::$app->tapPayments->stringify($operatorApiResponse));
 
             self::updateAll([
                 'business_id' => $this->business_id,
@@ -3243,7 +3250,8 @@ class Restaurant extends ActiveRecord
 
                 if($saveInDb) {
                     if(!$this->save()) {
-                        Yii::error("Error when uploading logo photos to Cloudinry: " . json_encode($this->errors));
+                        Yii::error("Error when uploading logo photos to Cloudinry: "
+                            . json_encode($this->errors));
 
                         return [
                             "operation" => "error",

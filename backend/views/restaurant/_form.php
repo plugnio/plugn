@@ -121,7 +121,6 @@ use borales\extensions\phoneInput\PhoneInput;
     <?=
       $form->field($model, 'tap_merchant_status')->dropDownList(
               [
-                  "" => "Unknown",
                   "Active" => 'Active',
                   "New Pending Approval" => 'New Pending Approval',
                   "Closed" => "Closed"

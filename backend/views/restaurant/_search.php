@@ -175,6 +175,19 @@ $paymentMethodArray = [null => 'All'] + $paymentMethodArray;
                     ->hint("Tap payment enabled")
                     ->checkbox([]) ?>
             </div>
+
+            <div class="col-md-3">
+            <?=
+            $form->field($model, 'tap_merchant_status')->dropDownList(
+                [
+                    "Unknown" => "Unknown",
+                    "Active" => 'Active',
+                    "New Pending Approval" => 'New Pending Approval',
+                    "Closed" => "Closed"
+                ]
+            );
+            ?>
+            </div>
             <div class="col-md-3">
                 <?php echo $form->field($model, 'is_myfatoorah_enable')
                     ->hint("Myfatoorah delivery enabled")
