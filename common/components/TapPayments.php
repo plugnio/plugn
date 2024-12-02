@@ -1156,7 +1156,7 @@ class TapPayments extends Component
         if (str_contains($contentType, "text/html")) {
             return $response->content;
         } else {
-            return $response->data;
+            return json_encode($response->data);
         }
      }
 }
