@@ -108,11 +108,23 @@ use borales\extensions\phoneInput\PhoneInput;
     ?>
 
 
+
     <?=
-      $form->field($model, 'is_tap_enable')->dropDownList(
+    $form->field($model, 'is_tap_enable')->dropDownList(
+        [
+            1 => 'Yes',
+            0 => 'No',
+        ]
+    );
+    ?>
+
+    <?=
+      $form->field($model, 'tap_merchant_status')->dropDownList(
               [
-                  1 => 'Yes',
-                  0 => 'No',
+                  "" => "Unknown",
+                  "Active" => 'Active',
+                  "New Pending Approval" => 'New Pending Approval',
+                  "Closed" => "Closed"
               ]
       );
     ?>
