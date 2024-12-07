@@ -14,7 +14,9 @@
                             <img *ngIf="order.armada_qr_code_link" [src]="order.armada_qr_code_link" width="100" height="100"></img>
 -->
 
-                            <?php if(!$order->restaurant->logo) { ?>
+                            <?php use common\models\Voucher;
+
+                            if(!$order->restaurant->logo) { ?>
                                 <img src="<?= $defaultLogo ?>"></img>
                             <?php } else { ?>
                                 <img class="ion-float-start" width="75" height="75"
@@ -288,13 +290,13 @@
                                                 </TD>
                                             </tr>
 
-                                            <?php if($voucherDiscount) { ?>
+                                            <?php if($order->voucher_discount && $order->discount_type != Voucher::DISCOUNT_TYPE_FREE_DELIVERY) { ?>
                                                 <tr>
                                                     <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
                                                     <td align="end">
 
                                                         <?= Yii::$app->formatter->asCurrency(
-                                                            $voucherDiscount,
+                                                            $order->voucher_discount,
                                                             $order->currency->code,
                                                             [
                                                                 \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
@@ -311,7 +313,7 @@
                                                     <td align="end">
 
                                                         <?= Yii::$app->formatter->asCurrency(
-                                                            $order->subtotal - $voucherDiscount,
+                                                            $order->subtotal - $order->voucher_discount,
                                                             $order->currency->code,
                                                             [
                                                                 \NumberFormatter::MIN_FRACTION_DIGITS => $order->currency->decimal_place,
