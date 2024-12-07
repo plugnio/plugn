@@ -1449,7 +1449,8 @@ class OrderController extends BaseController
 
                 $order->subtotal = round($itemTotal, $order->currency->decimal_place);
 
-                $order->total_price = round($order->calculateOrderTotalPrice($itemTotal), $order->currency->decimal_place);
+                $order->total_price = round($order->calculateOrderTotalPrice($itemTotal),
+                    $order->currency->decimal_place);
 
                 if(!$order->save()) {
                     return [

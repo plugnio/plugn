@@ -303,7 +303,7 @@
                                                 </TD>
                                             </tr>
 
-                                            <?php if($voucherDiscount) { ?>
+                                            <?php if($voucherDiscount && $order->discount_type != 3) { ?>
                                                 <tr>
                                                     <td align="start" colspan="3">Voucher Discount (<?= $order->voucher->code ?>)</td>
                                                     <td align="end">

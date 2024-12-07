@@ -448,6 +448,9 @@ class Order extends \yii\db\ActiveRecord
             'delivery_fee' => function ($order) {
                 return (float) $order->delivery_fee;
             },
+            'discount_type' => function ($order) {
+                return (int) $order->discount_type;
+            },
             'subtotal' => function ($order) {
                 return (float) $order->subtotal;
             },
@@ -1303,20 +1306,32 @@ class Order extends \yii\db\ActiveRecord
 
         if ($totalPrice > 0)
         {
-            //todo: free delivery voucher?
             if ($this->voucher)
             {
-                $discountAmount = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_PERCENTAGE ?
-                    ($totalPrice * ($this->voucher->discount_amount / 100)) : $this->voucher->discount_amount;
+                $discountAmount = null;
+
+                switch ($this->voucher->discount_type) {
+                    case Voucher::DISCOUNT_TYPE_PERCENTAGE:
+                        $discountAmount = $totalPrice * ($this->voucher->discount_amount / 100);
+                        break;
+                    case Voucher::DISCOUNT_TYPE_FREE_DELIVERY:
+                        $discountAmount = $this->deliveryZone?
+                            round($this->deliveryZone->delivery_fee, $this->currency->decimal_place): 0;
+                        break;
+                    default:
+                        $discountAmount =  $this->voucher->discount_amount;
+                }
 
                 $totalPrice -= $discountAmount;
 
-                $totalPrice = $totalPrice > 0 ? $totalPrice : 0;
+                $totalPrice = $this->voucher->discount_type == Voucher::DISCOUNT_TYPE_FREE_DELIVERY || $totalPrice > 0 ?
+                    $totalPrice : 0;
             }
             else if ($this->bank_discount_id && $this->bankDiscount->minimum_order_amount <= $totalPrice)
             {
                 $discountAmount = $this->bankDiscount->discount_type == BankDiscount::DISCOUNT_TYPE_PERCENTAGE ?
-                    ($totalPrice * ($this->bankDiscount->discount_amount / 100)) : $this->bankDiscount->discount_amount;
+                    ($totalPrice * ($this->bankDiscount->discount_amount / 100)) :
+                    $this->bankDiscount->discount_amount;
 
                 $totalPrice -= $discountAmount;
 
@@ -1324,13 +1339,16 @@ class Order extends \yii\db\ActiveRecord
             }
         }
 
-        if ($this->order_mode == static::ORDER_MODE_DELIVERY &&
-            (
-                !$this->voucher ||
-                ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)
-            )
-        ) {
-            $totalPrice += $this->deliveryZone->delivery_fee;
+        /**
+         *  &&
+        (
+        !$this->voucher ||
+        ($this->voucher && $this->voucher->discount_type !== Voucher::DISCOUNT_TYPE_FREE_DELIVERY)
+        )
+         */
+
+        if ($this->order_mode == static::ORDER_MODE_DELIVERY) {
+            $totalPrice += round($this->deliveryZone->delivery_fee, $this->currency->decimal_place);
         }
 
         if ($this->delivery_zone_id)
@@ -1468,15 +1486,24 @@ class Order extends \yii\db\ActiveRecord
             $this->currency_code = $this->restaurant->currency->code;
         }
 
-
         if ($this->voucher && !$this->voucher_discount) {
 
             $this->discount_type = $this->voucher->discount_type;
 
-            $this->voucher_discount = $this->voucher->discount_type == 1 ?
-                $this->subtotal * ($this->voucher->discount_amount / 100) : $this->voucher->discount_amount;
+            switch ($this->voucher->discount_type) {
+                case Voucher::DISCOUNT_TYPE_PERCENTAGE:
+                    $this->voucher_discount = $this->subtotal * ($this->voucher->discount_amount / 100);
+                    break;
+                case Voucher::DISCOUNT_TYPE_FREE_DELIVERY:
+                    $this->voucher_discount = $this->deliveryZone?
+                        round($this->deliveryZone->delivery_fee, $this->currency->decimal_place): 0;
+                    break;
+                default:
+                    $this->voucher_discount = $this->voucher->discount_amount;
+            }
 
-            //todo: if free delivery?
+            $this->voucher_code = $this->voucher->code;
+            $this->discount_type = $this->voucher->discount_type;
         }
 
         if ($this->bankDiscount && !$this->bank_discount) {
@@ -1524,7 +1551,6 @@ class Order extends \yii\db\ActiveRecord
 
             } else {
                 $this->estimated_time_of_arrival = ((!$insert && $this->order_created_at == 'NOW()') || $insert) ? date('Y-m-d H:i:s') : date('Y-m-d H:i:s', strtotime($this->order_created_at));
-
             }
 
             // if($this->orderItems){
