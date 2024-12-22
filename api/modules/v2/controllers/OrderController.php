@@ -618,6 +618,15 @@ class OrderController extends BaseController
 
                 $responseContent = json_decode($response->content);
 
+                if (!$responseContent || is_string($responseContent)) {
+                    return [
+                        'operation' => 'error',
+                        'message' => 'Invalid Token ID',
+                        "details" => $response->content,
+                        'code' => 11
+                    ];
+                }
+
                 // Validate that theres no error from TAP gateway
 
                 if (isset($responseContent->status) && $responseContent->status == "fail") {
@@ -625,7 +634,7 @@ class OrderController extends BaseController
                     return [
                         'operation' => 'error',
                         'message' => 'Invalid Token ID',
-                        'code' => 11
+                        'code' => 12
                     ];
 
                 } else if (isset($responseContent->id) && $responseContent->id) {
