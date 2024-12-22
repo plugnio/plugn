@@ -169,7 +169,9 @@ class ItemController extends BaseController
                 }
 
                 if ($option['extraOptions'] && count($option['extraOptions']) > 0) {
+
                     foreach ($option['extraOptions'] as $extraOption) {
+
                         $extraOptionModel = new ExtraOption();
                         $extraOptionModel->option_id = $optionModel->option_id;
                         $extraOptionModel->extra_option_name = $extraOption['extra_option_name'];
@@ -428,10 +430,14 @@ class ItemController extends BaseController
                             if(empty($extraOption['extra_option_id'])) {
                                 $extraOptionModel = new ExtraOption();
                             } else {
-                                $extraOptionModel = ExtraOption::findOne([
+                                $extraOptionModel = ExtraOption::find()->andWhere([
                                     'option_id' => $optionModel->option_id,
                                     'extra_option_id' => $extraOption['extra_option_id']
-                                ]);
+                                ])->one();
+
+                                if (!$extraOptionModel) {
+                                    throw new NotFoundHttpException('The requested record does not exist.');
+                                }
                             }
 
                             $extraOptionModel->option_id = $optionModel->option_id;
