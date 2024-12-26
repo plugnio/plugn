@@ -50,10 +50,16 @@ AppAsset::register($this);
 
         ];
 
+        $txtLogout = 'Logout ';
+
+        if (Yii::$app->user->identity->referral_code) {
+          $txtLogout .= "(".Yii::$app->user->identity->referral_code.")";
+        }
+
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post')
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->referral_code . ' )',
+                $txtLogout,
                 ['class' => 'btn btn-link logout']
             )
             . Html::endForm()

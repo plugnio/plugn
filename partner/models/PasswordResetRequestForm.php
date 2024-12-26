@@ -2,9 +2,12 @@
 
 namespace partner\models;
 
+use common\models\Customer;
 use Yii;
 use yii\base\Model;
 use common\models\Partner;
+use yii\db\Expression;
+use yii\helpers\Url;
 
 /**
  * Password reset request form
@@ -37,13 +40,36 @@ class PasswordResetRequestForm extends Model {
      */
     public function sendEmail() {
 
-        /* @var $partner Partner */
         $partner = Partner::findOne([
                     'partner_status' => Partner::STATUS_ACTIVE,
                     'partner_email' => $this->email,
         ]);
 
         if (!$partner) {
+
+            Yii::$app->session->setFlash('error', "No account with provided mail");
+
+            return false;
+        }
+
+        //Check if this user sent an email in past few minutes (to limit email spam)
+        $emailLimitDatetime = new \DateTime($partner->partner_limit_email);
+        date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+        $currentDatetime = new \DateTime();
+
+        if ($partner->partner_limit_email && $currentDatetime < $emailLimitDatetime) {
+
+            $difference = $currentDatetime->diff($emailLimitDatetime);
+            $minuteDifference = (int) $difference->i;
+            $secondDifference = (int) $difference->s;
+
+            $errors = Yii::t('api', "Email was sent previously, you may request another one in {numMinutes, number} minutes and {numSeconds, number} seconds", [
+                'numMinutes' => $minuteDifference,
+                'numSeconds' => $secondDifference,
+            ]);
+
+            Yii::$app->session->setFlash('error', $errors);
+
             return false;
         }
 
@@ -57,21 +83,36 @@ class PasswordResetRequestForm extends Model {
 
                 //die(var_dump($partner->errors));
 
+                Yii::$app->session->setFlash('error', print_r($partner->errors, true));
+
                 return false;
             }
         }
 
+        Partner::updateAll([
+            'partner_limit_email' => new Expression('NOW()')
+        ], [
+            "partner_uuid" => $partner->partner_uuid
+        ]);
 
-        // return Yii::$app->mailer
-        //                 ->compose(
-        //                         ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'], ['partner' => $partner]
-        //                 )
-        //                 ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-        //                 ->setTo($this->email)
-        //                 ->setSubject('Reset your password')
-        //                 ->send();
+        $url = Url::to(['site/reset-password', 'token' => $partner->partner_password_reset_token], true);
 
-        
+        $mailer = Yii::$app->mailer->compose(
+                ['html' => 'partner/passwordResetToken-html', 'text' => 'partner/passwordResetToken-text'],
+                [
+                    'partner' => $partner,
+                    "resetLink" => $url
+                ]
+            )
+             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+             ->setTo($this->email)
+             ->setSubject('Reset your password');
+
+        if(\Yii::$app->params['elasticMailIpPool'])
+            $mailer->setHeader ("poolName", \Yii::$app->params['elasticMailIpPool']);
+
+        $mailer->send();
+
         return true;
     }
 

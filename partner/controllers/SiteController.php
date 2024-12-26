@@ -175,26 +175,23 @@ class SiteController extends Controller
      */
     public function actionRequestPasswordReset() {
 
-
         $model = new PasswordResetRequestForm();
-        if ($model->load(Yii::$app->request->post()) ) {
 
+        if ($model->load(Yii::$app->request->post()) ) {
 
             if ($model->sendEmail()) {
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
 
                 return $this->goHome();
             } else {
-                Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
+            //    Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
             }
         }
 
         return $this->render('requestPasswordResetToken', [
-                    'model' => $model,
+            'model' => $model,
         ]);
     }
-
-
 
     /**
      * Resets password.
@@ -242,6 +239,7 @@ class SiteController extends Controller
         }
 
         Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with provided token.');
+
         return $this->goHome();
     }
 
@@ -253,12 +251,14 @@ class SiteController extends Controller
     public function actionResendVerificationEmail()
     {
         $model = new ResendVerificationEmailForm();
+
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail()) {
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
                 return $this->goHome();
             }
-            Yii::$app->session->setFlash('error', 'Sorry, we are unable to resend verification email for the provided email address.');
+
+           // Yii::$app->session->setFlash('error', 'Sorry, we are unable to resend verification email for the provided email address.');
         }
 
         return $this->render('resendVerificationEmail', [

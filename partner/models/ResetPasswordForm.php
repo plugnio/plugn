@@ -2,6 +2,7 @@
 
 namespace partner\models;
 
+use common\models\Partner;
 use yii\base\InvalidArgumentException;
 use yii\base\Model;
 use Yii;
@@ -32,7 +33,7 @@ class ResetPasswordForm extends Model
         if (empty($token) || !is_string($token)) {
             throw new InvalidArgumentException('Password reset token cannot be blank.');
         }
-        $this->_user = User::findByPasswordResetToken($token);
+        $this->_user = Partner::findByPasswordResetToken($token);
         if (!$this->_user) {
             throw new InvalidArgumentException('Wrong password reset token.');
         }
@@ -46,7 +47,7 @@ class ResetPasswordForm extends Model
     {
         return [
             ['password', 'required'],
-            ['password', 'string', 'min' => Yii::$app->params['user.passwordMinLength']],
+            ['password', 'string', 'min' => 4],//Yii::$app->params['user.passwordMinLength']
         ];
     }
 

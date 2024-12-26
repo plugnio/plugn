@@ -25,8 +25,10 @@ use common\models\PartnerToken;
  * @property integer $bank_id
  * @property int $commission
  * @property int $partner_status
+ * @property string $partner_limit_email
  * @property int $created_at
  * @property int $updated_at
+ * @property string $deleted_at
  * @property int $partner_phone_number_country_code
  * @property string $partner_phone_number
  *
@@ -657,4 +659,11 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
                       ->sum('subscription_payment.partner_fee');
       }
 
+    /**
+     * @return query\PartnerQuery
+     */
+    public static function find()
+    {
+        return new query\PartnerQuery(get_called_class());
+    }
 }
