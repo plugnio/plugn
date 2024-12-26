@@ -2503,6 +2503,9 @@ failed: the order has failed to find a driver */
         return round($this->total_price * $this->currency_rate, $this->currency->decimal_place);
     }
 
+    /**
+     * @return query\OrderQuery
+     */
     public static function find()
     {
         return new query\OrderQuery(get_called_class());
