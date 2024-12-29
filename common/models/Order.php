@@ -1080,7 +1080,7 @@ class Order extends \yii\db\ActiveRecord
         foreach ($this->orderItems as $orderedItem) {
             $productsList[] = [
                 'product_id' => $orderedItem->item_uuid,
-                'sku' => $orderedItem->item->sku ? $orderedItem->item->sku : null,
+                'sku' => $orderedItem->item ? $orderedItem->item->sku : null,
                 'name' => $orderedItem->item_name,
                 'price' => $orderedItem->item_price,
                 'quantity' => $orderedItem->qty,
