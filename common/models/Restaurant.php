@@ -510,11 +510,9 @@ class Restaurant extends ActiveRecord
                 'message' => 'Your store url can only contain alphanumeric characters',
                 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
-            [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
-
-            [['restaurant_domain'], 'string', 'min' => 3, 'max' => 20, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
-
             ['restaurant_domain', 'validateDomain'],
+
+            [['restaurant_domain'], 'string', 'min' => 3, 'max' => 50, 'on' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
             [['ip_address'], 'string', 'max' => 45],
 
@@ -631,6 +629,8 @@ class Restaurant extends ActiveRecord
 
             [['restaurant_domain'], 'unique', 'comboNotUnique' => 'Domain already exist.',  'targetAttribute' => [
                 'restaurant_domain', 'is_deleted']],
+
+            [['restaurant_domain'], 'url', 'except' => self::SCENARIO_CREATE_STORE_BY_AGENT],
 
             [['payment_gateway_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => PaymentGatewayQueue::className(), 'targetAttribute' => ['payment_gateway_queue_id' => 'payment_gateway_queue_id']],
             [['tap_queue_id'], 'exist', 'skipOnError' => true, 'targetClass' => TapQueue::className(), 'targetAttribute' => ['tap_queue_id' => 'tap_queue_id']],
@@ -1079,7 +1079,8 @@ class Restaurant extends ActiveRecord
 
         if ($count > 3) {
             Yii::error("Store #" . $this->restaurant_uuid . " having more than 3 domain assigned to store");
-            //$this->addError($attribute, 'You can not assign more than 3 domain to site');
+            $this->addError($attribute, 'You can not assign more than 3 domain to site');
+            return false;
         }
 
         $restaurantDomain = $this->getRestaurantDomainRequests()
@@ -1105,6 +1106,33 @@ class Restaurant extends ActiveRecord
                 $this->addError($attribute, Yii::t("app", 'Domain already registered with other website'));
                 return false;
             }
+        }
+
+        //replace http:// with https://
+        $this->restaurant_domain = str_replace("http://", "https://", $this->restaurant_domain);
+
+        //if not contain https://
+        if (!str_contains($this->restaurant_domain, "https://")) {
+            $this->restaurant_domain = "https://" . $this->restaurant_domain;
+        }
+
+        if (
+            $this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT &&
+            !str_contains($this->restaurant_domain, ".plugn.site")
+        ) {
+            $this->restaurant_domain = $this->restaurant_domain . ".plugn.site";
+        }
+
+        $isExists = self::find()
+            ->andWhere([
+                'is_deleted' => 0,
+                'restaurant_domain' => $this->restaurant_domain
+            ])
+            ->exists();
+
+        if ($isExists) {
+            $this->addError($attribute, Yii::t("app", 'Domain already registered with other website'));
+            return false;
         }
 
         return true;
@@ -3486,12 +3514,17 @@ class Restaurant extends ActiveRecord
                 return $this->addError('restaurant_domain', Yii::t('app', 'Another store is already using this domain'));
             }
 
-            $isDomainExist = self::find()->where(['restaurant_domain' => $this->restaurant_domain])->exists();
+            //if(!str_contains($store_domain, 'https://')) {
+            //$this->restaurant_domain = 'https://' . $store_domain . '.plugn.site';
+            //}
+
+            $isDomainExist = self::find()->where([
+                'restaurant_domain' => $this->restaurant_domain,
+                "is_deleted" => false
+            ])->exists();
 
             if ($isDomainExist)
                 return $this->addError('restaurant_domain', Yii::t('app', 'Another store is already using this domain'));
-
-            $this->restaurant_domain = 'https://' . $store_domain . '.plugn.site';
         }
 
         if ($this->scenario == self::SCENARIO_UPLOAD_STORE_DOCUMENT) {
