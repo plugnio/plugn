@@ -233,9 +233,6 @@ use borales\extensions\phoneInput\PhoneInput;
     ?>
 
 
-
-
-
     <?=
     $form->field($model, 'support_delivery')->dropDownList(
             [
@@ -371,6 +368,16 @@ use borales\extensions\phoneInput\PhoneInput;
     <?= $form->field($model, 'accept_order_247')->checkbox(['checked' => $model->accept_order_247 > 0,  'value' => true]) ?>
 
     <?= $form->field($model, 'is_under_maintenance')->checkbox(['checked' => $model->is_under_maintenance > 0,  'value' => true]) ?>
+
+    <?=
+    $form->field($model, 'restaurant_status')->dropDownList(
+        [
+            \common\models\Restaurant::RESTAURANT_STATUS_OPEN => 'Open',
+            \common\models\Restaurant::RESTAURANT_STATUS_BUSY => 'Busy',
+            \common\models\Restaurant::RESTAURANT_STATUS_CLOSED => 'Closed',
+        ]
+    );
+    ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
