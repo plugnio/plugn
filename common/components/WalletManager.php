@@ -21,19 +21,21 @@ class WalletManager
      */
     public function addEntry($data) {
         $client = new Client();
-        
-        $response = $client->createRequest()
-            ->setMethod('POST')
-            ->setUrl($this->apiEndpoint . '/balance/add-wallet-entry')
-            ->setFormat(Client::FORMAT_JSON)
-            ->setData($data)
-            ->addHeaders([
-                'x-api-key' => $this->apiKey,
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'content-type' => 'application/json',
-            ])
-            ->send();
 
-        return $response;
+        try {
+            return $client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($this->apiEndpoint . '/balance/add-wallet-entry')
+                ->setFormat(Client::FORMAT_JSON)
+                ->setData($data)
+                ->addHeaders([
+                    'x-api-key' => $this->apiKey,
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'content-type' => 'application/json',
+                ])
+                ->send();
+        } catch (\Exception $e) {
+            \Yii::error($e->getMessage());
+        }
     }
 }

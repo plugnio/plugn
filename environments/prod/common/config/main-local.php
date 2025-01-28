@@ -37,7 +37,7 @@ return [
         ],
         'walletManager' => [
             'class' => 'common\components\WalletManager',
-            'apiKey' => 'imx4kpyVCXbi7sVy-zEvEITL63sQWisn',//QSw2ByGUITXFNjJVNNjyzxdbvYP9rXbG
+            'apiKey' => 'POAO-BiBxj-Oqp2XOIDZgSDrTYJxOa3M',
         ],
         'gpt' => [
             'class' => 'common\components\GptComponent',
@@ -113,7 +113,6 @@ return [
                 'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
                 'port' => '2525',
                 'encryption' => 'tls'
-
             ],
         ],
 /*
