@@ -1704,6 +1704,56 @@ class Restaurant extends ActiveRecord
     }
 
     /**
+     * @param $title
+     * @param $message
+     * @param $response
+     * @return void
+     */
+    public function notifyTapError($title, $message, $response) {
+
+        //check if already logged
+
+        $model = TapError::find()
+            ->andWhere([
+                "title" => $title,
+                "status" => TapError::STATUS_PENDING,
+                'restaurant_uuid' => $this->restaurant_uuid
+            ])
+            ->one();
+
+        if ($model) {
+            $model->issue_logged = $model->issue_logged + 1;
+        } else {
+            $model = new TapError();
+            $model->restaurant_uuid = $this->restaurant_uuid;
+            $model->title = $title;
+            $model->message = $message;
+            $model->issue_logged = 1;
+            $model->text = Yii::$app->tapPayments->stringify($response);
+        }
+
+        if (!$model->save()) {
+            Yii::error("error saving tap error log" . print_r($model->attributes, true));
+        }
+
+        if ($model->issue_logged == 1) {
+            Yii::$app->slackTapOperation->send(
+                $title,// Yii::$app->formatter->asDatetime(new \DateTime("now")),
+                "⚠️",
+                [
+                    [
+                        'fallback' => "test",
+                        'title' => $message,
+                        'text' => Yii::$app->tapPayments->stringify($response),
+                        'color' => "red",
+                        'footer' => 'Environment: ' . ucfirst(YII_ENV)
+                    ]
+                ]
+            );
+        }
+    }
+
+    /**
      * Create an account for vendor on tap
      */
     public function createTapAccount($forceCreate = false)
@@ -1714,18 +1764,10 @@ class Restaurant extends ActiveRecord
 
         if ($response['operation'] == "error") {
 
-            Yii::$app->slackTapOperation->send(
-                "Vendor faced error while creating account [" . $this->name . "]",// Yii::$app->formatter->asDatetime(new \DateTime("now")),
-                ":thumb-up:",
-                [
-                    [
-                        'fallback' => "test",
-                        'title' => 'Error while uploading doc for Business [' . $this->name . ']',
-                        'text' => json_encode($response),
-                        'color' => "red",
-                        'footer' => 'Environment: '.ucfirst(YII_ENV)
-                    ]
-                ]
+            $this->notifyTapError(
+                "Vendor faced error while creating account [" . $this->name . "]",
+                'Error while uploading doc for Business [' . $this->name . ']',
+                $response
             );
 
             Yii::error('Error while uploading doc for Business [' . $this->name . '] '
@@ -1819,19 +1861,11 @@ class Restaurant extends ActiveRecord
 
         } else {
 
-            Yii::$app->slackTapOperation->send(
+            $this->notifyTapError(
                 "Vendor faced error while creating account [" . $this->name . "]",
               //  Yii::$app->formatter->asDatetime(new \DateTime("now")),
-                ":thumb-up:",
-                [
-                    [
-                        'fallback' => "test",
-                        'title' => 'Error while create Business [' . $this->name . ']',
-                        'text' => Yii::$app->tapPayments->stringify($businessApiResponse),
-                        'color' => "red",
-                        'footer' => 'Environment: '.ucfirst(YII_ENV)
-                    ]
-                ]
+                'Error while create Business [' . $this->name . ']',
+                 $businessApiResponse
             );
 
             Yii::error('Error while create Business [' . $this->name . '] ' . Yii::$app->tapPayments->stringify($businessApiResponse));
@@ -1904,19 +1938,11 @@ class Restaurant extends ActiveRecord
 
         } else {
 
-            Yii::$app->slackTapOperation->send(
+            $this->notifyTapError(
                 "Vendor faced error while creating account [" . $this->name . "]",
                 //Yii::$app->formatter->asDatetime(new \DateTime("now")),
-                ":thumb-up:",
-                [
-                    [
-                        'fallback' => "test",
-                        'title' => 'Error while create Merchant [' . $this->name . ']',
-                        'text' => Yii::$app->tapPayments->stringify($merchantApiResponse),
-                        'color' => "red",
-                        'footer' => 'Environment: '.ucfirst(YII_ENV)
-                    ]
-                ]
+               'Error while create Merchant [' . $this->name . ']',
+                $merchantApiResponse
             );
 
             $message = 'Error while create Merchant [' . $this->name . '] ';
@@ -2065,38 +2091,22 @@ class Restaurant extends ActiveRecord
 
             } catch (\Exception $e) { // Handle the exception
 
-                Yii::$app->slackTapOperation->send(
+                $this->notifyTapError(
                     "Vendor faced error while fetching merchant details [" . $this->name . "]",
                     //Yii::$app->formatter->asDatetime(new \DateTime("now")),
-                    ":thumb-up:",
-                    [
-                        [
-                            'fallback' => "test",
-                            'title' => 'Error while Fetching Merchant [' . $this->name . ']',
-                            'text' => $e->getMessage(),
-                            'color' => "red",
-                            'footer' => 'Environment: '.ucfirst(YII_ENV)
-                        ]
-                    ]
+                   'Error while Fetching Merchant [' . $this->name . ']',
+                    $e->getMessage()
                 );
 
                 Yii::error('Error while decoding fetch merchant response [' . $this->name . '] ' . $e->getMessage());
 
             }
 
-            Yii::$app->slackTapOperation->send(
+            $this->notifyTapError(
                 "Vendor faced error while creating account [" . $this->name . "]",
                // Yii::$app->formatter->asDatetime(new \DateTime("now")),
-                ":thumb-up:",
-                [
-                    [
-                        'fallback' => "test",
-                        'title' => 'Error while Fetching Merchant [' . $this->name . ']',
-                        'text' => Yii::$app->tapPayments->stringify($merchantApiResponse),
-                        'color' => "red",
-                        'footer' => 'Environment: '.ucfirst(YII_ENV)
-                    ]
-                ]
+                'Error while Fetching Merchant [' . $this->name . ']',
+                $merchantApiResponse
             );
 
             //if ($merchantApiResponse->data) {
@@ -2255,19 +2265,11 @@ class Restaurant extends ActiveRecord
 
         } else {
 
-            Yii::$app->slackTapOperation->send(
+            $this->notifyTapError(
                 "Vendor faced error while creating account [" . $this->name . "]",
                 //Yii::$app->formatter->asDatetime(new \DateTime("now")),
-                ":thumb-up:",
-                [
-                    [
-                        'fallback' => "test",
-                        'title' => 'Error while fetching merchant with store key [' . $this->name . ']',
-                        'text' => Yii::$app->tapPayments->stringify($merchantApiResponse),
-                        'color' => "red",
-                        'footer' => 'Environment: '.ucfirst(YII_ENV)
-                    ]
-                ]
+               'Error while fetching merchant with store key [' . $this->name . ']',
+                $merchantApiResponse
             );
 
             //if ($merchantApiResponse->data) {
@@ -2378,19 +2380,11 @@ class Restaurant extends ActiveRecord
 
         } else {
 
-            Yii::$app->slackTapOperation->send(
+            $this->notifyTapError(
                 "Vendor faced error while creating account [" . $this->name . "]",
                 //Yii::$app->formatter->asDatetime(new \DateTime("now")),
-                ":thumb-up:",
-                [
-                    [
-                        'fallback' => "test",
-                        'title' => 'Error while create Operator [' . $this->name . ']',
-                        'text' => Yii::$app->tapPayments->stringify($operatorApiResponse),
-                        'color' => "red",
-                        'footer' => 'Environment: '.ucfirst(YII_ENV)
-                    ]
-                ]
+               'Error while create Operator [' . $this->name . ']',
+                $operatorApiResponse
             );
 
             Yii::error('Error while create Operator  [' . $this->name . '] ' . Yii::$app->tapPayments->stringify($operatorApiResponse));
