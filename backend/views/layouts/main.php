@@ -82,6 +82,7 @@ AppAsset::register($this);
                     ['label' => 'Customers', 'url' => ['/customer/index']],
                     ['label' => 'Debugger', 'url' => Yii::$app->apiUrlManager->getBaseUrl(). '/debug'],
                     ['label' => 'API Log', 'url' => ['/api-log/index']],
+                    ['label' => 'Tap Error Logs', 'url' => ['tap-error/index']],
                 ]
             ],
             [
@@ -92,7 +93,8 @@ AppAsset::register($this);
                     ['label' => 'Payment', 'url' => ['/payment/index']],
                     ['label' => 'Failed Payment', 'url' => ['/payment-failed/index']],
                     ['label' => 'Subscription Payment', 'url' => ['/subscription-payment/index']],
-                    ['label' => 'Tap Requirements', 'url' => ['tap-requirements/index']]
+                    ['label' => 'Tap Requirements', 'url' => ['tap-requirements/index']],
+
                 ]
             ],
             [

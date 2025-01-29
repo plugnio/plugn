@@ -1150,7 +1150,16 @@ class TapPayments extends Component
         return !str_contains($contentType, "text/html");
     }
 
+    /**
+     * @param $response
+     * @return void|string
+     */
     public function stringify($response) {
+
+         if (is_string($response)) {
+            return $response;
+         }
+
         $contentType = $response->getHeaders()->get("content-type");
 
         if (str_contains($contentType, "text/html")) {
