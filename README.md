@@ -272,3 +272,15 @@ You can also receive any custom postback header as described in the previous sec
 
 https://github.com/orgs/tabby-ai/repositories
 https://api-docs.tabby.ai/
+
+# SSL renew 
+
+## test 
+`sudo certbot renew --dry-run`
+
+## renew 
+`sudo certbot renew`
+
+## check 
+`sudo certbot certificates`
+    
