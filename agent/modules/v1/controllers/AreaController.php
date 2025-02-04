@@ -2,6 +2,9 @@
 
 namespace agent\modules\v1\controllers;
 
+use agent\models\Country;
+use api\models\City;
+use api\models\State;
 use Yii;
 use yii\db\Expression;
 use yii\rest\Controller;
@@ -98,6 +101,159 @@ class AreaController extends BaseController {
      */
     public function actionDetail($id) {
         return $this->findModel($id);
+    }
+
+    /**
+     * @return void
+     */
+    public function actionCityByLocation() {
+        $latitude = Yii::$app->request->get('latitude');
+        $longitude = Yii::$app->request->get('longitude');
+        $postal_code = Yii::$app->request->get("postal_code");
+
+        // call google api to get country name, lat, long
+
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $latitude .','. $longitude;
+
+        return City::addByGoogleAPIResponse($url, null, null, $postal_code);
+    }
+
+    /**
+     * @param $city_id
+     * @return ActiveDataProvider
+     * @throws NotFoundHttpException
+     */
+    public function actionCityAreas($city_id)
+    {
+        $keyword = Yii::$app->request->get("keyword");
+
+        $city = City::findOne($city_id);
+
+        if (!$city) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $city->getAreas("\common\models\Area");
+
+        if ($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    public function actionCountryAreas($country_id)
+    {
+        $keyword = Yii::$app->request->get("keyword");
+
+        $country = Country::findOne($country_id);
+
+        if (!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getAreas("\common\models\Area");
+
+        if ($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'area_name', $keyword],
+                ['like', 'area_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    public function actionCountryStates($country_id)
+    {
+        $keyword = Yii::$app->request->get("keyword");
+
+        $country = Country::findOne($country_id);
+
+        if (!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getStates("\api\models\State");
+
+        if ($keyword) {
+            $query->andWhere(['like', 'name', $keyword]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false
+        ]);
+    }
+
+    /**
+     * Return list of cities available for state
+     */
+    public function actionCountryCities($country_id)
+    {
+        $keyword = Yii::$app->request->get("keyword");
+
+        $country = Country::findOne($country_id);
+
+        if (!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getCities("\api\models\City");
+
+        if($country && $country->iso == "KW") {
+            $query->andWhere(new Expression('state_id IS NULL'));
+            //hide areas added as city in kuwait by google api
+        }
+
+        if ($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'city_name', $keyword],
+                ['like', 'city_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
+    }
+
+    /**
+     * Return list of cities available for state
+     */
+    public function actionStateCities($state_id)
+    {
+        $keyword = Yii::$app->request->get("keyword");
+
+        $state = State::findOne($state_id);
+
+        if (!$state) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $state->getCities("\api\models\City");
+
+        if ($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'city_name', $keyword],
+                ['like', 'city_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
     }
 
     /**
