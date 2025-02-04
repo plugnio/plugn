@@ -58,10 +58,10 @@ class ItemQuery extends \yii\db\ActiveQuery
   public function filterKeyword($keyword) {
       return $this->andWhere([
           'OR',
-          ['like', 'item.item_name', $keyword],
-          ['like', 'item.item_name_ar', $keyword],
-          ['like', 'item.item_description', $keyword],
-          ['like', 'item.item_description_ar', $keyword]
+          ['like', 'item.item_name',   preg_replace('/[^\p{L}\p{N}\s]/u', '', $keyword)],
+          ['like', 'item.item_name_ar', preg_replace('/[^\p{L}\p{N}\s]/u', '', $keyword)],
+          ['like', 'item.item_description', preg_replace('/[^\p{L}\p{N}\s]/u', '', $keyword)],
+          ['like', 'item.item_description_ar', preg_replace('/[^\p{L}\p{N}\s]/u', '', $keyword)]
       ]);
   }
 }

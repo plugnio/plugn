@@ -12,6 +12,9 @@ use yii\web\NotFoundHttpException;
 
 class ItemController extends BaseController {
 
+    /**
+     * @return array|array[]
+     */
     public function behaviors() {
         $behaviors = parent::behaviors();
 
