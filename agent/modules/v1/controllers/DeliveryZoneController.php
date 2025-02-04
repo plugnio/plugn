@@ -7,6 +7,7 @@ use api\models\City;
 use api\models\Item;
 use api\models\Restaurant;
 use api\models\State;
+use common\models\Area;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 use Yii;
 use yii\db\Expression;
@@ -81,6 +82,39 @@ class DeliveryZoneController extends BaseController
             return new ActiveDataProvider([
                 'query' => $query
             ]);
+    }
+
+    /**
+     * Return list of cities available for state
+     */
+    public function actionCountryCities($country_id)
+    {
+        $keyword = Yii::$app->request->get("keyword");
+
+        $country = Country::findOne($country_id);
+
+        if (!$country) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $query = $country->getCities("\api\models\City");
+
+        if($country && $country->iso == "KW") {
+            $query->andWhere(new Expression('state_id IS NULL'));
+            //hide areas added as city in kuwait by google api
+        }
+
+        if ($keyword) {
+            $query->andWhere([
+                'OR',
+                ['like', 'city_name', $keyword],
+                ['like', 'city_name_ar', $keyword]
+            ]);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query
+        ]);
     }
 
     /**
@@ -450,6 +484,97 @@ class DeliveryZoneController extends BaseController
         return $areaDeliveryZone? $areaDeliveryZone->deliveryZone: null;
     }
 
+    public function actionByLocation()
+    {
+        $area_id = Yii::$app->request->get('area_id');
+        $city_id = Yii::$app->request->get('city_id');
+        $state_id = Yii::$app->request->get("state_id");
+
+        if (!$state_id && !$area_id && !$city_id) {
+            return [
+                "operation" => "error",
+                "message" => "Location details missing"
+            ];
+        }
+
+        $query = $this->findStore()
+            ->getAreaDeliveryZones();
+
+        if ($area_id) //for kuwait
+        {
+            $area = Area::find()
+                ->with(['city'])
+                ->andWhere(['area_id' => $area_id])
+                ->one();
+
+            if(!$area || !$area->city) {
+                return null;
+            }
+
+            //area or whole country, not having states in Kuwait
+
+            $query->andWhere([
+                'OR',
+                new Expression('area_delivery_zone.country_id="'.$area->city->country_id.'" AND area_delivery_zone.state_id IS NULL 
+                    AND area_delivery_zone.city_id IS NULL AND area_delivery_zone.area_id IS NULL'),
+                ['area_delivery_zone.area_id' => $area_id]
+            ]);
+        }
+        else if ($city_id)
+        {
+            $city = \common\models\City::find()
+                ->andWhere(['city_id' => $city_id])
+                ->one();
+
+            if(!$city) {
+                return null;
+            }
+
+            //city or whole country
+
+            $conditions = [
+                'OR',
+                new Expression('area_delivery_zone.country_id="'.$city->country_id.'" AND area_delivery_zone.state_id IS NULL 
+                    AND area_delivery_zone.city_id IS NULL AND area_delivery_zone.area_id IS NULL'),
+                ['area_delivery_zone.city_id' => $city_id]
+            ];
+
+            // or whole state, some cities might not have state, so checking if having state
+
+            if($city->state_id) {
+                $conditions[] = new Expression('area_delivery_zone.state_id="'.$city->state_id.'" AND 
+                    area_delivery_zone.city_id IS NULL AND 
+                    area_delivery_zone.area_id IS NULL');
+            }
+
+            $query->andWhere($conditions);
+        }
+        else if ($state_id)
+        {
+            $state = \common\models\State::find()
+                ->andWhere(['state_id' => $state_id])
+                ->one();
+
+            if(!$state) {
+                return null;
+            }
+
+            //delivering to whole state or whole country
+
+            $query->andWhere([
+                "OR",
+                new Expression('area_delivery_zone.state_id="'.$state_id.'" AND 
+                    area_delivery_zone.city_id IS NULL AND 
+                    area_delivery_zone.area_id IS NULL'),
+                new Expression('area_delivery_zone.country_id="'.$state->country_id.'" AND 
+                    area_delivery_zone.city_id IS NULL AND 
+                    area_delivery_zone.area_id IS NULL')
+            ]);
+        }
+
+        return $query->one();
+    }
+
     /**
      * Return list of areas available for delivery
      */
@@ -496,6 +621,8 @@ class DeliveryZoneController extends BaseController
      */
     public function actionListOfCountries($restaurant_uuid) {
 
+        $keyword = Yii::$app->request->get("keyword");
+
         $store_model = $this->findStore($restaurant_uuid);
 
         $subQuery = $store_model->getDeliveryZones()
@@ -504,6 +631,11 @@ class DeliveryZoneController extends BaseController
 
         $countries = Country::find()
             ->andWhere(['IN', 'country.country_id', $subQuery])
+            ->andWhere([
+                "OR",
+                ['like', 'country_name', $keyword],
+                ['like', 'country_name_ar', $keyword],
+            ])
             ->all();
 
         $data = [];
@@ -621,9 +753,10 @@ class DeliveryZoneController extends BaseController
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findStore($id)
+    protected function findStore($id = null)
     {
-        $model = Restaurant::findOne($id);
+        $model = Yii::$app->accountManager->getManagedAccount($id);
+        //$model = Restaurant::findOne($id);
 
         if ($model !== null) {
             return $model;

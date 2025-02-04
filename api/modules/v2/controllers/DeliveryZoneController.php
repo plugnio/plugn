@@ -363,7 +363,6 @@ class DeliveryZoneController extends BaseController
      */
     public function actionListOfAreas($restaurant_uuid, $country_id)
     {
-
         if ($store = Restaurant::findOne($restaurant_uuid)) {
 
             $countryCities = City::find()

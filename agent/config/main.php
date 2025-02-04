@@ -460,11 +460,22 @@ return [
                     'controller' => 'v1/area',
                     'patterns' => [
                         'GET' => 'list',
+                        'GET country-states/<country_id>' => 'country-states',
+                        'GET country-cities/<country_id>' => 'country-cities',
+                        'GET state-cities/<state_id>' => 'state-cities',
+                        'GET city-areas/<city_id>' => 'city-areas',
+                        'GET city-by-location' => 'city-by-location',
                         'GET delivery-areas' => 'delivery-areas',
                         'GET <id>' => 'detail',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
-                        'OPTIONS <id>' => 'options'
+                        'OPTIONS city-by-location' => 'options',
+                        'OPTIONS <id>' => 'options',
+                        'OPTIONS country-states/<country_id>' => 'options',
+                        'OPTIONS country-cities/<country_id>' => 'options',
+                        'OPTIONS state-cities/<state_id>' => 'options',
+                        'OPTIONS city-areas/<city_id>' => 'options',
+
                     ]
                 ],
                 [// VoucherController
@@ -524,12 +535,14 @@ return [
                     'patterns' => [
                         'GET' => 'list',
                         'GET detail' => 'detail',
+                        'GET country-cities/<country_id>' => 'country-cities',
                         'GET cities/<state_id>' => 'cities',
                         'GET states/<country_id>' => 'states',
                         'GET areas/<city_id>' => 'areas',
                         'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
                         'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
                         'GET detail-by-location' => 'detail-by-location',
+                        'GET by-location' => 'by-location',
                         'POST create' => 'create',
                         'POST add-state-to-delivery-area' => "add-state-to-delivery-area",
                         'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
@@ -545,7 +558,7 @@ return [
                         'OPTIONS create' => 'options',
                         'OPTIONS add-state-to-delivery-area' =>  'options',
                         "OPTIONS remove-state-from-delivery-area/<state_id>/<delivery_zone_id>" => "options",
-
+                        'OPTIONS by-location' => 'options',
                         'OPTIONS detail-by-location' => 'options',
                         'OPTIONS cities/<state_id>' => 'options',
                         'OPTIONS states/<country_id>' => 'options',
