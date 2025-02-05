@@ -629,13 +629,18 @@ class DeliveryZoneController extends BaseController
             ->select('delivery_zone.country_id')
             ->distinct();
 
-        $countries = Country::find()
-            ->andWhere(['IN', 'country.country_id', $subQuery])
-            ->andWhere([
+        $countryQuery = Country::find()
+            ->andWhere(['IN', 'country.country_id', $subQuery]);
+
+        if (!empty($keyword)) {
+            $countryQuery->andWhere([
                 "OR",
                 ['like', 'country_name', $keyword],
                 ['like', 'country_name_ar', $keyword],
-            ])
+            ]);
+        }
+
+        $countries = $countryQuery
             ->all();
 
         $data = [];
