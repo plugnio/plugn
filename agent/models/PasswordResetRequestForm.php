@@ -71,7 +71,7 @@ class PasswordResetRequestForm extends Model {
                 ]
             )
                 ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
-                ->setReplyTo(\Yii::$app->params['supportEmail'])
+                //->setReplyTo(\Yii::$app->params['supportEmail'])
                 ->setTo($this->email)
                 ->setSubject('Password reset for ' . Yii::$app->name . ' Dashboard');
 

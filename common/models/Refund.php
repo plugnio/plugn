@@ -260,7 +260,7 @@ class Refund extends \yii\db\ActiveRecord
         ]);
         $message->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name]);
         $message->setTo($replyTo);
-        $message->setReplyTo(\Yii::$app->params['supportEmail']);
+        //$message->setReplyTo(\Yii::$app->params['supportEmail']);
 
         if ($this->order->customer_email) {
             $message->setCc([$this->order->customer_email]);

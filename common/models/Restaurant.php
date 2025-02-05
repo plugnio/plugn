@@ -1205,7 +1205,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
             ->setTo(Yii::$app->params['adminEmail'])
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            //->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('[Plugn] Agent updated DN');
 
         if(\Yii::$app->params['elasticMailIpPool'])
@@ -1272,7 +1272,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
             //->setTo(Yii::$app->params['adminEmail'])
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            //->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject('Store Domain Updated');
 
         if(\Yii::$app->params['elasticMailIpPool'])
@@ -1366,7 +1366,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             //->setFrom([Yii::$app->params['noReplyEmail']])
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+           // ->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject("We miss you!");
 
         if(\Yii::$app->params['elasticMailIpPool'])
@@ -1422,7 +1422,7 @@ class Restaurant extends ActiveRecord
         $mailer = Yii::$app->mailer->compose()
             ->setHtmlBody($html)
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            //->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($campaign->template->subject);
 
         if(\Yii::$app->params['elasticMailIpPool'])
@@ -1690,7 +1690,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo([$this->restaurant_email])
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            //->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
         if(\Yii::$app->params['elasticMailIpPool'])
@@ -3049,7 +3049,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo([$this->restaurant_email])
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            //->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
         if(\Yii::$app->params['elasticMailIpPool'])
@@ -3083,7 +3083,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo([$this->restaurant_email])
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            //->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setCc([Yii::$app->params['supportEmail'] => 'Plugn'])
             ->setSubject($subject);
 
@@ -3150,7 +3150,7 @@ class Restaurant extends ActiveRecord
         ])
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             ->setTo([$this->restaurant_email])
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            //->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
 
         if(\Yii::$app->params['elasticMailIpPool'])
@@ -5279,7 +5279,7 @@ class Restaurant extends ActiveRecord
                         ], $data)
                             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
                             ->setTo([$agentAssignment->agent->agent_email])
-                            ->setReplyTo(\Yii::$app->params['supportEmail'])
+                            //->setReplyTo(\Yii::$app->params['supportEmail'])
                             ->setSubject('Weekly Store Summary');
 
                         $weeklyStoreSummaryEmail->setHeader("poolName", \Yii::$app->params['elasticMailIpPool']);

@@ -92,7 +92,7 @@ class TapQueue extends \yii\db\ActiveRecord
                         ])
                             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
                             ->setTo([$agent->agent_email])
-                            ->setReplyTo(\Yii::$app->params['supportEmail'])
+                           // ->setReplyTo(\Yii::$app->params['supportEmail'])
                             ->setSubject('Your TAP Payments account has been approved');
 
                         if(\Yii::$app->params['elasticMailIpPool'])

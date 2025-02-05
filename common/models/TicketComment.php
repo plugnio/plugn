@@ -162,7 +162,7 @@ class TicketComment extends \yii\db\ActiveRecord
             ])
             ->setFrom([\Yii::$app->params['noReplyEmail'] => \Yii::$app->name])
             //->setFrom ([Yii::$app->params['supportEmail']])
-            ->setReplyTo($this->ticket_uuid . Yii::$app->params['remailerDomain']) //inbound email address
+            //->setReplyTo($this->ticket_uuid . Yii::$app->params['remailerDomain']) //inbound email address
             ->setTo ($toEmails)
             ->setCc (Yii::$app->params['supportEmail'])
             ->setSubject ('New comment on ticket #' . $this->ticket_uuid);

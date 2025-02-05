@@ -208,7 +208,7 @@ class OrderHistory extends \yii\db\ActiveRecord
             ->setFrom([$fromEmail => $this->order->restaurant->name])
             //->setFrom($fromEmail)//[$fromEmail => $this->order->restaurant->name]
             ->setTo($this->order->customer_email)
-            ->setReplyTo(\Yii::$app->params['supportEmail'])
+            //->setReplyTo(\Yii::$app->params['supportEmail'])
             ->setSubject($subject);
         //->setReplyTo($replyTo)
 
