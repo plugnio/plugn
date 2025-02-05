@@ -198,7 +198,7 @@ class SiteController extends Controller
                     ])
                         ->setFrom([Yii::$app->params['noReplyEmail'] => Yii::$app->name])
                         ->setTo(Yii::$app->params['adminEmail'])
-                        ->setReplyTo(\Yii::$app->params['supportEmail'])
+                      //  ->setReplyTo(\Yii::$app->params['supportEmail'])
                         ->setSubject('[Plugn] Agent updated DN');
 
                     if(\Yii::$app->params['elasticMailIpPool'])
@@ -488,7 +488,7 @@ class SiteController extends Controller
                        ])
                        ->setFrom([\Yii::$app->params['noReplyEmail'] => 'Plugn'])
                        ->setTo([$agent->agent_email])
-                       ->setReplyTo(\Yii::$app->params['supportEmail'])
+                      // ->setReplyTo(\Yii::$app->params['supportEmail'])
                        ->setBcc(\Yii::$app->params['supportEmail'])
                        ->setSubject('Your store '. $paymentRecord->restaurant->name . ' has been upgraded to our '. $subscription_model->plan->name);
 
