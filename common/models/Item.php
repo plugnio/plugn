@@ -248,9 +248,50 @@ class Item extends \yii\db\ActiveRecord
   {
       $fields = parent::fields ();
 
+      $fields['unit_sold'] = function($data) {
+          return (int) $data->unit_sold;
+      };
+
+      $fields['stock_qty'] = function($data) {
+          return (int) $data->stock_qty;
+      };
+
+      $fields['sort_number'] = function($data) {
+          return (int) $data->sort_number;
+      };
+
       $fields['track_quantity'] = function($data) {
           return (boolean) $data->track_quantity;
       };
+
+      $fields['prep_time'] = function($data) {
+          return (int) $data->prep_time;
+      };
+      
+      $fields['weight'] = function($data) {
+          return (float) $data->weight;
+      };
+
+      $fields['length'] = function($data) {
+          return (float) $data->length;
+      };
+
+      $fields['height'] = function($data) {
+          return (float) $data->height;
+      };
+
+      $fields['width'] = function($data) {
+          return (float) $data->width;
+      };
+
+      $fields['item_price'] = function($data) {
+          return $data->item_price? (double) $data->item_price: null;
+      };
+
+      $fields['compare_at_price'] = function($data) {
+          return  $data->compare_at_price? (double) $data->compare_at_price: null;
+      };
+
 
       return $fields;
   }
