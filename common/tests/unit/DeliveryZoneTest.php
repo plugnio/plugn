@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\DeliveryZoneFixture;
-use Codeception\Specify;
 use common\models\DeliveryZone;
 
 class DeliveryZoneTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class DeliveryZoneTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'zones' => DeliveryZoneFixture::className()];
+            'zones' => DeliveryZoneFixture::class];
     }
 
     /**
@@ -31,27 +28,20 @@ class DeliveryZoneTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                DeliveryZone::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(DeliveryZone::find()->one(), 'Check data loaded');
 
-        $this->specify('DeliveryZone model fields validation', function () {
-            $model = new DeliveryZone();
+        $model = new DeliveryZone();
+        $this->assertFalse($model->validate(['country_id']), 'should not accept empty country_id');
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+        $this->assertFalse($model->validate(['business_location_id']), 'should not accept empty business_location_id');
 
-            expect('should not accept empty country_id', $model->validate(['country_id']))->false();
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty business_location_id', $model->validate(['business_location_id']))->false();
+        $model->restaurant_uuid = 99999999999;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
 
-            $model->restaurant_uuid = 99999999999;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
+        $model->business_location_id = 999999999999999;
+        $this->assertFalse($model->validate(['business_location_id']), 'should not accept invalid business_location_id');
 
-            $model->business_location_id  = 999999999999999;
-            expect('should not accept invalid business_location_id ', $model->validate(['business_location_id']))->false();
-
-            $model->country_id = 99999999999;
-            expect('should not accept invalid country_id', $model->validate(['country_id']))->false();
-        });
+        $model->country_id = 99999999999;
+        $this->assertFalse($model->validate(['country_id']), 'should not accept invalid country_id');
     }
 }

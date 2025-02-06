@@ -21,13 +21,13 @@ class OrderItemCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'orderItems' => OrderItemFixture::className(),
-            'orders' => OrderFixture::className(),
-            'currencies' => CurrencyFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agents' => AgentFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'orderItems' => OrderItemFixture::class,
+            'orders' => OrderFixture::class,
+            'currencies' => CurrencyFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

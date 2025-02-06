@@ -23,7 +23,7 @@ class PlanTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'plans' => PlanFixture::className()
+            'plans' => PlanFixture::class
         ];
     }
 
@@ -32,17 +32,13 @@ class PlanTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Plan::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Plan::find()->one(), 'Check data loaded');
 
-        $this->specify('Plan model fields validation', function () {
+       /// $this->specify('Plan model fields validation', function () {
             $model = new Plan;
 
-            expect('should not accept empty name', $model->validate(['name']))->false();
-            expect('should not accept empty description', $model->validate(['description']))->false();
-        });
+            $this->assertFalse($model->validate(['name']), 'should not accept empty name');
+            $this->assertFalse($model->validate(['description']), 'should not accept empty description');
+      //  });
     }
 }

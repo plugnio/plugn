@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\CategoryFixture;
-use Codeception\Specify;
 use common\models\Category;
 
 class CategoryTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class CategoryTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'bankDiscounts' => CategoryFixture::className()];
+            'bankDiscounts' => CategoryFixture::class];
     }
 
     /**
@@ -31,20 +28,13 @@ class CategoryTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Category::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Category::find()->one(), 'Check data loaded');
 
-        $this->specify('Category model fields validation', function () {
-            $model = new Category();
+        $model = new Category();
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+        $this->assertFalse($model->validate(['title']), 'should not accept empty title');
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty title', $model->validate(['title']))->false();
-
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
     }
 }

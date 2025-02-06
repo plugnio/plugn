@@ -3,76 +3,88 @@ namespace common\tests;
 
 use backend\models\Admin;
 use common\fixtures\AdminFixture;
-use Codeception\Specify;
+use PHPUnit\Framework\TestCase;
 
-class AdminTest extends \Codeception\Test\Unit
+class AdminTest extends TestCase
 {
-    use Specify;
-
-    /**
-     * @var \common\tests\UnitTester
-     */
     protected $tester;
-
-    public function _fixtures(){
+    
+    public function _fixtures()
+    {
         return [
-            'admin' => AdminFixture::className()
+            'admin' => AdminFixture::class
         ];
     }
 
-    protected function _before(){}
-
-    protected function _after() { }
-
-    /**
-     * Tests validator
-     */
-    public function testValidators()
+    protected function setUp(): void
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check admin loaded',
-                Admin::find()->one()
-            )->notNull();
-        });
+        parent::setUp();
+    }
 
-        $this->specify('Admin model fields validation', function () {
-            $admin = new Admin;
-            //$admin->scenario = 'newAccount';
-            expect('should not accept empty admin_name', $admin->validate(['admin_name']))->false();
-            expect('should not accept empty admin_email', $admin->validate(['admin_email']))->false();
-            //expect('should not accept empty admin_password_hash', $admin->validate(['admin_password_hash']))->false();
-
-            $admin->admin_email = 'randomString';
-            expect('should not accept invalid email', $admin->validate(['admin_email']))->false();
-
-            $admin->admin_email = 'demo@admin.com';
-            expect('should accept valid email', $admin->validate(['admin_email']))->true();
-        });
+    protected function tearDown(): void
+    {
+        parent::tearDown();
     }
 
     /**
-     * Tests Create, Update
+     * Test fixtures are loaded
      */
-    public function testCrud()
+    public function testFixturesAreLoaded()
     {
-        $this->specify('Create New Admin', function () {
-            $model = new Admin();
-            $model->admin_name = 'Magan';
-            $model->admin_email = 'unique@admin.com';
-            $model->admin_auth_key = '';
-            $model->setPassword('admin2');
-            $model->admin_role = Admin::ROLE_ADMIN;
-            
-            expect('Created successfully', $model->save())->true();
-            expect('Record is in database', $model->findOne(['admin_name' => 'Magan']))->notNull();
-        });
+        $admin = Admin::find()->one();
+        $this->assertNotNull($admin, 'Admin fixture should be loaded');
+    }
 
-        $this->specify('Update university Data', function() {
-            $model = Admin::findOne(['admin_id' => 1]);
-            $model->admin_name = 'Chhagan';
-            $model->admin_auth_key = '';
-            expect('updated successfully', $model->save())->true();
-            expect('Updated Record is in database', $model->findOne(['admin_name' => 'Chhagan']))->notNull();
-        });
+    /**
+     * Test field validations
+     */
+    public function testFieldValidations()
+    {
+        $admin = new Admin();
+        
+        // Test empty fields
+        $this->assertFalse($admin->validate(['admin_name']), 'Should not accept empty admin_name');
+        $this->assertFalse($admin->validate(['admin_email']), 'Should not accept empty admin_email');
+        
+        // Test invalid email
+        $admin->admin_email = 'randomString';
+        $this->assertFalse($admin->validate(['admin_email']), 'Should not accept invalid email');
+        
+        // Test valid email
+        $admin->admin_email = 'demo@admin.com';
+        $this->assertTrue($admin->validate(['admin_email']), 'Should accept valid email');
+    }
+
+    /**
+     * Test CRUD operations
+     */
+    public function testCrudOperations()
+    {
+        // Test Create
+        $admin = new Admin();
+        $admin->admin_name = 'Magan';
+        $admin->admin_email = 'unique@admin.com';
+        $admin->admin_auth_key = '';
+        $admin->setPassword('admin2');
+        $admin->admin_role = Admin::ROLE_ADMIN;
+        
+        $this->assertTrue($admin->save(), 'Admin should be created successfully');
+        $this->assertNotNull(
+            Admin::findOne(['admin_name' => 'Magan']),
+            'Should find newly created admin'
+        );
+
+        // Test Update
+        $admin = Admin::findOne(['admin_id' => 1]);
+        $this->assertNotNull($admin, 'Should find admin with ID 1');
+        
+        $admin->admin_name = 'Chhagan';
+        $admin->admin_auth_key = '';
+        
+        $this->assertTrue($admin->save(), 'Admin should be updated successfully');
+        $this->assertNotNull(
+            Admin::findOne(['admin_name' => 'Chhagan']),
+            'Should find updated admin'
+        );
     }
 }

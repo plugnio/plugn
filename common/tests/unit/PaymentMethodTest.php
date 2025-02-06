@@ -23,7 +23,7 @@ class PaymentMethodTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'methods' => PaymentMethodFixture::className()
+            'methods' => PaymentMethodFixture::class
         ];
     }
 
@@ -32,16 +32,12 @@ class PaymentMethodTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                PaymentMethod::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(PaymentMethod::find()->one(), 'Check data loaded');
 
-        $this->specify('PaymentMethod model fields validation', function () {
+        //$this->specify('PaymentMethod model fields validation', function () {
             $model = new PaymentMethod;
 
-            expect('should not accept empty payment_method_name', $model->validate(['payment_method_name']))->false();
-        });
+            $this->assertFalse($model->validate(['payment_method_name']), 'should not accept empty payment_method_name');
+        //});
     }
 }

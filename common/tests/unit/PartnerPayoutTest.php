@@ -24,7 +24,7 @@ class PartnerPayoutTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'bankDiscounts' => PartnerPayoutFixture::className()];
+            'bankDiscounts' => PartnerPayoutFixture::class];
     }
 
     /**
@@ -32,22 +32,15 @@ class PartnerPayoutTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                PartnerPayout::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(PartnerPayout::find()->one(), 'Check data loaded');
 
-        $this->specify('PartnerPayout model fields validation', function () {
-            $model = new PartnerPayout;
+        $model = new PartnerPayout();
+        $this->assertFalse($model->validate(['partner_uuid']), 'should not accept empty partner_uuid');
 
-            expect('should not accept empty partner_uuid', $model->validate(['partner_uuid']))->false();
+        $model->partner_uuid = 12312312313;
+        $this->assertFalse($model->validate(['partner_uuid']), 'should not accept invalid partner_uuid');   
 
-            $model->partner_uuid = 12312312313;
-            expect('should not accept invalid partner_uuid', $model->validate(['partner_uuid']))->false();
-
-            $model->bank_id = 12312312313;
-            expect('should not accept invalid bank_id', $model->validate(['bank_id']))->false();
-        });
+        $model->bank_id = 12312312313;
+        $this->assertFalse($model->validate(['bank_id']), 'should not accept invalid bank_id');
     }
 }

@@ -406,7 +406,8 @@ class Order extends \yii\db\ActiveRecord
      */
     private static function getUniqueOrderUuid($length = 6)
     {
-        $uuid = \ShortCode\Random::get($length);
+        $uuid = Yii::$app->security->generateRandomString ($length);
+            //\ShortCode\Random::get($length);
 
         $isNotUnique = static::find()->where(['order_uuid' => $uuid])->exists();
 

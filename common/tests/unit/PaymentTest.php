@@ -23,7 +23,7 @@ class PaymentTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'payments' => PaymentFixture::className()
+            'payments' => PaymentFixture::class
         ];
     }
 
@@ -32,27 +32,23 @@ class PaymentTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Payment::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Payment::find()->one(), 'Check data loaded');
 
-        $this->specify('Payment model fields validation', function () {
+        //$this->specify('Payment model fields validation', function () {
             $model = new Payment();
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty customer_id', $model->validate(['customer_id']))->false();
-            expect('should not accept empty order_uuid', $model->validate(['order_uuid']))->false();
-            expect('should not accept empty payment_mode', $model->validate(['payment_mode']))->false();
-            expect('should not accept empty payment_amount_charged', $model->validate(['payment_amount_charged']))->false();
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+            $this->assertFalse($model->validate(['customer_id']), 'should not accept empty customer_id');
+            $this->assertFalse($model->validate(['order_uuid']), 'should not accept empty order_uuid');
+            $this->assertFalse($model->validate(['payment_mode']), 'should not accept empty payment_mode');
+            $this->assertFalse($model->validate(['payment_amount_charged']), 'should not accept empty payment_amount_charged');
 
             $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
 
             $model->customer_id = 12312312313;
-            expect('should not accept invalid customer_id', $model->validate(['customer_id']))->false();
+            $this->assertFalse($model->validate(['customer_id']), 'should not accept invalid customer_id');
 
-        });
-    }
+        //});
+    }   
 }

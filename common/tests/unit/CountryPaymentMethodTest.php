@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\CountryPaymentMethodFixture;
-use Codeception\Specify;
 use common\models\CountryPaymentMethod;
 
 class CountryPaymentMethodTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class CountryPaymentMethodTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'cpms' => CountryPaymentMethodFixture::className()];
+            'cpms' => CountryPaymentMethodFixture::class];
     }
 
     /**
@@ -31,23 +28,16 @@ class CountryPaymentMethodTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                CountryPaymentMethod::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(CountryPaymentMethod::find()->one(), 'Check data loaded');
 
-        $this->specify('CountryPaymentMethod model fields validation', function () {
-            $model = new CountryPaymentMethod;
+        $model = new CountryPaymentMethod;
+        $this->assertFalse($model->validate(['payment_method_id']), 'should not accept empty payment_method_id');
+        $this->assertFalse($model->validate(['country_id']), 'should not accept empty country_id');
 
-            expect('should not accept empty payment_method_id', $model->validate(['payment_method_id']))->false();
-            expect('should not accept empty country_id', $model->validate(['country_id']))->false();
+        $model->payment_method_id = 12312312313;
+        $this->assertFalse($model->validate(['payment_method_id']), 'should not accept invalid payment_method_id');
 
-            $model->payment_method_id = 12312312313;
-            expect('should not accept invalid payment_method_id', $model->validate(['payment_method_id']))->false();
-
-            $model->country_id = 12312312313;
-            expect('should not accept invalid country_id', $model->validate(['country_id']))->false();
-        });
+        $model->country_id = 12312312313;
+        $this->assertFalse($model->validate(['country_id']), 'should not accept invalid country_id');
     }
 }

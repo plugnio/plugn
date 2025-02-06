@@ -2,12 +2,9 @@
 
 use common\fixtures\RestaurantThemeFixture;
 use common\models\RestaurantTheme;
-use Codeception\Specify;
 
 class RestaurantThemeTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class RestaurantThemeTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'themes' => RestaurantThemeFixture::className()
+            'themes' => RestaurantThemeFixture::class
         ];
     }
 
@@ -32,19 +29,12 @@ class RestaurantThemeTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check restaurant theme loaded',
-                RestaurantTheme::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(RestaurantTheme::find()->one(), 'Check restaurant theme loaded');
 
-        $this->specify('RestaurantTheme model fields validation', function () {
-            $model = new RestaurantTheme;
+        $model = new RestaurantTheme();
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
     }
 }

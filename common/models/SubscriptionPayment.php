@@ -363,7 +363,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      * @param string $source                        transaction's source
      * @param string $response_message
      */
-    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
+    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference = null, $response_message = null )
     {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);

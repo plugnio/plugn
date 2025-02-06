@@ -924,7 +924,7 @@ class ItemController extends BaseController
             header("Content-Disposition: attachment;filename=\"sold-items.xlsx\"");
             header("Cache-Control: max-age=0");
 
-            \moonland\phpexcel\Excel::export([
+            \common\components\PhpExcel::export([
                 'isMultipleSheet' => false,
                 'models' => $searchResult,
                 'columns' => [
@@ -955,7 +955,7 @@ class ItemController extends BaseController
         header("Content-Disposition: attachment;filename=\"item-report.xlsx\"");
         header("Cache-Control: max-age=0");
 
-        \moonland\phpexcel\Excel::export([
+        \common\components\PhpExcel::export([
             'isMultipleSheet' => false,
             'models' => $model,
             'columns' => [

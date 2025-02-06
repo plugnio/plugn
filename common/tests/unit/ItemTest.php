@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\ItemFixture;
-use Codeception\Specify;
 use common\models\Item;
 
 class ItemTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class ItemTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'bankDiscounts' => ItemFixture::className()];
+            'bankDiscounts' => ItemFixture::class];
     }
 
     /**
@@ -31,20 +28,13 @@ class ItemTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Item::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Item::find()->one(), 'Check data loaded');
 
-        $this->specify('Item model fields validation', function () {
-            $model = new Item();
+        $model = new Item();
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+        $this->assertFalse($model->validate(['item_name']), 'should not accept empty item_name');
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty item_name', $model->validate(['item_name']))->false();
-
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
     }
 }

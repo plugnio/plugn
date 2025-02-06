@@ -137,7 +137,7 @@ class RestaurantController extends Controller {
 
         $arrStatus = Restaurant::arrStatus();
 
-        \moonland\phpexcel\Excel::export([
+        \common\components\PhpExcel::export([
             'isMultipleSheet' => false,
             'models' => $dataProvider->query->all(),
             'columns' => [

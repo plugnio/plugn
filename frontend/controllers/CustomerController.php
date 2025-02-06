@@ -154,7 +154,7 @@ class CustomerController extends Controller {
            header("Cache-Control: max-age=0");
 
            if($restaurant->restaurant_uuid == 'rest_fe5b6a72-18a7-11ec-973b-069e9504599a'){
-             \moonland\phpexcel\Excel::export([
+             \common\components\PhpExcel::export([
                  'isMultipleSheet' => false,
                  'models' => $model,
                  'columns' => [
@@ -241,7 +241,7 @@ class CustomerController extends Controller {
                  ]
              ]);
            } else {
-             \moonland\phpexcel\Excel::export([
+             \common\components\PhpExcel::export([
                  'isMultipleSheet' => false,
                  'models' => $model,
                  'columns' => [

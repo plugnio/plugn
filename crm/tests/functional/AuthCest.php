@@ -20,11 +20,11 @@ class AuthCest {
 
     public function _fixtures() {
         return [
-            'country' => CountryFixture::className(),
-            'currencies' => CurrencyFixture::className(),
-            'staffs' => StaffFixture::className(),
-            'staff_assignments' => StaffAssignmentFixture::className(),
-            'staffToken' => StaffTokenFixture::className()
+            'country' => CountryFixture::class,
+            'currencies' => CurrencyFixture::class,
+            'staffs' => StaffFixture::class,
+            'staff_assignments' => StaffAssignmentFixture::class,
+            'staffToken' => StaffTokenFixture::class
         ];
     }
 

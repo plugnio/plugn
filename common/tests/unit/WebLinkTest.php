@@ -23,7 +23,7 @@ class WebLinkTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'weblinks' => WebLinkFixture::className()
+            'weblinks' => WebLinkFixture::class
         ];
     }
 
@@ -32,28 +32,23 @@ class WebLinkTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check weblink loaded',
-                WebLink::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(WebLink::find()->one(), 'Check data loaded');
+        
+        $model = new WebLink();
+        $this->assertFalse($model->validate(['url']), 'should not accept empty url');
+        $this->assertFalse($model->validate(['web_link_title']), 'should not accept empty web_link_title');
+        $this->assertFalse($model->validate(['web_link_title_ar']), 'should not accept empty web_link_title_ar');
 
-        $this->specify('WebLink model fields validation', function () {
-            $model = new WebLink;
+        $model->url = 12312312313;
+        $this->assertFalse($model->validate(['url']), 'should not accept invalid url');
 
-            expect('should not accept empty url', $model->validate(['url']))->false();
-            expect('should not accept empty web_link_title', $model->validate(['web_link_title']))->false();
-            expect('should not accept empty web_link_title_ar', $model->validate(['web_link_title_ar']))->false();
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
 
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
+        $model->web_link_type = 12312312313;
+        $this->assertFalse($model->validate(['web_link_type']), 'should not accept invalid web_link_type');
 
-            $model->web_link_type = 12312312313;
-            expect('should not accept invalid web_link_type', $model->validate(['web_link_type']))->false();
-
-            $model->web_link_type = WebLink::WEB_LINK_TYPE_WEBSITE_URL;
-            expect('should accept valid web_link_type', $model->validate(['web_link_type']))->true();
-
-        });
+        $model->web_link_type = WebLink::WEB_LINK_TYPE_WEBSITE_URL;
+        $this->assertTrue($model->validate(['web_link_type']), 'should accept valid web_link_type');
     }
 }

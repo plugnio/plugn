@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\ItemImageFixture;
-use Codeception\Specify;
 use common\models\ItemImage;
 
 class ItemImageTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class ItemImageTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'images' => ItemImageFixture::className()];
+            'images' => ItemImageFixture::class];
     }
 
     /**
@@ -31,20 +28,13 @@ class ItemImageTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                ItemImage::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(ItemImage::find()->one(), 'Check data loaded');
 
-        $this->specify('ItemImage model fields validation', function () {
-            $model = new ItemImage();
+        $model = new ItemImage();
+        $this->assertFalse($model->validate(['item_uuid']), 'should not accept empty item_uuid');
+        $this->assertFalse($model->validate(['product_file_name']), 'should not accept empty product_file_name');
 
-            expect('should not accept empty item_uuid', $model->validate(['item_uuid']))->false();
-            expect('should not accept empty product_file_name', $model->validate(['product_file_name']))->false();
-
-            $model->item_uuid = 12312312313;
-            expect('should not accept invalid item_uuid', $model->validate(['item_uuid']))->false();
-        });
+        $model->item_uuid = 12312312313;
+        $this->assertFalse($model->validate(['item_uuid']), 'should not accept invalid item_uuid');
     }
 }

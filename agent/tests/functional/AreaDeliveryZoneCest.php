@@ -24,16 +24,16 @@ class AreaDeliveryZoneCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'areas' => AreaFixture::className(),
-            'cities' => CityFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'countries' => CountryFixture::className(),
-            'areaDeliveryZone' => AreaDeliveryZoneFixture::className(),
-            'deliveryZones' => DeliveryZoneFixture::className(),
-            'businessLocations' => BusinessLocationFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agents' => AgentFixture::class,
+            'areas' => AreaFixture::class,
+            'cities' => CityFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'countries' => CountryFixture::class,
+            'areaDeliveryZone' => AreaDeliveryZoneFixture::class,
+            'deliveryZones' => DeliveryZoneFixture::class,
+            'businessLocations' => BusinessLocationFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

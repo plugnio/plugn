@@ -24,7 +24,7 @@ class RefundTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'refunds' => RefundFixture::className()
+            'refunds' => RefundFixture::class
         ];
     }
 
@@ -33,24 +33,20 @@ class RefundTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Refund::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Refund::find()->one(), 'Check data loaded');
 
-        $this->specify('Refund model fields validation', function () {
+      //  $this->specify('Refund model fields validation', function () {
             $model = new Refund();
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty order_uuid', $model->validate(['order_uuid']))->false();
-            expect('should not accept empty refund_amount', $model->validate(['refund_amount']))->false();
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+            $this->assertFalse($model->validate(['order_uuid']), 'should not accept empty order_uuid');
+            $this->assertFalse($model->validate(['refund_amount']), 'should not accept empty refund_amount');
 
             $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
 
             $model->order_uuid = 12312312313;
-            expect('should not accept invalid order_uuid', $model->validate(['order_uuid']))->false();
-        });
+            $this->assertFalse($model->validate(['order_uuid']), 'should not accept invalid order_uuid');
+       // });
     }
 }

@@ -2,12 +2,9 @@
 
 use common\fixtures\RestaurantCurrencyFixture;
 use common\models\RestaurantCurrency;
-use Codeception\Specify;
 
 class RestaurantCurrencyTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class RestaurantCurrencyTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'locations' => RestaurantCurrencyFixture::className()
+            'locations' => RestaurantCurrencyFixture::class
         ];
     }
 
@@ -32,24 +29,16 @@ class RestaurantCurrencyTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check currency loaded',
-                RestaurantCurrency::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(RestaurantCurrency::find()->one(), 'Check currency loaded');
 
-        $this->specify('RestaurantCurrency model fields validation', function () {
-            $model = new RestaurantCurrency;
+        $model = new RestaurantCurrency();
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+        $this->assertFalse($model->validate(['currency_id']), 'should not accept empty currency_id');
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty currency_id', $model->validate(['currency_id']))->false();
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
 
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-
-            $model->currency_id = 12312312313;
-            expect('should not accept invalid currency_id', $model->validate(['currency_id']))->false();
-
-        });
+        $model->currency_id = 12312312313;
+        $this->assertFalse($model->validate(['currency_id']), 'should not accept invalid currency_id');
     }
 }

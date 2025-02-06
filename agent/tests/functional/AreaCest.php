@@ -17,10 +17,10 @@ class AreaCest
 
     public function _fixtures() {
         return [
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'area' => AreaFixture::className(),
-            'agents' => AgentFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'area' => AreaFixture::class,
+            'agents' => AgentFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

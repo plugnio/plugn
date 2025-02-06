@@ -25,13 +25,13 @@ class StoreCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'restaurants' => RestaurantPaymentMethodFixture::className(),
-            'agentToken' => AgentTokenFixture::className(),
-            'currency' => CurrencyFixture::className(),
-            'country' => CountryFixture::className()
+            'agents' => AgentFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'restaurants' => RestaurantPaymentMethodFixture::class,
+            'agentToken' => AgentTokenFixture::class,
+            'currency' => CurrencyFixture::class,
+            'country' => CountryFixture::class
         ];
     }
 

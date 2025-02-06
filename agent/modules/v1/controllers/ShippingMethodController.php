@@ -23,7 +23,7 @@ class ShippingMethodController extends BaseController
         if($shipping_method)
             $shipping_method->delete();
 
-        return self::message('success', "Extension $code updated.");
+        return self::message("Extension $code updated.");   
     }
 
     /**
@@ -82,7 +82,7 @@ class ShippingMethodController extends BaseController
 
         if (!$model->save())
         {
-            return self::message('error', $model->errors);
+            return self::message($model->errors, 'error');
         }
 
         return $this->_enableMethod($store, ShippingMethod::CODE_ARAMEX);
@@ -101,7 +101,7 @@ class ShippingMethodController extends BaseController
 
         if (!$model->save())
         {
-            return self::message('error', $model->errors);
+            return self::message($model->errors, 'error');
         }
 
         return $this->_enableMethod($store, ShippingMethod::CODE_FEDEX);
@@ -138,7 +138,7 @@ class ShippingMethodController extends BaseController
         $store->setScenario(\common\models\Restaurant::SCENARIO_UPDATE_DELIVERY);
 
         if (!$store->save()) {
-            return self::message("error", $store->getErrors());
+            return self::message($store->getErrors(), 'error');
         }
 
         return $this->_enableMethod($store, ShippingMethod::CODE_ARMADA);
@@ -151,7 +151,7 @@ class ShippingMethodController extends BaseController
         $store->setScenario(\common\models\Restaurant::SCENARIO_UPDATE_DELIVERY);
 
         if (!$store->save()) {
-            return self::message("error", $store->getErrors());
+            return self::message($store->getErrors(), 'error');
         }
 
         return $this->_enableMethod($store, ShippingMethod::CODE_MASHKOR);
@@ -199,7 +199,7 @@ class ShippingMethodController extends BaseController
                 ->one();
 
             if(!$aramexShippingMethod) {
-                return self::message("error", Yii::t("agent", "Method not found!"));
+                return self::message(Yii::t("agent", "Method not found!"), 'error');
             }
 
             $shippings_method = new RestaurantShippingMethod();
@@ -207,11 +207,11 @@ class ShippingMethodController extends BaseController
             $shippings_method->restaurant_uuid = $store->restaurant_uuid;
 
             if (!$shippings_method->save()) {
-                return self::message("error", $shippings_method->getErrors());
+                return self::message($shippings_method->getErrors(), 'error');
             }
         }
 
-        return self::message('success', "Extension $code updated.");
+        return self::message("Extension $code updated.");
     }
 
     /**
@@ -219,7 +219,7 @@ class ShippingMethodController extends BaseController
      * @param $message
      * @return array
      */
-    public static function message($type = "success", $message)
+    public static function message($message, $type = "success")
     {
         return [
             "operation" => $type,

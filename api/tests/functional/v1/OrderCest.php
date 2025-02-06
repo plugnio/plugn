@@ -13,11 +13,11 @@ class OrderCest
 
     public function _fixtures() {
         return [
-            'currencies' => \common\fixtures\CurrencyFixture::className(),
-            'items' => \common\fixtures\ItemFixture::className(),
-            'orders' => \common\fixtures\OrderFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className(),
-            'restaurantBranches' => \common\fixtures\RestaurantBranchFixture::className(),
+            'currencies' => \common\fixtures\CurrencyFixture::class,
+            'items' => \common\fixtures\ItemFixture::class,
+            'orders' => \common\fixtures\OrderFixture::class,
+            'restaurants' => \common\fixtures\RestaurantFixture::class,
+            'restaurantBranches' => \common\fixtures\RestaurantBranchFixture::class,
         ];
     }
 

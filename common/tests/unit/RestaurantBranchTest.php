@@ -23,7 +23,7 @@ class RestaurantBranchTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'branchs' => RestaurantBranchFixture::className()
+            'branchs' => RestaurantBranchFixture::class
         ];
     }
 
@@ -32,20 +32,16 @@ class RestaurantBranchTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                RestaurantBranch::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(RestaurantBranch::find()->one(), 'Check data loaded');
 
-        $this->specify('RestaurantBranch model fields validation', function () {
+      //  $this->specify('RestaurantBranch model fields validation', function () {
             $model = new RestaurantBranch;
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty branch_name_en', $model->validate(['branch_name_en']))->false();
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+            $this->assertFalse($model->validate(['branch_name_en']), 'should not accept empty branch_name_en');
 
             $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
+        //});
     }
 }

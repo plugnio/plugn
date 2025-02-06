@@ -12,11 +12,11 @@ class DeliveryZoneCest
     public function _fixtures()
     {
         return [
-            'areas' => \common\fixtures\AreaFixture::className(),
-            'countries' => \common\fixtures\CountryFixture::className(),
-            'deliveryZones' => \common\fixtures\DeliveryZoneFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className(),
-            'businessLocations' => \common\fixtures\BusinessLocationFixture::className()
+            'areas' => \common\fixtures\AreaFixture::class,
+            'countries' => \common\fixtures\CountryFixture::class,
+            'deliveryZones' => \common\fixtures\DeliveryZoneFixture::class,
+            'restaurants' => \common\fixtures\RestaurantFixture::class,
+            'businessLocations' => \common\fixtures\BusinessLocationFixture::class
         ];
     }
 

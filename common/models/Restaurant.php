@@ -1217,7 +1217,7 @@ class Restaurant extends ActiveRecord
             Yii::error($e->getMessage(), "email");
         }
 
-        return self::message("success", "Our customer service agent will contact you soon!");
+        return self::message("Our customer service agent will contact you soon!");
     }
 
     /**
@@ -1225,7 +1225,7 @@ class Restaurant extends ActiveRecord
      * @param $message
      * @return array
      */
-    public static function message($type = "success", $message)
+    public static function message($message, $type = "success")     
     {
         return [
             "operation" => $type,
@@ -1307,7 +1307,7 @@ class Restaurant extends ActiveRecord
             }
         }
 
-        return self::message("success", "Domain assigned to store. Don't forgot to point A record to 75.2.60.5 if you connecting existing domain (domain managed by you). Please contact customer care if facing any issue.");
+        return self::message("Domain assigned to store. Don't forgot to point A record to 75.2.60.5 if you connecting existing domain (domain managed by you). Please contact customer care if facing any issue.");
     }
 
     /**

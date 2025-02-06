@@ -4,10 +4,9 @@ namespace common\components;
 use agent\models\AgentAssignment;
 use Aws\Exception\AwsException;
 use Aws\Sqs\SqsClient;
-use Mpdf\Tag\P;
+use Segment\Segment;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
 
 class EventManager extends Component
 {
@@ -92,7 +91,7 @@ class EventManager extends Component
             }
 
             if($this->segmentKey)
-                \Segment::init($this->segmentKey);
+                Segment::init($this->segmentKey);
         }
 
         // Create an SQS client
@@ -117,7 +116,7 @@ class EventManager extends Component
 
         $this->segmentKey = $key;
 
-        \Segment::init($key);
+        Segment::init($key);
     }
 
     /**
@@ -137,7 +136,7 @@ class EventManager extends Component
         }
 
         if($this->segmentKey) {
-            \Segment::identify([
+            Segment::identify([
                 "userId" => $id,
                 "traits" => $data
             ]);
@@ -275,9 +274,9 @@ class EventManager extends Component
                 $data['anonymousId'] = $userId;
             }
 
-            \Segment::track($data);
+            Segment::track($data);
 
-            \Segment::flush();
+            Segment::flush();
         }
 
         // send to queue
@@ -317,6 +316,6 @@ class EventManager extends Component
     public function flush()
     {
         if($this->segmentKey)
-            \Segment::flush();
+            Segment::flush();
     }
 }

@@ -1606,7 +1606,7 @@ class OrderController extends BaseController
         header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
         header("Cache-Control: max-age=0");
 
-        \moonland\phpexcel\Excel::export([
+        \common\components\PhpExcel::export([
             'isMultipleSheet' => false,
             'models' => $searchResult,
             'columns' => [
@@ -2148,7 +2148,7 @@ class OrderController extends BaseController
                 'fontdata' => array_merge($fontData, [
                     "Nunito" => [
                         'R' => 'Nunito-Regular.ttf',
-                        'B' => 'Nunito-Bold.ttf',
+                        //'B' => 'Nunito-Bold.ttf',
                         'B' => 'Nunito-Italic.ttf',
                     ],
                     "NunitoSans" => [

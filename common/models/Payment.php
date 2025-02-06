@@ -279,7 +279,7 @@ class Payment extends \yii\db\ActiveRecord
         $status,
         $destinations = null ,
         $source = null,
-        $reference,
+        $reference = null,
         $response_message = null,
         $responseContent = []
     ) {

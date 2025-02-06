@@ -153,7 +153,7 @@ class ReportController extends Controller
             ];
         }
 
-        \moonland\phpexcel\Excel::export([
+        \common\components\PhpExcel::export([
             'isMultipleSheet' => true,
             "asAttachment" => true,
             'mode' => 'export', //default value as 'export'
@@ -270,7 +270,7 @@ class ReportController extends Controller
             ];
         }
 
-        \moonland\phpexcel\Excel::export([
+        \common\components\PhpExcel::export([
             'isMultipleSheet' => true,
             "asAttachment" => true,
             'mode' => 'export', //default value as 'export'

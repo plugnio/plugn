@@ -2,12 +2,9 @@
 
 use common\fixtures\CustomerBankDiscountFixture;
 use common\models\CustomerBankDiscount;
-use Codeception\Specify;
 
 class CustomerBankDiscountTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class CustomerBankDiscountTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'bankDiscounts' => CustomerBankDiscountFixture::className()];
+            'bankDiscounts' => CustomerBankDiscountFixture::class];
     }
 
     /**
@@ -31,24 +28,16 @@ class CustomerBankDiscountTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                CustomerBankDiscount::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(CustomerBankDiscount::find()->one(), 'Check data loaded');
 
-        $this->specify('CustomerBankDiscount model fields validation', function () {
-            $model = new CustomerBankDiscount();
+        $model = new CustomerBankDiscount();
+        $this->assertFalse($model->validate(['customer_id']), 'should not accept empty customer_id');
+        $this->assertFalse($model->validate(['bank_discount_id']), 'should not accept empty bank_discount_id');
 
-            expect('should not accept empty customer_id', $model->validate(['customer_id']))->false();
-            expect('should not accept empty bank_discount_id', $model->validate(['bank_discount_id']))->false();
+        $model->customer_id = 12312312313;
+        $this->assertFalse($model->validate(['customer_id']), 'should not accept invalid customer_id');
 
-            $model->customer_id = 12312312313;
-            expect('should not accept invalid customer_id', $model->validate(['customer_id']))->false();
-
-            $model->bank_discount_id = 12312312313;
-            expect('should not accept invalid bank_discount_id', $model->validate(['bank_discount_id']))->false();
-
-        });
+        $model->bank_discount_id = 12312312313;
+        $this->assertFalse($model->validate(['bank_discount_id']), 'should not accept invalid bank_discount_id');
     }
 }

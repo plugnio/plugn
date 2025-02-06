@@ -16,10 +16,10 @@ class CountryCest
 
     public function _fixtures() {
         return [
-            'country' => CountryFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'agents' => AgentFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'country' => CountryFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'agents' => AgentFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 
