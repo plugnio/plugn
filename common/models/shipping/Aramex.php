@@ -544,11 +544,11 @@ class Aramex
 
                     try {
 
-                        $pickupDate = strtotime($date);
+                        $pickupDate = $date? strtotime($date) : null;
 
-                        $readyTime = strtotime($ready_time);
+                        $readyTime = $ready_time? strtotime($ready_time) : null;
 
-                        $closingTime = strtotime($closing_time);
+                        $closingTime = $closing_time? strtotime($closing_time) : null;
 
                         $weight_unit ='KG' ;
 

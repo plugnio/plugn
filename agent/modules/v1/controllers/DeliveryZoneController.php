@@ -68,7 +68,7 @@ class DeliveryZoneController extends BaseController
      * @param type $store_uuid
      * @return type
      */
-    public function actionList($store_uuid = null, $business_location_id)
+    public function actionList($business_location_id, $store_uuid = null)
     {
 //        $this->ownerCheck();
         $store = Yii::$app->accountManager->getManagedAccount($store_uuid);
@@ -259,7 +259,7 @@ class DeliveryZoneController extends BaseController
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid = null, $delivery_zone_id)
+    public function actionDetail($delivery_zone_id, $store_uuid = null)
     {
 //        $this->ownerCheck();
         return $this->findModel($delivery_zone_id, $store_uuid);

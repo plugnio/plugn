@@ -77,18 +77,28 @@ return [
                 ],
             ],
         ],
+        
         'mailer' => [
-             'class' => 'yii\swiftmailer\Mailer',
-             'viewPath' => '@common/mail',
-             'transport' => [
-                 'class' => 'Swift_SmtpTransport',
+            'class' => \yii\symfonymailer\Mailer::class,
+            'viewPath' => '@common/mail',
+            'transport' => [
+                'scheme' => 'smtp',
+                'host' => 'smtp.elasticemail.com',
+                'username' => 'no-reply@mail.plugn.site',
+                'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
+                'port' => '2525',
+                'encryption' => 'tls'
+            ],
+            
+            /* 'transport' => [
+                 'scheme' => 'smtp',
                  'host' => 'email-smtp.eu-west-1.amazonaws.com',
                  'username' => 'AKIAWMITDJRKTH5HBB2O',
                  'password' => 'BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ',
                  'port' => '587',
                  'encryption' => 'tls',
-                 /*
-                 'class' => 'Swift_SmtpTransport',
+                
+                 'scheme' => 'smtp',
                  'host' => 'smtp.sendgrid.net',
                  'username' => 'apikey',
                  'password' => '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',
@@ -98,8 +108,8 @@ return [
                  //     [
                  //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
                  //     ],
-                 // ],*/
-            ],
+                 // ],
+            ],*/
         ],
         // 'cache' => [
         //     // Use Redis as a cache

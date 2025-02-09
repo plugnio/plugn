@@ -357,7 +357,7 @@ class StoreController extends BaseController
      * Disable payment method
      * @return mixed
      */
-    public function actionDisablePaymentMethod($id = null, $paymentMethodId)
+    public function actionDisablePaymentMethod($id = null, $paymentMethodId = null)
     {
         $model = $this->findModel($id);
 
@@ -498,7 +498,7 @@ class StoreController extends BaseController
      * Enable payment method
      * @return mixed
      */
-    public function actionEnablePaymentMethod($id = null, $paymentMethodId)
+    public function actionEnablePaymentMethod($id = null, $paymentMethodId = null)
     {
         $model = $this->findModel($id);
 
@@ -1663,7 +1663,7 @@ class StoreController extends BaseController
      * @throws NotFoundHttpException
      * update store status
      */
-    public function actionUpdateStoreStatus($id = null, $status) {
+    public function actionUpdateStoreStatus($id = null, $status = null) {
 
         $model = $this->findModel($id);
 

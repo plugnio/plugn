@@ -87,7 +87,7 @@ class ExtraOption extends \yii\db\ActiveRecord {
 
     /**
      * increase stock_qty
-     * @param type $qty
+     * @param number $qty
      */
     public function increaseStockQty($qty)
     {
@@ -110,7 +110,7 @@ class ExtraOption extends \yii\db\ActiveRecord {
 
     /**
      * decrease stock_qty
-     * @param type $qty
+     * @param number $qty
      */
     public function decreaseStockQty($qty)
     {

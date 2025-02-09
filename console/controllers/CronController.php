@@ -992,7 +992,10 @@ class CronController extends \yii\console\Controller
 
         foreach ($query->batch() as $vouchers) {
             foreach ($vouchers as $voucher) {
-                if (date('Y-m-d', strtotime('now')) >= date('Y-m-d', strtotime($voucher->valid_until))) {
+                if (
+                    date('Y-m-d') >= 
+                    date('Y-m-d', strtotime($voucher->valid_until))
+                ) {
                     $voucher->voucher_status = Voucher::VOUCHER_STATUS_EXPIRED;
                     $voucher->save();
                 }

@@ -125,10 +125,10 @@ class ZapierController extends Controller {
 
             foreach ($orders as $key => $order) {
                 $orders[$key]['id'] = $order['order_uuid'];
-                $orders[$key]['estimated_time_of_arrival'] = date('c', strtotime($order['estimated_time_of_arrival']));
+                $orders[$key]['estimated_time_of_arrival'] = $order['estimated_time_of_arrival']?
+                    date('c', strtotime($order['estimated_time_of_arrival'])) : null;
                 $orders[$key]['order_created_at'] = date('c', strtotime($order['order_created_at']));
                 $orders[$key]['order_updated_at'] = date('c', strtotime($order['order_updated_at']));
-
 
                 foreach ($order['orderItems'] as $orderItemKey => $orderItem) {
 

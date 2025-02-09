@@ -189,7 +189,7 @@ class BankDiscountController extends BaseController {
      * @return BankDiscount
      * @throws NotFoundHttpException
      */
-    public function actionDetail($store_uuid = null, $bank_discount_id) {
+    public function actionDetail($bank_discount_id, $store_uuid = null) {
         $this->ownerCheck();
         return $this->findModel($bank_discount_id, $store_uuid);
     }

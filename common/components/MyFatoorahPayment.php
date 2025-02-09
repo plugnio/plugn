@@ -364,7 +364,7 @@ class MyFatoorahPayment extends Component
     /**
    * Create a charge for redirect
    */
-  public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $platform_fee  , $paymentMethodId, $paymentMethodCode,$warehouse_fee = 0, $warehouse_delivery_charges =0,$country_name)
+  public function createCharge($currency, $amount ,$firstName, $email, $country_code ,$phone, $redirectUrl, $orderUuid, $supplierCode , $platform_fee  , $paymentMethodId, $paymentMethodCode,$warehouse_fee = 0, $warehouse_delivery_charges =0,$country_name = "")
   {
 
       $chargeEndpoint = $this->apiEndpoint . "/ExecutePayment";

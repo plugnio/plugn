@@ -53,7 +53,7 @@ class CustomerController extends BaseController
      * @param string $customer_id
      * @return ActiveDataProvider
      */
-    public function actionListAllCustomerOrders($store_uuid = null, $customer_id)
+    public function actionListAllCustomerOrders($customer_id, $store_uuid = null)
     {
         $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
