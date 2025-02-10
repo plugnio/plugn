@@ -2457,7 +2457,7 @@ class Restaurant extends ActiveRecord
                 . $this->tax_document))) {
                 //Yii::error ('Error reading document: ');
 
-                $this->addError('tax_document', 'Error reading document');
+                $this->addError('tax_document', 'Error reading tax document');
 
                 return [
                     "operation" => 'error',
@@ -2487,11 +2487,11 @@ class Restaurant extends ActiveRecord
 
                 //Yii::error ('Error when uploading document: ' . $error);
 
-                $this->addError('tax_document', 'Error reading document' . $error);
+                $this->addError('tax_document', 'Error response for tax document' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error reading document' . $error
+                    "message" => 'Error response for tax document' . $error
                 ];
             }
         }
@@ -2535,11 +2535,11 @@ class Restaurant extends ActiveRecord
 
                 //Yii::error ('Error when uploading commercial registration document: ' . $error);
 
-                $this->addError('commercial_registration', 'Error reading document' . $error);
+                $this->addError('commercial_registration', 'Error for commercial registration document' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error reading document' . $error
+                    "message" => 'Error response for commercial registration document' . $error
                 ];
             }
         }
@@ -2563,7 +2563,7 @@ class Restaurant extends ActiveRecord
 
             $response = Yii::$app->tapPayments->uploadFileToTap(
                 $tmpFile,
-                "establishment_card",
+                "commercial_registration",
                 "Establishment Card",
                 [
                     "issuing_country" => $this->country->iso
@@ -2583,11 +2583,11 @@ class Restaurant extends ActiveRecord
 
                 //Yii::error ('Error when uploading document: ' . $error);
 
-                $this->addError('establishment_card', 'Error reading document' . $error);
+                $this->addError('establishment_card', 'Error uploading establishment card document' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error reading document' . $error
+                    "message" => 'Error uploading establishment card document' . $error
                 ];
             }
         }
@@ -2631,11 +2631,11 @@ class Restaurant extends ActiveRecord
 
                 //Yii::error ('Error when uploading document: ' . $error);
 
-                $this->addError('work_permit', 'Error reading document' . $error);
+                $this->addError('work_permit', 'Error uploading work permit document' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error reading document' . $error
+                    "message" => 'Error uploading work permit document' . $error
                 ];
             }
         }
@@ -2679,11 +2679,11 @@ class Restaurant extends ActiveRecord
 
                 //Yii::error ('Error when uploading document: ' . $error);
 
-                $this->addError('residence_permit', 'Error reading document' . $error);
+                $this->addError('residence_permit', 'Error uploading residence document' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error reading document' . $error
+                    "message" => 'Error uploading residence document ' . $error
                 ];
             }
         }
@@ -2727,11 +2727,11 @@ class Restaurant extends ActiveRecord
 
                 //Yii::error ('Error when uploading IBAN document: ' . $error);
 
-                $this->addError('logo_file_id', 'Error reading logo' . $error);
+                $this->addError('logo_file_id', 'Error uploading logo' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error reading logo' . $error
+                    "message" => 'Error uploading logo' . $error
                 ];
             }
         }
@@ -2776,11 +2776,11 @@ class Restaurant extends ActiveRecord
 
                 //Yii::error ('Error when uploading IBAN document: ' . $error);
 
-                $this->addError('iban_certificate_file', 'Error reading IBAN document' . $error);
+                $this->addError('iban_certificate_file', 'Error uploading IBAN document' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error reading IBAN document' . $error
+                    "message" => 'Error uploading IBAN document' . $error
                 ];
             }
         }
@@ -2825,11 +2825,11 @@ class Restaurant extends ActiveRecord
 
                 //Yii::error ('Error when uploading authorized signature document: ' . $error);
 
-                $this->addError('authorized_signature_file', 'Error reading authorized signature document' . $error);
+                $this->addError('authorized_signature_file', 'Error uploading authorized signature document' . $error);
 
                 return [
                     "operation" => 'error',
-                    "message" => 'Error reading authorized signature document' . $error
+                    "message" => 'Error uploading authorized signature document' . $error
                 ];
             }
         }
@@ -2903,7 +2903,10 @@ class Restaurant extends ActiveRecord
             }
 
             $response = Yii::$app->tapPayments->uploadFileToTap(
-                $civilIdFrontSideTmpFile, $this->identification_file_purpose, $this->identification_title);
+                $civilIdFrontSideTmpFile,
+                $this->identification_file_purpose,
+                $this->identification_title
+            );
 
             @unlink($civilIdFrontSideTmpFile);
 
@@ -2950,7 +2953,10 @@ class Restaurant extends ActiveRecord
             }
 
             $response = Yii::$app->tapPayments->uploadFileToTap(
-                $civilIdBackSideTmpFile, $this->identification_file_purpose, $this->identification_title);
+                $civilIdBackSideTmpFile,
+                $this->identification_file_purpose,
+                $this->identification_title
+            );
 
             @unlink($civilIdBackSideTmpFile);
 
@@ -2975,6 +2981,7 @@ class Restaurant extends ActiveRecord
         }
 
         self::updateAll([
+            'establishment_card_file_id' => $this->establishment_card_file_id,
             'iban_certificate_file_id' => $this->iban_certificate_file_id,
             'authorized_signature_file_id' => $this->authorized_signature_file_id,
             'logo_file_id' => $this->logo_file_id,
