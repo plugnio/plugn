@@ -19,11 +19,11 @@ class StaffCest
 
     public function _fixtures() {
         return [
-            'locations' => BusinessLocationFixture::className(),
-            'agents' => AgentFixture::className(),
-            'agentAssignments' => AgentAssignmentFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'locations' => BusinessLocationFixture::class,
+            'agents' => AgentFixture::class,
+            'agentAssignments' => AgentAssignmentFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

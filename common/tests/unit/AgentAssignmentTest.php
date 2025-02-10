@@ -23,33 +23,30 @@ class AgentAssignmentTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'agentAssignments' => AgentAssignmentFixture::className()
+            'agentAssignments' => AgentAssignmentFixture::class
         ];
     }
 
     // tests
     public function testSomeFeature()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check agent assignment loaded',
-                AgentAssignment::find()->one()
-            )->notNull();
-        });
+        // Test fixtures loading
+        $assignment = AgentAssignment::find()->one();
+        $this->assertNotNull($assignment, 'Agent assignment should be loaded');
 
-        $this->specify('AgentAssignment model fields validation', function () {
-            $agent = new AgentAssignment;
+        // Test model validation
+        $agent = new AgentAssignment();
+        
+        // Test required fields
+        $this->assertFalse($agent->validate(['role']), 'Empty role should not be accepted');
+        $this->assertFalse($agent->validate(['agent_id']), 'Empty agent_id should not be accepted');
+        $this->assertFalse($agent->validate(['restaurant_uuid']), 'Empty restaurant_uuid should not be accepted');
 
-            //expect('should not accept empty business_location_id', $agent->validate(['business_location_id']))->false();
-            expect('should not accept empty role', $agent->validate(['role']))->false();
-            expect('should not accept empty agent_id', $agent->validate(['agent_id']))->false();
-            expect('should not accept empty restaurant_uuid', $agent->validate(['restaurant_uuid']))->false();
+        // Test invalid values
+        $agent->restaurant_uuid = 'randomString';
+        $this->assertFalse($agent->validate(['restaurant_uuid']), 'Invalid restaurant_uuid should not be accepted');
 
-            $agent->restaurant_uuid = 'randomString';
-            expect('should not accept invalid restaurant_uuid', $agent->validate(['restaurant_uuid']))->false();
-
-            $agent->agent_id = 'randomString';
-            expect('should not accept invalid agent_id', $agent->validate(['agent_id']))->false();
-
-        });
+        $agent->agent_id = 'randomString';
+        $this->assertFalse($agent->validate(['agent_id']), 'Invalid agent_id should not be accepted');
     }
 }

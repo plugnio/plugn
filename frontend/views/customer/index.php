@@ -111,7 +111,9 @@ white-space: nowrap !important;
                       'attribute' => 'customer_created_at',
                       "format" => "raw",
                       "value" => function($model) {
+                        if ($model->customer_created_at) {
                           return date('d M, Y - h:i A', strtotime($model->customer_created_at));
+                        }
                       }
                   ],
               ],

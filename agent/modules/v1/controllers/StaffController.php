@@ -209,7 +209,7 @@ class StaffController extends BaseController {
      * @return Country|array
      * @throws NotFoundHttpException
      */
-      public function actionDetail($store_uuid = null, $assignment_id) {
+      public function actionDetail($assignment_id, $store_uuid = null) {
           $this->ownerCheck();
           return $this->findModel($assignment_id);
 

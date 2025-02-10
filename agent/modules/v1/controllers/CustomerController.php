@@ -2,10 +2,8 @@
 
 namespace agent\modules\v1\controllers;
 
-use agent\models\Item;
 use Yii;
 use yii\db\Expression;
-use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use agent\models\Customer;
 use agent\models\Order;
@@ -15,9 +13,8 @@ class CustomerController extends BaseController
 {
     /**
      * Get all store's Customers
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * @param string $store_uuid
+     * @return ActiveDataProvider         
      */
     public function actionList($store_uuid = null)
     {
@@ -42,8 +39,8 @@ class CustomerController extends BaseController
 
     /**
      * Return customer detail
-     * @param type $order_uuid
-     * @return type
+     * @param string $customer_id
+     * @return Customer
      */
     public function actionDetail($customer_id)
     {
@@ -52,11 +49,11 @@ class CustomerController extends BaseController
 
     /**
      * Return a List of all customers Orders
-     * @param type $store_uuid
-     * @param type $customer_id
-     * @return type
+     * @param string $store_uuid
+     * @param string $customer_id
+     * @return ActiveDataProvider
      */
-    public function actionListAllCustomerOrders($store_uuid = null, $customer_id)
+    public function actionListAllCustomerOrders($customer_id, $store_uuid = null)
     {
         $store = Yii::$app->accountManager->getManagedAccount ($store_uuid);
 
@@ -124,7 +121,7 @@ class CustomerController extends BaseController
         header ("Content-Disposition: attachment;filename=\"customers.xlsx\"");
         header ("Cache-Control: max-age=0");
 
-        \moonland\phpexcel\Excel::export ([
+        \common\components\PhpExcel::export ([
             'isMultipleSheet' => false,
             'models' => $result,
             'columns' => [
@@ -162,9 +159,9 @@ class CustomerController extends BaseController
                                 return Yii::$app->formatter->asCurrency($data['totalSpent'], 'KWD');
                             //}
 
-                            return \Yii::$app->formatter->asDecimal($data['totalSpent'], 3);
+                           // return \Yii::$app->formatter->asDecimal($data['totalSpent'], 3);
                         } else {
-                            return \Yii::$app->formatter->asDecimal(0, 3);
+                            return Yii::$app->formatter->asDecimal(0, 3);
                         }
                     }
                 ],
@@ -219,7 +216,7 @@ class CustomerController extends BaseController
      * Finds the Customer model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $customer_id
-     * @return Item the loaded model
+     * @return Customer the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($customer_id)

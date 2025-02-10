@@ -210,7 +210,6 @@ class StoreController extends BaseController
                 $timeUnit = $deliveryZone->time_unit == 'hrs' ? 'hour' : $deliveryZone->time_unit;
                 $startDate = strtotime('+ ' . $deliveryZone->delivery_time . ' ' . $timeUnit);
 
-
                 if ($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_MIN)
                     $deliveryTime = intval($deliveryZone->delivery_time);
                 else if ($deliveryZone->time_unit == DeliveryZone::TIME_UNIT_HRS)

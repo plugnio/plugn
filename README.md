@@ -284,3 +284,60 @@ https://api-docs.tabby.ai/
 ## check 
 `sudo certbot certificates`
     
+
+# on reboot, don't forget to run this based on the environment you want to run
+ 
+ - docker-compose -f docker-compose-prod.yml -p plugn-prod-server up -d
+
+ - docker-compose -f docker-compose-dev.yml -p plugn-dev-server up -d
+
+ - docker-compose -f docker-compose-local.yml -p plugn-local-server up -d
+
+# git tag 
+
+git tag -a v2.0 -m "Version 2.0: PHP 7.4 to 8.2"
+git push origin v2.0
+git tag -l
+
+# fix migration applied but ActiveRecord/ Table column not found error getting trigger 
+`docker exec -it plugn-backend-prod /bin/bash`
+`./yii cache/flush-schema db`
+`./yii cache/flush cache`
+
+## if still not working 
+
+rm -rf /var/www/html/admin/runtime/cache
+rm -rf /var/www/html/candidate/runtime/cache
+rm -rf /var/www/html/company/runtime/cache
+rm -rf /var/www/html/console/runtime/cache
+rm -rf /var/www/html/common/runtime/cache
+rm -rf /var/www/html/staff/runtime/cache
+rm -rf /var/www/html/inspector/runtime/cache
+rm -rf /var/www/html/manager/runtime/cache
+rm -rf /var/www/html/status/runtime/cache
+rm -rf /var/www/html/verification/runtime/cache
+
+# docker container url in local 
+
+## backend 
+http://localhost:8083
+
+## store 
+http://localhost:8082 
+
+## vendor dashboard 
+http://localhost:8081
+
+## crm 
+http://localhost:8084
+
+## partner 
+http://localhost:8085
+
+## remail 
+http://localhost:8086
+
+## shortner 
+http://localhost:8087
+
+      

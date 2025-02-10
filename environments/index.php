@@ -1,5 +1,45 @@
 <?php
 return [
+    'Development[Docker]' => [
+        'path' => 'dev-krushn-docker',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'backend/web/uploads/project-files',
+            'console/runtime',
+            'partner/runtime',
+            'partner/web/assets',
+            'frontend/runtime',
+            'frontend/web/assets',
+            'frontend/web/uploads/',
+            'api/runtime',
+            'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
+        ],
+        'setExecutable' => [
+            'yii',
+            'yii_test',
+            'fixture-generate-and-load',
+            'run-tests.sh'
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'common/config/codeception-local.php',
+            'partner/config/main-local.php',
+            'frontend/config/main-local.php',
+            'api/config/main-local.php',
+            'agent/config/main-local.php',
+            'crm/config/main-local.php',
+            'shortner/config/main-local.php',
+            'remail/config/main-local.php',
+        ],
+    ],
     'Development [Krushn-PC]' => [
         'path' => 'dev-krushn-pc',
         'setWritable' => [
@@ -79,47 +119,7 @@ return [
             'remail/config/main-local.php',
         ],
     ],
-    'Development [Saoud]' => [
-        'path' => 'dev-saoud',
-        'setWritable' => [
-            'partner/runtime',
-            'partner/web/assets',
-            'backend/runtime',
-            'backend/web/assets',
-            'backend/web/uploads/project-files',
-            'console/runtime',
-            'frontend/runtime',
-            'frontend/web/assets',
-            'frontend/web/uploads/',
-            'api/runtime',
-            'api/web/assets',
-            'agent/runtime',
-            'agent/web/assets',
-            'crm/runtime',
-            'crm/web/assets',
-            'shortner/runtime',
-            'remail/runtime',
-            'remail/web/assets'
-        ],
-        'setExecutable' => [
-            'yii',
-            'yii_test',
-            'fixture-generate-and-load',
-            'run-tests.sh'
-        ],
-        'setCookieValidationKey' => [
-            'backend/config/main-local.php',
-            'common/config/codeception-local.php',
-            'partner/config/main-local.php',
-            'frontend/config/main-local.php',
-            'api/config/main-local.php',
-            'agent/config/main-local.php',
-            'crm/config/main-local.php',
-            'shortner/config/main-local.php',
-            'remail/config/main-local.php',
-        ],
-    ],
-    'Development [Docker Compose]' => [
+    'Development [Docker Compose (Old)]' => [
         'path' => 'docker-compose',
         'setWritable' => [
             'backend/runtime',
@@ -272,6 +272,45 @@ return [
             'remail/config/main-local.php',
         ],
     ],
+    'Dev-Server-Docker' => [
+        'path' => 'dev-server-docker',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'backend/web/uploads/project-files',
+            'console/runtime',
+            'partner/runtime',
+            'partner/web/assets',
+            'frontend/runtime',
+            'frontend/web/assets',
+            'frontend/web/uploads/',
+            'api/runtime',
+            'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
+        ],
+        'setExecutable' => [
+            'yii',
+            'yii_test',
+            'fixture-generate-and-load'
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'common/config/codeception-local.php',
+            'partner/config/main-local.php',
+            'frontend/config/main-local.php',
+            'api/config/main-local.php',
+            'agent/config/main-local.php',
+            'crm/config/main-local.php',
+            'shortner/config/main-local.php',
+            'remail/config/main-local.php',
+        ],
+    ],
     'Staging-Server' => [
         'path' => 'staging',
         'setWritable' => [
@@ -313,6 +352,42 @@ return [
     ],
     'Production' => [
         'path' => 'prod',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'backend/web/uploads/project-files',
+            'console/runtime',
+            'partner/runtime',
+            'partner/web/assets',
+            'frontend/runtime',
+            'frontend/web/assets',
+            'frontend/web/uploads/',
+            'api/runtime',
+            'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
+        ],
+        'setExecutable' => [
+            'yii',
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'partner/config/main-local.php',
+            'frontend/config/main-local.php',
+            'api/config/main-local.php',
+            'agent/config/main-local.php',
+            'crm/config/main-local.php',
+            'shortner/config/main-local.php',
+            'remail/config/main-local.php',
+        ],
+    ],
+    'Production-Docker' => [
+        'path' => 'prod-docker',
         'setWritable' => [
             'backend/runtime',
             'backend/web/assets',

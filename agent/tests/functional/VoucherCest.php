@@ -20,11 +20,11 @@ class VoucherCest
 
     public function _fixtures() {
         return [
-            'vouchers' => VoucherFixture::className(),
-            'agents' => AgentFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'vouchers' => VoucherFixture::class,
+            'agents' => AgentFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

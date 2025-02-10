@@ -13,10 +13,10 @@ class ZapierCest
 
     public function _fixtures() {
         return [
-            'agents' => \common\fixtures\AgentFixture::className(),
-            'agentAssignments' => \common\fixtures\AgentAssignmentFixture::className(),
-            'orders' => \common\fixtures\OrderFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className()
+            'agents' => \common\fixtures\AgentFixture::class,
+            'agentAssignments' => \common\fixtures\AgentAssignmentFixture::class,
+            'orders' => \common\fixtures\OrderFixture::class,
+            'restaurants' => \common\fixtures\RestaurantFixture::class
         ];
     }
 

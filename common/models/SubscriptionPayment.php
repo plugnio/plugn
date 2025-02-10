@@ -316,12 +316,16 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
 
         $valid_for =  $subscription->plan->valid_for;
 
-        $subscription->subscription_end_at = date(
-            'Y-m-d', strtotime(
-                date('Y-m-d H:i:s',  strtotime($subscription->subscription_start_at)) . " + $valid_for MONTHS"
-            )
-        );
-
+        if ($subscription->subscription_start_at) {
+            $subscription->subscription_end_at = date(
+                'Y-m-d',  
+                strtotime(
+                    " + $valid_for MONTHS",
+                    strtotime($subscription->subscription_start_at)
+                )
+            );
+        }
+        
         $subscription->save(false);
 
         foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent ) {
@@ -363,7 +367,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
      * @param string $source                        transaction's source
      * @param string $response_message
      */
-    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference, $response_message = null )
+    public static function updatePaymentStatus($id, $status, $destinations = null , $source = null, $reference = null, $response_message = null )
     {
         // Look for payment with same Payment Gateway Transaction ID
         $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);

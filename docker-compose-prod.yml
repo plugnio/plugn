@@ -1,118 +1,50 @@
-version: '3.2'
+version: '3.8'
+
+networks:
+  plugn-network:
+    driver: bridge
 
 services:
- 
-  #migration need to be handle manually for production 
+   
+  app:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile-nginx-prod
+    container_name: plugn-backend-prod
+    #command:
+    #  - /bin/sh
+    #  - -c
+    #  - |
+    #    sleep 5 && \
+    #    ./init --env=Dev-Server --overwrite=All && \
+    #    ./yii migrate && \
+    #    sleep 1 && \
+    #    ln -s /etc/nginx/sites-available/basic.conf /etc/nginx/sites-enabled/ && \
+    #    service nginx restart  && \
+    #    tail -f /dev/null  # Keep container running
+    ports:
+      - "80:80" #app endpoint
+    volumes:
+      - .:/var/www/html
+      #- ./nginx/basic.conf:/etc/nginx/sites-available/basic.conf
+    depends_on:
+      - redis
+      #- mysql
+    networks:
+      - plugn-network
 
-  composer-deps-prod:
-    build: backend
-    command: composer install
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      
-  # Start container to init dev environment and kill after
-  init-environment-prod:
-    build: backend
-    command: php init --env=Production --overwrite=All
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app 
-    depends_on:
-      - "composer-deps-prod"
-       
-  backend-prod:
-    build: backend
+  redis:
+    image: redis:6.2.3
     ports:
-      - 27080:80
+      #- "7777:7777"
+      - "6379:6379"
+    networks:
+      - plugn-network
+   # command:
+   #   - redis-server --port 7777
     volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-    working_dir: /app 
-    depends_on:
-      - "init-environment-prod"
+    - redis-data:/data
 
-  frontend-prod:
-    build: frontend
-    ports:
-      - 28080:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-    depends_on:
-      - "init-environment-prod"
-        
-  agent-prod:
-    build: agent
-    ports:
-      - 28081:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-    depends_on:
-      - "init-environment-prod"
-        
-  crm-prod:
-    build: crm
-    ports:
-      - 28082:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-    depends_on:
-      - "init-environment-prod"
-        
-  api-prod:
-    build: api
-    ports:
-      - 28083:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-    depends_on:
-      - "init-environment-prod"
-        
-  shortner-prod:
-    build: shortner
-    ports:
-      - 28084:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-    depends_on:
-      - "init-environment-prod"
-        
-  partner-prod:
-    build: partner
-    ports:
-      - 28085:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-    depends_on:
-      - "init-environment-prod"
-        
-  cron-prod:
-    build: cron
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
+volumes:
+  redis-data:
   

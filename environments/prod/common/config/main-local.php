@@ -104,10 +104,10 @@ return [
 
         //aws
         'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
+            'class' => \yii\symfonymailer\Mailer::class,
             'viewPath' => '@common/mail',
             'transport' => [
-                'class' => 'Swift_SmtpTransport',
+                'scheme' => 'smtp',
                 'host' => 'smtp.elasticemail.com',
                 'username' => 'no-reply@mail.plugn.site',
                 'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
@@ -118,7 +118,7 @@ return [
 /*
         //mailgun
         'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
+            'class' => \yii\symfonymailer\Mailer::class,
             'viewPath' => '@common/mail',
             'transport' => [
 
@@ -163,7 +163,7 @@ return [
         ],
         //sendgrid
         'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
+            'class' => \yii\symfonymailer\Mailer::class,
             'viewPath' => '@common/mail',
             'transport' => [
                 'class' => 'Swift_SmtpTransport',

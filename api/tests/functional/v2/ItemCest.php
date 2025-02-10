@@ -12,10 +12,10 @@ class ItemCest
     public function _fixtures()
     {
         return [
-            'items' => \common\fixtures\ItemFixture::className(),
-            'categories' => \common\fixtures\CategoryFixture::className(),
-            'categoryItems' => \common\fixtures\CategoryItemFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className()
+            'items' => \common\fixtures\ItemFixture::class,
+            'categories' => \common\fixtures\CategoryFixture::class,
+            'categoryItems' => \common\fixtures\CategoryItemFixture::class,
+            'restaurants' => \common\fixtures\RestaurantFixture::class
         ];
     }
 

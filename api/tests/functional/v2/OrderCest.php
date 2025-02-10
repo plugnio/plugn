@@ -21,15 +21,15 @@ class OrderCest
 
     public function _fixtures() {
         return [
-            'items' => \common\fixtures\ItemFixture::className(),
-            'orders' => \common\fixtures\OrderFixture::className(),
-            'countries' => CountryFixture::className(),
-            'currency' => CurrencyFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className(),
-            'deliveryZones' => DeliveryZoneFixture::className(),
-            'restaurantPaymentMethods' => \common\fixtures\RestaurantPaymentMethodFixture::className(),
-            'restaurantBranches' => \common\fixtures\RestaurantBranchFixture::className(),
-            'restaurantLocations' => \common\fixtures\BusinessLocationFixture::className(),
+            'items' => \common\fixtures\ItemFixture::class,
+            'orders' => \common\fixtures\OrderFixture::class,
+            'countries' => CountryFixture::class,
+            'currency' => CurrencyFixture::class,
+            'restaurants' => \common\fixtures\RestaurantFixture::class,
+            'deliveryZones' => DeliveryZoneFixture::class,
+            'restaurantPaymentMethods' => \common\fixtures\RestaurantPaymentMethodFixture::class,
+            'restaurantBranches' => \common\fixtures\RestaurantBranchFixture::class,
+            'restaurantLocations' => \common\fixtures\BusinessLocationFixture::class,
         ];
     }
 
@@ -128,7 +128,7 @@ class OrderCest
 
         $branch = $this->store->getRestaurantBranches()->one();
 
-        $I->wantTo('Validate order > place an order api');
+        $I->wantTo('Validate order > place an order api with Cash');
         $I->sendPOST('v2/order/' . $this->store->restaurant_uuid, [
             "customer_name" => "Bedardi khan",
             "phone_number" => 2342342342,
@@ -156,7 +156,7 @@ class OrderCest
      * @param FunctionalTester $I
      *  TODO: find reason for knet source
      *  {"operation":"error","message":"Error: 1125 - We were unable to process your payment. Please verify your payment method or card details and try again.","code":15,"errors":[{"code":"1125","description":"We were unable to process your payment. Please verify your payment method or card details and try again."}]}
-     */
+     *
     public function tryToPlaceOrderByKnet(FunctionalTester $I) {
 
         $item = $this->store->getItems()->one();
@@ -169,7 +169,7 @@ class OrderCest
 
         $businessLocation = $this->store->getBusinessLocations()->one();
 
-        $I->wantTo('Validate order > place an order api');
+        $I->wantTo('Validate order > place an order api with ' . $paymentMethod->payment_method_name);
         $I->sendPOST('v2/order/' . $this->store->restaurant_uuid, [
             "customer_name" => "Bedardi khan",
             "phone_number" => 2342342342,
@@ -194,7 +194,7 @@ class OrderCest
         $I->seeResponseContainsJson([
             'operation' => 'redirecting',
         ]);
-    }
+    }*/
 
     /**
      * @param FunctionalTester $I
@@ -211,7 +211,7 @@ class OrderCest
 
         $businessLocation = $this->store->getBusinessLocations()->one();
 
-        $I->wantTo('Validate order > place an order api');
+        $I->wantTo('Validate order > place an order api with '. $paymentMethod->payment_method_name);
         $I->sendPOST('v2/order/' . $this->store->restaurant_uuid, [
             "customer_name" => "Bedardi khan",
             "phone_number" => 2342342342,

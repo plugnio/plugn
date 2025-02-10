@@ -146,6 +146,10 @@ class TicketComment extends \yii\db\ActiveRecord
             }
         }
 
+        if(empty($toEmails)) {
+            return null;
+        }
+
         $ml = new MailLog();
         $ml->to = $toEmails[0];
         $ml->from = \Yii::$app->params['supportEmail'];

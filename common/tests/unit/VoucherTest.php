@@ -23,7 +23,7 @@ class VoucherTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'vouchers' => VoucherFixture::className()
+            'vouchers' => VoucherFixture::class
         ];
     }
 
@@ -32,20 +32,14 @@ class VoucherTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check Voucher loaded',
-                Voucher::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Voucher::find()->one(), 'Check data loaded');      
+        
+        $model = new Voucher();
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+        $this->assertFalse($model->validate(['code']), 'should not accept empty code');
 
-        $this->specify('Voucher model fields validation', function () {
-            $model = new Voucher;
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty code', $model->validate(['code']))->false();
-
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
     }
 }

@@ -2,12 +2,9 @@
 
 use common\fixtures\SubscriptionPaymentFixture;
 use common\models\SubscriptionPayment;
-use Codeception\Specify;
 
 class SubscriptionPaymentTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class SubscriptionPaymentTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'payments' => SubscriptionPaymentFixture::className()
+            'payments' => SubscriptionPaymentFixture::class
         ];
     }
 
@@ -32,25 +29,18 @@ class SubscriptionPaymentTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check Subscription Payment loaded',
-                SubscriptionPayment::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(SubscriptionPayment::find()->one(), 'Check Subscription Payment loaded');
 
-        $this->specify('SubscriptionPayment model fields validation', function () {
-            $model = new SubscriptionPayment();
+        $model = new SubscriptionPayment();
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+        $this->assertFalse($model->validate(['subscription_uuid']), 'should not accept empty subscription_uuid');
+        $this->assertFalse($model->validate(['payment_mode']), 'should not accept empty payment_mode');
+        $this->assertFalse($model->validate(['payment_amount_charged']), 'should not accept empty payment_amount_charged');
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty subscription_uuid', $model->validate(['subscription_uuid']))->false();
-            expect('should not accept empty payment_mode', $model->validate(['payment_mode']))->false();
-            expect('should not accept empty payment_amount_charged', $model->validate(['payment_amount_charged']))->false();
+        $model->subscription_uuid = 12312312313;
+        $this->assertFalse($model->validate(['subscription_uuid']), 'should not accept invalid subscription_uuid');
 
-            $model->subscription_uuid = 12312312313;
-            expect('should not accept invalid subscription_uuid', $model->validate(['subscription_uuid']))->false();
-
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
     }
 }

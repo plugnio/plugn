@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\OpeningHourFixture;
-use Codeception\Specify;
 use common\models\OpeningHour;
 
 class OpeningHourTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class OpeningHourTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'hours' => OpeningHourFixture::className()];
+            'hours' => OpeningHourFixture::class];
     }
 
     /**
@@ -31,27 +28,18 @@ class OpeningHourTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check bank discount loaded',
-                OpeningHour::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(OpeningHour::find()->one(), 'Check opening hour loaded');
 
-        $this->specify('OpeningHour model fields validation', function () {
-            $model = new OpeningHour();
+        $model = new OpeningHour();
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+        $this->assertFalse($model->validate(['day_of_week']), 'should not accept empty day_of_week');
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty day_of_week', $model->validate(['day_of_week']))->false();
+        $model->is_closed = false;
 
-            $model->is_closed = false;
+        $this->assertFalse($model->validate(['open_at']), 'should not accept empty open_at');
+        $this->assertFalse($model->validate(['close_at']), 'should not accept empty close_at');
 
-            expect('should not accept empty open_at', $model->validate(['open_at']))->false();
-            expect('should not accept empty close_at', $model->validate(['close_at']))->false();
-
-            //expect('should not accept empty is_closed', $model->validate(['is_closed']))->false();
-
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
     }
 }

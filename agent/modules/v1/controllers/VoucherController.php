@@ -180,7 +180,7 @@ class VoucherController extends BaseController
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid = null, $voucher_id)
+    public function actionDetail($voucher_id, $store_uuid = null)
     {
         $this->authCheck();
         return $this->findModel($voucher_id, $store_uuid);

@@ -74,14 +74,14 @@ class PaymentMethodController extends BaseController
                 $payments_method->restaurant_uuid = $store->restaurant_uuid;
 
                 if (!$payments_method->save()) {
-                    return self::message("error", $payments_method->getErrors());
+                    return self::message($payments_method->getErrors(), 'error');       
                 }
             }
 
-            return self::message('success', "Extension $code updated.");
+            return self::message("Extension $code updated.");
         }
 
-        return self::message('error', $model->errors);
+        return self::message($model->errors, 'error');      
     }
 
     private function _configUPayment($model, $store, $code) {
@@ -106,15 +106,15 @@ class PaymentMethodController extends BaseController
                 $payments_method->restaurant_uuid = $store->restaurant_uuid;
 
                 if (!$payments_method->save()) {
-                    return self::message("error", $payments_method->getErrors());
+                    return self::message($payments_method->getErrors(), 'error');   
                 }
             }
 
-            return self::message('success', "Extension $code updated.");
+            return self::message("Extension $code updated.");
         }
 
-        return self::message('error', $model->errors);
-    }
+        return self::message($model->errors, 'error');
+    }               
 
     private function _configStripe($model, $store, $code) {
 
@@ -139,14 +139,14 @@ class PaymentMethodController extends BaseController
                 $payments_method->restaurant_uuid = $store->restaurant_uuid;
 
                 if (!$payments_method->save()) {
-                    return self::message("error", $payments_method->getErrors());
+                    return self::message($payments_method->getErrors(), 'error');       
                 }
             }
 
-            return self::message('success', "Extension $code updated.");
+            return self::message("Extension $code updated.");
         }
 
-        return self::message('error', $model->errors);
+        return self::message($model->errors, 'error');
     }
 
 
@@ -176,7 +176,7 @@ class PaymentMethodController extends BaseController
                 $payments_method->restaurant_uuid = $store->restaurant_uuid;
 
                 if (!$payments_method->save()) {
-                    return self::message("error", $payments_method->getErrors());
+                    return self::message($payments_method->getErrors(), 'error');
                 }
             }
 
@@ -196,13 +196,13 @@ class PaymentMethodController extends BaseController
             $upload->created_by = Yii::$app->user->getId();
 
             if (!$upload->save()) {
-                return self::message("error", $upload->getErrors());
+                return self::message($upload->getErrors(), 'error');
             }
 
-            return self::message('success', "Extension $code updated.");
+            return self::message("Extension $code updated.");
         }
 
-        return self::message('error', $model->errors);
+        return self::message($model->errors, 'error');
     }
 
     /**
@@ -228,7 +228,7 @@ class PaymentMethodController extends BaseController
      * @param $message
      * @return array
      */
-    public static function message($type = "success", $message) {
+    public static function message($message, $type = "success") {
         return [
             "operation" => $type,
             "message" => is_string ($message)? Yii::t('agent', $message): $message

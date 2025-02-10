@@ -21,12 +21,12 @@ class DeliveryZoneCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'delivery-zone' => DeliveryZoneFixture::className(),
-            'businessLocations' => BusinessLocationFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agents' => AgentFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'delivery-zone' => DeliveryZoneFixture::class,
+            'businessLocations' => BusinessLocationFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

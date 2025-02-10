@@ -11,8 +11,8 @@ class SitemapCest
 
     public function _fixtures() {
         return [
-            'items' => \common\fixtures\ItemFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className()
+            'items' => \common\fixtures\ItemFixture::class,
+            'restaurants' => \common\fixtures\RestaurantFixture::class
         ];
     }
 

@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\ExtraOptionFixture;
-use Codeception\Specify;
 use common\models\ExtraOption;
 
 class ExtraOptionTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class ExtraOptionTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'options' => ExtraOptionFixture::className()];
+            'options' => ExtraOptionFixture::class];
     }
 
     /**
@@ -31,20 +28,12 @@ class ExtraOptionTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                ExtraOption::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(ExtraOption::find()->one(), 'Check data loaded');
 
-        $this->specify('ExtraOption model fields validation', function () {
-            $model = new ExtraOption();
+        $model = new ExtraOption();
+        $this->assertFalse($model->validate(['extra_option_name']), 'should not accept empty extra_option_name');
 
-            //expect('should not accept empty option_id', $model->validate(['option_id']))->false();
-            expect('should not accept empty extra_option_name', $model->validate(['extra_option_name']))->false();
-
-            $model->option_id = 12312312313;
-            expect('should not accept invalid option_id', $model->validate(['option_id']))->false();
-        });
+        $model->option_id = 12312312313;
+        $this->assertFalse($model->validate(['option_id']), 'should not accept invalid option_id');
     }
 }

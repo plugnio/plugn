@@ -1,13 +1,9 @@
 <?php namespace common\tests;
 
 use common\fixtures\CustomerVoucherFixture;
-use Codeception\Specify;
 use common\models\CustomerVoucher;
-
 class CustomerVoucherTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +19,7 @@ class CustomerVoucherTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'customerVouchers' => CustomerVoucherFixture::className()];
+            'customerVouchers' => CustomerVoucherFixture::class];
     }
 
     /**
@@ -31,23 +27,16 @@ class CustomerVoucherTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                CustomerVoucher::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(CustomerVoucher::find()->one(), 'Check data loaded');
 
-        $this->specify('CustomerVoucher model fields validation', function () {
-            $model = new CustomerVoucher();
+        $model = new CustomerVoucher();
+        $this->assertFalse($model->validate(['customer_id']), 'should not accept empty customer_id');
+        $this->assertFalse($model->validate(['voucher_id']), 'should not accept empty voucher_id');
 
-            expect('should not accept empty customer_id', $model->validate(['customer_id']))->false();
-            expect('should not accept empty voucher_id', $model->validate(['voucher_id']))->false();
+        $model->customer_id = 12312312313;
+        $this->assertFalse($model->validate(['customer_id']), 'should not accept invalid customer_id');
 
-            $model->customer_id = 12312312313;
-            expect('should not accept invalid customer_id', $model->validate(['customer_id']))->false();
-
-            $model->voucher_id = 12312312313;
-            expect('should not accept invalid voucher_id', $model->validate(['voucher_id']))->false();
-        });
+        $model->voucher_id = 12312312313;
+        $this->assertFalse($model->validate(['voucher_id']), 'should not accept invalid voucher_id');
     }
 }

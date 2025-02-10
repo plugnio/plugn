@@ -19,11 +19,11 @@ class AuthCest
 
     public function _fixtures() {
         return [
-            'country' => CountryFixture::className(),
-            'currencies' => CurrencyFixture::className(),
-            'customers' => CustomerFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'customerToken' => CustomerTokenFixture::className()
+            'country' => CountryFixture::class,
+            'currencies' => CurrencyFixture::class,
+            'customers' => CustomerFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'customerToken' => CustomerTokenFixture::class
         ];
     }
 

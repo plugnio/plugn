@@ -312,7 +312,7 @@ $this->registerCss("
                                                        <?php
                                                          foreach ($models as $index => $model) {
 
-                                                             if ($model->day_of_week == $dayOfWeek) {
+                                                             if ($model->day_of_week == $dayOfWeek && $model->open_at && $model->close_at) {
                                                                  ?>
 
                                                                      <div>

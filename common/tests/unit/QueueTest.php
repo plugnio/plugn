@@ -23,7 +23,7 @@ class QueueTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'queues' => QueueFixture::className()
+            'queues' => QueueFixture::class
         ];
     }
 
@@ -32,19 +32,15 @@ class QueueTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Queue::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Queue::find()->one(), 'Check data loaded');
 
-        $this->specify('Queue model fields validation', function () {
+       // $this->specify('Queue model fields validation', function () {
             $model = new Queue();
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
 
             $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
+       // });
     }
 }

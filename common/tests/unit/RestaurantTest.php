@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\RestaurantFixture;
-use Codeception\Specify;
 use common\models\Restaurant;
 
 class RestaurantTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class RestaurantTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'restaurants' => RestaurantFixture::className()
+            'restaurants' => RestaurantFixture::class
         ];
     }
 
@@ -32,29 +29,22 @@ class RestaurantTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check Restaurant loaded',
-                Restaurant::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Restaurant::find()->one(), 'Check Restaurant loaded');
 
-        $this->specify('Restaurant model fields validation', function () {
-            $model = new Restaurant();
+        $model = new Restaurant();
+        $this->assertFalse($model->validate(['name']), 'should not accept empty name');
+        $this->assertFalse($model->validate(['restaurant_email']), 'should not accept empty restaurant_email');
 
-            expect('should not accept empty name', $model->validate(['name']))->false();
-            expect('should not accept empty restaurant_email', $model->validate(['restaurant_email']))->false();
+        $model->restaurant_email = 'randomString';
+        $this->assertFalse($model->validate(['restaurant_email']), 'should not accept invalid restaurant_email');
 
-            $model->restaurant_email = 'randomString';
-            expect('should not accept invalid restaurant_email', $model->validate(['restaurant_email']))->false();
+        $model->restaurant_email = 'demo@admin.com';
+        $this->assertTrue($model->validate(['restaurant_email']), 'should accept valid restaurant_email');
 
-            $model->restaurant_email = 'demo@admin.com';
-            expect('should accept valid restaurant_email', $model->validate(['restaurant_email']))->true();
+        $model->country_id = 12312312313;
+        $this->assertFalse($model->validate(['country_id']), 'should not accept invalid country_id');
 
-            $model->country_id = 12312312313;
-            expect('should not accept invalid country_id', $model->validate(['country_id']))->false();
-
-            $model->currency_id = 12312312313;
-            expect('should not accept invalid currency_id', $model->validate(['currency_id']))->false();
-        });
+        $model->currency_id = 12312312313;
+        $this->assertFalse($model->validate(['currency_id']), 'should not accept invalid currency_id');
     }
 }

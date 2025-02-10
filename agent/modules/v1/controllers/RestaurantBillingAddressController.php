@@ -116,7 +116,7 @@ class RestaurantBillingAddressController extends BaseController
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid = null, $rba_uuid)
+    public function actionDetail($rba_uuid, $store_uuid = null)
     {
         return $this->findModel ($rba_uuid, $store_uuid);
     }

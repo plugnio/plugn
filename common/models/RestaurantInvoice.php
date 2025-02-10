@@ -149,7 +149,8 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
      */
     private static function getUniqueInvoiceNumber($length = 6)
     {
-        $uuid = \ShortCode\Random::get($length);
+        $uuid = Yii::$app->security->generateRandomString ($length);
+        //\ShortCode\Random::get($length);
 
         $isNotUnique = static::find()->where(['invoice_number' => $uuid])->exists();
 

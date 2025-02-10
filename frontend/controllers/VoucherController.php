@@ -136,8 +136,9 @@ class VoucherController extends Controller
     {
         $model = $this->findModel($id, $storeUuid);
 
-        if($model->valid_from && $model->valid_until)
+        if($model->valid_from && $model->valid_until) {
           $model->duration =  date('Y-m-d', strtotime( $model->valid_from ))  . ' - '. date('Y-m-d', strtotime( $model->valid_until ));
+        }
 
         if ($model->load(Yii::$app->request->post())) {
 

@@ -147,7 +147,7 @@ class PaymentController extends Controller
         header("Content-Disposition: attachment;filename=\"payments.xlsx\"");
         header("Cache-Control: max-age=0");
 
-        \moonland\phpexcel\Excel::export([
+        \common\components\PhpExcel::export([
             'isMultipleSheet' => false,
             'models' => $dataProvider->query->all(),
             'columns' => [

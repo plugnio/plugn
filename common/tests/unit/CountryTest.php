@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\CountryFixture;
-use Codeception\Specify;
 use common\models\Country;
 
 class CountryTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class CountryTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'bankDiscounts' => CountryFixture::className()];
+            'bankDiscounts' => CountryFixture::class];
     }
 
     /**
@@ -31,16 +28,9 @@ class CountryTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Country::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Country::find()->one(), 'Check data loaded');
 
-        $this->specify('Country model fields validation', function () {
-            $model = new Country;
-
-            expect('should not accept empty country_name', $model->validate(['country_name']))->false();
-        });
+        $model = new Country();
+        $this->assertFalse($model->validate(['country_name']), 'should not accept empty country_name');
     }
 }
