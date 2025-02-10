@@ -848,14 +848,26 @@ class AuthController extends BaseController {
 
         $response = Agent::verifyEmail($email, $code);
 
-        if ($response['success'] == false) {
+        if (!$response['success']) {
+            //add entry for invalid attempt
+
+            $model = new AgentEmailVerifyAttempt;
+            $model->code = $code;
+            $model->agent_email = $email;
+            $model->ip_address = Yii::$app->getRequest()->getUserIP();
+            $model->save();
+
+            /*return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'Invalid email verification code.')
+            ];*/
+
             return [
                 'operation' => 'error',
                 'message' => $response['message']
             ];
         }
 
-        if ($response['success'] == true) {
             //remove old email verification attempts
 
             AgentEmailVerifyAttempt::deleteAll([
@@ -869,21 +881,6 @@ class AuthController extends BaseController {
             //$agent->save(false);
 
             return $this->_loginResponse($response['data']);
-            
-        } else {
-            //add entry for invalid attempt
-
-            $model = new AgentEmailVerifyAttempt;
-            $model->code = $code;
-            $model->agent_email = $email;
-            $model->ip_address = Yii::$app->getRequest()->getUserIP();
-            $model->save();
-
-            return [
-                'operation' => 'error',
-                'message' => Yii::t('agent', 'Invalid email verification code.')
-            ];
-        }
     }
 
     /**

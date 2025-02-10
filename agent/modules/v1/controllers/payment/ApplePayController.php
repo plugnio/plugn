@@ -161,7 +161,7 @@ class ApplePayController extends BaseController
                     return [
                         'operation' => 'success',
                         'redirect' => $paymentRecord->addon->name . ' has been activated'
-                    ];;
+                    ];
                 } else {
                     return [
                         'operation' => 'error',

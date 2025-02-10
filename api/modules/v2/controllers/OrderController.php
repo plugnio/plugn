@@ -367,6 +367,7 @@ class OrderController extends BaseController
 
                         $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id']) ? $extraOption['extra_option_id'] : null;
                         $orderItemExtraOption->option_id = isset($extraOption['option_id']) ? $extraOption['option_id'] : null;
+
                         $orderItemExtraOption->qty = (int)$item["qty"];
 
                         if (!$orderItemExtraOption->save()) {

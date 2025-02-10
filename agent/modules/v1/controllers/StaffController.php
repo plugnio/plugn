@@ -3,7 +3,7 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\rest\Controller;
-use yii\data\ActiveDataProvider;;
+use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\AgentAssignment;
 use agent\models\Agent;

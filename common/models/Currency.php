@@ -140,7 +140,7 @@ class Currency extends \yii\db\ActiveRecord
 
                 $currency = substr($label, 3);
 
-                if (strlen($currency) > 3) {
+                if (!$currency || strlen($currency) > 3) {
                     continue;
                 }
 
