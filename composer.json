@@ -40,7 +40,8 @@
         "kartik-v/yii2-widget-timepicker": "^1.0",
         "kartik-v/yii2-date-range": "^1.7",
         "kartik-v/yii2-widget-fileinput": "^1.1",
-        "borales/yii2-phone-input": "^0.3.0"
+        "borales/yii2-phone-input": "^0.3.0",
+        "understeam/yii2-slack": "^0.3.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "^2.1",

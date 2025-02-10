@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5a0df9af5a5f970f15b13c647596d686",
+    "content-hash": "472b7bc5652af0b78f60f7ba585b2b81",
     "packages": [
         {
             "name": "auth0/auth0-php",
@@ -6396,6 +6396,42 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.3.0"
             },
             "time": "2024-12-21T16:25:41+00:00"
+        },
+        {
+            "name": "understeam/yii2-slack",
+            "version": "v0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Understeam/yii2-slack.git",
+                "reference": "dd54b48c44e6ac644c346b28a8ca9b79909b9c50"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Understeam/yii2-slack/zipball/dd54b48c44e6ac644c346b28a8ca9b79909b9c50",
+                "reference": "dd54b48c44e6ac644c346b28a8ca9b79909b9c50",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "yiisoft/yii2": ">=2.0.0",
+                "yiisoft/yii2-httpclient": "^2.0.0"
+            },
+            "type": "extension",
+            "autoload": {
+                "psr-4": {
+                    "understeam\\slack\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-v3"
+            ],
+            "description": "Yii2 slack client based on GuzzleHttp library",
+            "support": {
+                "issues": "https://github.com/understeam/yii2-slack/issues",
+                "source": "https://github.com/understeam/yii2-slack"
+            },
+            "time": "2016-09-23T08:50:27+00:00"
         },
         {
             "name": "yiisoft/yii2",
