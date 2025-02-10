@@ -2710,7 +2710,7 @@ class Restaurant extends ActiveRecord
 
             $response = Yii::$app->tapPayments->uploadFileToTap(
                 $tmpFile,
-                "identity_document",
+                "business_logo",
                 "Business Logo"
             );
 
