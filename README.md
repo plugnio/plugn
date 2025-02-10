@@ -340,4 +340,11 @@ http://localhost:8086
 ## shortner 
 http://localhost:8087
 
+# MySql requirement 
+
+## for stats 
+
+`SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));`
+
+
       
