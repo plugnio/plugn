@@ -36,14 +36,6 @@ class CronController extends \yii\console\Controller
 {
     public function actionIndex()
     {
-        $title = "test title";
-        $message = "test message";
-        $response = "test response";
-
-        $store = Restaurant::find()->one();
-
-        $store->notifyTapError($title, $message, $response);
-
         //UPDATE agent SET deleted=1 where agent_email_verification=0 AND DATE(agent_created_at) > DATE('2023-11-20');
 
         /*Yii::$app->mailer->compose ([
