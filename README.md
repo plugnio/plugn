@@ -346,5 +346,25 @@ http://localhost:8087
 
 `SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));`
 
+# to login to docker containers 
 
-      
+## prod server
+docker exec -it plugn-backend-prod /bin/bash
+docker exec -it plugn-prod-server_mysql_1 /bin/bash
+docker exec -it plugn-prod-server_redis_1 /bin/bash
+
+## dev server 
+docker exec -it plugn-backend-dev /bin/bash
+docker exec -it plugn-dev-server_mysql_1 /bin/bash
+docker exec -it plugn-dev-server_redis_1 /bin/bash
+
+### setup database 
+
+`mysql -u root -pplugn;`
+`SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));`
+
+# Attention 
+
+- need to check if cron is running or not 
+- first time running dev server, need to wait for mysql to be ready, then only start the main container 
+ 

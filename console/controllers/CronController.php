@@ -1141,6 +1141,8 @@ class CronController extends \yii\console\Controller
      */
     public function actionMinute() {
 
+        \Yii::$app->redis->set("lastCronRun", date("Y-m-d H:i:s"));
+      
         $query = VendorCampaign::find()
             ->andWhere(['status' => VendorCampaign::STATUS_READY]);
 

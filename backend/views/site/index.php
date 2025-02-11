@@ -64,6 +64,15 @@ $this->title = 'Admin dashboard';
     <div class="body-content">
 
         <div class="row">
+        
+
+        <div class="col-12 col-lg-4">
+                <h2>Last cron run</h2>
+
+                <span class="badge badge-light"><?= $lastCronRun ?></span>
+
+            </div>
+
             <div class="col-12 col-lg-4">
                 <h2>Stores</h2>
 
