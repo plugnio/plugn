@@ -83,7 +83,7 @@ class StripeController extends BaseController
             // Create a PaymentIntent with amount and currency
             $paymentIntent = \Stripe\PaymentIntent::create([
                 'amount' => $payment->payment_amount_charged * pow(10, $currency->decimal_place),
-                'currency' => strtolower($currency->code),
+                'currency' =>$currency->code? strtolower($currency->code): 'kwd',
                 "payment_method_types" => ["card"],
                 /*'automatic_payment_methods' => [
                     'enabled' => true,
