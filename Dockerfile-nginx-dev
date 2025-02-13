@@ -15,8 +15,10 @@ RUN apt-get update && apt-get install -y \
      #curl \
      #gh \
      #composer \
+     libicu-dev \
+     && docker-php-ext-configure intl \
      && docker-php-ext-configure gd --with-freetype --with-jpeg \
-     && docker-php-ext-install gd pdo pdo_mysql zip opcache exif 
+     && docker-php-ext-install gd pdo pdo_mysql zip opcache exif intl
 
 # Install Imagick PHP extension
 #RUN apt-get install -y libmagickwand-dev \
@@ -48,22 +50,22 @@ RUN apt-get update && apt-get install -y \
 #RUN ln -sf /etc/nginx/conf.d/development.conf /etc/nginx/sites-enabled/
 #RUN ln -sf /etc/nginx/conf.d/basic.conf /etc/nginx/sites-enabled/
 
-RUN ln -s /var/www/html ~/www
+RUN ln -s /home/ubuntu/plugn ~/www
 
 # Set working directory in the container
-WORKDIR /var/www/html
+WORKDIR /home/ubuntu/plugn
 
 # Copy application files to the container
-COPY . /var/www/html
+COPY . /home/ubuntu/plugn
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set permissions for the web server
-#RUN chown -R www-data:www-data /var/www/html \
-RUN chmod -R 775 /var/www/html
+#RUN chown -R www-data:www-data /home/ubuntu/plugn \
+RUN chmod -R 775 /home/ubuntu/plugn
 
-RUN cd /var/www/html
+RUN cd /home/ubuntu/plugn
 
 #RUN composer install 
 

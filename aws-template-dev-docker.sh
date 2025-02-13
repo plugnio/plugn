@@ -15,9 +15,9 @@ sudo usermod -aG docker ubuntu
 apt install -y openssh-clients
 ps -auxc | grep ssh-agent
 eval $(ssh-agent)
-sudo mkdir -p /var/www/html
+sudo mkdir -p /home/ubuntu/plugn
 sudo chmod 2775 /var/www
-cd /var/www/html
+cd /home/ubuntu/plugn
 
 echo "github private key" > ~/.ssh/github
 chmod go-rw ~/.ssh/github
@@ -27,12 +27,12 @@ echo "github public key" > ~/.ssh/github.pub
 ssh-add ~/.ssh/github
 ssh-keyscan github.com >> ~/.ssh/known_hosts
 apt install -y git
-git clone git@github.com:plugnio/plugn.git /var/www/html
+git clone git@github.com:plugnio/plugn.git /home/ubuntu/plugn
 #cd ./plugn
-cd /var/www/html
+cd /home/ubuntu/plugn
 git remote add git@github.com:plugnio/plugn.git
 git checkout develop
-git config --global --add safe.directory /var/www/html
+git config --global --add safe.directory /home/ubuntu/plugn
 
 find /var/www -type d -exec chmod 2775 {} \;
 find /var/www -type f -exec chmod 0664 {} \;

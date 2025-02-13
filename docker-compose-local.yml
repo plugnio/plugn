@@ -47,7 +47,7 @@ services:
       - "8086:8086" #remail endpoint
       - "8087:8087" #shortner endpoint
     volumes:
-      - .:/var/www/html
+      - .:/home/ubuntu/plugn
       #- ./nginx/basic.conf:/etc/nginx/sites-available/basic.conf
     depends_on:
       - redis

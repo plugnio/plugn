@@ -65,3 +65,6 @@ phpunit.phar
 composer.lock
 
 dump.rdb
+partner/config/main-local.php
+partner/web/index-test.php
+partner/web/index.php

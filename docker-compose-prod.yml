@@ -25,7 +25,7 @@ services:
     ports:
       - "80:80" #app endpoint
     volumes:
-      - .:/var/www/html
+      - .:/home/ubuntu/plugn
       #- ./nginx/basic.conf:/etc/nginx/sites-available/basic.conf
     depends_on:
       - redis

@@ -306,16 +306,16 @@ git tag -l
 
 ## if still not working 
 
-rm -rf /var/www/html/admin/runtime/cache
-rm -rf /var/www/html/candidate/runtime/cache
-rm -rf /var/www/html/company/runtime/cache
-rm -rf /var/www/html/console/runtime/cache
-rm -rf /var/www/html/common/runtime/cache
-rm -rf /var/www/html/staff/runtime/cache
-rm -rf /var/www/html/inspector/runtime/cache
-rm -rf /var/www/html/manager/runtime/cache
-rm -rf /var/www/html/status/runtime/cache
-rm -rf /var/www/html/verification/runtime/cache
+rm -rf /home/ubuntu/plugn/admin/runtime/cache
+rm -rf /home/ubuntu/plugn/candidate/runtime/cache
+rm -rf /home/ubuntu/plugn/company/runtime/cache
+rm -rf /home/ubuntu/plugn/console/runtime/cache
+rm -rf /home/ubuntu/plugn/common/runtime/cache
+rm -rf /home/ubuntu/plugn/staff/runtime/cache
+rm -rf /home/ubuntu/plugn/inspector/runtime/cache
+rm -rf /home/ubuntu/plugn/manager/runtime/cache
+rm -rf /home/ubuntu/plugn/status/runtime/cache
+rm -rf /home/ubuntu/plugn/verification/runtime/cache
 
 # docker container url in local 
 
