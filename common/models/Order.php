@@ -844,7 +844,7 @@ class Order extends \yii\db\ActiveRecord
                 'host' => $host,
                 'username' => $username,
                 'password' => $password,
-                'port' => $port,
+                'port' => (int) $port,
                 'encryption' => $encryption
             ]);
         }
