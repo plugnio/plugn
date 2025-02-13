@@ -6,7 +6,6 @@ use agent\models\PaymentMethod;
 use api\models\Item;
 use borales\extensions\phoneInput\PhoneInputBehavior;
 use Cloudinary\Error;
-use Swift_TransportException;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -1213,8 +1212,12 @@ class Restaurant extends ActiveRecord
 
         try {
             $mailer->send();
-        } catch (Swift_TransportException $e) {
-            Yii::error($e->getMessage(), "email");
+        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+            // Handle email transport-specific exceptions
+            Yii::error( "Failed to send email: " . $e->getMessage());
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            Yii::error( "An error occurred: " . $e->getMessage());
         }
 
         return self::message("Our customer service agent will contact you soon!");
@@ -1293,17 +1296,25 @@ class Restaurant extends ActiveRecord
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
-            } catch (Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
-            }
+                } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                    // Handle email transport-specific exceptions
+                    Yii::error( "Failed to send email: " . $e->getMessage());
+                } catch (\Exception $e) {
+                    // Handle any other exceptions
+                    Yii::error( "An error occurred: " . $e->getMessage());
+                }
         }
 
         if ($this->restaurant_email_notification && $this->restaurant_email) {
             try {
                 $mailer->setTo($this->restaurant_email)
                     ->send();
-            } catch (Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
+            } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                // Handle email transport-specific exceptions
+                Yii::error( "Failed to send email: " . $e->getMessage());
+            } catch (\Exception $e) {
+                // Handle any other exceptions
+                Yii::error( "An error occurred: " . $e->getMessage());
             }
         }
 
@@ -1387,18 +1398,26 @@ class Restaurant extends ActiveRecord
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
-            } catch (Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
-            }
+                } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                    // Handle email transport-specific exceptions
+                    Yii::error( "Failed to send email: " . $e->getMessage());
+                } catch (\Exception $e) {
+                    // Handle any other exceptions
+                    Yii::error( "An error occurred: " . $e->getMessage());
+                }
         }
 
         if ($this->restaurant_email_notification && $this->restaurant_email) {
             try {
                 $mailer->setTo($this->restaurant_email)
                     ->send();
-            } catch (Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
-            }
+                } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                    // Handle email transport-specific exceptions
+                    Yii::error( "Failed to send email: " . $e->getMessage());
+                } catch (\Exception $e) {
+                    // Handle any other exceptions
+                    Yii::error( "An error occurred: " . $e->getMessage());
+                }
         }
 
         //mark store as notified
@@ -1443,18 +1462,26 @@ class Restaurant extends ActiveRecord
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
-            } catch (Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
-            }
+                } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                    // Handle email transport-specific exceptions
+                    Yii::error( "Failed to send email: " . $e->getMessage());
+                } catch (\Exception $e) {
+                    // Handle any other exceptions
+                    Yii::error( "An error occurred: " . $e->getMessage());
+                }
         }
 
         if ($this->restaurant_email_notification && $this->restaurant_email) {
             try {
                 $mailer->setTo($agentAssignment->agent->agent_email)
                     ->send();
-            } catch (Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
-            }
+                } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                    // Handle email transport-specific exceptions
+                    Yii::error( "Failed to send email: " . $e->getMessage());
+                } catch (\Exception $e) {
+                    // Handle any other exceptions
+                    Yii::error( "An error occurred: " . $e->getMessage());
+                }
         }
     }
 
@@ -1698,8 +1725,12 @@ class Restaurant extends ActiveRecord
 
         try {
             $mailer->send();
-        } catch (Swift_TransportException $e) {
-            Yii::error($e->getMessage(), "email");
+        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+            // Handle email transport-specific exceptions
+            Yii::error( "Failed to send email: " . $e->getMessage());
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            Yii::error( "An error occurred: " . $e->getMessage());
         }
     }
 
@@ -3064,8 +3095,12 @@ class Restaurant extends ActiveRecord
 
         try {
             $mailer->send();
-        } catch (Swift_TransportException $e) {
-            Yii::error($e->getMessage(), "email");
+        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+            // Handle email transport-specific exceptions
+            Yii::error( "Failed to send email: " . $e->getMessage());
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            Yii::error( "An error occurred: " . $e->getMessage());
         }
     }
 
@@ -3099,8 +3134,12 @@ class Restaurant extends ActiveRecord
 
         try {
             $mailer->send();
-        } catch (Swift_TransportException $e) {
-            Yii::error($e->getMessage(), "email");
+        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+            // Handle email transport-specific exceptions
+            Yii::error( "Failed to send email: " . $e->getMessage());
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            Yii::error( "An error occurred: " . $e->getMessage());
         }
     }
 
@@ -3165,8 +3204,12 @@ class Restaurant extends ActiveRecord
 
         try {
             $mailer->send();
-        } catch (Swift_TransportException $e) {
-            Yii::error($e->getMessage(), "email");
+        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+            // Handle email transport-specific exceptions
+            Yii::error( "Failed to send email: " . $e->getMessage());
+        } catch (\Exception $e) {
+            // Handle any other exceptions
+            Yii::error( "An error occurred: " . $e->getMessage());
         }
     }
 
@@ -5296,8 +5339,12 @@ class Restaurant extends ActiveRecord
 
                         try {
                             $weeklyStoreSummaryEmail->send();
-                        } catch (Swift_TransportException $e) {
-                            Yii::error($e->getMessage(), "email");
+                        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                            // Handle email transport-specific exceptions
+                            Yii::error( "Failed to send email: " . $e->getMessage());
+                        } catch (\Exception $e) {
+                            // Handle any other exceptions
+                            Yii::error( "An error occurred: " . $e->getMessage());
                         }
                     }
 

@@ -879,8 +879,12 @@ class Order extends \yii\db\ActiveRecord
 
             try {
                 $mailer->send();
-            } catch (\Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
+            } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                // Handle email transport-specific exceptions
+                Yii::error( "Failed to send email: " . $e->getMessage());
+            } catch (\Exception $e) {
+                // Handle any other exceptions
+                Yii::error( "An error occurred: " . $e->getMessage());
             }
         }
 
@@ -914,8 +918,12 @@ class Order extends \yii\db\ActiveRecord
                 try {
                     $mailer->send();
                     $emailSentTo[] = $agentAssignment->agent->agent_email;
-                } catch (\Swift_TransportException $e) {
-                    Yii::error($e->getMessage(), "email");
+                } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                    // Handle email transport-specific exceptions
+                    Yii::error( "Failed to send email: " . $e->getMessage());
+                } catch (\Exception $e) {
+                    // Handle any other exceptions
+                    Yii::error( "An error occurred: " . $e->getMessage());
                 }
             }
         }
@@ -948,8 +956,12 @@ class Order extends \yii\db\ActiveRecord
 
             try {
                 $mailer->send();
-            } catch (\Swift_TransportException $e) {
-                Yii::error($e->getMessage(), "email");
+            } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                // Handle email transport-specific exceptions
+                Yii::error( "Failed to send email: " . $e->getMessage());
+            } catch (\Exception $e) {
+                // Handle any other exceptions
+                Yii::error( "An error occurred: " . $e->getMessage());
             }
         }
     }

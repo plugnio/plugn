@@ -306,8 +306,12 @@ class CronController extends \yii\console\Controller
 
                     try {
                         $mailer->send();
-                    } catch (\Swift_TransportException $e) {
-                        Yii::error($e->getMessage(), "email");
+                    } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                        // Handle email transport-specific exceptions
+                        Yii::error( "Failed to send email: " . $e->getMessage());
+                    } catch (\Exception $e) {
+                        // Handle any other exceptions
+                        Yii::error( "An error occurred: " . $e->getMessage());
                     }
                 }
             }
@@ -365,8 +369,12 @@ class CronController extends \yii\console\Controller
 
                     try {
                         $mailer->send();
-                    } catch (\Swift_TransportException $e) {
-                        Yii::error($e->getMessage(), "email");
+                    } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                        // Handle email transport-specific exceptions
+                        Yii::error( "Failed to send email: " . $e->getMessage());
+                    } catch (\Exception $e) {
+                        // Handle any other exceptions
+                        Yii::error( "An error occurred: " . $e->getMessage());
                     }
                 }
 
@@ -417,8 +425,12 @@ class CronController extends \yii\console\Controller
 
                     try {
                         $mailer->send();
-                    } catch (\Swift_TransportException $e) {
-                        Yii::error($e->getMessage(), "email");
+                    } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                        // Handle email transport-specific exceptions
+                        Yii::error( "Failed to send email: " . $e->getMessage());
+                    } catch (\Exception $e) {
+                        // Handle any other exceptions
+                        Yii::error( "An error occurred: " . $e->getMessage());
                     }
                 }
 
@@ -532,8 +544,12 @@ class CronController extends \yii\console\Controller
                         if (!$result)
                             Yii::error('[Error while sending email]' . json_encode($result), __METHOD__);
 
-                    } catch (\Swift_TransportException $e) {
-                        Yii::error($e->getMessage(), "email");
+                    } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                        // Handle email transport-specific exceptions
+                        Yii::error( "Failed to send email: " . $e->getMessage());
+                    } catch (\Exception $e) {
+                        // Handle any other exceptions
+                        Yii::error( "An error occurred: " . $e->getMessage());
                     }
                 }
 
@@ -611,8 +627,12 @@ class CronController extends \yii\console\Controller
                             $subscription->save(false);
                         }
 
-                    } catch (\Swift_TransportException $e) {
-                        Yii::error($e->getMessage(), "email");
+                    } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                        // Handle email transport-specific exceptions
+                        Yii::error( "Failed to send email: " . $e->getMessage());
+                    } catch (\Exception $e) {
+                        // Handle any other exceptions
+                        Yii::error( "An error occurred: " . $e->getMessage());
                     }
 
                 }
@@ -1095,8 +1115,12 @@ class CronController extends \yii\console\Controller
 
                         try {
                             $mailer->send();
-                        } catch (\Swift_TransportException $e) {
-                            Yii::error($e->getMessage(), "email");
+                        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                            // Handle email transport-specific exceptions
+                            Yii::error( "Failed to send email: " . $e->getMessage());
+                        } catch (\Exception $e) {
+                            // Handle any other exceptions
+                            Yii::error( "An error occurred: " . $e->getMessage());
                         }
                     }
                 }
