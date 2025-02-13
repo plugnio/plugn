@@ -840,7 +840,7 @@ class Order extends \yii\db\ActiveRecord
                 \Yii::$app->params['noReplyEmail']: $this->restaurant->restaurant_email;
 
             \Yii::$app->mailer->setTransport([
-                'class' => 'Swift_SmtpTransport',
+                'scheme' => 'smtp',
                 'host' => $host,
                 'username' => $username,
                 'password' => $password,
