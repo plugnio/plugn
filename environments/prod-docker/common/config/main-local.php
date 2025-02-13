@@ -106,7 +106,7 @@ return [
                 'host' => 'smtp.elasticemail.com',
                 'username' => 'no-reply@mail.plugn.site',
                 'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
-                'port' => '2525',
+                'port' => 2525,
                 'encryption' => 'tls'
             ],
         ],
