@@ -78,10 +78,10 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                     <?= $model->area_id && $model->floor != null ? 'Floor ' . $model->floor : ''?>
                   </p>
                   <p class="card-text mb-25"  style="display: contents">
-                    <?=  $model->area_id && $model->apartment != null  && strtolower($model->unit_type) == Order::UNIT_TYPE_APARTMENT ? 'Apartment No. ' . $model->apartment : ''?>
+                    <?=  $model->area_id && $model->apartment != null  && $model->unit_type && strtolower($model->unit_type) == Order::UNIT_TYPE_APARTMENT ? 'Apartment No. ' . $model->apartment : ''?>
                   </p>
                   <p class="card-text mb-25"  style="display: contents">
-                    <?=  $model->area_id && $model->office != null && strtolower($model->unit_type) == Order::UNIT_TYPE_OFFICE ? 'Office No. ' . $model->office : ''?>
+                    <?=  $model->area_id && $model->office != null && $model->unit_type && strtolower($model->unit_type) == Order::UNIT_TYPE_OFFICE ? 'Office No. ' . $model->office : ''?>
                   </p>
                   <?php if ($model->area_id) { ?>
                     <p class="card-text mb-25"  style="display: block">
@@ -99,7 +99,7 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                       <?= $model->area_id && $model->avenue ? 'Avenue ' . $model->avenue : ''; ?>
                     </p>
                     <p class="card-text mb-25"  style="display: contents">
-                      <?= $model->area_id ? (strtolower($model->unit_type) == Order::UNIT_TYPE_HOUSE ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
+                      <?= $model->area_id ? ($model->unit_type && strtolower($model->unit_type) == Order::UNIT_TYPE_HOUSE ? 'House No. ' : 'Building: ') . $model->house_number :  ''  ?>
                     </p>
                     <p class="card-text mb-25" style="display: block">
                       <?= $model->address_1 ? $model->address_1 : ''  ?>

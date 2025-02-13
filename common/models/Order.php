@@ -274,18 +274,18 @@ class Order extends \yii\db\ActiveRecord
             }, 'skipOnError' => false, 'skipOnEmpty' => false],
 */
             [['floor'], 'required', 'when' => function ($model) {
-                return strtolower($model->unit_type) == self::UNIT_TYPE_APARTMENT &&
+                return $model->unit_type && strtolower($model->unit_type) == self::UNIT_TYPE_APARTMENT &&
                     $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
             }],//(strtolower($model->unit_type) == self::UNIT_TYPE_OFFICE ||
 
             [['office'], 'required', 'when' => function ($model) {
-                return strtolower($model->unit_type) == self::UNIT_TYPE_OFFICE &&
+                return $model->unit_type && strtolower($model->unit_type) == self::UNIT_TYPE_OFFICE &&
                     $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
             }
             ],
 
             [['apartment'], 'required', 'when' => function ($model) {
-                return strtolower($model->unit_type) == self::UNIT_TYPE_APARTMENT &&
+                return $model->unit_type && strtolower($model->unit_type) == self::UNIT_TYPE_APARTMENT &&
                     $model->restaurant->version > 1 && $this->order_mode == Order::ORDER_MODE_DELIVERY;
             }],
 

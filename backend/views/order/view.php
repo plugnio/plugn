@@ -879,7 +879,7 @@ DetailView::widget([
                             'value' => function ($data) {
                                 return $data->office;
                             },
-                            'visible' => $model->area_id && strtolower($model->unit_type) == Order::UNIT_TYPE_OFFICE && $model->office != null ? true : false,
+                            'visible' => $model->area_id && $model->unit_type && strtolower($model->unit_type) == Order::UNIT_TYPE_OFFICE && $model->office != null ? true : false,
                         ],
                         [
                             'label' => 'Apartment No.',
@@ -887,10 +887,10 @@ DetailView::widget([
                             'value' => function ($data) {
                                 return $data->apartment;
                             },
-                            'visible' => $model->area_id && strtolower($model->unit_type) == Order::UNIT_TYPE_APARTMENT && $model->apartment != null ? true : false,
+                            'visible' => $model->area_id && $model->unit_type &&  strtolower($model->unit_type) == Order::UNIT_TYPE_APARTMENT && $model->apartment != null ? true : false,
                         ],
                         [
-                            'label' => strtolower($model->unit_type) == Order::UNIT_TYPE_HOUSE ? 'House No.' : 'Building',
+                            'label' => $model->unit_type &&  && strtolower($model->unit_type) == Order::UNIT_TYPE_HOUSE ? 'House No.' : 'Building',
                             'format' => 'html',
                             'value' => function ($data) {
                                 return $data->house_number;
