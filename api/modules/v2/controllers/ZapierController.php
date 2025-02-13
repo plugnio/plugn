@@ -134,11 +134,14 @@ class ZapierController extends Controller {
 
                 $orders[$key]['estimated_time_of_arrival'] = $order['estimated_time_of_arrival']?
                     date('c', strtotime($order['estimated_time_of_arrival'])) : null;
+
                 $orders[$key]['order_created_at'] = date('c', strtotime($order['order_created_at']));
                 $orders[$key]['order_updated_at'] =  date('c', strtotime($order['order_updated_at']));
 
-                $orders[$key]['scheduled_time_to'] =  date('c', strtotime($order['scheduled_time_to']));
-                $orders[$key]['scheduled_time_start_from'] =  
+                $orders[$key]['scheduled_time_to'] = $order['scheduled_time_to']?
+                    date('c', strtotime($order['scheduled_time_to'])): null;
+
+                $orders[$key]['scheduled_time_start_from'] =
                 $order['scheduled_time_start_from']?
                     date('c', strtotime($order['scheduled_time_start_from'])): null;
 
