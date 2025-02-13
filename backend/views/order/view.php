@@ -890,7 +890,7 @@ DetailView::widget([
                             'visible' => $model->area_id && $model->unit_type &&  strtolower($model->unit_type) == Order::UNIT_TYPE_APARTMENT && $model->apartment != null ? true : false,
                         ],
                         [
-                            'label' => $model->unit_type &&  && strtolower($model->unit_type) == Order::UNIT_TYPE_HOUSE ? 'House No.' : 'Building',
+                            'label' => $model->unit_type && strtolower($model->unit_type) == Order::UNIT_TYPE_HOUSE ? 'House No.' : 'Building',
                             'format' => 'html',
                             'value' => function ($data) {
                                 return $data->house_number;
