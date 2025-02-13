@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y \
      libicu-dev \
      && docker-php-ext-configure intl \
      && docker-php-ext-configure gd --with-freetype --with-jpeg \
-     && docker-php-ext-install gd pdo pdo_mysql zip opcache exif intl
-
+     && docker-php-ext-install gd pdo pdo_mysql zip  exif intl
+#opcache
 # Install Imagick PHP extension
 #RUN apt-get install -y libmagickwand-dev \
 #    && pecl install imagick \
