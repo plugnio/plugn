@@ -21,12 +21,12 @@ class BankDiscountCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'banks' => BankFixture::className(),
-            'bankDiscounts' => BankDiscountFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agents' => AgentFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'banks' => BankFixture::class,
+            'bankDiscounts' => BankDiscountFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

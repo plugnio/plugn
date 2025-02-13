@@ -109,7 +109,7 @@ class WebLinkController extends BaseController
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid = null, $web_link_id)
+    public function actionDetail($web_link_id, $store_uuid = null)
     {
         return $this->findModel ($web_link_id, $store_uuid);
     }

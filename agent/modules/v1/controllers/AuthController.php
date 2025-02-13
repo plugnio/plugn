@@ -621,7 +621,7 @@ class AuthController extends BaseController {
     
     /**
      * Update email address
-     * @return type
+     * @return array
      */
     public function actionUpdateEmail() {
 
@@ -751,10 +751,14 @@ class AuthController extends BaseController {
             }
 
             //Check if this user sent an email in past few minutes (to limit email spam)
-            $emailLimitDatetime = new \DateTime($agent->agent_limit_email);
-            date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+            $emailLimitDatetime = null;
             $currentDatetime = new \DateTime();
 
+            if ($agent->agent_limit_email) {
+                $emailLimitDatetime = new \DateTime($agent->agent_limit_email);
+                date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+            }
+            
             if ($agent->agent_limit_email && $currentDatetime < $emailLimitDatetime) {
 
                 $difference = $currentDatetime->diff($emailLimitDatetime);
@@ -844,14 +848,26 @@ class AuthController extends BaseController {
 
         $response = Agent::verifyEmail($email, $code);
 
-        if ($response['success'] == false) {
+        if (!$response['success']) {
+            //add entry for invalid attempt
+
+            $model = new AgentEmailVerifyAttempt;
+            $model->code = $code;
+            $model->agent_email = $email;
+            $model->ip_address = Yii::$app->getRequest()->getUserIP();
+            $model->save();
+
+            /*return [
+                'operation' => 'error',
+                'message' => Yii::t('agent', 'Invalid email verification code.')
+            ];*/
+
             return [
                 'operation' => 'error',
                 'message' => $response['message']
             ];
         }
 
-        if ($response['success'] == true) {
             //remove old email verification attempts
 
             AgentEmailVerifyAttempt::deleteAll([
@@ -865,21 +881,6 @@ class AuthController extends BaseController {
             //$agent->save(false);
 
             return $this->_loginResponse($response['data']);
-            
-        } else {
-            //add entry for invalid attempt
-
-            $model = new AgentEmailVerifyAttempt;
-            $model->code = $code;
-            $model->agent_email = $email;
-            $model->ip_address = Yii::$app->getRequest()->getUserIP();
-            $model->save();
-
-            return [
-                'operation' => 'error',
-                'message' => Yii::t('agent', 'Invalid email verification code.')
-            ];
-        }
     }
 
     /**
@@ -921,9 +922,14 @@ class AuthController extends BaseController {
         ]);
 
         //Check if this user sent an email in past few minutes (to limit email spam)
+
+        $emailLimitDatetime = null;
+        $currentDatetime = new \DateTime('now');
+        
+        if ($agent->agent_limit_email) {
         $emailLimitDatetime = new \DateTime($agent->agent_limit_email);
         date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
-        $currentDatetime = new \DateTime('now');
+        }
 
         if ($agent->agent_limit_email && $currentDatetime < $emailLimitDatetime) {
             $difference = $currentDatetime->diff($emailLimitDatetime);
@@ -1008,7 +1014,7 @@ class AuthController extends BaseController {
 
     /**
      * return user location detail by user ip address
-     * @return type
+     * @return array
      */
     public function actionLocate() {
         return Yii::$app->ipstack->locate();
@@ -1016,8 +1022,8 @@ class AuthController extends BaseController {
 
     /**
      * Return agent data after successful login
-     * @param type $agent
-     * @return type
+     * @param  Agent $agent
+     * @return array
      */
     private function _loginResponse($agent, $store_id = null)
     {

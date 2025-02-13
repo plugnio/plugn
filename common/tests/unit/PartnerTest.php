@@ -23,7 +23,7 @@ class PartnerTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'locations' => PartnerFixture::className()
+            'locations' => PartnerFixture::class
         ];
     }
 
@@ -32,29 +32,23 @@ class PartnerTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Partner::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Partner::find()->one(), 'Check data loaded');
 
-        $this->specify('Partner model fields validation', function () {
-            $model = new Partner();
+        $model = new Partner();
 
-            expect('should not accept empty bank_id', $model->validate(['bank_id']))->false();
-            expect('should not accept empty username', $model->validate(['username']))->false();
-            expect('should not accept empty partner_password_hash', $model->validate(['partner_password_hash']))->false();
-            expect('should not accept empty partner_email', $model->validate(['partner_email']))->false();
-            expect('should not accept empty referral_code', $model->validate(['referral_code']))->false();
+        $this->assertFalse($model->validate(['bank_id']), 'should not accept empty bank_id');
+        $this->assertFalse($model->validate(['username']), 'should not accept empty username');
+        $this->assertFalse($model->validate(['partner_password_hash']), 'should not accept empty partner_password_hash');
+        $this->assertFalse($model->validate(['partner_email']), 'should not accept empty partner_email');
+        $this->assertFalse($model->validate(['referral_code']), 'should not accept empty referral_code');
 
-            $model->partner_email = 'randomString';
-            expect('should not accept invalid email', $model->validate(['partner_email']))->false();
+        $model->partner_email = 'randomString';
+        $this->assertFalse($model->validate(['partner_email']), 'should not accept invalid email');
 
-            $model->partner_email = 'demo@agent.com';
-            expect('should accept valid email', $model->validate(['partner_email']))->true();
+        $model->partner_email = 'demo@agent.com';
+        $this->assertTrue($model->validate(['partner_email']), 'should accept valid email');
 
-            $model->bank_id = 12312312313;
-            expect('should not accept invalid bank_id', $model->validate(['bank_id']))->false();
-        });
+        $model->bank_id = 12312312313;
+        $this->assertFalse($model->validate(['bank_id']), 'should not accept invalid bank_id');
     }
 }

@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\AreaFixture;
-use Codeception\Specify;
 use common\models\Area;
 
 class AreaTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class AreaTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'areas' => AreaFixture::className()];
+            'areas' => AreaFixture::class];
     }
 
     /**
@@ -31,20 +28,13 @@ class AreaTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check area loaded',
-                Area::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Area::find()->one(), 'Check area loaded');
 
-        $this->specify('Area model fields validation', function () {
-            $area = new Area();
+        $area = new Area();
+        $this->assertFalse($area->validate(['city_id']), 'should not accept empty city_id');
+        $this->assertFalse($area->validate(['area_name']), 'should not accept empty area_name');
 
-            expect('should not accept empty city_id', $area->validate(['city_id']))->false();
-            expect('should not accept empty area_name', $area->validate(['area_name']))->false();
-
-            $area->city_id = 12312312313;
-            expect('should not accept invalid city_id', $area->validate(['city_id']))->false();
-        });
+        $area->city_id = 12312312313;
+        $this->assertFalse($area->validate(['city_id']), 'should not accept invalid city_id');
     }
 }

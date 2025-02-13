@@ -286,8 +286,12 @@ class OrderController extends BaseController
 
             //Preorder
             if ($order->is_order_scheduled != null && $order->is_order_scheduled == true && $restaurant->schedule_order) {
-                $order->scheduled_time_start_from = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_start_from")));
-                $order->scheduled_time_to = date("Y-m-d H:i:s", strtotime(Yii::$app->request->getBodyParam("scheduled_time_to")));
+                $scheduled_time_start_from = Yii::$app->request->getBodyParam("scheduled_time_start_from");
+                $order->scheduled_time_start_from = $scheduled_time_start_from?
+                    date("Y-m-d H:i:s", strtotime($scheduled_time_start_from)) : null;
+                $scheduled_time_to = Yii::$app->request->getBodyParam("scheduled_time_to");
+                $order->scheduled_time_to = $scheduled_time_to?
+                    date("Y-m-d H:i:s", strtotime($scheduled_time_to)) : null;
             }
         } else if ($order->order_mode == Order::ORDER_MODE_PICK_UP) {
             $order->pickup_location_id = Yii::$app->request->getBodyParam("business_location_id");
@@ -363,6 +367,7 @@ class OrderController extends BaseController
 
                         $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id']) ? $extraOption['extra_option_id'] : null;
                         $orderItemExtraOption->option_id = isset($extraOption['option_id']) ? $extraOption['option_id'] : null;
+
                         $orderItemExtraOption->qty = (int)$item["qty"];
 
                         if (!$orderItemExtraOption->save()) {

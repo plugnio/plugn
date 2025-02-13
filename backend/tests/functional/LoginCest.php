@@ -2,6 +2,7 @@
 
 namespace backend\tests\functional;
 
+use Yii;
 use backend\tests\FunctionalTester;
 use common\fixtures\UserFixture;
 
@@ -21,7 +22,7 @@ class LoginCest
     {
         return [
             'user' => [
-                'class' => UserFixture::className(),
+                'class' => UserFixture::class,
                 'dataFile' => codecept_data_dir() . 'login_data.php'
             ]
         ];

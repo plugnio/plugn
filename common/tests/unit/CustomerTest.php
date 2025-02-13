@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\CustomerFixture;
-use Codeception\Specify;
 use common\models\Customer;
 
 class CustomerTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class CustomerTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'customers' => CustomerFixture::className()];
+            'customers' => CustomerFixture::class];
     }
 
     /**
@@ -31,18 +28,10 @@ class CustomerTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                Customer::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Customer::find()->one(), 'Check data loaded');
 
-        $this->specify('Customer model fields validation', function () {
-            $model = new Customer();
-
-            expect('should not accept empty customer_name', $model->validate(['customer_name']))->false();
-            //expect('should not accept empty customer_email', $model->validate(['customer_email']))->false();
-            expect('should not accept empty customer_phone_number', $model->validate(['customer_phone_number']))->false();
-        });
+        $model = new Customer();
+        $this->assertFalse($model->validate(['customer_name']), 'should not accept empty customer_name');
+        $this->assertFalse($model->validate(['customer_phone_number']), 'should not accept empty customer_phone_number');
     }
 }

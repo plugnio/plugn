@@ -23,7 +23,7 @@ class PaymentGatewayQueueTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'locations' => PaymentGatewayQueueFixture::className()
+            'locations' => PaymentGatewayQueueFixture::class
         ];
     }
 
@@ -32,20 +32,18 @@ class PaymentGatewayQueueTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                PaymentGatewayQueue::find()->one()
-            )->notNull();
-        });
+       // $this->specify('Fixtures should be loaded', function() {
+            $this->assertNotNull(PaymentGatewayQueue::find()->one(), 'Check data loaded');
+        //});
 
-        $this->specify('PaymentGatewayQueue model fields validation', function () {
+        //$this->specify('PaymentGatewayQueue model fields validation', function () {
             $model = new PaymentGatewayQueue;
 
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty payment_gateway', $model->validate(['payment_gateway']))->false();
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+            $this->assertFalse($model->validate(['payment_gateway']), 'should not accept empty payment_gateway');
 
             $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-        });
+            $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
+       // });
     }
 }

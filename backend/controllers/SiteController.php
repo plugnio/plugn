@@ -125,6 +125,7 @@ class SiteController extends Controller
             ->count();
 
         return $this->render('index', [
+            "lastCronRun" => \Yii::$app->redis->get("lastCronRun"),
             'draft' => $draft,
             'pending' => $pending,
             'paid' => $paid,

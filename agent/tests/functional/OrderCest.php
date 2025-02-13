@@ -26,17 +26,17 @@ class OrderCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'orders' => OrderFixture::className(),
-            'orderItems' => OrderItemFixture::className(),
-            'currencies' => CurrencyFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'areas' => AreaFixture::className(),
-            'countries' => CountryFixture::className(),
-            'deliveryZones' => DeliveryZoneFixture::className(),
-            'locations' => BusinessLocationFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agents' => AgentFixture::class,
+            'orders' => OrderFixture::class,
+            'orderItems' => OrderItemFixture::class,
+            'currencies' => CurrencyFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'areas' => AreaFixture::class,
+            'countries' => CountryFixture::class,
+            'deliveryZones' => DeliveryZoneFixture::class,
+            'locations' => BusinessLocationFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

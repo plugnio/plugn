@@ -98,7 +98,7 @@ class OrderController extends Controller
         header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
         header("Cache-Control: max-age=0");
 
-        \moonland\phpexcel\Excel::export([
+        \common\components\PhpExcel::export([
             'isMultipleSheet' => false,
             'models' => $orders,
             'columns' => [
@@ -247,7 +247,7 @@ class OrderController extends Controller
             header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
             header("Cache-Control: max-age=0");
 
-            \moonland\phpexcel\Excel::export([
+            \common\components\PhpExcel::export([
                 'isMultipleSheet' => false,
                 'models' => $searchResult,
                 'columns' => [

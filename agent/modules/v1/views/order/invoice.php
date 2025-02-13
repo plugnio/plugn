@@ -1,3 +1,12 @@
+<?php
+/**
+* @var $defaultLogo string
+* @var $order \common\models\Order
+* @var $voucherDiscount \common\models\Voucher
+* @var $bankDiscount \common\models\BankDiscount
+*/
+?>
+
 <!-- todo: update language support -->
 
 <div class="ion-content">

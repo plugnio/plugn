@@ -1,5 +1,12 @@
-<!-- todo: update language support for api endpoint invoice -->
+<?php
 
+/* @var $order /Common/models/Order
+ * @var  $defaultLogo string
+ * @var $bankDiscount /common/models/BankDiscount
+ */
+
+?>
+<!-- todo: update language support for api endpoint invoice -->
 <div class="ion-content">
 
     <div class="ion-card ion-no-padding card-invoice" id="invoice">

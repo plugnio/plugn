@@ -660,9 +660,14 @@ class OrderController extends BaseController
                     foreach ($extraOptionsArray as $key => $extraOption) {
 
                         $orderItemExtraOption = new OrderItemExtraOption;
+
                         $orderItemExtraOption->order_item_id = $orderItem->order_item_id;
-                        $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
-                        $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
+                        $orderItemExtraOption->extra_option_name = isset($extraOption['extra_option_name']) ? $extraOption['extra_option_name'] : null;
+                        $orderItemExtraOption->extra_option_name_ar = isset($extraOption['extra_option_name_ar']) ? $extraOption['extra_option_name_ar'] : null;
+
+                        $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id']) ? $extraOption['extra_option_id'] : null;
+                        $orderItemExtraOption->option_id = isset($extraOption['option_id']) ? $extraOption['option_id'] : null;
+
                         $orderItemExtraOption->qty = (int)$item["qty"];
 
                         if (!$orderItemExtraOption->save()) {
@@ -937,6 +942,9 @@ class OrderController extends BaseController
                 $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
                 $orderItemExtraOption->qty = (int)$item["qty"];
 
+                $orderItemExtraOption->extra_option_name = isset($extraOption['extra_option_name']) ? $extraOption['extra_option_name'] : null;
+                $orderItemExtraOption->extra_option_name_ar = isset($extraOption['extra_option_name_ar']) ? $extraOption['extra_option_name_ar'] : null;
+
                 if (!$orderItemExtraOption->save()) {
 
                     $transaction->rollBack();
@@ -961,14 +969,16 @@ class OrderController extends BaseController
             ];
         }
 
-        if(Yii::$app->request->getBodyParam('estimated_time_of_arrival')){
+        $estimatedTimeOfArrival = Yii::$app->request->getBodyParam('estimated_time_of_arrival');
+
+        if($estimatedTimeOfArrival) {
 
           $order->setScenario(Order::SCENARIO_CREATE_ORDER_BY_ADMIN);
 
           $order->estimated_time_of_arrival =
               date(
                   "Y-m-d H:i:s",
-                  strtotime(Yii::$app->request->getBodyParam('estimated_time_of_arrival'))
+                  strtotime($estimatedTimeOfArrival)
               );
 
               if (!$order->save()) {
@@ -1606,7 +1616,7 @@ class OrderController extends BaseController
         header("Content-Disposition: attachment;filename=\"orders.xlsx\"");
         header("Cache-Control: max-age=0");
 
-        \moonland\phpexcel\Excel::export([
+        \common\components\PhpExcel::export([
             'isMultipleSheet' => false,
             'models' => $searchResult,
             'columns' => [
@@ -1820,7 +1830,8 @@ class OrderController extends BaseController
         $model->customer_phone_country_code = $customer_phone_country_code;
         $model->customer_phone_number = $customer_phone_number;
         $model->pickup_location_id = $pickup_location_id;
-        $model->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($estimated_time_of_arrival));
+        $model->estimated_time_of_arrival = $estimated_time_of_arrival?
+            date("Y-m-d H:i:s", strtotime($estimated_time_of_arrival)) : null;
         $model->special_directions = $special_directions;
 
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY)
@@ -1932,6 +1943,9 @@ class OrderController extends BaseController
                 $orderItemExtraOption->extra_option_id = isset($extraOption['extra_option_id'])? $extraOption['extra_option_id']: null;
                 $orderItemExtraOption->option_id = isset($extraOption['option_id'])?$extraOption['option_id']: null;
                 $orderItemExtraOption->qty = (int)$item["qty"];
+
+                $orderItemExtraOption->extra_option_name = isset($extraOption['extra_option_name']) ? $extraOption['extra_option_name'] : null;
+                $orderItemExtraOption->extra_option_name_ar = isset($extraOption['extra_option_name_ar']) ? $extraOption['extra_option_name_ar'] : null;
 
                 if (!$orderItemExtraOption->save()) {
 
@@ -2148,7 +2162,7 @@ class OrderController extends BaseController
                 'fontdata' => array_merge($fontData, [
                     "Nunito" => [
                         'R' => 'Nunito-Regular.ttf',
-                        'B' => 'Nunito-Bold.ttf',
+                        //'B' => 'Nunito-Bold.ttf',
                         'B' => 'Nunito-Italic.ttf',
                     ],
                     "NunitoSans" => [

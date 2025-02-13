@@ -339,9 +339,13 @@ class AuthController extends BaseController {
             }
 
             //Check if this user sent an email in past few minutes (to limit email spam)
-            $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
-            date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+
             $currentDatetime = new \DateTime();
+            $emailLimitDatetime = null;
+            if ($customer->customer_limit_email) {
+                $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
+                date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+            }
 
             if ($customer->customer_limit_email && $currentDatetime < $emailLimitDatetime) {
 
@@ -507,9 +511,12 @@ class AuthController extends BaseController {
         }
 
         //Check if this user sent an email in past few minutes (to limit email spam)
-        $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
-        date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
         $currentDatetime = new \DateTime('now');
+        $emailLimitDatetime = null;
+        if ($customer->customer_limit_email) {
+            $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
+            date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+        }
 
         if ($customer->customer_limit_email && $currentDatetime < $emailLimitDatetime) {
 

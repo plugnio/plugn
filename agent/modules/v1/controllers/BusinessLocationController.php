@@ -178,7 +178,7 @@ class BusinessLocationController extends BaseController
      * @param type $order_uuid
      * @return type
      */
-    public function actionDetail($store_uuid = null, $business_location_id)
+    public function actionDetail($business_location_id, $store_uuid = null)
     {
 //        $this->ownerCheck();
         return $this->findModel ($business_location_id, $store_uuid);

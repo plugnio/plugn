@@ -284,3 +284,87 @@ https://api-docs.tabby.ai/
 ## check 
 `sudo certbot certificates`
     
+
+# on reboot, don't forget to run this based on the environment you want to run
+ 
+ - docker-compose -f docker-compose-prod.yml -p plugn-prod-server up -d
+
+ - docker-compose -f docker-compose-dev.yml -p plugn-dev-server up -d
+
+ - docker-compose -f docker-compose-local.yml -p plugn-local-server up -d
+
+# git tag 
+
+git tag -a v2.0 -m "Version 2.0: PHP 7.4 to 8.2"
+git push origin v2.0
+git tag -l
+
+# fix migration applied but ActiveRecord/ Table column not found error getting trigger 
+`docker exec -it plugn-backend-prod /bin/bash`
+`./yii cache/flush-schema db`
+`./yii cache/flush cache`
+
+## if still not working 
+
+rm -rf /home/ubuntu/plugn/admin/runtime/cache
+rm -rf /home/ubuntu/plugn/candidate/runtime/cache
+rm -rf /home/ubuntu/plugn/company/runtime/cache
+rm -rf /home/ubuntu/plugn/console/runtime/cache
+rm -rf /home/ubuntu/plugn/common/runtime/cache
+rm -rf /home/ubuntu/plugn/staff/runtime/cache
+rm -rf /home/ubuntu/plugn/inspector/runtime/cache
+rm -rf /home/ubuntu/plugn/manager/runtime/cache
+rm -rf /home/ubuntu/plugn/status/runtime/cache
+rm -rf /home/ubuntu/plugn/verification/runtime/cache
+
+# docker container url in local 
+
+## backend 
+http://localhost:8083
+
+## store 
+http://localhost:8082 
+
+## vendor dashboard 
+http://localhost:8081
+
+## crm 
+http://localhost:8084
+
+## partner 
+http://localhost:8085
+
+## remail 
+http://localhost:8086
+
+## shortner 
+http://localhost:8087
+
+# MySql requirement 
+
+## for stats 
+
+`SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));`
+
+# to login to docker containers 
+
+## prod server
+docker exec -it plugn-backend-prod /bin/bash
+docker exec -it plugn-prod-server_mysql_1 /bin/bash
+docker exec -it plugn-prod-server_redis_1 /bin/bash
+
+## dev server 
+docker exec -it plugn-backend-dev /bin/bash
+docker exec -it plugn-dev-server_mysql_1 /bin/bash
+docker exec -it plugn-dev-server_redis_1 /bin/bash
+
+### setup database 
+
+`mysql -u root -pplugn;`
+`SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));`
+
+# Attention 
+
+- need to check if cron is running or not 
+- first time running dev server, need to wait for mysql to be ready, then only start the main container 
+ 

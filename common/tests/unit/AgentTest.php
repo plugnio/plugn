@@ -16,7 +16,7 @@ class AgentTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'agents' => AgentFixture::className()
+            'agents' => AgentFixture::class
         ];
     }
     
@@ -32,25 +32,23 @@ class AgentTest extends \Codeception\Test\Unit
      * Tests validator
      */
     public function testValidators()
-    {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check agent loaded',
-                Agent::find()->one()
-            )->notNull();
-        });
+    {   
+        // Test fixtures loading
+        $agent = Agent::find()->one();
+        $this->assertNotNull($agent, 'Agent fixture should be loaded');
 
-        $this->specify('Agent model fields validation', function () {
-            $agent = new Agent;
-            //$agent->scenario = 'newAccount';
-            expect('should not accept empty agent_name', $agent->validate(['agent_name']))->false();
-            expect('should not accept empty agent_email', $agent->validate(['agent_email']))->false();
-            //expect('should not accept empty agent_password_hash', $agent->validate(['agent_password_hash']))->false();
+        // Test model validation
+        $agent = new Agent();           
 
-            $agent->agent_email = 'randomString';
-            expect('should not accept invalid email', $agent->validate(['agent_email']))->false();
+        // Test required fields
+        $this->assertFalse($agent->validate(['agent_name']), 'Empty agent_name should not be accepted');
+        $this->assertFalse($agent->validate(['agent_email']), 'Empty agent_email should not be accepted');
 
-            $agent->agent_email = 'demo@agent.com';
-            expect('should accept valid email', $agent->validate(['agent_email']))->true();
-        });
+        // Test invalid values
+        $agent->agent_email = 'randomString';
+        $this->assertFalse($agent->validate(['agent_email']), 'Invalid agent_email should not be accepted');
+
+        $agent->agent_email = 'demo@agent.com';
+        $this->assertTrue($agent->validate(['agent_email']), 'Valid agent_email should be accepted');
     }
 }

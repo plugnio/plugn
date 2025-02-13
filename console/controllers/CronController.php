@@ -984,7 +984,10 @@ class CronController extends \yii\console\Controller
 
         foreach ($query->batch() as $vouchers) {
             foreach ($vouchers as $voucher) {
-                if (date('Y-m-d', strtotime('now')) >= date('Y-m-d', strtotime($voucher->valid_until))) {
+                if (
+                    date('Y-m-d') >= 
+                    date('Y-m-d', strtotime($voucher->valid_until))
+                ) {
                     $voucher->voucher_status = Voucher::VOUCHER_STATUS_EXPIRED;
                     $voucher->save();
                 }
@@ -1138,6 +1141,8 @@ class CronController extends \yii\console\Controller
      */
     public function actionMinute() {
 
+        \Yii::$app->redis->set("lastCronRun", date("Y-m-d H:i:s"));
+      
         $query = VendorCampaign::find()
             ->andWhere(['status' => VendorCampaign::STATUS_READY]);
 

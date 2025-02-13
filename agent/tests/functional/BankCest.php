@@ -18,11 +18,11 @@ class BankCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'banks' => BankFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agents' => AgentFixture::class,
+            'banks' => BankFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

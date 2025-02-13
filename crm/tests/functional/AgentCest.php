@@ -16,10 +16,10 @@ class StaffCest
 
     public function _fixtures() {
         return [
-            'staff_assignments' => StaffAssignmentFixture::className(),
-            'stores' => RestaurantFixture::className(),
-            'staffs' => StaffFixture::className(),
-            'staffToken' => StaffTokenFixture::className()
+            'staff_assignments' => StaffAssignmentFixture::class,
+            'stores' => RestaurantFixture::class,
+            'staffs' => StaffFixture::class,
+            'staffToken' => StaffTokenFixture::class
         ];
     }
 

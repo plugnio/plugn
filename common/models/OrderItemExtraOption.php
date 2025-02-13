@@ -131,6 +131,11 @@ class OrderItemExtraOption extends \yii\db\ActiveRecord {
      * @param type $attribute
      */
     public function checkIfExtraOptionBelongToItem($attribute) {
+
+        if (!$this->extra_option_id) {
+            return true;
+        }
+
         $extra_option_model = ExtraOption::findOne($this->extra_option_id);
 
         if ($extra_option_model)

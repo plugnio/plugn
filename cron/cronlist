@@ -1,0 +1,63 @@
+# Weekly stats report every start of week
+0 0 * * SUN php ~/www/yii cron/weekly-report > /dev/null 2>&1
+
+# Retention emails
+0 0 * * * php ~/www/yii cron/retention-emails-who-passed-five-days-and-no-sales  > /dev/null 2>&1
+0 0 * * * php ~/www/yii cron/retention-emails-who-passed-two-days-and-no-products > /dev/null 2>&1
+
+# Subscription status updates
+0 0 * * * php ~/www/yii cron/notify-agents-for-subscription-that-will-expire-soon > /dev/null 2>&1
+0 0 * * * php ~/www/yii cron/downgraded-store-subscription > /dev/null 2>&1
+
+# Check site status every minute
+* * * * * php ~/www/yii cron/site-status > /dev/null 2>&1
+
+# Update transactions Every 5 minutes
+*/5 * * * * php ~/www/yii cron/update-transactions > /dev/null 2>&1
+#*/5 * * * * php ~/www/yii cron/update-stock-qty > /dev/null 2>&1
+
+# Every 5 minutes
+*/5 * * * * php ~/www/yii cron/send-reminder-email  > /dev/null 2>&1
+
+# Build every 10 sec
+* * * * * php ~/www/yii cron/create-build-js-file > /dev/null 2>&1
+* * * * * sleep 10 && php ~/www/yii cron/create-build-js-file > /dev/null 2>&1
+* * * * * sleep 20 && php ~/www/yii cron/create-build-js-file > /dev/null 2>&1
+* * * * * sleep 30 && php ~/www/yii cron/create-build-js-file > /dev/null 2>&1
+* * * * * sleep 40 && php ~/www/yii cron/create-build-js-file > /dev/null 2>&1
+* * * * * sleep 50 && php ~/www/yii cron/create-build-js-file > /dev/null 2>&1
+
+# Every day at midnight
+0 0 * * * php ~/www/yii cron/update-voucher-status > /dev/null 2>&1
+#0 0 * * * php ~/www/yii cron/update-sitemap > /dev/null 2>&1
+
+* * * * * php ~/www/yii cron/create-payment-gateway-account > /dev/null 2>&1
+*/5 * * * * php ~/www/yii cron/update-refund-status-message  > /dev/null 2>&1
+*/5 * * * * php ~/www/yii cron/make-refund  > /dev/null 2>&1
+
+# Pull from git every minute
+#* * * * * cd ~/www && git pull > /dev/null 2>&1
+
+# Install composer dependencies every minute
+#* * * * * cd ~/www && /usr/local/bin/composer install 2>&1
+
+# Initialize server environment files every minute
+#* * * * * cd ~/www && ./init --env=Production --overwrite=All > /dev/null 2>&1
+
+# Migrate database changes every minute
+#* * * * * cd ~/www && ./yii migrate --interactive=0 > /dev/null 2>&1
+
+# Invalidate Cache every 4 hours
+0 0,4,8,12,16,20 * * * /home/ubuntu/invalidate-cloudfront-cache.sh
+
+# Run Cron Commands Once A Day
+30 13 * * * php ~/www/yii cron/daily > /dev/null 2>&1
+
+# Run Cron commands every minute
+* * * * * php ~/www/yii cron/minute > /dev/null 2>&1
+
+
+
+
+
+

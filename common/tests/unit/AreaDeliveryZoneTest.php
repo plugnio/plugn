@@ -7,12 +7,9 @@ use common\fixtures\CountryFixture;
 use common\fixtures\DeliveryZoneFixture;
 use common\fixtures\RestaurantFixture;
 use common\models\AreaDeliveryZone;
-use Codeception\Specify;
 
 class AreaDeliveryZoneTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -29,12 +26,12 @@ class AreaDeliveryZoneTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'areaDeliveryZones' => AreaDeliveryZoneFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'deliveryZones' => DeliveryZoneFixture::className(),
-            'countries' => CountryFixture::className(),
-            'cities' => CityFixture::className(),
-            'areas' => AreaFixture::className(),
+            'areaDeliveryZones' => AreaDeliveryZoneFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'deliveryZones' => DeliveryZoneFixture::class,
+            'countries' => CountryFixture::class,
+            'cities' => CityFixture::class,
+            'areas' => AreaFixture::class,
         ];
     }
 
@@ -43,41 +40,34 @@ class AreaDeliveryZoneTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check area delivery zone loaded',
-                AreaDeliveryZone::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(AreaDeliveryZone::find()->one(), 'Check area delivery zone loaded');
 
-        $this->specify('AreaDeliveryZone model fields validation', function () {
-            $area = new AreaDeliveryZone;
+        $area = new AreaDeliveryZone();
+        $this->assertFalse($area->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
+        $this->assertFalse($area->validate(['delivery_zone_id']), 'should not accept empty delivery_zone_id');
 
-            expect('should not accept empty restaurant_uuid', $area->validate(['restaurant_uuid']))->false();
-            expect('should not accept empty delivery_zone_id', $area->validate(['delivery_zone_id']))->false();
+        $area->restaurant_uuid = 12312312313;
+        $this->assertFalse($area->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
 
-            $area->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $area->validate(['restaurant_uuid']))->false();
+        $area->delivery_zone_id = 12312312313;
+        $this->assertFalse($area->validate(['delivery_zone_id']), 'should not accept invalid delivery_zone_id');
 
-            $area->delivery_zone_id = 12312312313;
-            expect('should not accept invalid delivery_zone_id', $area->validate(['delivery_zone_id']))->false();
+        $area->country_id = 12312312313;
+        $this->assertFalse($area->validate(['country_id']), 'should not accept invalid country_id');
 
-            $area->country_id = 12312312313;
-            expect('should not accept invalid country_id', $area->validate(['country_id']))->false();
+        $area->city_id = 12312312313;
+        $this->assertFalse($area->validate(['city_id']), 'should not accept invalid city_id');
 
-            $area->city_id = 12312312313;
-            expect('should not accept invalid city_id', $area->validate(['city_id']))->false();
+        $area->area_id = 12312312313;
+        $this->assertFalse($area->validate(['area_id']), 'should not accept invalid area_id');
 
-            $area->area_id = 12312312313;
-            expect('should not accept invalid area_id', $area->validate(['area_id']))->false();
+        $area->country_id = 1;
+        $this->assertTrue($area->validate(['country_id']), 'should accept valid country_id');
 
-            $area->country_id = 1;
-            expect('should accept valid country_id', $area->validate(['country_id']))->true();
+        $area->city_id = 1;
+        $this->assertTrue($area->validate(['city_id']), 'should accept valid city_id');
 
-            $area->city_id = 1;
-            expect('should accept valid city_id', $area->validate(['city_id']))->true();
-
-            $area->area_id = 1;
-            expect('should accept valid area_id', $area->validate(['area_id']))->true();
-        });
+        $area->area_id = 1;
+        $this->assertTrue($area->validate(['area_id']), 'should accept valid area_id');
     }
 }

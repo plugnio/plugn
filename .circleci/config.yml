@@ -17,12 +17,11 @@ jobs:
 
     docker:
       # specify the version you desire here
-      - image: cimg/php:7.4.30-browsers
-      #- image: 'cimg/base:stable'
+      - image: cimg/php:8.2.27
 
       #older: 7.3-apache-stretch-node-browsers
 
-      - image: circleci/mysql:8.0 #5.7
+      - image: cimg/mysql:8.0 
         environment:
           MYSQL_ROOT_PASSWORD: rootpw
           MYSQL_DATABASE: plugn_test
@@ -114,10 +113,14 @@ jobs:
       #    name: Seed secondary database for wallet
       #    command: ./yii cron/
 
+          #- run:
+          # name: Codeception test packages
+          # command: composer require codeception/module-rest --dev
+
       - run:
-          name: Codeception test packages 
-          command: composer require codeception/module-rest --dev  
-          
+          name: Load fixture data
+          command: ./yii fixture/load "*" --interactive 0
+
       #---------- Store app --------------#
 
       - run:

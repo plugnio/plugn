@@ -20,13 +20,13 @@ class StatsCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'items' => ItemFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'orders' => OrderFixture::className(),
-            'customers' => CustomerFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agents' => AgentFixture::class,
+            'items' => ItemFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'orders' => OrderFixture::class,
+            'customers' => CustomerFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

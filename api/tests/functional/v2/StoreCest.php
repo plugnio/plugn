@@ -12,13 +12,13 @@ class StoreCest
 
     public function _fixtures() {
         return [
-            'items' => \common\fixtures\ItemFixture::className(),
-            'openingHours' => \common\fixtures\OpeningHourFixture::className(),
-            'deliveryZones' => \common\fixtures\DeliveryZoneFixture::className(),
-            "restaurantBranches" => \common\fixtures\RestaurantBranchFixture::className(),
-            'restaurantDeliveryAreas' => RestaurantDeliveryFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className(),
-            'businessLocations' => \common\fixtures\BusinessLocationFixture::className()
+            'items' => \common\fixtures\ItemFixture::class,
+            'openingHours' => \common\fixtures\OpeningHourFixture::class,
+            'deliveryZones' => \common\fixtures\DeliveryZoneFixture::class,
+            "restaurantBranches" => \common\fixtures\RestaurantBranchFixture::class,
+            'restaurantDeliveryAreas' => RestaurantDeliveryFixture::class,
+            'restaurants' => \common\fixtures\RestaurantFixture::class,
+            'businessLocations' => \common\fixtures\BusinessLocationFixture::class
         ];
     }
 

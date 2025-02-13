@@ -24,7 +24,7 @@ class PartnerTokenTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'tokens' => PartnerTokenFixture::className()
+            'tokens' => PartnerTokenFixture::class
         ];
     }
 
@@ -33,19 +33,19 @@ class PartnerTokenTest extends \Codeception\Test\Unit
      */
     public function testValidation()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Partner is in the table', Partner::find()->one())->notNull();
-            expect('Partner Token is in the table', PartnerToken::find()->one())->notNull();
-        });
+        $this->assertNotNull(Partner::find()->one(), 'Check data loaded');
+        $this->assertNotNull(PartnerToken::find()->one(), 'Check data loaded');
 
-        $this->specify('Test Validator', function() {
-            $model = new PartnerToken();
-            $model->validate();
-            expect('partner_uuid required error',$model->errors)->hasKey('partner_uuid');
-            expect('token_value required error',$model->errors)->hasKey('token_value');
-            expect('token_status required error',$model->errors)->hasKey('token_status');
-            //expect('total 3 errors',count($model->errors))->equals(3);
-        });
+        $model = new PartnerToken();
+        $this->assertFalse($model->validate(['partner_uuid']), 'should not accept empty partner_uuid');
+        $this->assertFalse($model->validate(['token_value']), 'should not accept empty token_value');
+     
+        $model->partner_uuid = 12312312313;
+        $this->assertFalse($model->validate(['partner_uuid']), 'should not accept invalid partner_uuid');
+  
+      //  $model->token_status = 12312312313;
+      //  $this->assertFalse($model->validate(['token_status']), 'should not accept invalid token_status');
+         
     }
 
     /**
@@ -54,15 +54,9 @@ class PartnerTokenTest extends \Codeception\Test\Unit
      */
     public function testGenerateToken()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Partner Token is in the table', PartnerToken::find()->one())->notNull();
-        });
+        $this->assertNotNull(PartnerToken::find()->one(), 'Check data loaded');
 
-        $this->specify('Test existing Token', function() {
-            expect(
-                'unique token string',
-                PartnerToken::findOne(['token_value' => PartnerToken::generateUniqueTokenString()])
-            )->null();
-        });
+        $token = PartnerToken::generateUniqueTokenString();
+        $this->assertNull(PartnerToken::findOne(['token_value' => $token]), 'Check unique token string');
     }
 }

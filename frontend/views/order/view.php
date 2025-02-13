@@ -133,9 +133,14 @@ if  ($model->delivery_zone_id && $model->deliveryZone->business_location_id && $
     <div style="display: block">
 
         <?php
-        $currentTime = strtotime('now');
-        $deliveryTime = strtotime($model->estimated_time_of_arrival);
-        $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
+        
+        $difference = 0;
+
+        if ($model->estimated_time_of_arrival) {
+            $deliveryTime = strtotime($model->estimated_time_of_arrival);
+            $currentTime = strtotime('now');
+            $difference = round(abs($deliveryTime - $currentTime) / 3600, 2);
+        }
 
         if ($model->order_mode == Order::ORDER_MODE_DELIVERY) {
 
@@ -335,10 +340,13 @@ if ($model->order_status != Order::STATUS_CANCELED && $model->order_status != Or
                             'label' => 'Estimated Delivery',
                             "format" => "raw",
                             "value" => function($model) {
+                                if (!$model->estimated_time_of_arrival) {
+                                    return null;
+                                }
                                 if($model->is_order_scheduled)
-                                  return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival)) .  date(' - h:i A', strtotime($model->scheduled_time_to));
+                                    return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival)) .  date(' - h:i A', strtotime($model->scheduled_time_to));
                                 else
-                                  return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
+                                    return date('l d M, Y - h:i A', strtotime($model->estimated_time_of_arrival));
                             }
                         ],
                         [

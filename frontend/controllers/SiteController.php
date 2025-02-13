@@ -469,7 +469,15 @@ class SiteController extends Controller
                 $subscription_model = $paymentRecord->subscription;
                 $subscription_model->subscription_status = Subscription::STATUS_ACTIVE;
                 $valid_for =  $subscription_model->plan->valid_for;
-                $subscription_model->subscription_end_at = date('Y-m-d', strtotime(date('Y-m-d H:i:s',  strtotime($subscription_model->subscription_start_at)) . " + $valid_for MONTHS"));
+
+                $subscription_model->subscription_end_at = date(
+                    'Y-m-d', 
+                    strtotime(
+                        "+$valid_for MONTHS",  
+                        strtotime($subscription_model->subscription_start_at)
+                    )
+                );
+
                 $subscription_model->save(false);
 
                 foreach ($subscription_model->restaurant->getOwnerAgent()->all() as $agent ) {

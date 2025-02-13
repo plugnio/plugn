@@ -11,9 +11,9 @@ class PaymentCest
 
     public function _fixtures() {
         return [
-            'items' => \common\fixtures\ItemFixture::className(),
-            'paymentMethods' => \common\fixtures\RestaurantPaymentMethodFixture::className(),
-            'restaurants' => \common\fixtures\RestaurantFixture::className()
+            'items' => \common\fixtures\ItemFixture::class,
+            'paymentMethods' => \common\fixtures\RestaurantPaymentMethodFixture::class,
+            'restaurants' => \common\fixtures\RestaurantFixture::class
         ];
     }
 

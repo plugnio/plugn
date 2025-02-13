@@ -113,7 +113,7 @@ class StoreController extends BaseController
             ];
         }
 
-        return self::message("success", 'Integration working fine.');
+        return self::message("Integration working fine.");       
     }
 
     /**
@@ -160,7 +160,7 @@ class StoreController extends BaseController
         }
 
         if (!$store->save()) {
-            return self::message("error",$store->getErrors());
+            return self::message($store->getErrors(), 'error');
         }
 
         //check if store currency
@@ -174,11 +174,11 @@ class StoreController extends BaseController
             $storeCurrency->currency_id = $store->currency_id;
             $storeCurrency->restaurant_uuid = $store->restaurant_uuid;
             if (!$storeCurrency->save()) {
-                return self::message("error", $storeCurrency->getErrors());
+                return self::message($storeCurrency->getErrors(), 'error');
             }
         }
 
-        return self::message("success",'Store details updated successfully');
+        return self::message("Store details updated successfully");
     }
 
     /**
@@ -266,7 +266,7 @@ class StoreController extends BaseController
         }
 
         if (!$store->save()) {
-            return self::message("error",$store->getErrors());
+            return self::message($store->getErrors(), 'error');  
         }
 
         if(!$utm_id) {
@@ -298,7 +298,7 @@ class StoreController extends BaseController
         return [
             "operation" => "success",
             "restaurant_uuid" => $store->restaurant_uuid,
-            "message" => Yii::t("agent",  'Store created successfully')
+            "message" => Yii::t("agent",  'Store created successfully')     
         ];
     }
 
@@ -322,7 +322,7 @@ class StoreController extends BaseController
         $store = $this->findModel();// Yii::$app->accountManager->getManagedAccount();
 
         if ($store->restaurant_domain == $domain) {
-            return self::message("error",'New domain can not be same as old domain');
+            return self::message("New domain can not be same as old domain");
         }
 
         $old_domain = $store->restaurant_domain;
@@ -334,7 +334,7 @@ class StoreController extends BaseController
         //for purchase request not changing store domain until domain available
 
         if (!$purchase && !$store->save()) {
-            return self::message("error",$store->getErrors());
+            return self::message($store->getErrors(), 'error');
         }
 
         //todo: response validation
@@ -357,7 +357,7 @@ class StoreController extends BaseController
      * Disable payment method
      * @return mixed
      */
-    public function actionDisablePaymentMethod($id = null, $paymentMethodId)
+    public function actionDisablePaymentMethod($id = null, $paymentMethodId = null)
     {
         $model = $this->findModel($id);
 
@@ -366,7 +366,7 @@ class StoreController extends BaseController
             'payment_method_id' => $paymentMethodId
         ]);
 
-        return self::message("success",'Payment method disabled successfully');
+        return self::message("Payment method disabled successfully");
     }
 
     /**
@@ -381,7 +381,7 @@ class StoreController extends BaseController
 
         Setting::setConfig($model->restaurant_uuid, 'Store', 'item_discount_label', $item_discount_label);
 
-        return self::message("success",'Mail settings updated successfully');
+        return self::message("Mail settings updated successfully");
     }
 
     /**
@@ -410,7 +410,7 @@ class StoreController extends BaseController
             "encryption" => $encryption
         ], null, $model->restaurant_uuid);
 
-        return self::message("success",'Mail settings updated successfully');
+        return self::message("Mail settings updated successfully");
     }
 
     /**
@@ -449,16 +449,16 @@ class StoreController extends BaseController
             $store->version = Yii::$app->params['storeVersion'];
 
             if(!$store->save()) {
-                return self::message("error",$store->errors);
+                return self::message($store->errors, 'error');
             }
 
-            return self::message("success","Store migrated to ". $store->restaurant_domain);
+            return self::message("Store migrated to ". $store->restaurant_domain);        
         }
 
         //if custom domain
 
         if(!$store->site_id) {
-            return [
+            return self::message($store->errors, 'error');[
                 'operation' => 'error',
                 'message' => "Site not published yet, can't update unpublished site!"
             ];
@@ -486,22 +486,19 @@ class StoreController extends BaseController
 
             //create new store? and delete current one
 
-            return self::message("success","Store will be updated in 2-5 min!");
+            return self::message("Store will be updated in 2-5 min!");
         }
 
         Yii::error('[Error while upgrading site]' . isset($response->data['message'])? json_encode($response->data['message']): json_encode($response->data) . ' RestaurantUuid: '. $store->restaurant_uuid, __METHOD__);
 
-        return [
-            'operation' => 'error',
-            'message' => $response->data['message']
-        ];
+        return self::message($response->data['message'], 'error');
     }
 
     /**
      * Enable payment method
      * @return mixed
      */
-    public function actionEnablePaymentMethod($id = null, $paymentMethodId)
+    public function actionEnablePaymentMethod($id = null, $paymentMethodId = null)
     {
         $model = $this->findModel($id);
 
@@ -510,9 +507,9 @@ class StoreController extends BaseController
         $method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$method->save()) {
-            return self::message("error",$method->getErrors());
+            return self::message($method->getErrors(), 'error');
         }
-        return self::message("success",'Payment method added successfully');
+        return self::message("Payment method added successfully");
     }
 
     /**
@@ -623,10 +620,10 @@ class StoreController extends BaseController
         }
 
         if (!$model->save()) {
-            return self::message("error", $model->errors);
+            return self::message($model->errors, 'error');  
         }
 
-        return self::message("success", "Business details updated successfully!");
+        return self::message("Business details updated successfully!");
     }
 
     /**
@@ -652,10 +649,10 @@ class StoreController extends BaseController
         $model->storeKyc->sales_channels = Yii::$app->request->getBodyParam('sales_channels');
 
         if(!$model->storeKyc->save()) {
-            return self::message("error",$model->errors);
+            return self::message($model->errors, 'error');
         }
 
-        return self::message("success", "KYC updated successfully");
+        return self::message("KYC updated successfully");
     }
 
     /**
@@ -696,7 +693,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error", $model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (
@@ -708,7 +705,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (
@@ -720,7 +717,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (
@@ -732,7 +729,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (
@@ -744,7 +741,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             //if provided + changed
@@ -758,7 +755,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (
@@ -770,7 +767,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (
@@ -782,7 +779,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (
@@ -794,7 +791,7 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (
@@ -806,23 +803,23 @@ class StoreController extends BaseController
                 )
             ) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             if (!$model->save()) {
                 $transaction->rollBack();
-                return self::message("error",$model->errors);
+                return self::message($model->errors, 'error');
             }
 
             $transaction->commit();
 
-            return self::message("success", "Documents uploaded successfully!");
+            return self::message("Documents uploaded successfully!");
         }
         catch (\Exception $e)
         {
             $transaction->rollBack();
 
-            return self::message("error",$e->getMessage());
+            return self::message($e->getMessage(), 'error');
         }
     }
 
@@ -851,7 +848,7 @@ class StoreController extends BaseController
             return $response;
         }
 
-        return self::message("success", "Your request has been successfully submitted");
+        return self::message("Your request has been successfully submitted");            
     }
 
     /**
@@ -874,7 +871,7 @@ class StoreController extends BaseController
             ->one();
 
         if($payment_gateway_queue) {
-            return self::message("success", "Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
+            return self::message("Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
         }
 
         $payment_gateway_queue = new PaymentGatewayQueue;
@@ -883,19 +880,19 @@ class StoreController extends BaseController
         $payment_gateway_queue->payment_gateway =  'tap';
 
         if (!$payment_gateway_queue->save()) {
-            return self::message("error", $model->errors);
+            return self::message($model->errors, 'error');
         }
 
         $model->payment_gateway_queue_id = $payment_gateway_queue->payment_gateway_queue_id;
 
         if(!$model->save(false)) {
-            return self::message("error", $model->errors);
+            return self::message($model->errors, 'error');          
         }
 
         //process to give them instant response/ feedback
         //return $model->processQueue();
 
-        return self::message("success", "Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
+        return self::message("Your TAP payments account will be ready within 24 hours. We'll email you once it's ready!");
     }
 
     /**
@@ -918,7 +915,7 @@ class StoreController extends BaseController
                 ->one();
 
             if(!$payment_method) {
-                return self::message("error", Yii::t('agent', 'Invalid payment method'));
+                return self::message(Yii::t('agent', 'Invalid payment method'), 'error');
             }
 
             $knet = new RestaurantPaymentMethod();
@@ -929,7 +926,7 @@ class StoreController extends BaseController
 
                 $transaction->rollBack();
 
-                return self::message("error",$knet->getErrors());
+                return self::message($knet->getErrors(), 'error');
             }
         }
 
@@ -944,7 +941,7 @@ class StoreController extends BaseController
                 ->one();
 
             if(!$payment_method) {
-                return self::message("error", Yii::t('agent', 'Invalid payment method'));
+                return self::message(Yii::t('agent', 'Invalid payment method'), 'error');
             }
 
             $creditCard = new RestaurantPaymentMethod();
@@ -955,13 +952,13 @@ class StoreController extends BaseController
 
                 $transaction->rollBack();
 
-                return self::message("error",$creditCard->getErrors());
+                return self::message($creditCard->getErrors(), 'error');
             }
         }
 
         $transaction->commit();
 
-        return self::message("success","Online payments enabled successfully");
+        return self::message("Online payments enabled successfully");
     }
 
     /**
@@ -981,13 +978,13 @@ class StoreController extends BaseController
             if (!$payment->delete()) {
                 $transaction->rollBack();
 
-                return self::message("error",'Error on disabling payment method');
+                return self::message('Error on disabling payment method', 'error');
             }
         }
 
         $transaction->commit();
 
-        return self::message("success","Online payments disabled successfully");
+        return self::message("Online payments disabled successfully");
     }
 
     /**
@@ -1002,7 +999,7 @@ class StoreController extends BaseController
             ->exists();
 
         if ($payment_method) {
-            return self::message("error",'Cash on delivery already enabled');
+            return self::message('Cash on delivery already enabled', 'error');
         }
 
         $codPaymentMethod = PaymentMethod::find()
@@ -1010,7 +1007,7 @@ class StoreController extends BaseController
             ->one();
 
         if(!$codPaymentMethod) {
-            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            return self::message(Yii::t('agent', 'Invalid payment method'), 'error');
         }
 
         $payments_method = new RestaurantPaymentMethod();
@@ -1018,10 +1015,10 @@ class StoreController extends BaseController
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
-            return self::message("error",$payments_method->getErrors());
+            return self::message($payments_method->getErrors(), 'error');
         }
 
-        return self::message("success","Cash on delivery enabled successfully");
+        return self::message("Cash on delivery enabled successfully");
     }
 
     /**
@@ -1037,14 +1034,14 @@ class StoreController extends BaseController
 
         if (!$payment_method) {
             //throw new BadRequestHttpException('The requested record does not exist.');
-            return self::message("success", "Cash on delivery disabled already!");
+            return self::message("Cash on delivery disabled already!");          
         }
 
         if (!$payment_method->delete()) {
-            return self::message("error", $payment_method->getErrors());
+            return self::message($payment_method->getErrors(), 'error');
         }
 
-        return self::message("success","Cash on delivery disabled successfully");
+        return self::message("Cash on delivery disabled successfully");
     }
 
     /**
@@ -1060,7 +1057,7 @@ class StoreController extends BaseController
             ->exists();
 
         if ($payment_method) {
-            return self::message("error",'Moyasar already enabled');
+            return self::message('Moyasar already enabled', 'error');
         }
 
         $codPaymentMethod = PaymentMethod::find()
@@ -1068,7 +1065,7 @@ class StoreController extends BaseController
             ->one();
 
         if(!$codPaymentMethod) {
-            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            return self::message(Yii::t('agent', 'Invalid payment method'), 'error');
         }
 
         $payments_method = new RestaurantPaymentMethod();
@@ -1076,10 +1073,10 @@ class StoreController extends BaseController
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
-            return self::message("error",$payments_method->getErrors());
+            return self::message($payments_method->getErrors(), 'error');
         }
 
-        return self::message("success","Moyasar enabled successfully");
+        return self::message("Moyasar enabled successfully");
     }
 
     /**
@@ -1095,12 +1092,12 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            return self::message("success", "Moyasar disabled already!");
+            return self::message("Moyasar disabled already!");
            // throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         if (!$payment_method->delete()) {
-            return self::message("error", $payment_method->getErrors());
+            return self::message($payment_method->getErrors(), 'error');
         }
 
         Setting::deleteAll([
@@ -1108,7 +1105,7 @@ class StoreController extends BaseController
                 'code' => PaymentMethod::CODE_MOYASAR
             ]);
 
-        return self::message("success", "Moyasar disabled successfully");
+        return self::message("Moyasar disabled successfully");
     }
 
     /**
@@ -1124,7 +1121,7 @@ class StoreController extends BaseController
             ->exists();
 
         if ($payment_method) {
-            return self::message("error",'Tabby already enabled');
+            return self::message('Tabby already enabled', 'error');
         }
 
         $codPaymentMethod = PaymentMethod::find()
@@ -1132,7 +1129,7 @@ class StoreController extends BaseController
             ->one();
 
         if(!$codPaymentMethod) {
-            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            return self::message(Yii::t('agent', 'Invalid payment method'), 'error');
         }
 
         $payments_method = new RestaurantPaymentMethod();
@@ -1140,12 +1137,12 @@ class StoreController extends BaseController
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
-            return self::message("error",$payments_method->getErrors());
+            return self::message($payments_method->getErrors(), 'error');
         }
 
         TabbyTransaction::registerWebhooks($model->restaurant_uuid);
 
-        return self::message("success","Tabby enabled successfully");
+        return self::message("Tabby enabled successfully");
     }
 
     /**
@@ -1161,12 +1158,12 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            return self::message("success", "Tabby disabled already!");
+            return self::message("Tabby disabled already!");
             // throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         if (!$payment_method->delete()) {
-            return self::message("error", $payment_method->getErrors());
+            return self::message($payment_method->getErrors(), 'error');
         }
 
         Setting::deleteAll([
@@ -1174,7 +1171,7 @@ class StoreController extends BaseController
             'code' => PaymentMethod::CODE_TABBY
         ]);
 
-        return self::message("success", "Tabby disabled successfully");
+        return self::message("Tabby disabled successfully");
     }
 
     /**
@@ -1192,7 +1189,7 @@ class StoreController extends BaseController
             ->exists();
 
         if ($payment_method) {
-            return self::message("error",'Stripe already enabled');
+            return self::message('Stripe already enabled', 'error');
         }
 
         $codPaymentMethod = PaymentMethod::find()
@@ -1200,7 +1197,7 @@ class StoreController extends BaseController
             ->one();
 
         if(!$codPaymentMethod) {
-            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            return self::message(Yii::t('agent', 'Invalid payment method'), 'error');
         }
 
         $payments_method = new RestaurantPaymentMethod();
@@ -1208,10 +1205,10 @@ class StoreController extends BaseController
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
-            return self::message("error", $payments_method->getErrors());
+            return self::message($payments_method->getErrors(), 'error');
         }
 
-        return self::message("success","Stripe enabled successfully");
+        return self::message("Stripe enabled successfully");
     }
 
     /**
@@ -1227,12 +1224,12 @@ class StoreController extends BaseController
             ->one();
 
         if (!$payment_method) {
-            return self::message("success", "Stripe disabled already!");
+            return self::message("Stripe disabled already!");
             //throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         if (!$payment_method->delete()) {
-            return self::message("error", $payment_method->getErrors());
+            return self::message($payment_method->getErrors(), 'error');
         }
 
         Setting::deleteAll([
@@ -1240,7 +1237,7 @@ class StoreController extends BaseController
             'code' => PaymentMethod::CODE_STRIPE
         ]);
 
-        return self::message("success", "Stripe disabled successfully");
+        return self::message("Stripe disabled successfully");
     }
 
     /**
@@ -1258,7 +1255,7 @@ class StoreController extends BaseController
             ->exists();
 
         if ($payment_method) {
-            return self::message("error",'UPayment already enabled');
+            return self::message('UPayment already enabled', 'error');
         }
 
         $codPaymentMethod = PaymentMethod::find()
@@ -1266,7 +1263,7 @@ class StoreController extends BaseController
             ->one();
 
         if(!$codPaymentMethod) {
-            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            return self::message(Yii::t('agent', 'Invalid payment method'), 'error');
         }
 
         $payments_method = new RestaurantPaymentMethod();
@@ -1274,10 +1271,10 @@ class StoreController extends BaseController
         $payments_method->restaurant_uuid = $model->restaurant_uuid;
 
         if (!$payments_method->save()) {
-            return self::message("error", $payments_method->getErrors());
+            return self::message($payments_method->getErrors(), 'error');
         }
 
-        return self::message("success","UPayment enabled successfully");
+        return self::message("UPayment enabled successfully");
     }
 
     /**
@@ -1297,7 +1294,7 @@ class StoreController extends BaseController
         }
 
         if (!$payment_method->delete()) {
-            return self::message("error", $payment_method->getErrors());
+            return self::message($payment_method->getErrors(), 'error');
         }
 
         Setting::deleteAll([
@@ -1305,7 +1302,7 @@ class StoreController extends BaseController
             'code' => PaymentMethod::CODE_UPAYMENT
         ]);
 
-        return self::message("success", "UPayment disabled successfully");
+        return self::message("UPayment disabled successfully");
     }
 
 
@@ -1321,7 +1318,7 @@ class StoreController extends BaseController
             ->one();
 
         if(!$freePaymentMethod) {
-            return self::message("error", Yii::t('agent', 'Invalid payment method'));
+            return self::message(Yii::t('agent', 'Invalid payment method'), 'error');
         }
 
         $restaurantPaymentMethod = RestaurantPaymentMethod::find()
@@ -1338,10 +1335,10 @@ class StoreController extends BaseController
         $restaurantPaymentMethod->status = RestaurantPaymentMethod::STATUS_ACTIVE;
 
         if (!$restaurantPaymentMethod->save()) {
-            return self::message("error",$restaurantPaymentMethod->getErrors());
+            return self::message($restaurantPaymentMethod->getErrors(), 'error');
         }
 
-        return self::message("success","Free checkout enabled successfully");
+        return self::message("Free checkout enabled successfully");
     }
 
     /**
@@ -1364,17 +1361,17 @@ class StoreController extends BaseController
             ->one();
 
         if (!$restaurantPaymentMethod) {
-            return self::message("success", "Free checkout disabled already!");
+            return self::message("Free checkout disabled already!");
             //throw new BadRequestHttpException('The requested record does not exist.');
         }
 
         $restaurantPaymentMethod->status = RestaurantPaymentMethod::STATUS_INACTIVE;
 
         if (!$restaurantPaymentMethod->save(false)) {
-            return self::message("error", $restaurantPaymentMethod->getErrors());
+            return self::message($restaurantPaymentMethod->getErrors(), 'error');
         }
 
-        return self::message("success","Free checkout disabled successfully");
+        return self::message("Free checkout disabled successfully");
     }
 
     /**
@@ -1400,7 +1397,7 @@ class StoreController extends BaseController
         $upload->created_by = Yii::$app->user->getId();
 
         if (!$upload->save()) {
-            return self::message("error", $upload->getErrors());
+            return self::message($upload->getErrors(), 'error');
         }
 
         //add apple pay in store if not already
@@ -1414,7 +1411,7 @@ class StoreController extends BaseController
         $rpm->payment_method_id = $paymentMethod->payment_method_id;
 
         if(!$rpm->save()) {
-            return self::message("error", $rpm->getErrors());
+            return self::message($rpm->getErrors(), 'error');
         }
 
         return [
@@ -1515,7 +1512,7 @@ class StoreController extends BaseController
 
         $transaction->commit ();
 
-        return self::message("success","Layout updated successfully");
+        return self::message("Layout updated successfully");          
     }
 
     /**
@@ -1531,7 +1528,7 @@ class StoreController extends BaseController
             $model->paymentGatewayQueue->queue_status == PaymentGatewayQueue::QUEUE_STATUS_COMPLETE
         )
         {
-            return self::message("error", "Payment gateway already active");
+            return self::message("Payment gateway already active", 'error');
         }
 
         return $model->paymentGatewayQueue->processQueue();
@@ -1551,10 +1548,10 @@ class StoreController extends BaseController
         $store->is_tap_enable = false;
 
         if(!$store->save(false)) {
-            return self::message("error", $store->errors);
+            return self::message($store->errors, 'error');
         }
 
-        return self::message("success", "Payment gateway queue removed");
+        return self::message("Payment gateway queue removed");
     }
 
     /**
@@ -1579,7 +1576,7 @@ class StoreController extends BaseController
             ];
         }
 
-        return self::message("success","Delivery integration updated successfully");
+        return self::message("Delivery integration updated successfully");
     }
 
     /**
@@ -1640,7 +1637,7 @@ class StoreController extends BaseController
                 $model->restaurant_uuid
             );
 
-        return self::message("success","Analytics integration updated successfully");
+        return self::message("Analytics integration updated successfully");
     }
 
     /**
@@ -1666,7 +1663,7 @@ class StoreController extends BaseController
      * @throws NotFoundHttpException
      * update store status
      */
-    public function actionUpdateStoreStatus($id = null, $status) {
+    public function actionUpdateStoreStatus($id = null, $status = null) {
 
         $model = $this->findModel($id);
 
@@ -1682,7 +1679,7 @@ class StoreController extends BaseController
             $model->save(false);
         }
 
-        return self::message("success","Status changed successfully");
+        return self::message("Status changed successfully");
     }
 
     /**
@@ -1724,7 +1721,7 @@ class StoreController extends BaseController
                 "store_status" => Restaurant::RESTAURANT_STATUS_CLOSED
             ], null, $model->restaurant_uuid);
 
-        return self::message("success", "Status changed successfully");
+        return self::message("Status changed successfully");
     }
 
     /**
@@ -1781,7 +1778,7 @@ class StoreController extends BaseController
      * @param $message
      * @return array
      */
-    public static function message($type = "success", $message) {
+    public static function message($message, $type = "success") {   
         return [
             "operation" => $type,
             "message" => is_string ($message)? Yii::t('agent', $message): $message

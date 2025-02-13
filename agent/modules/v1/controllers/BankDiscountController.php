@@ -34,6 +34,7 @@ class BankDiscountController extends BaseController {
     public function actionList($store_uuid = null) {
 
         $this->ownerCheck();
+
         $keyword = Yii::$app->request->get('keyword');
         $status = Yii::$app->request->get('status');
 
@@ -67,6 +68,7 @@ class BankDiscountController extends BaseController {
      * @return array
      */
     public function actionCreate() {
+
         $this->ownerCheck();
         
         $store_uuid = Yii::$app->request->getBodyParam("store_uuid");
@@ -187,7 +189,7 @@ class BankDiscountController extends BaseController {
      * @return BankDiscount
      * @throws NotFoundHttpException
      */
-    public function actionDetail($store_uuid = null, $bank_discount_id) {
+    public function actionDetail($bank_discount_id, $store_uuid = null) {
         $this->ownerCheck();
         return $this->findModel($bank_discount_id, $store_uuid);
     }

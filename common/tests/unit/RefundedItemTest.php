@@ -23,7 +23,7 @@ class RefundedItemTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'items' => RefundedItemFixture::className()
+            'items' => RefundedItemFixture::class
         ];
     }
 
@@ -32,34 +32,30 @@ class RefundedItemTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                RefundedItem::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(RefundedItem::find()->one(), 'Check data loaded');
 
-        $this->specify('RefundedItem model fields validation', function () {
+        //$this->specify('RefundedItem model fields validation', function () {
             $model = new RefundedItem();
 
-            expect('should not accept empty refund_id', $model->validate(['refund_id']))->false();
-            expect('should not accept empty order_item_id', $model->validate(['order_item_id']))->false();
-            expect('should not accept empty item_uuid', $model->validate(['item_uuid']))->false();
-            expect('should not accept empty order_uuid', $model->validate(['order_uuid']))->false();
-            expect('should not accept empty item_name', $model->validate(['item_name']))->false();
-            expect('should not accept empty item_price', $model->validate(['item_price']))->false();
-            expect('should not accept empty qty', $model->validate(['qty']))->false();
+            $this->assertFalse($model->validate(['refund_id']), 'should not accept empty refund_id');
+            $this->assertFalse($model->validate(['order_item_id']), 'should not accept empty order_item_id');
+            $this->assertFalse($model->validate(['item_uuid']), 'should not accept empty item_uuid');
+            $this->assertFalse($model->validate(['order_uuid']), 'should not accept empty order_uuid');
+            $this->assertFalse($model->validate(['item_name']), 'should not accept empty item_name');
+            $this->assertFalse($model->validate(['item_price']), 'should not accept empty item_price');
+            $this->assertFalse($model->validate(['qty']), 'should not accept empty qty');
 
             $model->item_uuid = 12312312313;
-            expect('should not accept invalid item_uuid', $model->validate(['item_uuid']))->false();
+            $this->assertFalse($model->validate(['item_uuid']), 'should not accept invalid item_uuid');
 
             $model->order_uuid = 12312312313;
-            expect('should not accept invalid order_uuid', $model->validate(['order_uuid']))->false();
+            $this->assertFalse($model->validate(['order_uuid']), 'should not accept invalid order_uuid');
 
             $model->refund_id = 12312312313;
-            expect('should not accept invalid refund_id', $model->validate(['refund_id']))->false();
+            $this->assertFalse($model->validate(['refund_id']), 'should not accept invalid refund_id');
 
             $model->order_item_id = 12312312313;
-            expect('should not accept invalid order_item_id', $model->validate(['order_item_id']))->false();
-        });
+            $this->assertFalse($model->validate(['order_item_id']), 'should not accept invalid order_item_id');
+      //  });
     }
 }

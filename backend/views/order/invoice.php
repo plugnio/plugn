@@ -83,9 +83,13 @@ $this->params['restaurant_uuid'] = $model->restaurant_uuid;
                   <p class="card-text mb-25"  style="display: contents">
                     <?=  $model->area_id && $model->office != null && strtolower($model->unit_type) == Order::UNIT_TYPE_OFFICE ? 'Office No. ' . $model->office : ''?>
                   </p>
-                  <p class="card-text mb-25"  style="display: block">
-                    <?= $model->area_id ? (strtotime($model->unit_type) == Order::UNIT_TYPE_HOUSE ? 'House No. ' : 'Building ') . $model->house_number :  ''  ?>
-                  </p>
+                  <?php if ($model->area_id) { ?>
+                    <p class="card-text mb-25"  style="display: block">
+                      <?= $model->unit_type == Order::UNIT_TYPE_HOUSE ? 'House No.' : 'Building'  ?>
+                      &nbsp;
+                      <?= $model->house_number ?>
+                    </p>
+                  <?php } ?>
 
                 </div>
                 <?php } else { ?>

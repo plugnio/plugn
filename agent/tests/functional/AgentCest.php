@@ -16,10 +16,10 @@ class AgentCest
 
     public function _fixtures() {
         return [
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'stores' => RestaurantFixture::className(),
-            'agents' => AgentFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'stores' => RestaurantFixture::class,
+            'agents' => AgentFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

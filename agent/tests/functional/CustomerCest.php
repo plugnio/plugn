@@ -20,13 +20,13 @@ class CustomerCest
 
     public function _fixtures() {
         return [
-            'agents' => AgentFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'banks' => BankFixture::className(),
-            'customers' => CustomerFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'orders' => OrderFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'agents' => AgentFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'banks' => BankFixture::class,
+            'customers' => CustomerFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'orders' => OrderFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

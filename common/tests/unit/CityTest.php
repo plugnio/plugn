@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\CityFixture;
-use Codeception\Specify;
 use common\models\City;
 
 class CityTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class CityTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'cities' => CityFixture::className()];
+            'cities' => CityFixture::class];
     }
 
     /**
@@ -31,20 +28,13 @@ class CityTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                City::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(City::find()->one(), 'Check data loaded');
 
-        $this->specify('City model fields validation', function () {
-            $model = new City();
+        $model = new City();
+        $this->assertFalse($model->validate(['country_id']), 'should not accept empty country_id');
+        $this->assertFalse($model->validate(['city_name']), 'should not accept empty city_name');
 
-            expect('should not accept empty country_id', $model->validate(['country_id']))->false();
-            expect('should not accept empty city_name', $model->validate(['city_name']))->false();
-
-            $model->country_id = 12312312313;
-            expect('should not accept invalid country_id', $model->validate(['country_id']))->false();
-        });
+        $model->country_id = 12312312313;
+        $this->assertFalse($model->validate(['country_id']), 'should not accept invalid country_id');
     }
 }

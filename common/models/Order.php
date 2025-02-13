@@ -406,7 +406,8 @@ class Order extends \yii\db\ActiveRecord
      */
     private static function getUniqueOrderUuid($length = 6)
     {
-        $uuid = \ShortCode\Random::get($length);
+        $uuid = Yii::$app->security->generateRandomString ($length);
+            //\ShortCode\Random::get($length);
 
         $isNotUnique = static::find()->where(['order_uuid' => $uuid])->exists();
 
@@ -1532,9 +1533,11 @@ class Order extends \yii\db\ActiveRecord
                 //set ETA value
                 \Yii::$app->timeZone = 'Asia/Kuwait';
 
-                if ($this->is_order_scheduled)
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
-                else {
+                if ($this->is_order_scheduled) {
+                    if ($this->scheduled_time_start_from) {
+                        $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime($this->scheduled_time_start_from));
+                    }
+                } else {
                     if ($this->delivery_zone_id) {
                         $this->estimated_time_of_arrival =
                             date(
@@ -1584,9 +1587,10 @@ class Order extends \yii\db\ActiveRecord
 
                     }
 
+                    $baseTime = $this->estimated_time_of_arrival? 
+                        Yii::$app->formatter->asTimestamp($this->estimated_time_of_arrival): time();
 
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
-
+                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $maxPrepTime . ' min', $baseTime));
                 }
             } else {
                 if ($this->orderItems) {
@@ -1610,23 +1614,32 @@ class Order extends \yii\db\ActiveRecord
 
                     }
 
-
-                    $this->estimated_time_of_arrival = date("Y-m-d H:i:s", strtotime('+' . $maxPrepTime . ' min', Yii::$app->formatter->asTimestamp(date('Y-m-d H:i:s', strtotime($this->estimated_time_of_arrival)))));
-
+                    $baseTime = $this->estimated_time_of_arrival? 
+                        Yii::$app->formatter->asTimestamp($this->estimated_time_of_arrival): time();
+                        
+                    $this->estimated_time_of_arrival = date(
+                        "Y-m-d H:i:s",
+                        strtotime(
+                        '+' . $maxPrepTime . ' min', 
+                        $baseTime
+                        )
+                    );
                 }
             }
 
-
-
                       if($this->restaurant->version == 4) {
 
-                          $start_date = date("Y-m-d H:i:s", mktime(00, 00, 0, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival))  ));
-                          $end_date =  date("Y-m-d H:i:s", mktime(23, 59, 59, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival)) ));
+                          $start_date = $this->estimated_time_of_arrival? 
+                            date("Y-m-d H:i:s", mktime(00, 00, 0, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival))  )): 
+                            date("Y-m-d H:i:s", mktime(00, 00, 0, date("m"),  date("d")  ));
+
+                          $end_date = $this->estimated_time_of_arrival? 
+                            date("Y-m-d H:i:s", mktime(23, 59, 59, date("m",strtotime($this->estimated_time_of_arrival)),  date("d",strtotime($this->estimated_time_of_arrival)) )): 
+                            date("Y-m-d H:i:s", mktime(23, 59, 59, date("m"),  date("d")));
 
                           $numOfPickupOrders = 0;
                           $numOfDeliveryOrders =  0;
                           $numOfOrders =  0;
-
 
                           if($this->order_mode  == static::ORDER_MODE_DELIVERY && $this->businessLocation->max_num_orders !== null){
                             $numOfPickupOrders = $this->businessLocation->getPickupOrders()->activeOrders()

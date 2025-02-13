@@ -50,11 +50,15 @@ class ResendVerificationEmailForm extends Model
         }
 
         //Check if this user sent an email in past few minutes (to limit email spam)
-        $emailLimitDatetime = new \DateTime($partner->partner_limit_email);
-        date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
         $currentDatetime = new \DateTime();
+        $emailLimitDatetime = null;
 
-        if ($partner->partner_limit_email && $currentDatetime < $emailLimitDatetime) {
+        if ($user->partner_limit_email) {
+            $emailLimitDatetime = new \DateTime($user->partner_limit_email);
+            date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+        }
+
+        if ($user->partner_limit_email && $currentDatetime < $emailLimitDatetime) {
 
             $difference = $currentDatetime->diff($emailLimitDatetime);
             $minuteDifference = (int) $difference->i;

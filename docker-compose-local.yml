@@ -1,0 +1,73 @@
+version: '3.8'
+
+networks:
+  plugn-network:
+    driver: bridge
+
+services:
+  
+  mysql:
+    image: mysql:8.4.3
+    restart: always
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=plugn
+      - MYSQL_DATABASE=plugn
+      - MYSQL_USER=plugnuser
+      - MYSQL_PASSWORD=plugn
+    #ports:
+    #  - "3306:3306"
+    networks:
+      - plugn-network
+
+  app:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile-nginx-local
+    container_name: plugn-backend-local
+    #command:
+    #  - /bin/sh
+    #  - -c
+    #  - |
+    #    sleep 5 && \
+    #    ./init --env=Dev-Server --overwrite=All && \
+    #    ./yii migrate && \
+    #    sleep 1 && \
+    #    ln -s /etc/nginx/sites-available/basic.conf /etc/nginx/sites-enabled/ && \
+    #    service nginx restart  && \
+    #    tail -f /dev/null  # Keep container running
+    ports:
+      - "8083:8083" #backend endpoint
+      - "8082:8082" #store endpoint
+      - "8081:8081" #vendor dashboard endpoint
+      - "8084:8084" #crm endpoint
+      - "8085:8085" #partner endpoint
+      - "8086:8086" #remail endpoint
+      - "8087:8087" #shortner endpoint
+    volumes:
+      - .:/home/ubuntu/plugn
+      #- ./nginx/basic.conf:/etc/nginx/sites-available/basic.conf
+    depends_on:
+      - redis
+      - mysql
+    networks:
+      - plugn-network
+
+  redis:
+    image: redis:6.2.3
+  #  ports:
+  #    - "7777:7777"
+ #     - "6379:6379"
+    networks:
+      - plugn-network
+   # command:
+   #   - redis-server --port 7777
+    volumes:
+    - redis-data:/data
+
+volumes:
+  redis-data:
+  mysql-data: 
+

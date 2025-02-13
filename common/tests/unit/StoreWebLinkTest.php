@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\StoreWebLinkFixture;
-use Codeception\Specify;
 use common\models\StoreWebLink;
 
 class StoreWebLinkTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class StoreWebLinkTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'links' => StoreWebLinkFixture::className()
+            'links' => StoreWebLinkFixture::class
         ];
     }
 
@@ -32,24 +29,16 @@ class StoreWebLinkTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check bank discount loaded',
-                StoreWebLink::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(StoreWebLink::find()->one(), 'Check bank discount loaded');
 
-        $this->specify('StoreWebLink model fields validation', function () {
-            $model = new StoreWebLink;
+        $model = new StoreWebLink();
+        $this->assertFalse($model->validate(['web_link_id']), 'should not accept empty web_link_id');
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept empty restaurant_uuid');
 
-            expect('should not accept empty web_link_id', $model->validate(['web_link_id']))->false();
-            expect('should not accept empty restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
+        $model->web_link_id = 12312312313;
+        $this->assertFalse($model->validate(['web_link_id']), 'should not accept invalid web_link_id');
 
-            $model->web_link_id = 12312312313;
-            expect('should not accept invalid web_link_id', $model->validate(['web_link_id']))->false();
-
-            $model->restaurant_uuid = 12312312313;
-            expect('should not accept invalid restaurant_uuid', $model->validate(['restaurant_uuid']))->false();
-
-        });
+        $model->restaurant_uuid = 12312312313;
+        $this->assertFalse($model->validate(['restaurant_uuid']), 'should not accept invalid restaurant_uuid');
     }
 }

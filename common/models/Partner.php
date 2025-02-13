@@ -10,6 +10,7 @@ use yii\db\Expression;
 use yii\web\IdentityInterface;
 use yii\db\ActiveQuery;
 use common\models\PartnerToken;
+
 /**
  * This is the model class for table "partner".
  *
@@ -169,7 +170,8 @@ class Partner extends \yii\db\ActiveRecord implements IdentityInterface {
     * @return string uuid
     */
    private static function getUniqueReferralCode($length = 6) {
-       $uuid = \ShortCode\Random::get($length);
+       $uuid = Yii::$app->security->generateRandomString ($length);
+       //\ShortCode\Random::get($length);
 
        $isNotUnique = static::find()->where(['referral_code' => $uuid])->exists();
 

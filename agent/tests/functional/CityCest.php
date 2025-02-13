@@ -17,10 +17,10 @@ class CityCest
 
     public function _fixtures() {
         return [
-            'city' => CityFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'agents' => AgentFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'city' => CityFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'agents' => AgentFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 

@@ -289,9 +289,13 @@ class AuthController extends Controller {
             }
 
             //Check if this user sent an email in past few minutes (to limit email spam)
-            $emailLimitDatetime = new \DateTime($staff->staff_limit_email);
-            date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+            $emailLimitDatetime = null;
             $currentDatetime = new \DateTime();
+
+            if ($staff->staff_limit_email) {
+                $emailLimitDatetime = new \DateTime($staff->staff_limit_email);
+                date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+            }
 
             if ($staff->staff_limit_email && $currentDatetime < $emailLimitDatetime) {
                 $difference = $currentDatetime->diff($emailLimitDatetime);
@@ -418,10 +422,15 @@ class AuthController extends Controller {
         ]);
 
         //Check if this user sent an email in past few minutes (to limit email spam)
-        $emailLimitDatetime = new \DateTime($staff->staff_limit_email);
-        date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+        
         $currentDatetime = new \DateTime('now');
-
+        $emailLimitDatetime = null;
+        
+        if ($staff->staff_limit_email) {
+            $emailLimitDatetime = new \DateTime($staff->staff_limit_email);
+            date_add($emailLimitDatetime, date_interval_create_from_date_string('1 minutes'));
+        }
+        
         if ($staff->staff_limit_email && $currentDatetime < $emailLimitDatetime) {
             $difference = $currentDatetime->diff($emailLimitDatetime);
             $minuteDifference = (int) $difference->i;

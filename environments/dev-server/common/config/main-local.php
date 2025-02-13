@@ -84,45 +84,25 @@ return [
             ],
         ],
         // 'mailer' => [
-        //          'class' => 'yii\swiftmailer\Mailer',
+        //          'class' => \yii\symfonymailer\Mailer::class,
         //          'viewPath' => '@common/mail',
         //          // send all mails to a file by default. You have to set
         //          // 'useFileTransport' to false and configure a transport
         //          // for the mailer to send real emails.
         //          'useFileTransport' => true,
         // ],
+        
         'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
+            'class' => \yii\symfonymailer\Mailer::class,
             'viewPath' => '@common/mail',
             'transport' => [
-                'class' => 'Swift_SmtpTransport',
+                'scheme' => 'smtp',
                 'host' => 'smtp.elasticemail.com',
-                'username' => 'support@plugn.io',
-                'password' => 'CD006D3ED0C5BD796D1D2C77B111CC24AF9E',
+                'username' => 'no-reply@mail.plugn.site',
+                'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
                 'port' => '2525',
                 'encryption' => 'tls'
-                /*
-                'class' => 'Swift_SmtpTransport',
-                'host' => 'email-smtp.eu-west-1.amazonaws.com',
-                'username' => 'AKIAWMITDJRKTH5HBB2O',
-                'password' => 'BKyPcINpZJsEVnUrMGymff27eaIztgNwSWN7xI2960eJ',
-                'port' => '587',
-                'encryption' => 'tls',*/
             ],
-            /*
-            'transport' => [
-                'class' => 'Swift_SmtpTransport',
-                'host' => 'smtp.sendgrid.net',
-                'username' => 'apikey',
-                'password' => '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',
-                'port' => '587',
-                'encryption' => 'tls',
-                // 'plugins' => [
-                //     [
-                //         'class' => 'Openbuildings\Swiftmailer\CssInlinerPlugin',
-                //     ],
-                // ],
-            ],*/
         ],
 
         'cache' => [

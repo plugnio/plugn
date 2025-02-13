@@ -590,8 +590,8 @@ class Item extends \yii\db\ActiveRecord
             "preparation_time_days" => $this->prep_time_unit == "day" ? $this->prep_time : null,
             "seo_page_title_english" => $this->item_meta_title,
             "seo_page_title_arabic" => $this->item_meta_title_ar,
-            "meta_tag_description_length_english" => strlen($this->item_meta_description),
-            "meta_tag_description_length_arabic" => strlen($this->item_meta_description_ar),
+            "meta_tag_description_length_english" => $this->item_meta_description? strlen($this->item_meta_description): 0,
+            "meta_tag_description_length_arabic" => $this->item_meta_description_ar? strlen($this->item_meta_description_ar): 0,
             "sku_id" => $this->sku,
             "barcode_id" => $this->barcode,
             "quantity_tracked" => $this->track_quantity,
@@ -636,7 +636,7 @@ class Item extends \yii\db\ActiveRecord
 
     /**
      * increase stock_qty
-     * @param type $qty
+     * @param number $qty
      */
     public function increaseStockQty($qty)
     {
@@ -667,7 +667,7 @@ class Item extends \yii\db\ActiveRecord
 
     /**
      * decrease stock_qty
-     * @param type $qty
+     * @param number $qty
      */
     public function decreaseStockQty($qty)
     {

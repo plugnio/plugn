@@ -1,13 +1,9 @@
 <?php namespace common\tests;
 
 use common\fixtures\CategoryItemFixture;
-use Codeception\Specify;
 use common\models\CategoryItem;
-
 class CategoryItemTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +19,7 @@ class CategoryItemTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'categoryItems' => CategoryItemFixture::className()
+            'categoryItems' => CategoryItemFixture::class
         ];
     }
 
@@ -32,23 +28,16 @@ class CategoryItemTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check data loaded',
-                CategoryItem::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(CategoryItem::find()->one(), 'Check data loaded');
 
-        $this->specify('CategoryItem model fields validation', function () {
-            $model = new CategoryItem;
+        $model = new CategoryItem;
+        $this->assertFalse($model->validate(['category_id']), 'should not accept empty category_id');
+        $this->assertFalse($model->validate(['item_uuid']), 'should not accept empty item_uuid');
 
-            expect('should not accept empty category_id', $model->validate(['category_id']))->false();
-            expect('should not accept empty item_uuid', $model->validate(['item_uuid']))->false();
+        $model->category_id = 12312312313;
+        $this->assertFalse($model->validate(['category_id']), 'should not accept invalid category_id');
 
-            $model->category_id = 12312312313;
-            expect('should not accept invalid category_id', $model->validate(['category_id']))->false();
-
-            $model->item_uuid = 12312312313;
-            expect('should not accept invalid item_uuid', $model->validate(['item_uuid']))->false();
-        });
+        $model->item_uuid = 12312312313;
+        $this->assertFalse($model->validate(['item_uuid']), 'should not accept invalid item_uuid');
     }
 }

@@ -120,7 +120,7 @@ class PartnerPayoutController extends Controller
 
               if($transferFilePath = $model->uploadTransferFile($tmpFile)){
 
-                  $excelData  = \moonland\phpexcel\Excel::import($tmpFile,  [
+                  $excelData  = \common\components\PhpExcel::import($tmpFile,  [
                     'setFirstRecordAsKeys' => false
                   ]);
 

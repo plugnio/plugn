@@ -3,7 +3,7 @@ namespace agent\modules\v1\controllers;
 
 use Yii;
 use yii\rest\Controller;
-use yii\data\ActiveDataProvider;;
+use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\AgentAssignment;
 use agent\models\Agent;
@@ -209,7 +209,7 @@ class StaffController extends BaseController {
      * @return Country|array
      * @throws NotFoundHttpException
      */
-      public function actionDetail($store_uuid = null, $assignment_id) {
+      public function actionDetail($assignment_id, $store_uuid = null) {
           $this->ownerCheck();
           return $this->findModel($assignment_id);
 

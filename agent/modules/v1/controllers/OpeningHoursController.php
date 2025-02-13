@@ -169,7 +169,7 @@ class OpeningHoursController extends BaseController
      * @param type $opening_hour_id
      * @return type
      */
-    public function actionDetail($store_uuid = null, $day_of_week)
+    public function actionDetail($day_of_week, $store_uuid = null)
     {
 //        $this->ownerCheck();
         $store = Yii::$app->accountManager->getManagedAccount($store_uuid);

@@ -1,13 +1,10 @@
 <?php namespace common\tests;
 
 use common\fixtures\BankFixture;
-use Codeception\Specify;
 use common\models\Bank;
 
 class BankTest extends \Codeception\Test\Unit
 {
-    use Specify;
-    
     /**
      * @var \common\tests\UnitTester
      */
@@ -23,7 +20,7 @@ class BankTest extends \Codeception\Test\Unit
 
     public function _fixtures(){
         return [
-            'banks' => BankFixture::className()];
+            'banks' => BankFixture::class];
     }
 
     /**
@@ -31,16 +28,9 @@ class BankTest extends \Codeception\Test\Unit
      */
     public function testValidators()
     {
-        $this->specify('Fixtures should be loaded', function() {
-            expect('Check bank loaded',
-                Bank::find()->one()
-            )->notNull();
-        });
+        $this->assertNotNull(Bank::find()->one(), 'Check bank loaded');
 
-        $this->specify('Bank model fields validation', function () {
-            $model = new Bank;
-
-            expect('should not accept empty bank_name', $model->validate(['bank_name']))->false();
-        });
+        $model = new Bank();
+        $this->assertFalse($model->validate(['bank_name']), 'should not accept empty bank_name');
     }
 }

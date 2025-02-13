@@ -19,11 +19,11 @@ class WebLinkCest
 
     public function _fixtures() {
         return [
-            'weblinks' => WebLinkFixture::className(),
-            'agents' => AgentFixture::className(),
-            'agent_assignments' => AgentAssignmentFixture::className(),
-            'restaurants' => RestaurantFixture::className(),
-            'agentToken' => AgentTokenFixture::className()
+            'weblinks' => WebLinkFixture::class,
+            'agents' => AgentFixture::class,
+            'agent_assignments' => AgentAssignmentFixture::class,
+            'restaurants' => RestaurantFixture::class,
+            'agentToken' => AgentTokenFixture::class
         ];
     }
 
