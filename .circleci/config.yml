@@ -129,7 +129,7 @@ jobs:
 
       - run:
           name: Run Store app Codeception tests and store result output
-          command: cd ./api && ./vendor/bin/codecept run unit --xml --html --fail-fast
+          command: cd ./api && ../vendor/bin/codecept run unit --xml --html --fail-fast
 
       #---------- remail app --------------# 
 
