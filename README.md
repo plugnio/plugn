@@ -363,6 +363,20 @@ docker exec -it plugn-dev-server_redis_1 /bin/bash
 `mysql -u root -pplugn;`
 `SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));`
 
+#  Auto-Start SSH Agent on Login
+
+## Edit .bashrc (or .bash_profile for Amazon Linux)
+
+`nano ~/.bashrc`
+
+## Add this at the end of the file:
+
+`if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/github
+    ssh-add ~/.ssh/id_rsa
+fi`
+
 # Attention 
 
 - need to check if cron is running or not 
