@@ -17,8 +17,13 @@ class Ipstack {
 
     public function locate($populateData = true) {
 
+        if (!isset(Yii::$app->request)) {
+            return null;
+        }
+
         // Get initial IP address of requester
-        $ip = Yii::$app->request->getRemoteIP();
+        $ip = method_exists(Yii::$app->request, "getRemoteIP")?
+            Yii::$app->request->getRemoteIP(): null;
 
         // Check if request is forwarded via load balancer or cloudfront on behalf of user
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -29,6 +34,10 @@ class Ipstack {
 
             // Get the first ip from forwarded array to get original requester
             $ip = $IParray[0];
+        }
+
+        if (!$ip) {
+            return null;
         }
 
         // Build url used for ip check
@@ -49,6 +58,9 @@ class Ipstack {
         try {
             $responseObj = $http->request('GET');
         } catch (ClientException $e) {
+            Yii::error($e);
+            return false;
+        } catch (\Exception $e) {
             Yii::error($e);
             return false;
         }
