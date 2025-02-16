@@ -66,9 +66,13 @@ class AuthController extends BaseController {
                 if(empty($customer->customer_password_hash)) {
 
                     //Check if this user sent an email in past few minutes (to limit email spam)
-                    $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
-                    date_add($emailLimitDatetime, date_interval_create_from_date_string('60 minutes'));
+                    $emailLimitDatetime = null;
                     $currentDatetime = new \DateTime();
+
+                    if ($customer->customer_limit_email) {
+                        $emailLimitDatetime = new \DateTime($customer->customer_limit_email);
+                        date_add($emailLimitDatetime, date_interval_create_from_date_string('60 minutes'));
+                    }
 
                     if ($customer->customer_limit_email && $currentDatetime < $emailLimitDatetime) {
 
