@@ -103,14 +103,20 @@ return [
             'viewPath' => '@common/mail',
             'transport' => [
                 'scheme' => 'smtp',
+                'host' => 'email-smtp.eu-west-1.amazonaws.com',
+                'username' => 'AKIAWMITDJRKUESNXW5I',
+                'password' => 'BNLEls4MLvkjiAltRpWLTic7IMwKhggzqRVpHU5C9TFh',
+                'port' => 587,
+            ]
+        ],
+/*
+ *
                 'host' => 'smtp.elasticemail.com',
                 'username' => 'no-reply@mail.plugn.site',
                 'password' => 'E5533D22AF72CD0C79C9ADE5BA11FA7A98AC',
                 'port' => 2525,
                 'encryption' => 'tls'
-            ],
-        ],
-/*
+
         //mailgun
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
