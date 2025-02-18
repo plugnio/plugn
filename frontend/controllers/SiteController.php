@@ -1832,7 +1832,7 @@ class SiteController extends Controller
 
                 Yii::$app->eventManager->track('Store Created', [
                         'first_name' => trim($firstname),
-                        'last_name' => trim($lastname),
+                        'last_name' => $lastname ? trim($lastname) : null,
                         'store_name' => $store->name,
                         'country' => $store->country_id ? $store->country->country_name : '',
                         'currency' => $store->currency_id ? $store->currency->title : '',

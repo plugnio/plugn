@@ -447,7 +447,7 @@ class AuthController extends BaseController {
 
         Yii::$app->eventManager->track('Agent Signup', [
             'first_name' => trim($firstname),
-            'last_name' => trim($lastname),
+            'last_name' => $lastname ? trim($lastname) : null,
             'email' => $agent->agent_email,
             "campaign" => $agent->campaign ? $agent->campaign->utm_campaign : null,
             "utm_medium" => $agent->campaign ? $agent->campaign->utm_medium : null,
@@ -552,7 +552,7 @@ class AuthController extends BaseController {
 
             Yii::$app->eventManager->track('Agent Signup', [
                 'first_name' => trim($firstname),
-                'last_name' => trim($lastname),
+                'last_name' => $lastname ? trim($lastname) : null,
                 'store_name' => $store->name,
                 'phone_number' => $store->owner_number,
                 'email' => $agent->agent_email,
