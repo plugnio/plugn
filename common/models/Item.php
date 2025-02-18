@@ -919,7 +919,7 @@ class Item extends \yii\db\ActiveRecord
     public function getItemImages($model = 'common\models\ItemImage')
     {
         return $this->hasMany($model::className(), ['item_uuid' => 'item_uuid'])
-            ->orderBy('sort_number');
+            ->orderBy('sort_number, item_image_id');
     }
 
     /**
