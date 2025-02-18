@@ -231,7 +231,7 @@ class EventController extends \yii\console\Controller {
                 
                 Yii::$app->eventManager->track('Store Created', [
                         'first_name' => trim($firstname),
-                        'last_name' => trim($lastname),
+                        'last_name' => $lastname ? trim($lastname) : null,
                         'store_name' => $store->name,
                         'phone_number' => $store->owner_phone_country_code . $store->owner_number,
                         'email' => $agent->agent_email,

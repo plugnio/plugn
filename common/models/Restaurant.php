@@ -3808,7 +3808,7 @@ class Restaurant extends ActiveRecord
         Yii::$app->eventManager->track('Store Created', [
             "restaurant_uuid" => $this->restaurant_uuid,
             'first_name' => trim($firstname),
-            'last_name' => trim($lastname),
+            'last_name' => $lastname ? trim($lastname) : null,
             'store_name' => $this->name,
             'phone_number' => $this->owner_phone_country_code . $this->owner_number,
             'email' => $agent->agent_email,
@@ -3912,7 +3912,7 @@ class Restaurant extends ActiveRecord
             /**
              * Yii::$app->eventManager->track('Agent Signup', [
                 'first_name' => trim($firstname),
-                'last_name' => trim($lastname),
+                'last_name' => $lastname ? trim($lastname) : null,
                 'phone_number' => $this->owner_phone_country_code . $this->owner_number,
                 'email' => $agent->agent_email,
                 'store_url' => $this->restaurant_domain,
