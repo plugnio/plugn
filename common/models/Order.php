@@ -892,6 +892,10 @@ class Order extends \yii\db\ActiveRecord
 
         foreach ($this->restaurant->getAgentAssignments()->all() as $agentAssignment) {
 
+            if (!$agentAssignment->agent) {
+                continue;
+            }
+
             if ($agentAssignment->email_notification) {
 
                 $ml = new MailLog();

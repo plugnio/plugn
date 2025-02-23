@@ -10,7 +10,7 @@ use yii\behaviors\AttributeBehavior;
 /**
  * This is the model class for table "agent_email_verify_attempt".
  *
- * @property string $ceva_uuid
+ * @property string $aeva_uuid
  * @property string $code
  * @property string $agent_email
  * @property string $ip_address
@@ -35,11 +35,11 @@ class AgentEmailVerifyAttempt extends \yii\db\ActiveRecord
             [['agent_email','code','ip_address'], 'required'],
             ['agent_email', 'email'],
             [['created_at'], 'safe'],
-            [['ceva_uuid'], 'string', 'max' => 60],
+            [['aeva_uuid'], 'string', 'max' => 60],
             [['code'], 'string', 'max' => 32],
             [['agent_email'], 'string', 'max' => 50],
             [['ip_address'], 'string', 'max' => 45],
-            [['ceva_uuid'], 'unique'],
+            [['aeva_uuid'], 'unique'],
         ];
     }
 
@@ -57,13 +57,13 @@ class AgentEmailVerifyAttempt extends \yii\db\ActiveRecord
             [
                 'class' => AttributeBehavior::className(),
                 'attributes' => [
-                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'ceva_uuid',
+                    \yii\db\ActiveRecord::EVENT_BEFORE_INSERT => 'aeva_uuid',
                 ],
                 'value' => function() {
-                    if(!$this->ceva_uuid)
-                        $this->ceva_uuid = 'ceva_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
+                    if(!$this->aeva_uuid)
+                        $this->aeva_uuid = 'ceva_' . Yii::$app->db->createCommand('SELECT uuid()')->queryScalar();
 
-                    return $this->ceva_uuid;
+                    return $this->aeva_uuid;
                 }
             ],
         ];
@@ -87,7 +87,7 @@ class AgentEmailVerifyAttempt extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'ceva_uuid' => Yii::t('app', 'Agent Email Verify Attempt UUID'),
+            'aeva_uuid' => Yii::t('app', 'Agent Email Verify Attempt UUID'),
             'agent_email' => Yii::t('app', 'Email'),
             'code' => Yii::t('app', 'Code'),
             'ip_address' => Yii::t('app', 'Ip Address'),
