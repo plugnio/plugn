@@ -293,7 +293,11 @@ class TapPayments extends Component
                         "email" => $email,// $restaurant->owner_email,
                         "phone" => [
                             "country_code" => $restaurant->owner_phone_country_code,
-                            "number" => str_replace(' ','',(str_replace('+'.$restaurant->owner_phone_country_code, '',$restaurant->owner_number)))
+                            "number" => str_replace(
+                                [' ', '+'.$restaurant->owner_phone_country_code, "+"],
+                                ['', '', ''],
+                                $restaurant->owner_number
+                            )
                         ]
                     ]
                 ],
