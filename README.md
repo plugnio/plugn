@@ -382,3 +382,7 @@ fi`
 - need to check if cron is running or not 
 - first time running dev server, need to wait for mysql to be ready, then only start the main container 
  
+
+ mysql --host=plugn-main-latest-cluster.cluster-c8mekjvvbygf.eu-west-2.rds.amazonaws.com --user=yo3an --password=iamyo3an yo3an
+
+;dbname=
