@@ -16,9 +16,12 @@ $config = [
             // Use Redis as a cache
             'class' => 'yii\redis\Session',
             'redis' => [
-                'hostname' => 'plugn-redis.0x1cgp.0001.euw2.cache.amazonaws.com',
+                'class' => 'yii\redis\Connection',
+                'hostname' => 'redis.railway.internal',
+                'username' => 'default',
+                'password' => 'FaHoFazhmBfIINFxgfVylfWHGuwymvdw',
                 'port' => 6379,
-                'database' => 6,
+                'database' => 0,
             ]
         ],
     ],
