@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
                     'rowOptions'=>function($model){
-                        if (!str_contains($model->restaurant_domain, ".site") && $model->queue) {
+                        if ($model->restaurant_domain && !str_contains($model->restaurant_domain, ".site") && $model->queue) {
                             if ($model->queue->queue_status == \common\models\Queue::QUEUE_STATUS_PENDING) {
                                 return ['class' => 'danger'];
                             } else if ($model->queue->queue_status == \common\models\Queue::QUEUE_STATUS_HOLD) {
@@ -66,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format' => 'raw',
                             'value' => function ($data) {
 
-                                if (!str_contains($data->restaurant_domain, ".site") && $data->queue) {
+                                if ($data->restaurant_domain && !str_contains($data->restaurant_domain, ".site") && $data->queue) {
 
                                     $icon = "";
 

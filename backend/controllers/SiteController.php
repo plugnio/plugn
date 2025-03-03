@@ -125,7 +125,7 @@ class SiteController extends Controller
             ->count();
 
         return $this->render('index', [
-            "lastCronRun" => \Yii::$app->redis->get("lastCronRun"),
+            "lastCronRun" => isset(\Yii::$app->redis)? \Yii::$app->redis->get("lastCronRun"): null,
             'draft' => $draft,
             'pending' => $pending,
             'paid' => $paid,
