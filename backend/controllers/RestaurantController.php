@@ -865,6 +865,13 @@ class RestaurantController extends Controller {
     {
         $store = $this->findModel($id);
 
+        if (!$store->restaurant_domain) {
+
+            Yii::$app->session->setFlash('errorResponse', "Restaurant domain missing!");
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
+
         if(str_contains($store->restaurant_domain, ".plugn.store"))
         {
             Yii::$app->session->setFlash('errorResponse', "Already using older design!");
@@ -919,6 +926,13 @@ class RestaurantController extends Controller {
     public function actionUpgrade($id)
     {
         $store = $this->findModel($id);
+
+        if (!$store->restaurant_domain) {
+
+            Yii::$app->session->setFlash('errorResponse', "Restaurant domain missing!");
+
+            return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
+        }
 
         if(str_contains($store->restaurant_domain, ".plugn.site"))
         {
@@ -1191,11 +1205,18 @@ class RestaurantController extends Controller {
             }
         }
 
+        if (!str_starts_with($model->owner_number, $model->owner_phone_country_code)) {
+            $model->owner_number = '+' . $model->owner_phone_country_code . " ".  $model->owner_number;
+        }
+
+        if (!str_starts_with($model->phone_number, $model->phone_number_country_code)) {
+            $model->phone_number = '+' .$model->phone_number_country_code . " ". $model->phone_number;
+        }
+
         return $this->render('update', [
                     'model' => $model,
         ]);
     }
-
 
     /**
      * Display request driver button on order detail page

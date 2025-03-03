@@ -276,7 +276,7 @@ use borales\extensions\phoneInput\PhoneInput;
         ?>
 
     <?=
-       $form->field($model, 'phone_number')->widget(PhoneInput::className(), [
+       $form->field($model, 'phone_number')->widget(PhoneInput::class, [
           'jsOptions' => [
               'preferredCountries' => ['kw', 'sa', 'aed','qa','bh','om'],
               'initialCountry' => 'kw'

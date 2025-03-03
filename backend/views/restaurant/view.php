@@ -311,6 +311,7 @@ $tapLatestError = $model->getApiLogs()
                  },
                  'format' => 'raw'
             ],
+            'phone_number_country_code',
             'phone_number',
             'restaurant_email:email',
             'restaurant_email_notification',
@@ -336,17 +337,13 @@ $tapLatestError = $model->getApiLogs()
                   return  $data->owner_first_name && $data->owner_last_name ? $data->owner_first_name . ' ' . $data->owner_last_name : null;
               },
             ],
+            'owner_phone_country_code',
             'owner_number',
 
             'custom_css:text',
 
             'currency_id',
             'country_id',
-
-            'phone_number_country_code',
-
-            'owner_phone_country_code',
-
 
             'armada_api_key',
             'phone_number_display',
