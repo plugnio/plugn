@@ -38,12 +38,15 @@ return [
         'walletManager' => [
             'class' => 'common\components\WalletManager',
             'apiKey' => 'POAO-BiBxj-Oqp2XOIDZgSDrTYJxOa3M',
+            'apiEndpoint' => 'https://webhook.wallet.bawes.net/v1',
         ],
         'resourceManager' => [
             'class' => 'common\components\S3ResourceManager',
-            'authMethod' => \common\components\S3ResourceManager::AUTH_VIA_IAM_ROLE,
+            'authMethod' => \common\components\S3ResourceManager::AUTH_VIA_KEY_AND_SECRET,
             'region' => 'eu-west-2', // Bucket based in London
             'bucket' => 'plugn-uploads',
+            'key' => 'AKIAWMITDJRKWZZEWCUM',//railway-s3-access
+            'secret' => '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',
             /**
              * For Local Development, we access using key and secret
              * For Dev and Production servers, access is via server embedded IAM roles so no key/secret required
