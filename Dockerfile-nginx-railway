@@ -66,7 +66,7 @@ RUN chmod -R 775 /home/ubuntu/plugn
 
 RUN cd /home/ubuntu/plugn
 
-#RUN composer install 
+RUN composer install 
 #--no-dev
 
 #COPY ./wait-for-it.sh /usr/local/bin/wait-for-it
@@ -85,8 +85,8 @@ RUN service cron start
 COPY ./nginx/php.conf /etc/nginx/php.conf
 
 # load environment specific configuration
-COPY ./nginx/production.conf /etc/nginx/sites-available/production.conf
-RUN ln -s /etc/nginx/sites-available/production.conf /etc/nginx/sites-enabled/
+COPY ./nginx/railway-prod.conf /etc/nginx/sites-available/railway-prod.conf
+RUN ln -s /etc/nginx/sites-available/railway-prod.conf /etc/nginx/sites-enabled/
        
 # run default nginx config
 RUN rm /etc/nginx/sites-enabled/default
@@ -96,4 +96,4 @@ EXPOSE 80
 
 # Start Nginx and PHP-FPM
 #CMD ["sh", "-c", "sleep 5 && ./yii migrate && service nginx restart && php-fpm && tail -f /dev/null"]
-CMD ["sh", "-c", "composer install && ./init --env=Production-Docker --overwrite=All && ./yii migrate --interactive=0 && service nginx restart && php-fpm && tail -f /dev/null"]
+CMD ["sh", "-c", "./init --env=Production-Railway --overwrite=All && ./yii migrate --interactive=0 && service nginx restart && php-fpm && tail -f /dev/null"]

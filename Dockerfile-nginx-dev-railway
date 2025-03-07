@@ -9,14 +9,15 @@ RUN apt-get update && apt-get install -y \
      unzip \
      nginx \
      cron \
-     #wkhtmltopdf \
+    # wkhtmltopdf \
      #chromium \
      #imagemagick \
      #curl \
+     #gh \
      #composer \
      libicu-dev \
-     && docker-php-ext-configure gd --with-freetype --with-jpeg  \
      && docker-php-ext-configure intl \
+     && docker-php-ext-configure gd --with-freetype --with-jpeg \
      && docker-php-ext-install gd pdo pdo_mysql zip  exif intl
 #opcache
 # Install Imagick PHP extension
@@ -66,8 +67,7 @@ RUN chmod -R 775 /home/ubuntu/plugn
 
 RUN cd /home/ubuntu/plugn
 
-#RUN composer install 
-#--no-dev
+RUN composer install 
 
 #COPY ./wait-for-it.sh /usr/local/bin/wait-for-it
 #RUN chmod +x /usr/local/bin/wait-for-it
@@ -79,15 +79,16 @@ RUN crontab /etc/cron.d/cronlist
 # Start cron service
 RUN service cron start
 
-#RUN ./init --env=Production-Nginx --overwrite=All 
+#todo: not getting fired
+#RUN ./init --env=Dev-Server-Nginx --overwrite=All 
   
 # copy php configuration
 COPY ./nginx/php.conf /etc/nginx/php.conf
 
 # load environment specific configuration
-COPY ./nginx/production.conf /etc/nginx/sites-available/production.conf
-RUN ln -s /etc/nginx/sites-available/production.conf /etc/nginx/sites-enabled/
-       
+COPY ./nginx/railway-dev.conf /etc/nginx/sites-available/railway-dev.conf
+RUN ln -s /etc/nginx/sites-available/railway-dev.conf /etc/nginx/sites-enabled/
+
 # run default nginx config
 RUN rm /etc/nginx/sites-enabled/default
 
@@ -95,5 +96,5 @@ RUN rm /etc/nginx/sites-enabled/default
 EXPOSE 80
 
 # Start Nginx and PHP-FPM
-#CMD ["sh", "-c", "sleep 5 && ./yii migrate && service nginx restart && php-fpm && tail -f /dev/null"]
-CMD ["sh", "-c", "composer install && ./init --env=Production-Docker --overwrite=All && ./yii migrate --interactive=0 && service nginx restart && php-fpm && tail -f /dev/null"]
+#CMD ["sh", "-c", "service nginx start && ./yii migrate && php-fpm"]
+CMD ["sh", "-c", "./init --env=Dev-Railway --overwrite=All && ./yii migrate --interactive=0 && service nginx restart && php-fpm && tail -f /dev/null"]

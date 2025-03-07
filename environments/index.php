@@ -311,6 +311,45 @@ return [
             'remail/config/main-local.php',
         ],
     ],
+    'Dev-Railway' => [
+        'path' => 'dev-railway',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'backend/web/uploads/project-files',
+            'console/runtime',
+            'partner/runtime',
+            'partner/web/assets',
+            'frontend/runtime',
+            'frontend/web/assets',
+            'frontend/web/uploads/',
+            'api/runtime',
+            'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
+        ],
+        'setExecutable' => [
+            'yii',
+            'yii_test',
+            'fixture-generate-and-load'
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'common/config/codeception-local.php',
+            'partner/config/main-local.php',
+            'frontend/config/main-local.php',
+            'api/config/main-local.php',
+            'agent/config/main-local.php',
+            'crm/config/main-local.php',
+            'shortner/config/main-local.php',
+            'remail/config/main-local.php',
+        ],
+    ],
     'Staging-Server' => [
         'path' => 'staging',
         'setWritable' => [
@@ -388,6 +427,42 @@ return [
     ],
     'Production-Docker' => [
         'path' => 'prod-docker',
+        'setWritable' => [
+            'backend/runtime',
+            'backend/web/assets',
+            'backend/web/uploads/project-files',
+            'console/runtime',
+            'partner/runtime',
+            'partner/web/assets',
+            'frontend/runtime',
+            'frontend/web/assets',
+            'frontend/web/uploads/',
+            'api/runtime',
+            'api/web/assets',
+            'agent/runtime',
+            'agent/web/assets',
+            'crm/runtime',
+            'crm/web/assets',
+            'shortner/runtime',
+            'remail/runtime',
+            'remail/web/assets'
+        ],
+        'setExecutable' => [
+            'yii',
+        ],
+        'setCookieValidationKey' => [
+            'backend/config/main-local.php',
+            'partner/config/main-local.php',
+            'frontend/config/main-local.php',
+            'api/config/main-local.php',
+            'agent/config/main-local.php',
+            'crm/config/main-local.php',
+            'shortner/config/main-local.php',
+            'remail/config/main-local.php',
+        ],
+    ],
+    'Production-Railway' => [
+        'path' => 'prod-railway',
         'setWritable' => [
             'backend/runtime',
             'backend/web/assets',

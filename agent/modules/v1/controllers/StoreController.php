@@ -315,6 +315,10 @@ class StoreController extends BaseController
         $domain = Yii::$app->request->getBodyParam('domain');
         $purchase = Yii::$app->request->getBodyParam('purchase');
 
+        if (!$domain) {
+            return self::message("Domain value required");
+        }
+
         if (!str_contains($domain, "http")) {
             $domain = "https://" . $domain;
         }
