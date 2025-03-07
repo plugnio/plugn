@@ -784,11 +784,18 @@ class ItemController extends BaseController
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function actionDeleteImage($id, $image)
+    public function actionDeleteImage($id, $image = null)
     {
         $restaurant = Yii::$app->accountManager->getManagedAccount();
 
-        $model = ItemImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
+        if (!$image) {
+            $image = Yii::$app->request->getBodyParam("image");
+        }
+
+        $model = ItemImage::findOne([
+            'item_uuid'=>$id,
+            'product_file_name'=>$image
+        ]);
 
         if(!$model) {
             return [
@@ -835,9 +842,13 @@ class ItemController extends BaseController
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function actionDeleteVariantImage($id, $image)
+    public function actionDeleteVariantImage($id, $image = null)
     {
         $restaurant = Yii::$app->accountManager->getManagedAccount();
+
+        if (!$image) {
+            $image = Yii::$app->request->getBodyParam("image");
+        }
 
         $model = ItemVariantImage::findOne(['item_uuid'=>$id, 'product_file_name'=>$image]);
 
