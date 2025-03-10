@@ -39,14 +39,23 @@ return [
             'clientSecret' => "Dt9rgs6ghpEHqKHLJf5NDp8Sps26U7OE65eYYBc3AHiWQjUNCkrjelvU18-1tCis",
             'cookieSecret' => "woZaulpAn0qo24K1Ve6dzBgw__936d9m"// Yii::$app->request->cookieValidationKey,
         ],
-        /*
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'google' => [
+                    'class' => 'yii\authclient\clients\Google',
+                    'clientId' => '876118421973-bhut8gnlo51u6loreh8oi6drhvotocap.apps.googleusercontent.com',
+                    'clientSecret' => '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',
+                ],
+            ],
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'site/auth' => 'site/auth',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];
