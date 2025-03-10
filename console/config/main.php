@@ -24,9 +24,9 @@ return [
         ],
     ],
     'components' => [
-        'cache' => [
+       /* 'cache' => [
             'class' => 'yii\caching\FileCache',
-        ],
+        ],*/
     ],
     'params' => $params,
 ];
