@@ -111,8 +111,8 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`admin_id`, `admin_name`, `admin_email`, `admin_role`, `admin_auth_key`, `admin_password_hash`, `admin_password_reset_token`, `admin_status`, `admin_created_at`, `admin_updated_at`) VALUES
-(1, 'KK', 'kk@bawes.net', 1, 'Lu4vPW4Npfgce6WkXdt9OErpxXdB7GW4', '$2y$13$XB8bRB2CqKN0wxD7QzgIbe65waVRRcoi8fEbUCbgZyiyU6Ngqn6US', NULL, 10, '2018-08-21 19:20:58', '2020-04-28 14:40:13'),
-(3, 'Khalid AlMutawa', 'khalid@plugn.io', 1, '4JqDS7pZ1mcv-46aZzFs_cbta7NjbM3A', '$2y$13$tPC4SmoBnPAvluc8OaaKwuKQL2UukAPCAQGfRFv0OqrutcabwnqJG', NULL, 10, '2020-04-28 14:39:01', '2020-04-28 14:39:01');
+(1, 'KK', 'kk@bawes.net', 1, 'Lu4vPW4Npfgce6WkXdt9OErpxXdB7GW4', '$2y$13$MOD.ouqG2Vr9KhQ4nz9HCeyBc10Bf7luZxZ5PlccCrx.8oW7icu2W', NULL, 10, '2018-08-21 19:20:58', '2020-04-28 14:40:13'),
+(3, 'Khalid AlMutawa', 'khalid@plugn.io', 1, '4JqDS7pZ1mcv-46aZzFs_cbta7NjbM3A', '$2y$13$MOD.ouqG2Vr9KhQ4nz9HCeyBc10Bf7luZxZ5PlccCrx.8oW7icu2W', NULL, 10, '2020-04-28 14:39:01', '2020-04-28 14:39:01');
 
 -- --------------------------------------------------------
 
