@@ -33,7 +33,7 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error', 'callback-auth0', 'login-auth0'],
+                        'actions' => ['login', 'error', 'auth', 'callback-auth0', 'login-auth0'],
                         'allow' => true,
                     ],
                     [
@@ -61,7 +61,35 @@ class SiteController extends Controller
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
+            'auth' => [
+                'class' => 'yii\authclient\AuthAction',
+                'successCallback' => [$this, 'onAuthSuccess'],
+            ],
         ];
+    }
+
+    public function onAuthSuccess($client)
+    {
+        $attributes = $client->getUserAttributes();
+
+        // Example: Get user information
+        $email = ArrayHelper::getValue($attributes, 'email');
+        //$name = ArrayHelper::getValue($attributes, 'name');
+
+        // Check if user exists
+
+        $user = Admin::findByEmail($email);
+
+        if (!$user) {
+            Yii::$app->session->addFlash('error', "Email not registered as admin");
+            return $this->redirect(['site/index']);
+        }
+
+        if (Yii::$app->user->login($user, 3600 * 24 * 30)) {//
+            return $this->redirect(['site/index']);
+        }
+
+        return $this->redirect(['site/login']);
     }
 
     /**

@@ -6,6 +6,7 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use yii\authclient\widgets\AuthChoice;
 
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
@@ -29,11 +30,27 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 </div>
 
-
             <?php ActiveForm::end(); ?>
 
-            <?= Html::a('<img src="https://dash.dev.plugn.io/assets/img/icon-bawes.svg" /> Login with Bawes', ['site/login-auth0'], ['class' => 'btn btn-login-bawes', 'name' => 'login-auth0']) ?>
-            
+            <?= Html::a('<img src="https://dash.dev.plugn.io/assets/img/icon-bawes.svg" /> Login with Bawes', ['site/login-auth0'],
+                ['class' => 'btn btn-login-bawes', 'name' => 'login-auth0']) ?>
+
+            <br />
+            <br />
+
+            <?= AuthChoice::widget([
+                'baseAuthUrl' => ['site/auth'],
+            ]) ?>
+            <!--
+            <div class="btn btn-login-bawes">
+                <div style="float: left; margin-inline-start: -10px;">
+
+                </div>
+                <div style="float: left; position: relative; top: 7px;">
+                    Login with Google
+                </div>
+            </div>-->
+
         </div>
     </div>
 </div>

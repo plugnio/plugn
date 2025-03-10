@@ -4,27 +4,14 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=plugn-main-latest-cluster.cluster-c8mekjvvbygf.eu-west-2.rds.amazonaws.com;dbname=yo3an',
-            'username' => 'yo3an',
-            'password' => 'iamyo3an',
+            'dsn' => 'mysql:host=mysql-eemz.railway.internal:3306;dbname=railway',
+            'username' => 'root',
+            'password' => 'xXzEvGzMcCYiFIkfogNUjqLcGFRVHbRp',
             'charset' => 'utf8mb4',
-            // common configuration for slaves
-            'slaveConfig' => [
-                'username' => 'yo3an',
-                'password' => 'iamyo3an',
-                'attributes' => [
-                    // use a smaller connection timeout
-                    PDO::ATTR_TIMEOUT => 10,
-                ],
-            ],
-            // list of slave configurations for Read-write splitting
-            'slaves' => [
-                ['dsn' => 'mysql:host=plugn-main-latest-cluster.cluster-ro-c8mekjvvbygf.eu-west-2.rds.amazonaws.com;dbname=yo3an']
-            ],
             // Enable Caching of Schema to Reduce SQL Queries
-            'enableSchemaCache' => false,
+            'enableSchemaCache' => true,
             // Duration of schema cache.
-            'schemaCacheDuration' => 300, // 5 mnts
+            'schemaCacheDuration' => 60, // 1 minute
             // Name of the cache component used to store schema information
             'schemaCache' => 'cache',
         ],
@@ -92,7 +79,9 @@ return [
         ],
         'redis' => [
             'class' => 'yii\redis\Connection',
-            'hostname' => 'redis',
+            'hostname' => 'redis-xkt_.railway.internal',
+            'username' => 'default',
+            'password' => 'BGtjhtRKQJvAirawTCZjYrjwRrQAGFBS',
             'port' => 6379,
             'database' => 0,
         ],
