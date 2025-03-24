@@ -293,11 +293,11 @@ class TapPayments extends Component
                         "email" => $email,// $restaurant->owner_email,
                         "phone" => [
                             "country_code" => $restaurant->owner_phone_country_code,
-                            "number" => str_replace(
+                            "number" => $restaurant->owner_number? str_replace(
                                 [' ', '+'.$restaurant->owner_phone_country_code, "+"],
                                 ['', '', ''],
                                 $restaurant->owner_number
-                            )
+                            ): null
                         ]
                     ]
                 ],
@@ -763,8 +763,8 @@ class TapPayments extends Component
     ) {
         $chargeEndpoint = $this->apiEndpoint . "/charges";
 
-        $phone =  str_replace(' ', '', $phone);
-        $phone =  str_replace('+'.$country_code, '', $phone);
+        $phone = $phone? str_replace(' ', '', $phone): null;
+        $phone = $phone? str_replace('+'.$country_code, '', $phone): null;
 
         $chargeParams = [
             "amount" => $amount,
