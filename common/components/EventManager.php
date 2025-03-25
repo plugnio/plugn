@@ -11,6 +11,12 @@ use yii\base\Component;
 class EventManager extends Component
 {
     private $_client;
+
+    /**
+     * @var string Mixpanel key for BAWES project
+     */
+    private $_walletClient;
+
     private $_sqsClient;
 
     public $sqsRagion;
@@ -22,6 +28,11 @@ class EventManager extends Component
      * @var string Mixpanel key
      */
     public $key;
+
+    /**
+     * @var string | null Mixpanel key for BAWES project
+     */
+    public $walletMixpanelKey;
 
     /**
      * @var string | null Mixpanel status
@@ -48,6 +59,10 @@ class EventManager extends Component
      */
     private $segmentIdentify;
 
+    public $walletEvents = [
+        "Order Placed"
+    ];
+
      /**
      * @inheritdoc
      */
@@ -73,11 +88,17 @@ class EventManager extends Component
 
             if (YII_ENV == 'prod') {
                 $this->key = Yii::$app->config->get('Mixpanel-Key');
+                $this->walletMixpanelKey = Yii::$app->config->get('Mixpanel-Key-Wallet');
             } else {
                 $this->key = Yii::$app->config->get('Test-Mixpanel-Key');
+                $this->walletMixpanelKey = Yii::$app->config->get('Test-Mixpanel-Key-Wallet');
             }
 
             $this->_client = \Mixpanel::getInstance($this->key);
+
+            if ($this->walletMixpanelKey) {
+                $this->_walletClient = \Mixpanel::getInstance($this->walletMixpanelKey);
+            }
         }
 
         if($this->segmentStatus) {
@@ -135,6 +156,11 @@ class EventManager extends Component
             $this->_client->people->set($id, $data, $ip, $ignore_time = false);
         }
 
+        if ($this->_walletClient) {
+            $this->_walletClient->identify($id);
+            $this->_walletClient->people->set($id, $data, $ip, $ignore_time = false);
+        }
+
         if($this->segmentKey) {
             Segment::identify([
                 "userId" => $id,
@@ -149,7 +175,7 @@ class EventManager extends Component
      * todo: userId not passing in mixpanel?
      * register event 
      */
-    public function track($event, $eventData, $timestamp = null, $storeId = null)
+    public function track($event, $eventData, $timestamp = null, $storeId = null, $onlyWallet = false)
     {
         $distinctID = null;
 
@@ -249,6 +275,16 @@ class EventManager extends Component
 
             if(isset($mixpanelData['$distinct_id']))
                 $mixpanelData['distinct_id'] = $mixpanelData['$distinct_id'];
+
+            //if wallet event, send to wallet/ main project
+            if ($this->_walletClient && in_array($event, $this->walletEvents)) {
+
+                $this->_walletClient->track("Revenue", $mixpanelData);
+                $this->_walletClient->flush();
+
+                if ($onlyWallet)
+                    return true;
+            }
 
             $this->_client->track($event, $mixpanelData);
 
