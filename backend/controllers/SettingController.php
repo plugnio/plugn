@@ -61,6 +61,9 @@ class SettingController extends Controller
             $mixpanel = Yii::$app->request->post('Mixpanel-Key');
             $testMixpanel = Yii::$app->request->post('Test-Mixpanel-Key');
 
+            $mixpanelWallet = Yii::$app->request->post('Mixpanel-Key-Wallet');
+            $testMixpanelWallet = Yii::$app->request->post('Test-Mixpanel-Key-Wallet');
+
             //segment
 
             $segmentStatus = Yii::$app->request->post('Segment-Status');
@@ -71,18 +74,67 @@ class SettingController extends Controller
             $testSegment = Yii::$app->request->post('Test-Segment-Key');
             $testSegmentWallet = Yii::$app->request->post('Test-Segment-Key-Wallet');
 
-            Setting::setConfig(null,'EventManager', 'Mixpanel-Status', $mixpanelStatus ? "enabled" : null);
+            $result = Setting::setConfig(null,'EventManager', 'Mixpanel-Status', $mixpanelStatus ? "enabled" : null);
 
-            Setting::setConfig(null, 'EventManager', 'Mixpanel-Key', $mixpanel);
-            Setting::setConfig(null,'EventManager', 'Test-Mixpanel-Key', $testMixpanel ? "enabled" : null);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
 
-            Setting::setConfig(null,'EventManager', 'Segment-Status', $segmentStatus ? "enabled" : null);
+            $result = Setting::setConfig(null, 'EventManager', 'Mixpanel-Key', $mixpanel);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
 
-            Setting::setConfig(null,'EventManager', 'Segment-Key', $segment);
-            Setting::setConfig(null,'EventManager', 'Segment-Key-Wallet', $segmentWallet);
+            $result = Setting::setConfig(null,'EventManager', 'Test-Mixpanel-Key', $testMixpanel);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
 
-            Setting::setConfig(null,'EventManager', 'Test-Segment-Key', $testSegment);
-            Setting::setConfig(null,'EventManager', 'Test-Segment-Key-Wallet', $testSegmentWallet);
+            $result = Setting::setConfig(null, 'EventManager', 'Mixpanel-Key-Wallet', $mixpanelWallet);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
+
+            $result = Setting::setConfig(null,'EventManager', 'Test-Mixpanel-Key-Wallet', $testMixpanelWallet);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
+
+            $result = Setting::setConfig(null,'EventManager', 'Segment-Status', $segmentStatus ? "enabled" : null);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
+
+            $result = Setting::setConfig(null,'EventManager', 'Segment-Key', $segment);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
+
+            $result = Setting::setConfig(null,'EventManager', 'Segment-Key-Wallet', $segmentWallet);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
+
+            $result = Setting::setConfig(null,'EventManager', 'Test-Segment-Key', $testSegment);
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
+
+            $result = Setting::setConfig(null,'EventManager', 'Test-Segment-Key-Wallet', $testSegmentWallet);
+
+            if ($result['operation'] != "success") {
+                Yii::$app->session->addFlash("error", $result['message']);
+                return $this->redirect(['setting/update']);
+            }
 
             Yii::$app->session->addFlash("success", "Settings updated successfully!");
         }

@@ -1353,4 +1353,6 @@ class CronController extends \yii\console\Controller
 
         $store->generateGPTTrainingData();
     }
+
+
 }

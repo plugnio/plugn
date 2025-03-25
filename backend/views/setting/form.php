@@ -71,11 +71,21 @@ $this->params['breadcrumbs'][] = 'Update';
                     <?= Html::textInput('Mixpanel-Key', $settings['Mixpanel-Key'], ['class' => 'form-control']); ?>
                 </div>
 
+                <div class="form-group">
+                    <?= Html::label('Mixpanel Key for Wallet', 'Mixpanel-Key-Wallet', ['class' => 'control-label']) ?>
+                    <?= Html::textInput('Mixpanel-Key-Wallet', isset($settings['Mixpanel-Key-Wallet'])? $settings['Mixpanel-Key-Wallet']: null, ['class' => 'form-control']); ?>
+                </div>
+
                 <h4>Development</h4>
 
                 <div class="form-group">
                     <?= Html::label('Mixpanel Key', 'Test-Mixpanel-Key', ['class' => 'control-label']) ?>
-                    <?= Html::textInput('Mixpanel-Key', $settings['Test-Mixpanel-Key'], ['class' => 'form-control']); ?>
+                    <?= Html::textInput('Test-Mixpanel-Key', $settings['Test-Mixpanel-Key'], ['class' => 'form-control']); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= Html::label('Mixpanel Key for Wallet', 'Test-Mixpanel-Key-Wallet', ['class' => 'control-label']) ?>
+                    <?= Html::textInput('Test-Mixpanel-Key-Wallet', isset($settings['Test-Mixpanel-Key-Wallet'])?$settings['Test-Mixpanel-Key-Wallet']: null, ['class' => 'form-control']); ?>
                 </div>
 
             </div>
