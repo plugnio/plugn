@@ -9,6 +9,7 @@ use common\models\Agent;
 use common\models\CustomerAddress;
 use common\models\MailLog;
 use common\models\RestaurantChatBotQueue;
+use common\models\StoreDomainSubscription;
 use Yii;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
@@ -109,6 +110,8 @@ class CronController extends \yii\console\Controller
                 ]
             ]
         );*/
+
+        StoreDomainSubscription::notifyAboutToExpire();
     }
 
     /**
@@ -1298,6 +1301,9 @@ class CronController extends \yii\console\Controller
             ];
 
             Yii::$app->eventManager->track('Inactive stores',  $data);
+
+
+        StoreDomainSubscription::notifyAboutToExpire();
     }
 
     /**
