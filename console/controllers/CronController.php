@@ -111,6 +111,9 @@ class CronController extends \yii\console\Controller
         );*/
     }
 
+    /**
+     * @return void
+     */
     public function actionFixDuplicateAreas() {
 
         $query = Area::find()

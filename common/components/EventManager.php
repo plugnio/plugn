@@ -60,7 +60,8 @@ class EventManager extends Component
     private $segmentIdentify;
 
     public $walletEvents = [
-        "Order Placed"
+        "Order Placed",
+        "Premium Plan Purchase"
     ];
 
      /**
