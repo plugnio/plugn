@@ -17,6 +17,7 @@ use yii\db\Expression;
  * @property string|null $addon_uuid
  * @property string|null $order_uuid
  * @property string|null $domain_subscription_uuid
+ * @property string|null $store_domain_subscription_payment_uuid
  * @property string|null $comment
  * @property float $total
  * @property string|null $created_at
@@ -52,7 +53,8 @@ class InvoiceItem extends \yii\db\ActiveRecord
             [['order_uuid'], 'string', 'max' => 40],
             [['comment'], 'string', 'max' => 255],
             [['invoice_item_uuid'], 'unique'],
-            [['domain_subscription_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => StoreDomainSubscription::className(), 'targetAttribute' => ['subscription_uuid' => 'domain_subscription_uuid']],
+            [['store_domain_subscription_payment_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => StoreDomainSubscriptionPayment::className(), 'targetAttribute' => ['store_domain_subscription_payment_uuid' => 'store_domain_subscription_payment_uuid']],
+            [['domain_subscription_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => StoreDomainSubscription::className(), 'targetAttribute' => ['domain_subscription_uuid' => 'subscription_uuid']],
             [['addon_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Addon::className(), 'targetAttribute' => ['addon_uuid' => 'addon_uuid']],
             [['invoice_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => RestaurantInvoice::className(), 'targetAttribute' => ['invoice_uuid' => 'invoice_uuid']],
             [['order_uuid'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_uuid' => 'order_uuid']],
@@ -101,11 +103,20 @@ class InvoiceItem extends \yii\db\ActiveRecord
             'addon_uuid' => Yii::t('app', 'Addon Uuid'),
             'order_uuid' => Yii::t('app', 'Order Uuid'),
             "domain_subscription_uuid" => Yii::t('app', 'Domain Subscription Uuid'),
+            "store_domain_subscription_payment_uuid"=> Yii::t('app', 'Domain Subscription Payment Uuid'),
             'comment' => Yii::t('app', 'Comment'),
             'total' => Yii::t('app', 'Total'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     * @return array|int[]|string[]
+     */
+    public function extraFields()
+    {
+        return array_merge(['storeDomainSubscription'], parent::extraFields());
     }
 
     /**

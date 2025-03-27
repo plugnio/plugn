@@ -13,7 +13,7 @@ class EventManager extends \common\components\EventManager
      * @param $timestamp
      * @return void
      */
-    public function track($event, $eventData, $timestamp = null, $store_id = null)
+    public function track($event, $eventData, $timestamp = null, $store_id = null, $onlyWallet = false)
     {
         if(!$store_id)
             $store_id = Yii::$app->request->headers->get('Store-Id');

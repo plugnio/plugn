@@ -24,6 +24,7 @@ use yii\helpers\ArrayHelper;
  * @property Admin $createdBy
  * @property Restaurant $restaurantUu
  * @property Admin $updatedBy
+ * @property StoreDomainSubscriptionPayment $storeDomainSubscriptionPayments
  */
 class StoreDomainSubscription extends \yii\db\ActiveRecord
 {
@@ -192,5 +193,15 @@ class StoreDomainSubscription extends \yii\db\ActiveRecord
     public function getUpdatedBy()
     {
         return $this->hasOne(Admin::class, ['admin_id' => 'updated_by']);
+    }
+
+    /**
+     * Gets query for [[StoreDomainSubscriptionPayments]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStoreDomainSubscriptionPayments()
+    {
+        return $this->hasMany(StoreDomainSubscriptionPayment::class, ['subscription_uuid' => 'subscription_uuid']);
     }
 }

@@ -61,7 +61,8 @@ class EventManager extends Component
 
     public $walletEvents = [
         "Order Placed",
-        "Premium Plan Purchase"
+        "Premium Plan Purchase",
+        "Invoice Paid"
     ];
 
      /**

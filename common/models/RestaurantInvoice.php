@@ -89,6 +89,9 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
             ->all();
     }
 
+    /**
+     * @return array|int[]|string[]
+     */
     public function fields()
     {
         $fields = parent::fields();
@@ -179,6 +182,60 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     * @param $insert
+     * @param $changedAttributes
+     * @return void
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if (
+            isset($changedAttributes['invoice_status']) &&
+            $this->invoice_status == self::STATUS_PAID
+        ) {
+              foreach($this->getInvoiceItems()->all() as $item) {
+                  if ($item->domain_subscription_uuid && $item->store_domain_subscription_payment_uuid) {
+
+                        $domainSubscriptionPayment = StoreDomainSubscriptionPayment::find()
+                            ->andWhere(['store_domain_subscription_payment_uuid' => $item->store_domain_subscription_payment_uuid])
+                            ->one();
+
+                        if (!$domainSubscriptionPayment) {
+                            Yii::error('Domain subscription payment not found for invoice item: ' . $item->store_domain_subscription_payment_uuid);
+                            continue;
+                        }
+
+                      $domainSubscription = StoreDomainSubscription::find()
+                          ->andWhere(['subscription_uuid' => $item->domain_subscription_uuid])
+                          ->one();
+
+                      if ($domainSubscription) {
+                          $domainSubscription->from = $domainSubscriptionPayment->from;
+                          $domainSubscription->to = $domainSubscriptionPayment->to;
+
+                          if (!$domainSubscription->save()) {
+                                Yii::error(print_r($domainSubscription->errors, true));
+                              print_r($domainSubscription->errors);
+                              die();
+                          }
+
+                          Yii::$app->eventManager->track('Invoice Paid for Domain', [
+                              "domain" => $domainSubscription->domain,
+                              'charged' => $domainSubscriptionPayment->total_amount,
+                              'revenue' => $domainSubscriptionPayment->total_amount - $domainSubscriptionPayment->cost_amount,
+                              'currency' => 'KWD'
+                          ],
+                              null,
+                              $domainSubscription->restaurant_uuid
+                          );
+                      }
+                  }
+              }
+        }
     }
 
     /**
