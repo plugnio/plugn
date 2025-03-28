@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use agent\models\Currency;
 use agent\models\Plan;
 use agent\models\Subscription;
 use agent\models\SubscriptionPayment;
@@ -121,7 +122,8 @@ class InvoicePayment extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if(isset($changedAttributes['payment_current_status']) && $this->payment_current_status == 'CAPTURED') {
+        if(isset($changedAttributes['payment_current_status']) &&
+            $this->payment_current_status == 'CAPTURED') {
 
             $this->invoice->invoice_status = 1;
             $this->invoice->save();
@@ -251,6 +253,30 @@ class InvoicePayment extends \yii\db\ActiveRecord
         if (!$payment->save()) {// && $payment->payment_current_status == 'CAPTURED'
             Yii::error($payment->errors); print_r($payment->errors); die();
             //self::onPaymentCaptured($payment);
+        }
+
+        //Send event to Segment
+
+        if ($payment->payment_current_status == 'CAPTURED') {
+
+            //$kwdCurrency = Currency::findOne(['code' => 'KWD']);
+
+            //$rate = 1 / $kwdCurrency->rate;// to USD
+
+            $rate = 1;
+
+            Yii::$app->eventManager->track('Invoice Paid', [
+                    //'addon_uuid' => $payment->invoice->addon_uuid,
+                    'invoice' => $payment->invoice_uuid,
+                    'paymentMethod' => $payment->payment_mode,
+                    'charged' => $payment->payment_amount_charged,
+                    'value' => ($payment->payment_amount_charged * $rate),
+                    'revenue' => $payment->payment_net_amount,
+                    'currency' => 'KWD'
+                ],
+                null,
+                $payment->restaurant_uuid
+            );
         }
 
         return $payment;

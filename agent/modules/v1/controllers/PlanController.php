@@ -19,6 +19,9 @@ use yii\web\Cookie;
 
 class PlanController extends BaseController
 {
+    /**
+     * @return array|array[]
+     */
     public function behaviors() {
         $behaviors = parent::behaviors();
 

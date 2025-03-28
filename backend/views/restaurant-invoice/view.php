@@ -73,6 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'order_uuid',
             'plan_id',
             'addon_uuid',
+            "domain_subcription_uuid",
             'comment',
             [
                 'attribute' => 'total',

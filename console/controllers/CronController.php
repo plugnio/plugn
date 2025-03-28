@@ -9,6 +9,8 @@ use common\models\Agent;
 use common\models\CustomerAddress;
 use common\models\MailLog;
 use common\models\RestaurantChatBotQueue;
+use common\models\StoreDomainSubscription;
+
 use Yii;
 use common\models\Currency;
 use common\models\RestaurantInvoice;
@@ -108,9 +110,16 @@ class CronController extends \yii\console\Controller
                     'footer' => 'Environment: '.ucfirst(YII_ENV)
                 ]
             ]
-        );*/
+        );
+
+        $model = RestaurantInvoice::findOne("invoice_426a6d7e-0b29-11f0-a34e-e81199cc35a2");
+        $model->invoice_status = RestaurantInvoice::STATUS_PAID;
+        $model->save();*/
     }
 
+    /**
+     * @return void
+     */
     public function actionFixDuplicateAreas() {
 
         $query = Area::find()
@@ -1295,6 +1304,9 @@ class CronController extends \yii\console\Controller
             ];
 
             Yii::$app->eventManager->track('Inactive stores',  $data);
+
+
+        StoreDomainSubscription::notifyAboutToExpire();
     }
 
     /**
@@ -1353,4 +1365,6 @@ class CronController extends \yii\console\Controller
 
         $store->generateGPTTrainingData();
     }
+
+
 }

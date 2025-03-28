@@ -178,7 +178,8 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
     public static function updatePaymentStatusFromTap($id, $showUpdatedFlashNotification = false) {
 
         // Look for payment with same Payment Gateway Transaction ID
-        $paymentRecord = \common\models\SubscriptionPayment::findOne(['payment_gateway_transaction_id' => $id]);
+        $paymentRecord = \common\models\SubscriptionPayment::findOne([
+            'payment_gateway_transaction_id' => $id]);
 
         if (!$paymentRecord) {
             throw new NotFoundHttpException('The requested payment does not exist in our database.');
@@ -200,7 +201,9 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
             $errorMessage = "[Error from TAP]" . $responseContent->errors[0]->code . " - " . $responseContent->errors[0]->description  . ' - Store Name: ' . $paymentRecord->restaurant->name . ' - Order Uuid: ' . $paymentRecord->order_uuid;
 
             \Yii::error($errorMessage, __METHOD__); // Log error faced by user
+
             \Yii::$app->getSession()->setFlash('error', $errorMessage);
+
             return $paymentRecord;
         }
 
@@ -295,6 +298,7 @@ class SubscriptionPayment extends \yii\db\ActiveRecord {
                     'order_id' => $paymentRecord->payment_uuid,
                     'payment_amount_charged' => $paymentRecord->payment_amount_charged,
                     'amount' => $paymentRecord->payment_amount_charged,
+                    "revenue"  => $paymentRecord->payment_amount_charged, //minus payment gateway commission
                     'value' => ( $paymentRecord->payment_amount_charged * $rate),
                     'paymentMethod' => $paymentRecord->payment_mode,
                     'currency' => 'USD',
