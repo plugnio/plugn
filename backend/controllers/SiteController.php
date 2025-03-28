@@ -9,6 +9,7 @@ use common\models\RestaurantDomainRequest;
 use common\models\Subscription;
 use common\models\Ticket;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
