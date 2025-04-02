@@ -1287,6 +1287,10 @@ class Restaurant extends ActiveRecord
 
         foreach ($agents as $agentAssignment) {
 
+            if (!$agentAssignment->agent) {
+                continue;
+            }
+
             $ml = new MailLog();
             $ml->to = $agentAssignment->agent->agent_email;
             $ml->from = \Yii::$app->params['noReplyEmail'];
@@ -1389,6 +1393,10 @@ class Restaurant extends ActiveRecord
 
         foreach ($agents as $agentAssignment) {
 
+            if (!$agentAssignment->agent) {
+                continue;
+            }
+
             $ml = new MailLog();
             $ml->to = $agentAssignment->agent->agent_email;
             $ml->from = \Yii::$app->params['noReplyEmail'];
@@ -1452,6 +1460,10 @@ class Restaurant extends ActiveRecord
             ->all();
 
         foreach ($agents as $agentAssignment) {
+
+            if (!$agentAssignment->agent) {
+                continue;
+            }
 
             $ml = new MailLog();
             $ml->to = $agentAssignment->agent->agent_email;

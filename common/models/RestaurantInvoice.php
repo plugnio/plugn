@@ -253,8 +253,13 @@ class RestaurantInvoice extends \yii\db\ActiveRecord
 
         $emails = [];
 
-        foreach ($agentAssignments as $agentAssignment)
+        foreach ($agentAssignments as $agentAssignment) {
+            if (!$agentAssignment->agent) {
+                continue;
+            }
+
             $emails[] = $agentAssignment->agent->agent_email;
+        }
 
         if ($this->restaurant->restaurant_email_notification && $this->restaurant->restaurant_email)
             $emails[] = $this->restaurant->restaurant_email;
