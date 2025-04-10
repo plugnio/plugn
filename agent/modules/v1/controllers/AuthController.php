@@ -7,9 +7,7 @@ use agent\models\Currency;
 use agent\models\Restaurant;
 use common\models\RestaurantByCampaign;
 use common\models\AgentEmailVerifyAttempt;
-use staff\models\Staff;
 use Yii;
-use yii\rest\Controller;
 use yii\filters\auth\HttpBasicAuth;
 use agent\models\Agent;
 use agent\models\PasswordResetRequestForm;
@@ -133,6 +131,22 @@ class AuthController extends BaseController {
      * If everything is alright,
      * Returns the BEARER access token required for futher requests to the API
      * @return array
+     * 
+     * @api {GET} /auth/login Login to the platform
+     * @apiHeader {string} md5 hash of email:password.
+     * @apiName Login
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} token Access token.
+     * @apiSuccess {string} id Agent ID.
+     * @apiSuccess {string} agent_name Agent name.
+     * @apiSuccess {string} agent_email Agent email.
+     * @apiSuccess {string} agent_new_email Agent new email.
+     * @apiSuccess {string} language_pref Language preference.
+     * @apiSuccess {Role} role Role.
+     * @apiSuccess {string} created_at Created at.
+     * @apiSuccess {Store} selectedStore Selected store.
+     * @apiSuccess {Array} stores Stores.
      */
     public function actionLogin() {
 
@@ -160,6 +174,22 @@ class AuthController extends BaseController {
     /**
      * login with auth0 token
      * @return array
+     * 
+     * @api {post} /auth/login-auth0 Login with auth0 token
+     * @apiHeader {string} accessToken Auth0 access token.
+     * @apiName LoginAuth0
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} token Access token.
+     * @apiSuccess {string} id Agent ID.
+     * @apiSuccess {string} agent_name Agent name.
+     * @apiSuccess {string} agent_email Agent email.
+     * @apiSuccess {string} agent_new_email Agent new email.
+     * @apiSuccess {string} language_pref Language preference.
+     * @apiSuccess {Role} role Role.
+     * @apiSuccess {string} created_at Created at.
+     * @apiSuccess {Store} selectedStore Selected store.
+     * @apiSuccess {Array} stores Stores.
      */
     public function actionLoginAuth0()
     {
@@ -225,6 +255,22 @@ class AuthController extends BaseController {
     /**
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /auth/login-by-key Login with key    
+     * @apiHeader {string} auth_key Auth key.
+     * @apiName LoginByKey
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} token Access token.
+     * @apiSuccess {string} id Agent ID.
+     * @apiSuccess {string} agent_name Agent name.  
+     * @apiSuccess {string} agent_email Agent email.
+     * @apiSuccess {string} agent_new_email Agent new email.
+     * @apiSuccess {string} language_pref Language preference.
+     * @apiSuccess {Role} role Role.
+     * @apiSuccess {string} created_at Created at.
+     * @apiSuccess {Store} selectedStore Selected store.
+     * @apiSuccess {Array} stores Stores.
      */
     public function actionLoginByKey() {
 
@@ -283,6 +329,22 @@ class AuthController extends BaseController {
 
     /**
      * Sign up with google login
+     * 
+     * @api {post} /auth/login-by-google Login with google
+     * @apiHeader {string} idToken Google ID token.
+     * @apiName LoginByGoogle
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} token Access token.
+     * @apiSuccess {string} id Agent ID.
+     * @apiSuccess {string} agent_name Agent name.  
+     * @apiSuccess {string} agent_email Agent email.
+     * @apiSuccess {string} agent_new_email Agent new email.
+     * @apiSuccess {string} language_pref Language preference.
+     * @apiSuccess {Role} role Role.
+     * @apiSuccess {string} created_at Created at.
+     * @apiSuccess {Store} selectedStore Selected store.
+     * @apiSuccess {Array} stores Stores.
      */
     public function actionLoginByGoogle() {
 
@@ -324,6 +386,22 @@ class AuthController extends BaseController {
     /**
      *
      * Sign up with apple login
+     * 
+     * @api {post} /auth/login-by-apple Login with apple    
+     * @apiHeader {string} identityToken Apple identity token.
+     * @apiName LoginByApple
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} token Access token.
+     * @apiSuccess {string} id Agent ID.
+     * @apiSuccess {string} agent_name Agent name.  
+     * @apiSuccess {string} agent_email Agent email.
+     * @apiSuccess {string} agent_new_email Agent new email.
+     * @apiSuccess {string} language_pref Language preference.
+     * @apiSuccess {Role} role Role.
+     * @apiSuccess {string} created_at Created at.
+     * @apiSuccess {Store} selectedStore Selected store.
+     * @apiSuccess {Array} stores Stores.     
      */
     public function actionLoginByApple() {
 
@@ -379,6 +457,21 @@ class AuthController extends BaseController {
     /**
      * signup agent
      * @return array|string[]
+     * 
+     * @api {post} /auth/signup-step-one Signup agent step one
+     * @apiName SignupStepOne
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} token Access token.
+     * @apiSuccess {string} id Agent ID.
+     * @apiSuccess {string} agent_name Agent name.  
+     * @apiSuccess {string} agent_email Agent email.
+     * @apiSuccess {string} agent_new_email Agent new email.
+     * @apiSuccess {string} language_pref Language preference.
+     * @apiSuccess {Role} role Role.
+     * @apiSuccess {string} created_at Created at.
+     * @apiSuccess {Store} selectedStore Selected store.
+     * @apiSuccess {Array} stores Stores.
      */
     public function actionSignupStepOne()
     {
@@ -473,6 +566,21 @@ class AuthController extends BaseController {
     /**
      * register user with store
      * @return mixed
+     * 
+     * @api {post} /auth/signup Signup agent
+     * @apiName Signup
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} token Access token.
+     * @apiSuccess {string} id Agent ID.
+     * @apiSuccess {string} agent_name Agent name.  
+     * @apiSuccess {string} agent_email Agent email.
+     * @apiSuccess {string} agent_new_email Agent new email.
+     * @apiSuccess {string} language_pref Language preference.
+     * @apiSuccess {Role} role Role.
+     * @apiSuccess {string} created_at Created at.
+     * @apiSuccess {Store} selectedStore Selected store.
+     * @apiSuccess {Array} stores Stores.
      */
     public function actionSignup() {
 
@@ -616,12 +724,18 @@ class AuthController extends BaseController {
         }*/
 
         return $this->_loginResponse ($agent);
-
     }
     
     /**
      * Update email address
      * @return array
+     * 
+     * @api {post} /auth/update-email Update email address
+     * @apiName UpdateEmail
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdateEmail() {
 
@@ -709,6 +823,13 @@ class AuthController extends BaseController {
     /**
      * Re-send manual verification email to agent
      * @return array
+     * 
+     * @api {post} /auth/resend-verification-email Re-send manual verification email to agent
+     * @apiName ResendVerificationEmail
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionResendVerificationEmail()
     {
@@ -800,6 +921,12 @@ class AuthController extends BaseController {
 
     /**
      * Check if agent email already verified
+     * 
+     * @api {post} /auth/is-email-verified Check if agent email already verified
+     * @apiName IsEmailVerified
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} status 0|1.
      */
     public function actionIsEmailVerified() {
 
@@ -823,6 +950,21 @@ class AuthController extends BaseController {
     /**
      * Process email verification
      * @return array
+     * 
+     * @api {post} /auth/verify-email Process email verification    
+     * @apiName VerifyEmail
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} token Access token.
+     * @apiSuccess {string} id Agent ID.
+     * @apiSuccess {string} agent_name Agent name.
+     * @apiSuccess {string} agent_email Agent email.
+     * @apiSuccess {string} agent_new_email Agent new email.
+     * @apiSuccess {string} language_pref Language preference.
+     * @apiSuccess {Role} role Role.
+     * @apiSuccess {string} created_at Created at.
+     * @apiSuccess {Store} selectedStore Selected store.
+     * @apiSuccess {Array} stores Stores.
      */
     public function actionVerifyEmail() {
 
@@ -886,6 +1028,13 @@ class AuthController extends BaseController {
     /**
      * Sends password reset email to user
      * @return array
+     * 
+     * @api {post} /auth/request-reset-password Request password reset
+     * @apiName RequestResetPassword
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionRequestResetPassword() {
 
@@ -961,6 +1110,17 @@ class AuthController extends BaseController {
     /**
      * Updates password based on passed token
      * @return array
+     * 
+     * @api {PATCH} /auth/update-password Update password
+     * @apiName UpdatePassword
+     * @apiGroup Auth
+     *
+     * @apiParam {string} token Token.
+     * @apiParam {string} newPassword New password.
+     * @apiParam {string} cPassword Confirm password.
+     * 
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdatePassword() {
 
@@ -1015,6 +1175,20 @@ class AuthController extends BaseController {
     /**
      * return user location detail by user ip address
      * @return array
+     * 
+     * @api {post} /auth/locate Return user location detail by user ip address
+     * @apiName Locate
+     * @apiGroup Auth
+     *
+     * @apiSuccess {string} ip IP address.
+     * @apiSuccess {string} hostname Hostname.
+     * @apiSuccess {string} city City.
+     * @apiSuccess {string} region Region.
+     * @apiSuccess {string} country Country.
+     * @apiSuccess {string} loc Location.
+     * @apiSuccess {string} org Organization.
+     * @apiSuccess {string} postal Postal code.
+     * @apiSuccess {string} timezone Timezone.
      */
     public function actionLocate() {
         return Yii::$app->ipstack->locate();

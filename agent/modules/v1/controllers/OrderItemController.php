@@ -13,6 +13,16 @@ class OrderItemController extends BaseController {
 
     /**
      * Delete Order Item
+     * 
+     * @api {PATCH} /order-items/:order_item_id Update order item
+     * @apiName Update
+     * @apiParam {string} order_item_id Order item ID.
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup OrderItem
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdate()
     {
@@ -41,6 +51,16 @@ class OrderItemController extends BaseController {
 
     /**
      * Delete Order Item
+     * 
+     * @api {DELETE} /order-items/:order_item_id Delete order item
+     * @apiName Delete
+     * @apiParam {string} order_item_id Order item ID.
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup OrderItem
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDelete()
     {

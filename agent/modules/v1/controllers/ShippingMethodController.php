@@ -11,6 +11,16 @@ use yii\web\NotFoundHttpException;
 
 class ShippingMethodController extends BaseController
 {
+    /**
+     * Disable shipping method
+     * 
+     * @api {post} /shipping-methods/disable Disable
+     * @apiName Disable
+     * @apiGroup ShippingMethod
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
+     */
     public function actionDisable($code)
     {
         $store = $this->findModel();
@@ -30,6 +40,13 @@ class ShippingMethodController extends BaseController
      * edit shipping gateway settings
      * @param $code
      * @return string
+     * 
+     * @api {post} /shipping-methods/config Config
+     * @apiName Config
+     * @apiGroup ShippingMethod
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionConfig($code)
     {
@@ -65,6 +82,13 @@ class ShippingMethodController extends BaseController
         }
     }
 
+    /**
+     * Config Aramex
+     * @param $model
+     * @param $store
+     * @return string
+     * 
+     */
     private function _configAramex($model, $store)
     {
         $model->shipping_aramex_sandbox = Yii::$app->request->getBodyParam('sandbox');
@@ -88,6 +112,12 @@ class ShippingMethodController extends BaseController
         return $this->_enableMethod($store, ShippingMethod::CODE_ARAMEX);
     }
 
+    /**
+     * Config Fedex
+     * @param $model
+     * @param $store
+     * @return string
+     */
     private function _configFedex($model, $store)
     {
         $model->shipping_fedex_key = Yii::$app->request->getBodyParam('key');

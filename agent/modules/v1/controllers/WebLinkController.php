@@ -15,6 +15,13 @@ class WebLinkController extends BaseController
      * @param type $id
      * @param type $store_uuid
      * @return type
+     * 
+     * @api {get} /web-links Get all web links
+     * @apiName GetAllWebLinks
+     * @apiGroup WebLink
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionList($store_uuid = null)
     {
@@ -41,6 +48,18 @@ class WebLinkController extends BaseController
     /**
      * Create Web Link
      * @return array
+     * 
+     * @api {post} /web-links Create web link
+     * @apiName CreateWebLink
+     * @apiGroup WebLink
+     * 
+     * @apiParam {string} web_link_type Web link type.
+     * @apiParam {string} url Web link URL.
+     * @apiParam {string} web_link_title Web link title.
+     * @apiParam {string} web_link_title_ar Web link title (Arabic).
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate()
     {
@@ -71,6 +90,18 @@ class WebLinkController extends BaseController
 
     /**
      * Update Web Link
+     * 
+     * @api {PATCH} /web-links/:web_link_id Update web link
+     * @apiName UpdateWebLink
+     * @apiGroup WebLink
+     * 
+     * @apiParam {string} web_link_type Web link type.
+     * @apiParam {string} url Web link URL.
+     * @apiParam {string} web_link_title Web link title.
+     * @apiParam {string} web_link_title_ar Web link title (Arabic).
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdate($web_link_id, $store_uuid = null)
     {
@@ -108,6 +139,12 @@ class WebLinkController extends BaseController
      * @param type $store_uuid
      * @param type $order_uuid
      * @return type
+     * 
+     * @api {get} /web-links/:web_link_id Web link detail
+     * @apiName GetWebLinkDetail
+     * @apiGroup WebLink
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionDetail($web_link_id, $store_uuid = null)
     {
@@ -116,6 +153,13 @@ class WebLinkController extends BaseController
 
     /**
      * Delete Web Link
+     * 
+     * @api {DELETE} /web-links/:web_link_id Delete web link
+     * @apiName DeleteWebLink
+     * @apiGroup WebLink
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDelete($web_link_id, $store_uuid = null)
     {

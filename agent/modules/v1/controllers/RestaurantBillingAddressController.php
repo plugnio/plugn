@@ -14,6 +14,13 @@ class RestaurantBillingAddressController extends BaseController
      * @param type $id
      * @param type $store_uuid
      * @return type
+     * 
+     * @api {get} /restaurant-billing-addresses List
+     * @apiName List
+     * @apiGroup RestaurantBillingAddress
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionList($store_uuid = null)
     {
@@ -39,6 +46,19 @@ class RestaurantBillingAddressController extends BaseController
     /**
      * Create Restaurant Billing Address
      * @return array
+     * 
+     * @api {post} /restaurant-billing-addresses Create
+     * @apiName Create
+     * 
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} recipient_name Recipient Name.
+     * @apiParam {string} address_1 Address 1.
+     * @apiParam {string} address_2 Address 2.
+     * @apiGroup RestaurantBillingAddress
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate()
     {
@@ -74,6 +94,27 @@ class RestaurantBillingAddressController extends BaseController
 
     /**
      * Update Restaurant Billing Address
+     * 
+     * @api {PATCH} /restaurant-billing-addresses/:rba_uuid Update
+     * @apiName Update
+     * 
+     * @urlParam {string} rba_uuid Restaurant Billing Address UUID.
+     * @urlParam {string} store_uuid Store UUID.
+     * 
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} recipient_name Recipient Name.
+     * @apiParam {string} address_1 Address 1.
+     * @apiParam {string} address_2 Address 2.
+     * @apiParam {string} po_box Po Box.
+     * @apiParam {string} district District.
+     * @apiParam {string} city City.
+     * @apiParam {string} state State.
+     * @apiParam {string} zip_code Zip Code.
+     * 
+     * @apiGroup RestaurantBillingAddress
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdate($rba_uuid, $store_uuid = null)
     {
@@ -112,9 +153,16 @@ class RestaurantBillingAddressController extends BaseController
     
     /**
      * Return detail
-     * @param type $store_uuid
-     * @param type $order_uuid
+     * @param string $rba_uuid
+     * @param string $store_uuid
      * @return type
+     * 
+     * @api {get} /restaurant-billing-addresses/:rba_uuid Detail
+     * @apiName Detail
+     * @apiGroup RestaurantBillingAddress
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDetail($rba_uuid, $store_uuid = null)
     {
@@ -123,6 +171,12 @@ class RestaurantBillingAddressController extends BaseController
 
     /**
      * Delete Restaurant Billing Address
+     * 
+     * @api {DELETE} /restaurant-billing-addresses/:rba_uuid Delete
+     * @apiName Delete
+     * @apiGroup RestaurantBillingAddress
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionDelete($rba_uuid, $store_uuid = null)
     {

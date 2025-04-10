@@ -11,6 +11,12 @@ class IngredientController extends BaseController
 {
     /**
      * @return ActiveDataProvider
+     * 
+     * @api {get} /ingredients Get list of ingredients
+     * @apiName GetIngredients
+     * @apiGroup Ingredient
+     *
+     * @apiSuccess {Array} ingredients List of ingredients.
      */
     public function actionList()
     {
@@ -35,6 +41,12 @@ class IngredientController extends BaseController
      * @param $id
      * @return array|\yii\db\ActiveRecord|null
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /ingredients/:id Get ingredient detail
+     * @apiName GetIngredientDetail
+     * @apiGroup Ingredient
+     *
+     * @apiSuccess {Array} ingredient Ingredient.
      */
     public function actionDetail($id)
     {
@@ -43,6 +55,16 @@ class IngredientController extends BaseController
 
     /**
      * @return array|string[]
+     * 
+     * @api {post} /ingredients Create ingredient
+     * @apiName CreateIngredient
+     * @apiGroup Ingredient
+     *
+     * @apiParam {string} name Ingredient name.
+     * @apiParam {string} stock_quantity Ingredient stock quantity.
+     * @apiParam {string} image_url Ingredient image URL.
+     * 
+     * @apiSuccess {Array} ingredient Ingredient.
      */
     public function actionCreate()
     {
@@ -71,6 +93,16 @@ class IngredientController extends BaseController
      * @param $id
      * @return array|string[]
      * @throws NotFoundHttpException
+     * 
+     * @api {patch} /ingredients/:id Update ingredient
+     * @apiName UpdateIngredient
+     * @apiGroup Ingredient
+     *
+     * @apiParam {string} name Ingredient name.
+     * @apiParam {string} stock_quantity Ingredient stock quantity.
+     * @apiParam {string} image_url Ingredient image URL.
+     * 
+     * @apiSuccess {Array} ingredient Ingredient.
      */
     public function actionUpdate($id)
     {
@@ -98,6 +130,12 @@ class IngredientController extends BaseController
      * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
+     * 
+     * @api {delete} /ingredients/:id Delete ingredient
+     * @apiName DeleteIngredient
+     * @apiGroup Ingredient
+     *
+     * @apiSuccess {Array} ingredient Ingredient.
      */
     public function actionDelete($id)
     {

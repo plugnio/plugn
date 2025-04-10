@@ -11,7 +11,13 @@ class StateController extends BaseController
 {
     /**
      * Get all cities data
-     * @return type
+     * 
+     * @api {get} /states List
+     * @apiName List
+     * @apiGroup State
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionList() {
 

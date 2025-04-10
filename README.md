@@ -384,5 +384,17 @@ fi`
  
 
  mysql --host=plugn-main-latest-cluster.cluster-c8mekjvvbygf.eu-west-2.rds.amazonaws.com --user=yo3an --password=iamyo3an yo3an
+ 
+ ## to generate API 
 
-;dbname=
+https://apidocjs.com
+
+apidoc -i src -o apidoc
+
+apidoc -i agent -o agent-doc
+
+todo
+- api params 
+- api method and url compare with main.php 
+- add details for passing token 
+- warning in doc generation command

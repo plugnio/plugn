@@ -7,9 +7,11 @@ use agent\models\Currency;
 use common\models\Restaurant;
 use common\models\RestaurantCurrency;
 use yii\data\ActiveDataProvider;
-use yii\rest\Controller;
 
 
+/**
+ * CurrencyController implements the CRUD actions for Currency model.
+ */
 class CurrencyController extends BaseController {
 
     public function behaviors() {
@@ -49,7 +51,13 @@ class CurrencyController extends BaseController {
 
     /**
      * Get all currency data
-     * @return type
+     * @return ActiveDataProvider
+     * 
+     * @api {get} /currencies Get all currency data
+     * @apiName ListCurrencies
+     * @apiGroup Currency
+     *
+     * @apiSuccess {Array} currencies List of currencies.
      */
     public function actionList() {
 
@@ -87,7 +95,17 @@ class CurrencyController extends BaseController {
 
     /**
      * return store currency data
-     * @return type
+     * @return ActiveDataProvider
+     * 
+     * @api {get} /currencies/store-currencies Get store currency data
+     * @apiName StoreCurrencies
+     * 
+     * @apiParam {string} keyword Keyword.
+     * @apiParam {string} page Page.
+     * 
+     * @apiGroup Currency
+     *
+     * @apiSuccess {Array} currencies List of currencies.
      */
     public function actionStoreCurrencies() {
 
@@ -117,6 +135,17 @@ class CurrencyController extends BaseController {
 
     /**
      * update store currencies
+     * 
+     * @api {post} /currencies Update store currencies
+     * @apiName UpdateStoreCurrencies
+     * 
+     * @apiParam {string} currencies Currencies.
+     * @apiParam {string} currency_id Currency ID.
+     * 
+     * @apiGroup Currency
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdate()
     {

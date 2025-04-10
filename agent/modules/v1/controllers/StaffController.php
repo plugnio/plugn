@@ -44,6 +44,13 @@ class StaffController extends BaseController {
      * Get all store's Staff members
      * @param $store_uuid
      * @return ActiveDataProvider
+     * 
+     * @api {get} /staffs List
+     * @apiName List
+     * @apiGroup Staff
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionList() {
 
@@ -75,6 +82,13 @@ class StaffController extends BaseController {
     /**
      * Create voucher
      * @return array
+     * 
+     * @api {post} /staffs Create
+     * @apiName Create
+     * @apiGroup Staff
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate() {
         $this->ownerCheck();
@@ -165,7 +179,14 @@ class StaffController extends BaseController {
 
      /**
       * Update voucher
-      */
+      * 
+     * @api {PATCH} /staffs/:assignment_id Update
+     * @apiName Update
+     * @apiGroup Staff
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
+     */
      public function actionUpdate($assignment_id, $store_uuid = null)
      {
          $this->ownerCheck();
@@ -208,6 +229,13 @@ class StaffController extends BaseController {
      * @param $assignment_id
      * @return Country|array
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /staffs/:assignment_id Detail
+     * @apiName Detail
+     * @apiGroup Staff
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
       public function actionDetail($assignment_id, $store_uuid = null) {
           $this->ownerCheck();
@@ -224,6 +252,13 @@ class StaffController extends BaseController {
 
     /**
      * Delete Agent Assignment
+     * 
+     * @api {DELETE} /staffs/:assignment_id Delete
+     * @apiName Delete
+     * @apiGroup Staff
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDelete($assignment_id, $store_uuid = null)
     {

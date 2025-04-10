@@ -62,6 +62,12 @@ class OrderController extends BaseController
      * list all order that has been completed order out for delivery
      * @param $type
      * @return ActiveDataProvider
+     * 
+     * @api {get} /orders/archive-orders List all order that has been completed order out for delivery
+     * @apiName ArchiveOrders
+     * @apiGroup Order
+     * 
+     * @apiSuccess {Array} orders Orders.
      */
     public function actionArchiveOrders()
     {
@@ -91,6 +97,20 @@ class OrderController extends BaseController
      * list orders
      * @param $type
      * @return ActiveDataProvider
+     * 
+     * @api {get} /orders/list List orders
+     * @apiName ListOrders
+     * @apiParam {string} type Type.
+     * @apiParam {string} keyword Keyword.
+     * @apiParam {string} order_uuid Order UUID.
+     * @apiParam {string} phone Phone.
+     * @apiParam {string} status Status.
+     * @apiParam {string} customer Customer.
+     * @apiParam {string} customer_id Customer ID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {Array} orders Orders.
      */
     public function actionList($type = null)
     {
@@ -171,6 +191,14 @@ class OrderController extends BaseController
     /**
      * get order stats
      * @return ActiveDataProvider
+     * 
+     * @api {get} /orders/stats Get order stats
+     * @apiName Stats
+     * @apiParam {string} customer_id Customer ID.
+     * @apiParam {string} query Query.
+     * 
+     * @apiGroup Order
+     * 
      */
     public function actionStats()
     {
@@ -443,6 +471,13 @@ class OrderController extends BaseController
     /**
      * return pending order count
      * @return ActiveDataProvider
+     * 
+     * @api {get} /orders/total-pending Return pending order count
+     * @apiName TotalPending
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {Array} orders Orders.
      */
     public function actionTotalPending()
     {
@@ -489,6 +524,13 @@ class OrderController extends BaseController
 
     /**
      * Place an order
+     * 
+     * @api {post} /orders/place-an-order Place an order
+     * @apiName PlaceAnOrder
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup Order
+     * 
      */
     public function actionPlaceAnOrder($store_uuid = null)
     {
@@ -737,6 +779,14 @@ class OrderController extends BaseController
 
     /**
      * Update Order
+     * 
+     * @api {PATCH} /orders/:order_uuid Update order
+     * @apiName UpdateOrder
+     * @apiParam {string} order_uuid Order UUID.
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup Order
+     * 
      */
     public function actionUpdate($order_uuid, $store_uuid = null)
     {
@@ -1001,6 +1051,14 @@ class OrderController extends BaseController
 
     /**
      *  find oreder item if exists
+     * 
+     * @api {get} /orders/find-order-item Find order item
+     * @apiName FindOrderItem
+     * @apiParam {string} order_uuid Order UUID.
+     * @apiParam {string} order_item_id Order item ID.
+     * 
+     * @apiGroup Order
+     * 
      */
     public function findOrderItem($order_uuid, $order_item_id)
     {
@@ -1012,8 +1070,16 @@ class OrderController extends BaseController
 
     /**
      * try to initiate refund
-     * @param $order_uuid
+     * @param string $order_uuid
      * @throws NotFoundHttpException
+     * 
+     * @api {PATCH} /orders/refund/:order_uuid Initiate refund
+     * @apiName Refund
+     * @apiParam {string} order_uuid Order UUID.
+     * @apiParam {string} refund_amount Refund amount.
+     * @apiParam {string} itemsToRefund Items to refund.
+     * 
+     * @apiGroup Order
      */
     public function actionRefund($order_uuid)
     {
@@ -1194,6 +1260,12 @@ class OrderController extends BaseController
 
     /**
      * Update Order Status
+     * 
+     * @api {PATCH} /orders/update-order-status Update order status
+     * @apiName UpdateOrderStatus
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup Order
      */
     public function actionUpdateOrderStatus($order_uuid, $store_uuid = null)
     {
@@ -1311,6 +1383,12 @@ class OrderController extends BaseController
      * @param $store_uuid
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /orders/request-driver-from-armada Request driver from armada
+     * @apiName RequestDriverFromArmada
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup Order
      */
     public function actionRequestDriverFromArmada($order_uuid, $store_uuid = null)
     {
@@ -1373,6 +1451,12 @@ class OrderController extends BaseController
      * @param $store_uuid
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /orders/create-shipment-aramex Create shipment aramex
+     * @apiName CreateShipmentAramex
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup Order
      */
     public function actionCreateShipmentAramex($order_uuid, $store_uuid = null)
     {
@@ -1386,6 +1470,16 @@ class OrderController extends BaseController
      * @return array
      * @throws NotFoundHttpException
      * @throws \SoapFault
+     * 
+     * @api {post} /orders/schedule-pickup-aramex Schedule pickup aramex
+     * @apiName SchedulePickupAramex
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
+     * @apiSuccess {ID} ID Pickup ID.
      */
     public function actionSchedulePickupAramex($order_uuid)
     {
@@ -1399,6 +1493,15 @@ class OrderController extends BaseController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /orders/cancel-delivery Cancel delivery
+     * @apiName CancelDelivery
+     * @apiParam {string} id Order ID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCancelDelivery($id)
     {
@@ -1434,8 +1537,19 @@ class OrderController extends BaseController
 
     /**
      * Request a driver from Mashkor
-     * @param type $order_uuid
-     * @param type $store_uuid
+     * @param string $order_uuid
+     * @param string $store_uuid
+     * 
+     * @api {post} /orders/request-driver-from-mashkor/:order_uuid Request a driver from Mashkor
+     * @apiName RequestDriverFromMashkor
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
+     * @apiSuccess {string} mashkor_order_number Mashkor order number.
+     * @apiSuccess {string} mashkor_order_status Mashkor order status.
      */
     public function actionRequestDriverFromMashkor($order_uuid, $store_uuid = null)
     {
@@ -1496,6 +1610,14 @@ class OrderController extends BaseController
      * Return order detail
      * @param type $order_uuid
      * @return type
+     * 
+     * @api {get} /orders/detail Return order detail
+     * @apiName Detail
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {Array} order Order.
      */
     public function actionDetail($order_uuid)
     {
@@ -1504,6 +1626,14 @@ class OrderController extends BaseController
 
     /**
      * Delete Order
+     * 
+     * @api {DELETE} /orders/:order_uuid Delete order
+     * @apiName Delete
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionDelete($order_uuid, $store_uuid = null)
     {
@@ -1545,6 +1675,14 @@ class OrderController extends BaseController
 
     /**
      * Delete Order
+     * 
+     * @api {post} /orders/soft-delete Soft delete order
+     * @apiName SoftDelete
+     * @apiParam {string} order_uuid Order UUID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionSoftDelete($order_uuid, $store_uuid = null)
     {
@@ -1584,6 +1722,13 @@ class OrderController extends BaseController
     /**
      * Lists all Order models.
      * @return mixed
+     * 
+     * @api {get} /orders/orders-report Orders report
+     * @apiName OrdersReport
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {Array} orders Orders.
      */
     public function actionOrdersReport()
     {
@@ -1732,6 +1877,15 @@ class OrderController extends BaseController
      * Creates a new Order model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * 
+     * @api {post} /orders/create Create order
+     * @apiName Create
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate($store_uuid = null)
     {
@@ -1978,6 +2132,16 @@ class OrderController extends BaseController
      * @param $store_uuid
      * @return string[]|void
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /orders/request-payment-status-from-tap Request payment status from tap
+     * @apiName RequestPaymentStatusFromTap
+     * @apiParam {string} order_uuid Order UUID.
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionRequestPaymentStatusFromTap($order_uuid, $store_uuid = null)
     {
@@ -2013,6 +2177,15 @@ class OrderController extends BaseController
      * @param $id
      * @param $type
      * @return array|mixed
+     * 
+     * @api {get} /orders/download-invoice Download invoice
+     * @apiName DownloadInvoice
+     * @apiParam {string} id Order ID.
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDownloadInvoice($id)
     {
@@ -2102,6 +2275,14 @@ class OrderController extends BaseController
      * @throws \setasign\Fpdi\PdfParser\PdfParserException
      * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
      * @throws \yii\base\InvalidConfigException
+     * 
+     * @api {get} /orders/download-today-invoices Download today invoices
+     * @apiName DownloadTodayInvoices
+     * 
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDownloadTodayInvoices()
     {

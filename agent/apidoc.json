@@ -1,0 +1,7 @@
+{
+    "name": "Plugn dashboard API",
+    "version": "0.1.0",
+    "description": "Plugn dashboard API documentation. For staging environment use https://agent.dev.plugn.io/v1",
+    "title": "Plugn dashboard API",
+    "url" : "https://agent.plugn.io/v1"
+}

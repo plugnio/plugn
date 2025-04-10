@@ -48,6 +48,7 @@ return [
                     'patterns' => [
                         "GET <id>" => "order",
                         "POST install" => "install",
+                        "POST order" => "order",
                         "PATCH refund" => "refund",
                         "PATCH close" => "close",
                         // OPTIONS VERBS
@@ -172,7 +173,6 @@ return [
                         'OPTIONS create' => 'options'
                     ]
                 ],
-
                 [// BusinessLocationController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/business-location',
@@ -592,10 +592,12 @@ return [
                     'patterns' => [
                         'GET' => 'index',
                         'POST' => 'index',
+                        'POST register-initiated-order' => 'register-initiated-order',
                         'GET callback' => 'callback',
                         'POST callback' => 'callback',
                         // OPTIONS VERBS
                         'OPTIONS' => 'options',
+                        'OPTIONS register-initiated-order' => 'options',
                     ]
                 ],
                 [// StripeController

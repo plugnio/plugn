@@ -16,6 +16,15 @@ class PaymentMethodController extends BaseController
      * edit payment gateway settings
      * @param $code
      * @return string
+     * 
+     * @api {post} /payment-methods/config Config payment gateway
+     * @apiName Config
+     * @apiParam {string} code Code.
+     * 
+     * @apiGroup PaymentMethod
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionConfig($code)
     {

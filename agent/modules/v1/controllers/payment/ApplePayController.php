@@ -29,6 +29,20 @@ class ApplePayController extends BaseController
     /**
      * process apple token -> tap token -> charge user
      * @return array
+     * 
+     * @api {POST} /payment/apple-pay/process-payment Process apple payment
+     * @apiName ProcessApplePayment
+     * @apiGroup Payment
+     *
+     * @apiParam {string} addon_uuid Addon UUID.
+     * @apiParam {string} payment_method_id Payment method ID.
+     * @apiParam {string} token Apple pay token.
+     *
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
+     * 
+     * @apiSuccess {string} redirect Redirect URL.
+     *
      */
     public function actionProcessPayment()
     {
@@ -206,6 +220,15 @@ class ApplePayController extends BaseController
 
     /**
      * @return void
+     * 
+     * @api {POST} /payment/apple-pay/validate-merchant Validate merchant
+     * @apiName ValidateMerchant
+     * @apiGroup Payment
+     * 
+     * @apiParam {string} validationURL Validation URL.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionValidateMerchant()
     {

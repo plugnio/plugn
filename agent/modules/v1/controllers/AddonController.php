@@ -11,7 +11,6 @@ use agent\models\Addon;
 use common\models\AddonPayment;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Url;
-use yii\rest\Controller;
 use yii\web\Cookie;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -30,6 +29,12 @@ class AddonController extends BaseController
 
     /**
      * @return ActiveDataProvider
+     * 
+     * @api {get} /addons Get addons list
+     * @apiName GetAddonsList
+     * @apiGroup Addon
+     *
+     * @apiSuccess {Array} List of addons.
      */
     public function actionList() {
 
@@ -51,15 +56,32 @@ class AddonController extends BaseController
      * Return Addon detail
      * @param integer $addon_uuid
      * @return Addon
+     * 
+     * @api {get} /addons/:id Get addon detail
+     * @apiName GetAddonDetail
+     * @apiGroup Addon
+     *
+     * @apiSuccess {Array} Addon detail.
      */
     public function actionDetail($id) {
         return $this->findModel($id);
     }
 
     /**
-     * confirm plan for current store
+     * confirm payment for addon
      * @param $id
      * @return array|string[]
+     * 
+     * @api {post} /addons/confirm Confirm payment for addon
+     * 
+     * @apiParam {string} addon_uuid Addon UUID.
+     * @apiParam {string} payment_method_id Payment method ID.
+     * @apiParam {string} token Token.
+     * 
+     * @apiName ConfirmAddon
+     * @apiGroup Addon
+     *
+     * @apiSuccess {Array} Addon confirmed successfully.
      */
     public function actionConfirm()
     {
@@ -188,6 +210,12 @@ class AddonController extends BaseController
      * Process callback from TAP payment gateway
      * @param string $tap_id
      * @return mixed
+     * 
+     * @api {get} /addons/callback Process callback from TAP payment gateway
+     * @apiName ProcessCallback
+     * @apiGroup Addon
+     *
+     * @apiSuccess {Array} Callback processed successfully.
      */
     public function actionCallback()
     {
@@ -222,6 +250,23 @@ class AddonController extends BaseController
      * Process callback from TAP payment gateway
      * @param string $tap_id
      * @return mixed
+     * 
+     * @api {post} /addons/payment-webhook Process callback from TAP payment gateway
+     * @apiName ProcessPaymentWebhook
+     * @apiGroup Addon
+     *
+     * @apiParam {string} id Charge ID.
+     * @apiParam {string} status Charge status.
+     * @apiParam {string} amount Amount.
+     * @apiParam {string} currency Currency.
+     * @apiParam {string} reference Reference.
+     * @apiParam {string} destinations Destinations.
+     * @apiParam {string} response Response.
+     * @apiParam {string} source Source.
+     * @apiParam {string} transaction Transaction.
+     * @apiParam {string} acquirer Acquirer.
+     * 
+     * @apiSuccess {Array} Payment webhook processed successfully.
      */
     public function actionPaymentWebhook() {
 

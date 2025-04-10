@@ -22,6 +22,13 @@ class TabbyController extends BaseController
     /**
      * @return void
      * @throws NotFoundHttpException
+     * 
+     * @api {POST} /payment/tabby/install Install Tabby
+     * @apiName InstallTabby
+     * @apiGroup Payment
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionInstall() {
         $store = $this->findStore();
@@ -32,6 +39,16 @@ class TabbyController extends BaseController
     /**
      * @param $id
      * @return array
+     * 
+     * @api {POST} /payment/tabby/order/:id Order
+     * @apiName Order
+     * @apiGroup Payment
+     * 
+     * @apiParam {string} txn Transaction.
+     * @apiParam {string} id Transaction ID.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionOrder($id) {
 
@@ -68,6 +85,16 @@ class TabbyController extends BaseController
 
     /**
      * @return array
+     * 
+     * @api {PATCH} /payment/tabby/refund Refund
+     * @apiName Refund
+     * @apiGroup Payment
+     * 
+     * @apiParam {string} transaction_id Transaction ID.
+     * @apiParam {string} amount Amount.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionRefund() {
         $json = array();
@@ -91,6 +118,12 @@ class TabbyController extends BaseController
 
     /**
      * @return array
+     * 
+     * @api {PATCH} /payment/tabby/close Close
+     * @apiName Close
+     * @apiGroup Payment
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionClose() {
         $json = array();

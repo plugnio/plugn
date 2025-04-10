@@ -24,6 +24,17 @@ class ItemController extends BaseController
     /**
      * Get all store's products
      * @return type
+     * 
+     * @api {get} /items Get all store's products
+     * @apiName GetItems
+     * 
+     * @apiParam {string} keyword Keyword.
+     * @apiParam {string} type Type.
+     * @apiParam {string} category_id Category ID.
+     * 
+     * @apiGroup Item
+     *
+     * @apiSuccess {Array} items List of items.
      */
     public function actionList()
     {
@@ -66,6 +77,13 @@ class ItemController extends BaseController
      * Return item detail
      * @param string $id
      * @return Item
+     * 
+     * @api {get} /items/:id Return item detail
+     * @apiName GetItemDetail
+     * @apiParam {string} id Item ID.
+     * @apiGroup Item
+     *
+     * @apiSuccess {Array} item Item.
      */
     public function actionDetail($id) {
         return $this->findModel($id);
@@ -75,6 +93,41 @@ class ItemController extends BaseController
      * add new item
      * @return array|string[]
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /items Create new item
+     * @apiName CreateItem
+     * 
+     * @apiParam {string} item_name Item name.
+     * @apiParam {string} item_name_ar Item name arabic.
+     * @apiParam {string} item_description Item description.
+     * @apiParam {string} item_description_ar Item description arabic.
+     * @apiParam {string} item_meta_description Item meta description.
+     * @apiParam {string} item_meta_description_ar Item meta description arabic.
+     * @apiParam {string} item_meta_title Item meta title.
+     * @apiParam {string} item_meta_title_ar Item meta title arabic.
+     * @apiParam {string} sort_number Sort number.
+     * @apiParam {string} item_type Item type.
+     * @apiParam {string} prep_time Prep time.
+     * @apiParam {string} prep_time_unit Prep time unit.
+     * @apiParam {string} item_price Item price.
+     * @apiParam {string} compare_at_price Compare at price.
+     * @apiParam {string} sku SKU.
+     * @apiParam {string} barcode Barcode.
+     * @apiParam {string} track_quantity Track quantity.
+     * @apiParam {string} shipping Shipping.
+     * @apiParam {string} weight Weight.
+     * @apiParam {string} length Length.
+     * @apiParam {string} height Height.
+     * @apiParam {string} width Width.
+     * @apiParam {string} itemCategories Item categories.
+     * @apiParam {string} itemImages Item images.
+     * @apiParam {string} itemVideos Item videos.
+     * @apiParam {string} itemVariants Item variants.
+     * @apiParam {string} options Options.
+     * 
+     * @apiGroup Item
+     *
+     * @apiSuccess {Array} item Item.
      */
     public function actionCreate()
     {
@@ -320,6 +373,42 @@ class ItemController extends BaseController
 
     /**
      * Update item
+     * 
+     * @api {post} /items/:id Update item
+     * @apiName UpdateItem
+     * @apiParam {string} id Item ID.
+     * @apiParam {string} item_name Item name.
+     * @apiParam {string} item_name_ar Item name arabic.
+     * @apiParam {string} item_description Item description.
+     * @apiParam {string} item_description_ar Item description arabic.
+     * @apiParam {string} item_meta_description Item meta description.
+     * @apiParam {string} item_meta_description_ar Item meta description arabic.
+     * @apiParam {string} item_meta_title Item meta title.
+     * @apiParam {string} item_meta_title_ar Item meta title arabic.
+     * @apiParam {string} sort_number Sort number.
+     * @apiParam {string} item_type Item type.
+     * @apiParam {string} prep_time Prep time.
+     * @apiParam {string} prep_time_unit Prep time unit.
+     * @apiParam {string} item_price Item price.
+     * @apiParam {string} compare_at_price Compare at price.
+     * @apiParam {string} sku SKU.
+     * @apiParam {string} barcode Barcode.
+     * @apiParam {string} track_quantity Track quantity.
+     * @apiParam {string} stock_qty Stock quantity.
+     * @apiParam {string} shipping Shipping.
+     * @apiParam {string} weight Weight.
+     * @apiParam {string} length Length.
+     * @apiParam {string} height Height.
+     * @apiParam {string} width Width.
+     * @apiParam {string} itemCategories Item categories.
+     * @apiParam {string} itemImages Item images.
+     * @apiParam {string} itemVideos Item videos.
+     * @apiParam {string} itemVariants Item variants.
+     * @apiParam {string} options Options.
+     *  
+     * @apiGroup Item
+     *
+     * @apiSuccess {Array} item Item.
      */
     public function actionUpdate($id)
     {
@@ -633,8 +722,18 @@ class ItemController extends BaseController
 
     /**
      * Update Stock Qty
-     * @param type $itemUuid
+     * @param string $itemUuid
      * @return boolean
+     * 
+     * @api {post} /items/update-stock-qty Update stock qty
+     * @apiName UpdateStockQty
+     * @apiParam {string} item_uuid Item UUID.
+     * @apiParam {string} stock_qty Stock quantity.
+     * @apiParam {string} track_quantity Track quantity.
+     * 
+     * @apiGroup Item
+     * 
+     * @apiSuccess {Array} item Item.
      */
     public function actionUpdateStockQty()
     {
@@ -666,8 +765,16 @@ class ItemController extends BaseController
 
     /**
      * Update Stock Qty
-     * @param type $itemUuid
+     * @param string $itemUuid
      * @return boolean
+     * 
+     * @api {post} /items/change-position Change position
+     * @apiName ChangePosition
+     * @apiParam {string} items Items.
+     * 
+     * @apiGroup Item
+     * 
+     * @apiSuccess {Array} item Item.
      */
     public function actionChangePosition(){
 
@@ -699,6 +806,14 @@ class ItemController extends BaseController
      * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
+     * 
+     * @api {DELETE} /items/:id Delete item
+     * @apiName DeleteItem
+     * @apiParam {string} id Item ID.
+     * 
+     * @apiGroup Item
+     * 
+     * @apiSuccess {Array} item Item.
      */
     public function actionDelete($id)
     {
@@ -730,6 +845,15 @@ class ItemController extends BaseController
      * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
+     * 
+     * @api {DELETE} /items/delete-video/:id Delete video
+     * @apiName DeleteVideo
+     * 
+     * @apiParam {string} id Item Video ID.
+     * 
+     * @apiGroup Item
+     * 
+     * @apiSuccess {Array} item Item.
      */
     public function actionDeleteVideo($id)
     {
@@ -783,6 +907,16 @@ class ItemController extends BaseController
      * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
+     * 
+     * @api {DELETE} /items/delete-image/:id/:image Delete image
+     * @apiName DeleteImage
+     * 
+     * @apiParam {string} id Item ID.
+     * @apiParam {string} image Image file name/path.
+     * 
+     * @apiGroup Item
+     * 
+     * @apiSuccess {Array} item Item.
      */
     public function actionDeleteImage($id, $image = null)
     {
@@ -841,6 +975,14 @@ class ItemController extends BaseController
      * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
+     * 
+     * @api {DELETE} /items/delete-variant-image/:id/:image Delete variant image
+     * @apiName DeleteVariantImage
+     * 
+     * @apiParam {string} id Item ID.
+     * @apiParam {string} image Image file name/path.
+     * 
+     * @apiGroup Item
      */
     public function actionDeleteVariantImage($id, $image = null)
     {
@@ -892,6 +1034,14 @@ class ItemController extends BaseController
 
     /**
      * download excel of item report
+     * 
+     * @api {GET} /items/items-report Download excel of item report
+     * @apiName ItemsReport
+     * 
+     * @apiParam {string} start_date Start date.
+     * @apiParam {string} end_date End date.
+     * 
+     * @apiGroup Item
      */
     public function actionItemsReport()
     {
@@ -955,6 +1105,17 @@ class ItemController extends BaseController
             ]);
     }
 
+    /**
+     * @return array|string[]
+     * @throws NotFoundHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     * 
+     * @api {GET} /items/export-to-excel Export to excel
+     * @apiName ExportToExcel
+     * 
+     * @apiGroup Item
+     */
     public function actionExportToExcel()
     {
         $restaurant = Yii::$app->accountManager->getManagedAccount();
@@ -1000,6 +1161,14 @@ class ItemController extends BaseController
      * @param $store_uuid
      * @return array|string[]
      * @throws NotFoundHttpException
+     * 
+     * @api {PATCH} /items/change-status/:id/:store_uuid Change status
+     * @apiName ChangeStatus
+     * 
+     * @apiParam {string} id Item ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup Item
      */
     public function actionChangeStatus($id, $store_uuid = null)
     {

@@ -9,6 +9,13 @@ class PlugnUpdateController extends BaseController
 {
     /**
      * @return ActiveDataProvider
+     * 
+     * @api {get} /plugn-updates Get plugn updates
+     * @apiName GetPlugnUpdates
+     * @apiGroup PlugnUpdate
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionIndex() {
 

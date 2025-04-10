@@ -21,6 +21,28 @@ use agent\models\AreaDeliveryZone;
 use agent\models\BusinessLocation;
 
 
+/**
+ * 
+ * 'GET' => 'list',
+                        'GET detail' => 'detail',
+                        'GET country-cities/<country_id>' => 'country-cities',
+                        'GET cities/<state_id>' => 'cities',
+                        'GET states/<country_id>' => 'states',
+                        'GET areas/<city_id>' => 'areas',
+                        'GET list-of-countries/<restaurant_uuid>' => 'list-of-countries',
+                        'GET list-of-areas/<restaurant_uuid>/<country_id>' => 'list-of-areas',
+                        'GET detail-by-location' => 'detail-by-location',
+                        'GET by-location' => 'by-location',
+                        'POST create' => 'create',
+                        'POST add-state-to-delivery-area' => "add-state-to-delivery-area",
+                        'PATCH <delivery_zone_id>/<store_uuid>' => 'update',
+                        'PATCH <delivery_zone_id>' => 'update',
+                        "DELETE remove-state-from-delivery-area/<state_id>/<delivery_zone_id>" => "remove-state-from-delivery-area",
+                        'DELETE cancel-override/<delivery_zone_id>/<store_uuid>' => 'cancel-override',
+                        'DELETE cancel-override/<delivery_zone_id>' => 'cancel-override',
+                        'DELETE <delivery_zone_id>/<store_uuid>' => 'delete',
+                        'DELETE <delivery_zone_id>' => 'delete',
+ */
 class DeliveryZoneController extends BaseController
 {
     /**
@@ -64,9 +86,16 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Get all delivery zones
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * @param string $business_location_id
+     * @param string $store_uuid
+     * @return ActiveDataProvider
+     * 
+     * @api {get} /delivery-zones Get all delivery zones
+     * @apiName ListDeliveryZones
+     * @apiParam {string} business_location_id Business location ID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} deliveryZones List of delivery zones.
      */
     public function actionList($business_location_id, $store_uuid = null)
     {
@@ -86,6 +115,16 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of cities available for state
+     * @param string $country_id
+     * @return ActiveDataProvider
+     * 
+     * @api {get} /delivery-zones/country-cities/:country_id Get list of cities available for state
+     * @apiName CountryCities
+     * @apiParam {string} country_id Country ID.
+     * 
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} cities List of cities.
      */
     public function actionCountryCities($country_id)
     {
@@ -120,6 +159,24 @@ class DeliveryZoneController extends BaseController
     /**
      * Create Delivery zone
      * @return array
+     * 
+     * @api {post} /delivery-zones Create delivery zone
+     * @apiName CreateDeliveryZone
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} business_location_id Business location ID.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} delivery_time Delivery time.
+     * @apiParam {string} time_unit Time unit.
+     * @apiParam {string} delivery_fee Delivery fee.
+     * @apiParam {string} min_charge Minimum charge.
+     * @apiParam {string} delivery_zone_tax Delivery zone tax.
+     * @apiParam {string} deliver_whole_country Deliver whole country.
+     * 
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {Array} model Delivery zone.
      */
     public function actionCreate()
     {
@@ -183,6 +240,27 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Update Delivery Zone
+     * @param string $delivery_zone_id
+     * @param string $store_uuid
+     * @return array
+     * 
+     * @api {PATCH} /delivery-zones Update delivery zone
+     * @apiName UpdateDeliveryZone
+     * 
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} business_location_id Business location ID.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} delivery_time Delivery time.
+     * @apiParam {string} time_unit Time unit.
+     * @apiParam {string} delivery_fee Delivery fee.
+     * @apiParam {string} min_charge Minimum charge.
+     * @apiParam {string} delivery_zone_tax Delivery zone tax.
+     * @apiParam {string} deliver_whole_country Deliver whole country.
+     * 
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {string} operation success|error.
      */
     public function actionUpdate($delivery_zone_id, $store_uuid = null)
     {
@@ -258,6 +336,14 @@ class DeliveryZoneController extends BaseController
      * @param type $store_uuid
      * @param type $order_uuid
      * @return type
+     * 
+     * @api {get} /delivery-zones/:delivery_zone_id Get delivery zone detail
+     * @apiName GetDeliveryZoneDetail
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} deliveryZone Delivery zone.
      */
     public function actionDetail($delivery_zone_id, $store_uuid = null)
     {
@@ -267,6 +353,14 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Delete Delivery zone
+     * 
+     * @api {delete} /delivery-zones/:delivery_zone_id Delete delivery zone
+     * @apiName DeleteDeliveryZone
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {string} operation success|error.
      */
     public function actionDelete($delivery_zone_id, $store_uuid = null)
     {
@@ -302,6 +396,14 @@ class DeliveryZoneController extends BaseController
 
     /**
      * cancel-override Delivery zone
+     * 
+     * @api {DELETE} /delivery-zones/cancel-override Cancel override delivery zone
+     * @apiName CancelOverrideDeliveryZone
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {string} operation success|error.
      */
     public function actionCancelOverride($delivery_zone_id, $store_uuid = null)
     {
@@ -333,6 +435,13 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of states available for delivery
+     * 
+     * @api {get} /delivery-zones/states/:country_id Get list of states available for delivery
+     * @apiName States
+     * @apiParam {string} country_id Country ID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} states List of states.
      */
     public function actionStates($country_id) {
 
@@ -364,6 +473,14 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of cities available for delivery
+     * 
+     * @api {get} /delivery-zones/cities/:state_id Get list of cities available for delivery
+     * @apiName Cities
+     * @apiParam {string} state_id State ID.
+     * 
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} cities List of cities.
      */
     public function actionCities($state_id) {
 
@@ -400,6 +517,13 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of cities available for delivery
+     * 
+     * @api {get} /delivery-zones/areas/:city_id Get list of areas available for delivery
+     * @apiName Areas
+     * @apiParam {string} city_id City ID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} areas List of areas.
      */
     public function actionAreas($city_id) {
 
@@ -437,6 +561,16 @@ class DeliveryZoneController extends BaseController
     /**
      * delivery zone by city, state and country
      * @return void
+     * 
+     * @api {get} /delivery-zones/detail-by-location Delivery zone by city, state and country
+     * @apiName DetailByLocation
+     * 
+     * @apiParam {string} city_id City ID.
+     * @apiParam {string} state_id State ID.
+     * @apiParam {string} country_id Country ID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} deliveryZone Delivery zone.
      */
     public function actionDetailByLocation()
     {
@@ -484,6 +618,20 @@ class DeliveryZoneController extends BaseController
         return $areaDeliveryZone? $areaDeliveryZone->deliveryZone: null;
     }
 
+    /**
+     * Return delivery zone by location
+     * 
+     * @api {get} /delivery-zones/by-location Delivery zone by location 
+     * @apiName ByLocation
+     * 
+     * @apiParam {string} area_id Area ID.
+     * @apiParam {string} city_id City ID.
+     * @apiParam {string} state_id State ID.
+     * 
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} deliveryZone Delivery zone.
+     */
     public function actionByLocation()
     {
         $area_id = Yii::$app->request->get('area_id');
@@ -577,6 +725,14 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of areas available for delivery
+     * 
+     * @api {get} /delivery-zones/list-of-areas/:restaurant_uuid/:country_id Get list of areas available for delivery
+     * @apiName ListOfAreas
+     * @apiParam {string} restaurant_uuid Restaurant UUID.
+     * @apiParam {string} country_id Country ID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} areas List of areas.
      */
     public function actionListOfAreas($restaurant_uuid, $country_id) {
 
@@ -618,6 +774,13 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return List of countries available for delivery
+     * 
+     * @api {get} /delivery-zones/list-of-countries/:restaurant_uuid Get list of countries available for delivery
+     * @apiName ListOfCountries
+     * @apiParam {string} restaurant_uuid Restaurant UUID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} countries List of countries.
      */
     public function actionListOfCountries($restaurant_uuid) {
 
@@ -672,6 +835,14 @@ class DeliveryZoneController extends BaseController
      * @param $state_id
      * @param $delivery_zone_id
      * @return string[]
+     * 
+     * @api {post} /delivery-zones/remove-state-from-delivery-area/:state_id/:delivery_zone_id Remove state from delivery area
+     * @apiName RemoveStateFromDeliveryArea
+     * @apiParam {string} state_id State ID.
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {string} operation success|error.
      */
     public function actionRemoveStateFromDeliveryArea($state_id, $delivery_zone_id) {
 
@@ -697,6 +868,14 @@ class DeliveryZoneController extends BaseController
 
     /**
      * @return string[]
+     * 
+     * @api {post} /delivery-zones/add-state-to-delivery-area/:state_id/:delivery_zone_id Add state to delivery area
+     * @apiName AddStateToDeliveryArea
+     * @apiParam {string} state_id State ID.
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {string} operation success|error.
      */
     public function actionAddStateToDeliveryArea() {
 
@@ -757,6 +936,13 @@ class DeliveryZoneController extends BaseController
      * @param integer $id
      * @return Item the loaded model
      * @throws NotFoundHttpException if the model cannot be found
+     * 
+     * @api {get} /delivery-zones/find-store/:id Find store
+     * @apiName FindStore
+     * @apiParam {string} id Store UUID.
+     * @apiGroup DeliveryZone
+     *
+     * @apiSuccess {Array} store Store.
      */
     protected function findStore($id = null)
     {

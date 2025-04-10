@@ -58,6 +58,13 @@ class RestaurantPaymentMethodController extends BaseController
      * @param $id
      * @return Plan|null
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /restaurant-payment-methods Index
+     * @apiName Index
+     * @apiGroup RestaurantPaymentMethod
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionIndex()
     {
@@ -71,6 +78,12 @@ class RestaurantPaymentMethodController extends BaseController
      * @param $id
      * @return Plan|null
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /restaurant-payment-methods ListAll
+     * @apiName ListAll
+     * @apiGroup RestaurantPaymentMethod
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionListAll()
     {

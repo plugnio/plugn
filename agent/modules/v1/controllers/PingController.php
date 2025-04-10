@@ -53,6 +53,13 @@ class PingController extends BaseController
 
     /**
      * @return void
+     * 
+     * @api {get} /ping Ping
+     * @apiName Ping
+     * 
+     * @apiGroup Ping
+     * 
+     * @apiSuccess {string} operation Operation.
      */
     public function actionTest()
     {

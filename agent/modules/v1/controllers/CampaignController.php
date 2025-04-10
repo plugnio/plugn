@@ -4,7 +4,6 @@ namespace agent\modules\v1\controllers;
 
 use common\models\Campaign;
 use Yii;
-use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 
@@ -23,9 +22,16 @@ class CampaignController extends BaseController
 
     /**
      * Get all store's categories
-     * @param type $id
-     * @param type $store_uuid
+     * @param string $store_uuid
+     * @param string $keyword
      * @return ActiveDataProvider
+     * 
+     * @api {get} /campaign List campaigns
+     * @apiName ListCampaigns
+     * @apiParam {string} keyword Keyword.
+     * @apiGroup Campaign
+     *
+     * @apiSuccess {Array} campaigns List of campaigns.
      */
     public function actionList($store_uuid = null)
     {
@@ -54,6 +60,21 @@ class CampaignController extends BaseController
     /**
      * Create category
      * @return array
+     * 
+     * @api {post} /campaign Create campaign
+     * @apiName CreateCampaign
+     * 
+     * @apiParam {string} source Source.
+     * @apiParam {string} medium Medium.
+     * @apiParam {string} campaign Campaign.
+     * @apiParam {string} content Content.
+     * @apiParam {string} term Term.
+     * 
+     * @apiGroup Campaign
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {Array} model Campaign.
      */
     public function actionCreate()
     {
@@ -83,6 +104,23 @@ class CampaignController extends BaseController
 
     /**
      * Update campaign
+     * @return array
+     * 
+     * @api {PATCH} /campaign/:id Update campaign
+     * @apiName UpdateCampaign
+     * 
+     * @apiParam {string} id Campaign ID.
+     * @apiParam {string} source Source.
+     * @apiParam {string} medium Medium.
+     * @apiParam {string} campaign Campaign.
+     * @apiParam {string} content Content.
+     * @apiParam {string} term Term.
+     * 
+     * @apiGroup Campaign
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {Array} model Campaign.
      */
     public function actionUpdate($id)
     {
@@ -116,7 +154,18 @@ class CampaignController extends BaseController
     }
 
     /**
-     * Delete Category
+     * Delete Campaign
+     * @return array
+     * 
+     * @api {DELETE} /campaign/:id Delete campaign
+     * @apiName DeleteCampaign
+     * 
+     * @apiParam {string} id Campaign ID.
+     * 
+     * @apiGroup Campaign
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionDelete($id)
     {
@@ -144,9 +193,15 @@ class CampaignController extends BaseController
 
     /**
      * Return Campaign detail
-     * @param type $store_uuid
-     * @param type $utm_uuid
-     * @return type
+     * @param string $store_uuid
+     * @param string $utm_uuid
+     * @return Campaign
+     * 
+     * @api {get} /campaigns/:id Get campaign detail
+     * @apiName GetCampaignDetail
+     * @apiGroup Campaign
+     *
+     * @apiSuccess {Array} campaign Campaign.
      */
     public function actionDetail($id)
     {
@@ -156,6 +211,13 @@ class CampaignController extends BaseController
     /**
      * @param $id
      * @return array|string[]
+     * 
+     * @api {post} /campaigns/click Click campaign
+     * @apiName ClickCampaign
+     * @apiGroup Campaign
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionClick($id)
     {

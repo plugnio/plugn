@@ -16,6 +16,15 @@ class CategoryController extends BaseController
      * @param type $id
      * @param type $store_uuid
      * @return ActiveDataProvider
+     * 
+     * @api {get} /category/list Get list of categories
+     * @apiName ListCategories
+     * 
+     * @apiParam {string} keyword keyword.    
+     * 
+     * @apiGroup Category
+     *
+     * @apiSuccess {Array} categories List of categories.
      */
     public function actionList($store_uuid = null)
     {
@@ -46,6 +55,19 @@ class CategoryController extends BaseController
         ]);
     }
 
+    /**
+     * Get list of category items
+     * @param string $store_uuid
+     * @return ActiveDataProvider
+     * 
+     * @api {get} /category/item-list Get list of category items
+     * 
+     * @apiParam {string} category_id Category ID.
+     * 
+     * @apiGroup Category
+     *
+     * @apiSuccess {Array} categoryItems List of category items.
+     */
     public function actionItemList($store_uuid = null)
     {
         $category_id = Yii::$app->request->get('category_id');
@@ -65,6 +87,20 @@ class CategoryController extends BaseController
     /**
      * Create category
      * @return array
+     * 
+     * @api {post} /category/create Create category
+     * 
+     * @apiParam {string} title Title.
+     * @apiParam {string} title_ar Title in Arabic.
+     * @apiParam {string} subtitle Subtitle.
+     * @apiParam {string} subtitle_ar Subtitle in Arabic.
+     * @apiParam {string} category_meta_description Category meta description.
+     * @apiParam {string} category_meta_description_ar Category meta description in Arabic.
+     * @apiParam {string} sort_number Sort number.
+     * 
+     * @apiGroup Category
+     *
+     * @apiSuccess {string} operation success|error.
      */
     public function actionCreate()
     {
@@ -115,6 +151,22 @@ class CategoryController extends BaseController
 
     /**
      * Update category
+     * 
+     * @api {post} /category/update Update category
+     * 
+     * @apiParam {string} category_id Category ID.
+     * @apiParam {string} title Title.
+     * @apiParam {string} title_ar Title in Arabic.
+     * @apiParam {string} subtitle Subtitle.
+     * @apiParam {string} subtitle_ar Subtitle in Arabic.
+     * @apiParam {string} category_meta_description Category meta description.
+     * @apiParam {string} category_meta_description_ar Category meta description in Arabic.
+     * @apiParam {string} sort_number Sort number.
+     * @apiParam {string} category_image Category image.
+     * 
+     * @apiGroup Category
+     *
+     * @apiSuccess {string} operation success|error.
      */
     public function actionUpdate($category_id)
     {
@@ -166,6 +218,17 @@ class CategoryController extends BaseController
 
     /**
      * Allows agent to upload category image
+     * 
+     * @api {post} /category/upload-category-image Upload category image
+     * 
+     * @apiParam {string} category_image Category image.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} category_id Category ID.
+     * 
+     * @apiGroup Category
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionUploadCategoryImage()
     {
@@ -209,6 +272,15 @@ class CategoryController extends BaseController
 
     /**
      * Delete Category
+     * 
+     * @api {post} /category/delete Delete category
+     * 
+     * @apiParam {string} category_id Category ID.
+     * 
+     * @apiGroup Category
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionDelete($category_id)
     {
@@ -237,8 +309,17 @@ class CategoryController extends BaseController
 
     /**
      * Update Stock Qty
-     * @param type $itemUuid
+     * @param string $itemUuid
      * @return boolean
+     * 
+     * @api {post} /category/change-position Change category position
+     * 
+     * @apiParam {string} items Items.
+     * 
+     * @apiGroup Category
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionChangePosition()
     {
@@ -269,9 +350,17 @@ class CategoryController extends BaseController
 
     /**
      * Return Category detail
-     * @param type $store_uuid
-     * @param type $category_id
-     * @return type
+     * @param string $store_uuid
+     * @param string $category_id
+     * @return Category
+     * 
+     * @api {get} /category/:id Get category detail
+     * 
+     * @apiParam {string} category_id Category ID.
+     * 
+     * @apiGroup Category
+     *
+     * @apiSuccess {Array} category Category.
      */
     public function actionDetail($category_id)
     {

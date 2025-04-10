@@ -36,6 +36,13 @@ class StatsController extends BaseController
 
     /**
      * @return Array
+     * 
+     * @api {get} /stats View
+     * @apiName View
+     * @apiGroup Stats
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionView()
     {
