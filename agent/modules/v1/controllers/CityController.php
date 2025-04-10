@@ -5,7 +5,6 @@ namespace agent\modules\v1\controllers;
 use agent\models\DeliveryZone;
 use Yii;
 use yii\db\Expression;
-use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use agent\models\City;
 
@@ -13,8 +12,21 @@ use agent\models\City;
 class CityController extends BaseController {
 
     /**
-    * Get all cities data
-     * @return type
+     * Get all cities data
+     * @return ActiveDataProvider
+     * 
+     * @api {get} /cities Get all cities data
+     * @apiName ListCities
+     * 
+     * @apiParam {string} keyword Keyword.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} state_id State ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * 
+     * @apiGroup City
+     *
+     * @apiSuccess {Array} cities List of cities.
      */
     public function actionList() {
 
@@ -62,9 +74,18 @@ class CityController extends BaseController {
 
     /**
     * Return City detail
-     * @param type $store_uuid
-     * @param type $city_id
-     * @return type
+     * @param string $store_uuid
+     * @param string $city_id
+     * @return City
+     * 
+     * @api {get} /cities/:city_id Get city detail
+     * @apiName GetCityDetail
+     * 
+     * @apiParam {string} city_id City ID.
+     * 
+     * @apiGroup City
+     *
+     * @apiSuccess {Array} city City.
      */
     public function actionDetail($city_id)
     {

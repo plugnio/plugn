@@ -55,6 +55,12 @@ class BlogController extends BaseController
     /**
      * Lists all Blog models.
      * @return mixed
+     * 
+     * @api {get} /blog Get list of blogs
+     * @apiName ListBlogs
+     * @apiGroup Blog
+     *
+     * @apiSuccess {Array} blogs List of blogs.
      */
     public function actionList()
     {
@@ -78,6 +84,12 @@ class BlogController extends BaseController
      * @param string $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
+     * 
+     * @api {get} /blog/:id Get blog detail
+     * @apiName GetBlogDetail
+     * @apiGroup Blog
+     *
+     * @apiSuccess {Array} blog Blog.
      */
     public function actionView($id)
     {

@@ -29,6 +29,12 @@ class InvoiceController extends BaseController
     /**
      * Get all store's products
      * @return type
+     * 
+     * @api {get} /invoices Get all store's invoices
+     * @apiName GetInvoices
+     * @apiGroup Invoice
+     *
+     * @apiSuccess {Array} invoices List of invoices.
      */
     public function actionList()
     {
@@ -48,6 +54,12 @@ class InvoiceController extends BaseController
      * Return invoice detail
      * @param string $id
      * @return RestaurantInvoice
+     * 
+     * @api {get} /invoices/:id Return invoice detail
+     * @apiName GetInvoiceDetail
+     * @apiGroup Invoice
+     *
+     * @apiSuccess {Array} invoice Invoice.
      */
     public function actionDetail($id)
     {
@@ -58,6 +70,14 @@ class InvoiceController extends BaseController
      * pay invoice by tap
      * @return array|string[]
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /invoices/pay-by-tap Pay invoice by tap
+     * @apiName PayInvoiceByTap
+     * @apiParam {string} invoice_uuid Invoice UUID.
+     * @apiParam {string} payment_method_id Payment method ID.
+     * @apiGroup Invoice
+     *
+     * @apiSuccess {Array} invoice Invoice.
      */
     public function actionPayByTap() {
 
@@ -163,6 +183,13 @@ class InvoiceController extends BaseController
      * Process callback from TAP payment gateway
      * @param string $tap_id
      * @return mixed
+     * 
+     * @api {post} /invoices/callback Process callback from TAP payment gateway
+     * @apiName Callback
+     * @apiParam {string} tap_id TAP ID.
+     * @apiGroup Invoice
+     *
+     * @apiSuccess {Array} invoice Invoice.
      */
     public function actionCallback()
     {
@@ -210,6 +237,24 @@ class InvoiceController extends BaseController
      * Process callback from TAP payment gateway
      * @param string $tap_id
      * @return mixed
+     * 
+     * @api {post} /invoices/payment-webhook Process callback from TAP payment gateway
+     * @apiName PaymentWebhook
+     * @apiParam {string} id TAP ID.
+     * @apiParam {string} status Status.
+     * @apiParam {string} amount Amount.
+     * @apiParam {string} currency Currency.
+     * @apiParam {string} reference Reference.
+     * @apiParam {string} destinations Destinations.
+     * @apiParam {string} response Response.
+     * @apiParam {string} source Source.
+     * @apiParam {string} transaction Transaction.
+     * @apiParam {string} acquirer Acquirer.
+     * @apiParam {string} headerSignature Header signature.
+     * 
+     * @apiGroup Invoice
+     * 
+     * @apiSuccess {Array} invoice Invoice.
      */
     public function actionPaymentWebhook() {
 

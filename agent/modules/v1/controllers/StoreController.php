@@ -65,6 +65,13 @@ class StoreController extends BaseController
     /**
      * Return an overview of the store details
      * @param type $store_uuid
+     * 
+     * @api {get} /stores/:store_uuid Detail
+     * @apiName Detail
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDetail($store_uuid = null)
     {
@@ -74,6 +81,13 @@ class StoreController extends BaseController
     /**
      * test tap connection
      * @return void
+     * 
+     * @api {get} /stores/test-tap Test Tap
+     * @apiName TestTap
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionTestTap()
     {
@@ -119,6 +133,39 @@ class StoreController extends BaseController
     /**
      * Return an overview of the store details
      * @param type $store_uuid
+     * 
+     * @api {PATCH} /stores/:store_uuid Update
+     * @apiName Update
+     * @apiGroup Store
+     * 
+     * @apiParam {string} enable_guest_checkout Enable guest checkout.
+     * @apiParam {string} is_sandbox Is sandbox.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} email_notification Email notification.
+     * @apiParam {string} mobile_country_code Mobile country code.
+     * @apiParam {string} mobile Mobile.
+     * @apiParam {string} name Store name.
+     * @apiParam {string} name_ar Store name in Arabic.
+     * @apiParam {string} restaurant_email Restaurant email.
+     * @apiParam {string} restaurant_domain Restaurant domain.
+     * @apiParam {string} currency Currency code.
+     * @apiParam {string} schedule_interval Schedule interval.
+     * @apiParam {string} schedule_order Schedule order.
+     * @apiParam {string} tagline Tagline.
+     * @apiParam {string} tagline_ar Tagline in Arabic.
+     * @apiParam {string} meta_description Meta description.
+     * @apiParam {string} meta_description_ar Meta description in Arabic.
+     * @apiParam {string} enable_gift_message Enable gift message.
+     * @apiParam {string} accept_order_247 Accept order 24/7.
+     * @apiParam {string} is_public Is public.
+     * @apiParam {string} owner_first_name Owner first name.
+     * @apiParam {string} owner_last_name Owner last name.
+     * @apiParam {string} owner_email Owner email.
+     * @apiParam {string} owner_number Owner number.
+     * @apiParam {string} owner_phone_country_code Owner phone country code.
+     *          
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdate($store_uuid = null)
     {
@@ -184,6 +231,20 @@ class StoreController extends BaseController
     /**
      * add new store
      * @return array|string[]
+     * 
+     * @api {post} /stores Create
+     * @apiName Create
+     * @apiGroup Store
+     * 
+     * @apiParam {string} name Store name.
+     * @apiParam {string} name_ar Store name in Arabic.
+     * @apiParam {string} restaurant_email Restaurant email.
+     * @apiParam {string} restaurant_domain Restaurant domain.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} currency Currency code.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate()
     {
@@ -309,6 +370,13 @@ class StoreController extends BaseController
      * 2) custom domain + request to purchase on behalf of client
      * 3) plugn sub domain
      * @return mixed
+     * 
+     * @api {post} /stores/:store_uuid Connect domain
+     * @apiName ConnectDomain
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionConnectDomain()
     {
@@ -360,6 +428,13 @@ class StoreController extends BaseController
     /**
      * Disable payment method
      * @return mixed
+     * 
+     * @api {post} /stores/:store_uuid Disable payment method
+     * @apiName DisablePaymentMethod
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDisablePaymentMethod($id = null, $paymentMethodId = null)
     {
@@ -376,6 +451,13 @@ class StoreController extends BaseController
     /**
      * Update front store settings
      * @return mixed
+     * 
+     * @api {post} /stores/:store_uuid Update store settings
+     * @apiName UpdateStoreSettings
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdateStoreSettings()
     {
@@ -391,6 +473,13 @@ class StoreController extends BaseController
     /**
      * Update mail settings
      * @return mixed
+     * 
+     * @api {post} /stores/:store_uuid Update mail settings
+     * @apiName UpdateEmailSettings
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdateEmailSettings()
     {
@@ -422,6 +511,13 @@ class StoreController extends BaseController
      * @param $code
      * @return array|\yii\db\ActiveRecord[]
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /stores/:store_uuid Settings
+     * @apiName Settings
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionSettings($code)
     {
@@ -438,6 +534,13 @@ class StoreController extends BaseController
      * upgrade store
      * @return \yii\web\Response
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /stores/:store_uuid Upgrade
+     * @apiName Upgrade
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpgrade()
     {
@@ -501,6 +604,13 @@ class StoreController extends BaseController
     /**
      * Enable payment method
      * @return mixed
+     * 
+     * @api {post} /stores/:store_uuid Enable payment method
+     * @apiName EnablePaymentMethod
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionEnablePaymentMethod($id = null, $paymentMethodId = null)
     {
@@ -519,6 +629,13 @@ class StoreController extends BaseController
     /**
      * View payment settings page
      * @return mixed
+     * 
+     * @api {get} /stores/:store_uuid View payment methods
+     * @apiName ViewPaymentMethods
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionViewPaymentMethods($id = null)
     {
@@ -534,6 +651,13 @@ class StoreController extends BaseController
     /**
      * View shipping settings page
      * @return mixed
+     * 
+     * @api {get} /stores/:store_uuid View shipping methods
+     * @apiName ViewShippingMethods
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionViewShippingMethods()
     {
@@ -549,6 +673,13 @@ class StoreController extends BaseController
     /**
      * Update bank account in tap account
      * @return array
+     * 
+     * @api {post} /stores/:store_uuid Update bank account
+     * @apiName UpdateBankAccount
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdateBankAccount()
     {
@@ -587,6 +718,32 @@ class StoreController extends BaseController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /stores/:store_uuid Update business details
+     * @apiName UpdateBusinessDetails
+     * @apiGroup Store
+     * 
+     * @apiParam {string} owner_name_title Owner name title.
+     * @apiParam {string} owner_middle_name Owner middle name.
+     * @apiParam {string} owner_nationality Owner nationality.
+     * @apiParam {string} owner_date_of_birth Owner date of birth.
+     * @apiParam {string} tax_number Tax number.
+     * @apiParam {string} swift_code Swift code.
+     * @apiParam {string} account_number Account number.
+     * @apiParam {string} bank_account_name Bank account name.
+     * @apiParam {string} owner_first_name Owner first name.
+     * @apiParam {string} owner_last_name Owner last name.
+     * @apiParam {string} owner_email Owner email.
+     * @apiParam {string} owner_number Owner number.
+     * @apiParam {string} owner_phone_country_code Owner phone country code.
+     * @apiParam {string} company_name Company name.
+     * @apiParam {string} vendor_sector Vendor sector.
+     * @apiParam {string} business_type Business type.
+     * @apiParam {string} license_number License number.
+     * @apiParam {string} iban Iban.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdateBusinessDetails($id = null)
     {
@@ -634,6 +791,22 @@ class StoreController extends BaseController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /stores/:store_uuid Update KYC
+     * @apiName UpdateKyc
+     * 
+     * @apiParam {string} place_of_birth Place of birth.
+     * @apiParam {string} marital_status Marital status.
+     * @apiParam {string} residence_region Residence region.
+     * @apiParam {string} source_of_income Source of income.
+     * @apiParam {string} occupation Occupation.
+     * @apiParam {string} expected_annual_sales Expected annual sales.
+     * @apiParam {string} sales_channels Sales channels.
+     *  
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdateKyc($id) {
 
@@ -663,6 +836,24 @@ class StoreController extends BaseController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /stores/:store_uuid Upload documents
+     * @apiName UploadDocs
+     * @apiGroup Store
+     * 
+     * @apiParam {string} identification_file_front_side Identification file front side.
+     * @apiParam {string} identification_file_back_side Identification file back side.
+     * @apiParam {string} commercial_license_file Commercial license file.
+     * @apiParam {string} authorized_signature_file Authorized signature file.
+     * @apiParam {string} iban_certificate_file Iban certificate file.
+     * @apiParam {string} commercial_registration Commercial registration.
+     * @apiParam {string} establishment_card Establishment card.
+     * @apiParam {string} work_permit Work permit.
+     * @apiParam {string} residence_permit Residence permit.
+     * @apiParam {string} tax_document Tax document.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUploadDocs($id = null)
     {
@@ -831,6 +1022,14 @@ class StoreController extends BaseController
      * Create tap account
      * @param type $id
      * @return array
+     * 
+     * @api {post} /stores/:store_uuid Create tap account
+     * @apiName CreateTapAccount
+     * @apiGroup Store
+     * 
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreateTapAccount($id = null)
     {
@@ -860,6 +1059,13 @@ class StoreController extends BaseController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /stores/:store_uuid Create tap queue
+     * @apiName CreateTapQueue
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreateTapQueue($id = null) {
 
@@ -901,6 +1107,13 @@ class StoreController extends BaseController
 
     /**
      *  Enable OnlinePayment
+     * 
+     * @api {post} /stores/:store_uuid Enable online payment
+     * @apiName EnableOnlinePayment
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionEnableOnlinePayment($id = null)
     {
@@ -967,6 +1180,13 @@ class StoreController extends BaseController
 
     /**
      *  Disable OnlinePayment
+     * 
+     * @api {post} /stores/:store_uuid Disable online payment
+     * @apiName DisableOnlinePayment
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDisableOnlinePayment($id = null)
     {
@@ -993,6 +1213,13 @@ class StoreController extends BaseController
 
     /**
      *  Enable Cash on delivery
+     * 
+     * @api {post} /stores/:store_uuid Enable cash on delivery
+     * @apiName EnableCod
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionEnableCod($id = null)
     {
@@ -1027,6 +1254,13 @@ class StoreController extends BaseController
 
     /**
      *  Disable Cash on delivery
+     * 
+     * @api {post} /stores/:store_uuid Disable cash on delivery
+     * @apiName DisableCod
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDisableCod($id = null)
     {
@@ -1050,6 +1284,13 @@ class StoreController extends BaseController
 
     /**
      *  Enable Moyasar
+     * 
+     * @api {post} /stores/:store_uuid Enable moyasar
+     * @apiName EnableMoyasar
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionEnableMoyasar($id = null)
     {
@@ -1085,6 +1326,13 @@ class StoreController extends BaseController
 
     /**
      *  Disable Moyasar
+     * 
+     * @api {post} /stores/:store_uuid Disable moyasar
+     * @apiName DisableMoyasar
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDisableMoyasar($id = null)
     {
@@ -1114,6 +1362,13 @@ class StoreController extends BaseController
 
     /**
      *  Enable Tabby
+     * 
+     * @api {post} /stores/:store_uuid Enable tabby
+     * @apiName EnableTabby
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionEnableTabby($id = null)
     {
@@ -1151,6 +1406,13 @@ class StoreController extends BaseController
 
     /**
      *  Disable Moyasar
+     * 
+     * @api {post} /stores/:store_uuid Disable tabby
+     * @apiName DisableTabby
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDisableTabby($id = null)
     {
@@ -1182,6 +1444,12 @@ class StoreController extends BaseController
      * enable stripe
      * @param $id
      * @return array
+     * 
+     * @api {post} /stores/:store_uuid Enable stripe
+     * @apiName EnableStripe
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionEnableStripe($id = null)
     {
@@ -1216,7 +1484,14 @@ class StoreController extends BaseController
     }
 
     /**
-     *  Disable Stripe
+     * Disable Stripe
+     * 
+     * @api {post} /stores/:store_uuid Disable stripe
+     * @apiName DisableStripe
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDisableStripe($id = null)
     {
@@ -1248,6 +1523,13 @@ class StoreController extends BaseController
      * enable Upayment
      * @param $id
      * @return array
+     * 
+     * @api {post} /stores/:store_uuid Enable upayment
+     * @apiName EnableUpayment
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionEnableUpayment($id = null)
     {
@@ -1283,6 +1565,13 @@ class StoreController extends BaseController
 
     /**
      *  Disable Upayment
+     * 
+     * @api {post} /stores/:store_uuid Disable upayment
+     * @apiName DisableUpayment
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDisableUpayment($id = null)
     {
@@ -1312,6 +1601,13 @@ class StoreController extends BaseController
 
     /**
      *  Enable Free Checkout
+     * 
+     * @api {post} /stores/:store_uuid Enable free checkout
+     * @apiName EnableFreeCheckout
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionEnableFreeCheckout($id = null)
     {
@@ -1347,6 +1643,13 @@ class StoreController extends BaseController
 
     /**
      *  Disable Free Checkout
+     * 
+     * @api {post} /stores/:store_uuid Disable free checkout
+     * @apiName DisableFreeCheckout
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDisableFreeCheckout($id = null)
     {
@@ -1380,6 +1683,13 @@ class StoreController extends BaseController
 
     /**
      * @return void
+     * 
+     * @api {post} /stores/:store_uuid Upload apple domain association
+     * @apiName UploadAppleDomainAssociation
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUploadAppleDomainAssociation()
     {
@@ -1427,6 +1737,13 @@ class StoreController extends BaseController
 
     /**
      * Updates store layout
+     * 
+     * @api {post} /stores/:store_uuid Update layout
+     * @apiName UpdateLayout
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdateLayout() {
 
@@ -1522,6 +1839,12 @@ class StoreController extends BaseController
     /**
      * process payment gateway queue
      * @return void
+     * 
+     * @api {post} /stores/:store_uuid Process payment gateway queue
+     * @apiName ProcessGatewayQueue
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionProcessGatewayQueue($id = null)
     {
@@ -1541,6 +1864,12 @@ class StoreController extends BaseController
     /**
      * remove payment gateway queue
      * @return void
+     * 
+     * @api {post} /stores/:store_uuid Remove payment gateway queue
+     * @apiName RemoveGatewayQueue
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionRemoveGatewayQueue($id = null)
     {
@@ -1563,6 +1892,13 @@ class StoreController extends BaseController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /stores/:store_uuid Update delivery integration
+     * @apiName UpdateDeliveryIntegration
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdateDeliveryIntegration($id = null) {
 
@@ -1589,6 +1925,12 @@ class StoreController extends BaseController
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
+     * 
+     * @api {post} /stores/:store_uuid Update analytics integration
+     * @apiName UpdateAnalyticsIntegration
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdateAnalyticsIntegration($id = null) {
 
@@ -1648,6 +1990,12 @@ class StoreController extends BaseController
      * @param $store_uuid
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /stores/:store_uuid Get store status
+     * @apiName GetStoreStatus
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionStatus($store_uuid = null) {
 
@@ -1666,6 +2014,12 @@ class StoreController extends BaseController
      * @return array
      * @throws NotFoundHttpException
      * update store status
+     * 
+     * @api {post} /stores/:store_uuid Update store status
+     * @apiName UpdateStoreStatus
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdateStoreStatus($id = null, $status = null) {
 
@@ -1689,6 +2043,12 @@ class StoreController extends BaseController
     /**
      * delete store
      * @return array
+     * 
+     * @api {DELETE} /stores Delete store
+     * @apiName DeleteStore
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionDelete()
     {
@@ -1701,6 +2061,12 @@ class StoreController extends BaseController
      * close store
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /stores/:store_uuid Deactivate store
+     * @apiName DeactivateStore
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionDeactivate()
     {
@@ -1732,6 +2098,12 @@ class StoreController extends BaseController
      * log to invitation when it was seen
      * @param $id
      * @throws \yii\web\ServerErrorHttpException
+     * 
+     * @api {post} /stores/:store_uuid Log email campaign
+     * @apiName LogEmailCampaign
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionLogEmailCampaign($id)
     {
@@ -1765,6 +2137,7 @@ class StoreController extends BaseController
      * @param integer $id
      * @return Restaurant the loaded model
      * @throws NotFoundHttpException if the model cannot be found
+     * 
      */
     protected function findModel($store_uuid =  null)
     {

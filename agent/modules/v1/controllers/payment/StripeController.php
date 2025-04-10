@@ -32,6 +32,17 @@ class StripeController extends BaseController
      * @return array
      * @throws NotFoundHttpException
      * @throws \Stripe\Exception\ApiErrorException
+     * 
+     * @api {POST} /payment/stripe Return client secret to initiate stripe form
+     * @apiName GetClientSecret
+     * @apiGroup Payment
+     * 
+     * @apiParam {string} plan_id Plan ID.
+     * @apiParam {string} invoice_uuid Invoice UUID.
+     * @apiParam {string} currency Currency.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionIndex() {
 
@@ -121,6 +132,15 @@ class StripeController extends BaseController
 
     /**
      * callback from gateway
+     * 
+     * @api {get} /payment/stripe/callback Callback from gateway
+     * @apiName StripeCallback
+     * @apiGroup Payment
+     * 
+     * @apiParam {string} intent_id Intent ID.
+     * @apiParam {string} redirect_status Redirect status.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCallback()
     {
@@ -151,6 +171,11 @@ class StripeController extends BaseController
     }
 
     // todo: old callback in general form
+    /**
+     * Update order
+     * 
+     * @return bool
+     */
     protected function updateOrder()
     {
         /*if (isset($get_data['sid'])) {

@@ -3,7 +3,6 @@
 namespace agent\modules\v1\controllers;
 
 use Yii;
-use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use agent\models\Country;
 
@@ -20,9 +19,17 @@ class CountryController extends BaseController {
 
     /**
     * Get all countries data
-     * @param type $id
-     * @param type $store_uuid
-     * @return type
+     * @param number $id
+     * @param string $store_uuid
+     * @return ActiveDataProvider
+     * 
+     * @api {get} /country Get all countries data
+     * @apiName ListCountries
+     * @apiParam {string} keyword Keyword.
+     * @apiParam {string} page Page.
+     * @apiGroup Country
+     *
+     * @apiSuccess {Array} countries List of countries.
      */
     public function actionList() {
 
@@ -53,9 +60,18 @@ class CountryController extends BaseController {
 
     /**
     * Return Country detail
-     * @param type $store_uuid
-     * @param type $order_uuid
-     * @return type
+     * @param string $store_uuid
+     * @param string $order_uuid
+     * @return Country
+     * 
+     * @api {get} /country/:id Get country detail
+     * @apiName GetCountryDetail
+     * 
+     * @apiParam {string} country_id Country ID.
+     * 
+     * @apiGroup Country
+     *
+     * @apiSuccess {Array} country Country.
      */
     public function actionDetail() {
 

@@ -62,6 +62,15 @@ class PlanController extends BaseController
      * @param $id
      * @return Plan|null
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /plans/:id Return plan detail
+     * @apiName View
+     * @apiParam {string} id Plan ID.
+     * 
+     * @apiGroup Plan
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionView($id)
     {
@@ -72,6 +81,21 @@ class PlanController extends BaseController
      * @param $id
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /plans/apple-pay-params Return apple pay params
+     * @apiName ApplePayParams
+     * @apiParam {string} id Plan ID.
+     *  
+     * @apiGroup Plan
+     * 
+     * @apiSuccess {string} public_key public key.
+     * @apiSuccess {string} merchant_id merchant id.
+     * @apiSuccess {string} currency currency.
+     * @apiSuccess {string} amount amount.
+     * @apiSuccess {string} agent_name agent name.
+     * @apiSuccess {string} agent_number agent number.
+     * @apiSuccess {string} agent_phone_country_code agent phone country code.
+     * @apiSuccess {string} agent_email agent email.
      */
     public function actionApplePayParams($id) {
 
@@ -131,6 +155,17 @@ class PlanController extends BaseController
      * confirm plan for current store
      * @param $id
      * @return array|string[]
+     * 
+     * @api {post} /plans/confirm Confirm plan
+     * @apiName Confirm
+     * @apiParam {string} plan_id Plan ID.
+     * @apiParam {string} payment_method_id Payment method ID.
+     * @apiParam {string} source Source.
+     * 
+     * @apiGroup Plan
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionConfirm()
     {
@@ -246,6 +281,15 @@ class PlanController extends BaseController
      * Process callback from TAP payment gateway
      * @param string $tap_id
      * @return mixed
+     * 
+     * @api {post} /plans/callback Callback
+     * @apiName Callback
+     * @apiParam {string} tap_id Tap ID.
+     * 
+     * @apiGroup Plan
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCallback()
     {
@@ -297,6 +341,24 @@ class PlanController extends BaseController
      * Process callback from TAP payment gateway
      * @param string $tap_id
      * @return mixed
+     * 
+     * @api {post} /plans/payment-webhook Payment webhook
+     * @apiName PaymentWebhook
+     * @apiParam {string} id Charge ID.
+     * @apiParam {string} status Status.
+     * @apiParam {string} amount Amount.
+     * @apiParam {string} currency Currency.
+     * @apiParam {string} reference Reference.
+     * @apiParam {string} destinations Destinations.
+     * @apiParam {string} response Response.
+     * @apiParam {string} source Source.
+     * @apiParam {string} transaction Transaction.
+     * @apiParam {string} acquirer Acquirer.
+     * 
+     * @apiGroup Plan
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionPaymentWebhook() {
 
@@ -462,6 +524,14 @@ class PlanController extends BaseController
 
     /**
      * @return array|\yii\db\ActiveRecord|null
+     * 
+     * @api {get} /plans/price Price
+     * @apiName Price
+     * @apiParam {string} currency Currency.
+     * 
+     * @apiGroup Plan
+     * 
+     * @apiSuccess {string} price Price.
      */
     public function actionPrice() {
 

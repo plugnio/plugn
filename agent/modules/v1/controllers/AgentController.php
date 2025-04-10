@@ -12,6 +12,12 @@ class AgentController extends BaseController
     /**
      * return stores assigned
      * @return mixed
+     * 
+     * @api {get} /agent/stores Get stores assigned
+     * @apiName GetStores
+     * @apiGroup Agent
+     *
+     * @apiSuccess {Array} List of stores assigned to the agent.
      */
     public function actionStores()
     {
@@ -22,7 +28,13 @@ class AgentController extends BaseController
 
     /**
      * return store assignment details
-     * @return mixed
+        * @return mixed
+     * 
+     * @api {get} /agent/store-profile Get store profile
+     * @apiName GetStoreProfile
+     * @apiGroup Agent
+     *
+     * @apiSuccess {Array} Store profile details.
      */
     public function actionStoreProfile()
     {
@@ -37,12 +49,28 @@ class AgentController extends BaseController
     /**
      * return user profile
      * @return \yii\web\IdentityInterface|null
+     * 
+     * @api {get} /agent Get user profile
+     * @apiName GetUserProfile
+     * @apiGroup Agent
+     *
+     * @apiSuccess {Array} User profile details.
      */
     public function actionDetail()
     {
         return Yii::$app->user->identity;
     }
 
+    /**
+     * Delete agent profile
+     * @return array
+     * 
+     * @api {delete} /agent/delete Delete agent profile
+     * @apiName DeleteAgentProfile
+     * @apiGroup Agent
+     *
+     * @apiSuccess {Array} Agent profile deleted successfully.
+     */
     public function actionDelete()
     {
         $model = Yii::$app->user->identity;
@@ -86,6 +114,18 @@ class AgentController extends BaseController
      * update store profile
      * @param $store_uuid
      * @return array|string[]
+     * 
+     * @api {put} /agent/update Update agent profile
+     * @apiName UpdateAgentProfile
+     * @apiGroup Agent
+     *
+     * @apiParam {string} agent_name Agent name.
+     * @apiParam {string} agent_email Agent email.
+     * @apiParam {string} email_notification Email notification.
+     * @apiParam {string} reminder_email Reminder email.
+     * @apiParam {string} receive_weekly_stats Receive weekly stats.
+     * 
+     * @apiSuccess {Array} Agent profile updated successfully.
      */
     public function actionUpdateAgentProfile($store_uuid = null)
     {
@@ -146,6 +186,13 @@ class AgentController extends BaseController
     /**
      * update language preferency
      * @return array
+     * 
+     * @api {PATCH} /agent/language-pref Update language preferency
+     * @apiName UpdateLanguagePref
+     * @apiGroup Agent
+     *
+     * @apiParam {string} language_pref Language preferency.
+     * @apiSuccess {Array} Language preferency updated successfully.
      */
     public function actionLanguagePref()
     {
@@ -170,6 +217,17 @@ class AgentController extends BaseController
 
     /**
      * change password
+     * @return array
+     * 
+     * @api {POST} /agent/change-password Change password
+     * @apiName ChangePassword
+     * @apiGroup Agent
+     *
+     * @apiParam {string} oldPassword Old password.
+     * @apiParam {string} newPassword New password.
+     * @apiParam {string} confirmPassword Confirm password.
+     * 
+     * @apiSuccess {Array} Password changed successfully.
      */
     public function actionChangePassword()
     {

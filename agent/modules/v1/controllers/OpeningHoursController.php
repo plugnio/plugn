@@ -32,6 +32,14 @@ class OpeningHoursController extends BaseController
      * @param type $id
      * @param type $store_uuid
      * @return type
+     * 
+     * @api {get} /opening-hours Get all opening hours
+     * @apiName GetAllOpeningHours
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup OpeningHours
+     * 
+     * @apiSuccess {Array} opening_hours Opening hours.
      */
     public function actionList($store_uuid = null)
     {
@@ -50,6 +58,18 @@ class OpeningHoursController extends BaseController
     /**
      * Create opening hours
      * @return array
+     * 
+     * @api {post} /opening-hours Create opening hours
+     * @apiName CreateOpeningHours
+     * 
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} day_of_week Day of week.
+     * @apiParam {string} open_at Open time.
+     * @apiParam {string} close_at Close time.
+     *  
+     * @apiGroup OpeningHours
+     * 
+     * @apiSuccess {Array} opening_hours Opening hours.
      */
     public function actionCreate($store_uuid = null)
     {
@@ -99,6 +119,14 @@ class OpeningHoursController extends BaseController
     /**
      * Update opening hours
      * @return array
+     * 
+     * @api {PATCH} /opening-hours/:day_of_week Update opening hours
+     * @apiName UpdateOpeningHours
+     * @apiParam {string} day_of_week Day of week.
+     * 
+     * @apiGroup OpeningHours
+     * 
+     * @apiSuccess {Array} opening_hours Opening hours.
      */
     public function actionUpdate($day_of_week)
     {
@@ -168,6 +196,14 @@ class OpeningHoursController extends BaseController
      * @param type $store_uuid
      * @param type $opening_hour_id
      * @return type
+     * 
+     * @api {get} /opening-hours/:day_of_week Get opening hours by day of week
+     * @apiName GetOpeningHoursByDayOfWeek
+     * @apiParam {string} day_of_week Day of week.
+     * 
+     * @apiGroup OpeningHours
+     * 
+     * @apiSuccess {Array} opening_hours Opening hours.
      */
     public function actionDetail($day_of_week, $store_uuid = null)
     {
@@ -189,6 +225,14 @@ class OpeningHoursController extends BaseController
 
     /**
      * Delete Opening hours
+     * 
+     * @api {DELETE} /opening-hours/:opening_hour_id Delete opening hours
+     * @apiName DeleteOpeningHours
+     * @apiParam {string} opening_hour_id Opening hour ID.
+     * 
+     * @apiGroup OpeningHours
+     * 
+     * @apiSuccess {Array} opening_hours Opening hours.
      */
     public function actionDelete($opening_hour_id, $store_uuid = null)
     {

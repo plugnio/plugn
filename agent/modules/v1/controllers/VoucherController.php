@@ -14,6 +14,13 @@ class VoucherController extends BaseController
     /**
      * @param $store_uuid
      * @return ActiveDataProvider
+     * 
+     * @api {get} /vouchers Get all vouchers
+     * @apiName GetAllVouchers
+     * @apiGroup Voucher
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionList($store_uuid = null)
     {
@@ -48,6 +55,27 @@ class VoucherController extends BaseController
     /**
      * Create voucher
      * @return array
+     * 
+     * @api {post} /vouchers Create voucher
+     * @apiName CreateVoucher
+     * @apiGroup Voucher
+     * 
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} code Code.
+     * @apiParam {string} description Description.
+     * @apiParam {string} description_ar Description in Arabic.
+     * @apiParam {string} discount_type Discount type.
+     * @apiParam {string} discount_amount Discount amount.
+     * @apiParam {string} valid_from Valid from.
+     * @apiParam {string} valid_until Valid until.
+     * @apiParam {string} max_redemption Max redemption.
+     * @apiParam {string} limit_per_customer Limit per customer.
+     * @apiParam {string} minimum_order_amount Minimum order amount.
+     * @apiParam {string} exclude_discounted_items Exclude discounted items.
+     * @apiParam {string} is_public Is public.
+     *  
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate()
     {
@@ -94,6 +122,28 @@ class VoucherController extends BaseController
 
     /**
      * Update voucher
+     * 
+     * @api {PATCH} /vouchers/:voucher_id Update voucher
+     * @apiName UpdateVoucher
+     * @apiGroup Voucher
+     * 
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} voucher_id Voucher ID.
+     * @apiParam {string} code Code.
+     * @apiParam {string} description Description.
+     * @apiParam {string} description_ar Description in Arabic.
+     * @apiParam {string} discount_type Discount type.
+     * @apiParam {string} discount_amount Discount amount.
+     * @apiParam {string} valid_from Valid from.
+     * @apiParam {string} valid_until Valid until.
+     * @apiParam {string} max_redemption Max redemption.
+     * @apiParam {string} limit_per_customer Limit per customer.
+     * @apiParam {string} minimum_order_amount Minimum order amount.
+     * @apiParam {string} exclude_discounted_items Exclude discounted items.
+     * @apiParam {string} is_public Is public.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdate($voucher_id, $store_uuid = null)
     {
@@ -139,6 +189,17 @@ class VoucherController extends BaseController
 
     /**
      * Ability to update voucher status
+     * 
+     * @api {PATCH} /vouchers/update-status Update voucher status
+     * @apiName UpdateVoucherStatus
+     * @apiGroup Voucher
+     * 
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} voucher_id Voucher ID.
+     * @apiParam {string} voucherStatus Voucher status.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdateVoucherStatus()
     {
@@ -179,6 +240,13 @@ class VoucherController extends BaseController
      * @param type $store_uuid
      * @param type $order_uuid
      * @return type
+     * 
+     * @api {get} /vouchers/:voucher_id Voucher detail
+     * @apiName VoucherDetail
+     * @apiGroup Voucher
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDetail($voucher_id, $store_uuid = null)
     {
@@ -188,6 +256,15 @@ class VoucherController extends BaseController
 
     /**
      * Delete Voucher
+     * 
+     * @api {DELETE} /vouchers/:voucher_id Delete voucher
+     * @apiName DeleteVoucher
+     * @apiGroup Voucher
+     * 
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionRemove($voucher_id, $store_uuid = null)
     {

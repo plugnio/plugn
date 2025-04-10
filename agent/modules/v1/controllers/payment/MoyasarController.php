@@ -29,6 +29,17 @@ class MoyasarController extends BaseController
     /**
      * return params for payment
      * @return array
+     * 
+     * @api {POST} /payment/moyasar Return params for payment
+     * @apiName GetPaymentParams
+     * @apiGroup Payment
+     * 
+     * @apiParam {string} plan_id Plan ID.
+     * @apiParam {string} invoice_uuid Invoice UUID.
+     * @apiParam {string} currency Currency.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionIndex()
     {
@@ -132,6 +143,12 @@ class MoyasarController extends BaseController
 
     /**
      * callback from gateway
+     * 
+     * @api {get} /payment/moyasar/callback Callback from gateway
+     * @apiName MoyasarCallback
+     * @apiGroup Payment
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCallback()
     {
@@ -162,6 +179,11 @@ class MoyasarController extends BaseController
     }
 
     // todo: old callback in general form
+    /**
+     * Update order
+     * 
+     * @return bool
+     */
     protected function updateOrder()
     {
         /*if (isset($get_data['sid'])) {
@@ -223,6 +245,20 @@ class MoyasarController extends BaseController
         return $payment;
     }
 
+    /**
+     * Register initiated order
+     * 
+     * @return void
+     * 
+     * @api {get} /payment/moyasar/register-initiated-order Register initiated order
+     * @apiName RegisterInitiatedOrder
+     * @apiGroup Payment
+     * 
+     * @apiParam {string} id Payment ID.
+     * @apiParam {string} payment_id Payment ID.
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionRegisterInitiatedOrder()
     {
         //Yii::debug(Yii::$app->request);

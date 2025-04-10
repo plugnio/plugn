@@ -56,6 +56,12 @@ class BusinessLocationController extends BaseController
     /**
      * @param $store_uuid
      * @return ActiveDataProvider
+     * 
+     * @api {get} /business-location List business locations
+     * @apiName ListBusinessLocations
+     * @apiGroup BusinessLocation
+     *
+     * @apiSuccess {Array} businessLocations List of business locations.
      */
     public function actionList($store_uuid = null)
     {
@@ -97,6 +103,27 @@ class BusinessLocationController extends BaseController
     /**
      * Create Business Location
      * @return array
+     * 
+     * @api {post} /business-locations Create business location  
+     * @apiName CreateBusinessLocation
+     * 
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} business_location_name Business location name.
+     * @apiParam {string} business_location_name_ar Business location name in Arabic.
+     * @apiParam {string} support_pick_up Support pick up.
+     * @apiParam {string} business_location_tax Business location tax.
+     * @apiParam {string} mashkor_branch_id Mashkor branch ID.
+     * @apiParam {string} armada_api_key Armada API key.
+     * @apiParam {string} address Address.
+     * @apiParam {string} latitude Latitude.
+     * @apiParam {string} longitude Longitude.
+     * @apiParam {string} max_num_orders Max number of orders.
+     * 
+     * @apiGroup BusinessLocation
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {Array} model Business location.
      */
     public function actionCreate()
     {
@@ -133,6 +160,27 @@ class BusinessLocationController extends BaseController
 
     /**
      * Update Business Location
+     * 
+     * @api {PATCH} /business-location/:business_location_id Update business location
+     * @apiName UpdateBusinessLocation
+     * 
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} business_location_name Business location name.
+     * @apiParam {string} business_location_name_ar Business location name in Arabic.
+     * @apiParam {string} support_pick_up Support pick up.
+     * @apiParam {string} business_location_tax Business location tax.
+     * @apiParam {string} mashkor_branch_id Mashkor branch ID.
+     * @apiParam {string} armada_api_key Armada API key.
+     * @apiParam {string} address Address.
+     * @apiParam {string} latitude Latitude.
+     * @apiParam {string} longitude Longitude.
+     * @apiParam {string} max_num_orders Max number of orders.
+     * 
+     * @apiGroup BusinessLocation
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {Array} model Business location.
      */
     public function actionUpdate($business_location_id, $store_uuid = null)
     {
@@ -174,9 +222,19 @@ class BusinessLocationController extends BaseController
 
     /**
      * Return Business Location detail
-     * @param type $store_uuid
-     * @param type $order_uuid
-     * @return type
+     * @param string $business_location_id
+     * @param string $store_uuid
+     * @return BusinessLocation
+     * 
+     * @api {get} /business-location/:business_location_id Get business location detail
+     * @apiName GetBusinessLocationDetail
+     * 
+     * @apiParam {string} business_location_id Business location ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup BusinessLocation
+     *
+     * @apiSuccess {Array} businessLocation Business location.
      */
     public function actionDetail($business_location_id, $store_uuid = null)
     {
@@ -186,6 +244,17 @@ class BusinessLocationController extends BaseController
 
     /**
      * Delete Business Location
+     * 
+     * @api {DELETE} /business-location/:business_location_id Delete business location  
+     * @apiName DeleteBusinessLocation
+     * 
+     * @apiParam {string} business_location_id Business location ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup BusinessLocation
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionDelete($business_location_id, $store_uuid = null)
     {

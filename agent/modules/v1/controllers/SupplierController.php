@@ -11,6 +11,13 @@ class SupplierController extends BaseController
 {
     /**
      * @return ActiveDataProvider
+     * 
+     * @api {get} /suppliers Get suppliers
+     * @apiName GetSuppliers
+     * @apiGroup Supplier
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionList()
     {
@@ -39,6 +46,13 @@ class SupplierController extends BaseController
      * @param $id
      * @return array|\yii\db\ActiveRecord|null
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /suppliers/:id Get supplier
+     * @apiName GetSupplier
+     * @apiGroup Supplier
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDetail($id)
     {
@@ -47,6 +61,16 @@ class SupplierController extends BaseController
 
     /**
      * @return array|string[]
+     * 
+     * @api {post} /suppliers Create supplier
+     * @apiName CreateSupplier
+     * @apiGroup Supplier
+     * 
+     * @apiParam {string} name Supplier name.
+     * @apiParam {string} contact_info Supplier contact info.
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate()
     {
@@ -74,6 +98,13 @@ class SupplierController extends BaseController
      * @param $id
      * @return array|string[]
      * @throws NotFoundHttpException
+     * 
+     * @api {PATCH} /suppliers/:id Update supplier
+     * @apiName UpdateSupplier
+     * @apiGroup Supplier
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdate($id)
     {
@@ -100,6 +131,13 @@ class SupplierController extends BaseController
      * @throws NotFoundHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
+     * 
+     * @api {DELETE} /suppliers/:id Delete supplier
+     * @apiName DeleteSupplier
+     * @apiGroup Supplier
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDelete($id)
     {

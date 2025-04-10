@@ -15,6 +15,13 @@ class TicketController extends BaseController
     /**
      * Get all tickets
      * @return ActiveDataProvider
+     * 
+     * @api {get} /tickets Get all tickets
+     * @apiName GetAllTickets
+     * @apiGroup Ticket
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionList() {
 
@@ -31,6 +38,13 @@ class TicketController extends BaseController
     /**
      * Create voucher
      * @return array
+     * 
+     * @api {post} /tickets Create ticket
+     * @apiName CreateTicket
+     * @apiGroup Ticket
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate() {
 
@@ -67,6 +81,12 @@ class TicketController extends BaseController
     /**
      * Create voucher
      * @return array
+     * 
+     * @api {post} /tickets/:ticket_uuid Comment on ticket
+     * @apiName CommentOnTicket
+     * @apiGroup Ticket
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionComment($ticket_uuid) {
 
@@ -104,6 +124,12 @@ class TicketController extends BaseController
 
     /**
      * return ticket comments
+     * 
+     * @api {get} /tickets/:ticket_uuid Comments on ticket
+     * @apiName CommentsOnTicket
+     * @apiGroup Ticket
+     * 
+     * @apiSuccess {string} message Message.
      */  
     public function actionComments($id)
     {
@@ -115,6 +141,12 @@ class TicketController extends BaseController
      * @param $ticket_uuid
      * @return Ticket|array
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /tickets/:ticket_uuid Ticket detail
+     * @apiName TicketDetail
+     * @apiGroup Ticket
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionView($id)
     {

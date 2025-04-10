@@ -17,6 +17,13 @@ class SitemapController extends BaseController
     /**
      * sitemap xml for search engine
      * @return XML
+     * 
+     * @api {get} /sitemap Sitemap
+     * @apiName Sitemap
+     * @apiGroup Sitemap
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionIndex()
     {

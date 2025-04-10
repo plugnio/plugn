@@ -18,6 +18,14 @@ class PageController extends BaseController
      * @param type $id
      * @param type $store_uuid
      * @return ActiveDataProvider
+     * 
+     * @api {get} /pages/list Return all store's pages
+     * @apiName List
+     * @apiParam {string} store_uuid Store UUID.
+     * 
+     * @apiGroup Page
+     * 
+     * @apiSuccess {Array} pages Pages.
      */
     public function actionList($store_uuid = null)
     {
@@ -45,6 +53,19 @@ class PageController extends BaseController
     /**
      * Create page
      * @return array
+     * 
+     * @api {post} /pages Create page
+     * @apiName Create
+     * @apiParam {string} title Page title.
+     * @apiParam {string} title_ar Page title arabic.
+     * @apiParam {string} description Page description.
+     * @apiParam {string} description_ar Page description arabic.
+     * @apiParam {string} sort_number Page sort number.
+     * 
+     * @apiGroup Page
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionCreate()
     {
@@ -73,6 +94,20 @@ class PageController extends BaseController
 
     /**
      * Update page
+     * 
+     * @api {PATCH} /pages/:page_uuid Update page
+     * @apiName Update
+     * @apiParam {string} page_uuid Page UUID.
+     * @apiParam {string} title Page title.
+     * @apiParam {string} title_ar Page title arabic.
+     * @apiParam {string} description Page description.
+     * @apiParam {string} description_ar Page description arabic.
+     * @apiParam {string} sort_number Page sort number.
+     * 
+     * @apiGroup Page
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionUpdate($page_uuid)
     {
@@ -107,6 +142,14 @@ class PageController extends BaseController
  
     /**
      * Delete Page
+     * 
+     * @api {DELETE} /pages/:page_uuid Delete page
+     * @apiName Delete
+     * @apiParam {string} page_uuid Page UUID.
+     * 
+     * @apiGroup Page
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionDelete($page_uuid)
     {
@@ -134,8 +177,17 @@ class PageController extends BaseController
  
     /**
      * Update Stock Qty
-     * @param type $itemUuid
+     * @param string $itemUuid
      * @return boolean
+     * 
+     * @api {PATCH} /pages/change-position Change position
+     * @apiName ChangePosition
+     * @apiParam {string} items Items.
+     * 
+     * @apiGroup Page
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionChangePosition()
     {
@@ -166,9 +218,18 @@ class PageController extends BaseController
 
     /**
      * Return Page detail
-     * @param type $store_uuid
-     * @param type $page_uuid
-     * @return type
+     * @param string $store_uuid
+     * @param string $page_uuid
+     * @return Page 
+     * 
+     * @api {get} /pages/:page_uuid Return page detail
+     * @apiName Detail
+     * @apiParam {string} page_uuid Page UUID.
+     * 
+     * @apiGroup Page
+     * 
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {string} operation Operation.
      */
     public function actionDetail($page_uuid)
     {

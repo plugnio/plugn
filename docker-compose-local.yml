@@ -67,6 +67,20 @@ services:
     volumes:
     - redis-data:/data
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: plugnuser
+      PMA_PASSWORD: plugn
+    ports:
+      - "8081:80"
+    networks:
+      - plugn-network
+    depends_on:
+      - mysql
+
 volumes:
   redis-data:
   mysql-data: 

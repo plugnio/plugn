@@ -8,6 +8,15 @@ use yii\data\ActiveDataProvider;
 
 class DomainRequestController extends BaseController
 {
+    /**
+     * Return list of domain requests
+     * 
+     * @api {get} /domain-requests Get list of domain requests
+     * @apiName GetDomainRequests
+     * @apiGroup DomainRequest
+     * 
+     * @apiSuccess {Array} domainRequests List of domain requests.
+     */
     public function actionIndex()
     {
         $store = Yii::$app->accountManager->getManagedAccount();

@@ -13,7 +13,9 @@ use agent\models\DeliveryZone;
 use agent\models\Area;
 use agent\models\AreaDeliveryZone;
 
-
+/**
+ * AreaDeliveryZoneController implements the CRUD actions for AreaDeliveryZone model.
+ */
 class AreaDeliveryZoneController extends BaseController
 {
     /**
@@ -59,6 +61,17 @@ class AreaDeliveryZoneController extends BaseController
     /**
      * @return ActiveDataProvider
      * @throws \yii\web\BadRequestHttpException
+     * 
+     * @api {get} /area-delivery-zone List area delivery zones
+     * @apiName GetAreaDeliveryZonesList
+     * @apiGroup AreaDeliveryZone
+     *
+     * @apiParam {string} [page] Page number.
+     * @apiParam {string} [keyword] Keyword to search for.
+     * @apiParam {string} [city_id] City ID.
+     * @apiParam {string} [delivery_zone_id] Delivery zone ID.
+     * 
+     * @apiSuccess {Array} List of area delivery zones.
      */
     public function actionList()
     {
@@ -104,6 +117,16 @@ class AreaDeliveryZoneController extends BaseController
      * save delivery zone areas
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {PATCH} /area-delivery-zone/save Save delivery zone areas
+     * @apiName SaveDeliveryZoneAreas
+     * @apiGroup AreaDeliveryZone
+     *
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} areas Areas.
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * 
+     * @apiSuccess {Array} Delivery zone areas saved successfully.
      */
     public function actionSaveDetails()
     {
@@ -168,6 +191,16 @@ class AreaDeliveryZoneController extends BaseController
      * save delivery zone cities
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {PATCH} /area-delivery-zone/save-cities Save delivery zone cities
+     * @apiName SaveDeliveryZoneCities
+     * @apiGroup AreaDeliveryZone
+     *
+     * @apiParam {string} states States.
+     * @apiParam {string} selectedCities Selected cities.
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     *  
+     * @apiSuccess {Array} Delivery zone cities saved successfully.
      */
     public function actionSaveCities()
     {
@@ -265,6 +298,16 @@ class AreaDeliveryZoneController extends BaseController
     /**
      * Create AreaDelivery Zone
      * @return array
+     * 
+     * @api {post} /area-delivery-zone/create Create area delivery zone
+     * @apiName CreateAreaDeliveryZone
+     * @apiGroup AreaDeliveryZone
+     *
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} area_id Area ID.
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     *  
+     * @apiSuccess {Array} Area delivery zone created successfully.
      */
     public function actionCreate()
     {
@@ -311,6 +354,17 @@ class AreaDeliveryZoneController extends BaseController
 
     /**
      * Update  AreaDelivery Zone
+     * @return array
+     * 
+     * @api {PATCH} /area-delivery-zone/:area_delivery_zone_id Update area delivery zone
+     * @apiName UpdateAreaDeliveryZone
+     * @apiGroup AreaDeliveryZone
+     *
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} area_id Area ID.
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * 
+     * @apiSuccess {Array} Area delivery zone updated successfully.
      */
     public function actionUpdate($area_delivery_zone_id, $store_uuid = null)
     {
@@ -364,6 +418,12 @@ class AreaDeliveryZoneController extends BaseController
 
     /**
      * Delete Delivery zone
+     * 
+     * @api {DELETE} /area-delivery-zone/:area_delivery_zone_id Delete area delivery zone
+     * @apiName DeleteAreaDeliveryZone
+     * @apiGroup AreaDeliveryZone
+     *
+     * @apiSuccess {Array} Area delivery zone deleted successfully.
      */
     public function actionDelete($area_delivery_zone_id, $store_uuid = null)
     {

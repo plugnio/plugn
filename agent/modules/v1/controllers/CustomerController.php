@@ -14,7 +14,16 @@ class CustomerController extends BaseController
     /**
      * Get all store's Customers
      * @param string $store_uuid
-     * @return ActiveDataProvider         
+     * @return ActiveDataProvider 
+     * 
+     * @api {get} /customers Get all store's customers
+     * 
+     * @apiParam {string} keyword Keyword.
+     * 
+     * @apiName ListCustomers
+     * @apiGroup Customer
+     *
+     * @apiSuccess {Array} customers List of customers.
      */
     public function actionList($store_uuid = null)
     {
@@ -41,6 +50,13 @@ class CustomerController extends BaseController
      * Return customer detail
      * @param string $customer_id
      * @return Customer
+     * 
+     * @api {get} /customers/:id Get customer detail
+     * @apiName GetCustomerDetail
+     * @apiParam {string} customer_id Customer ID.
+     * @apiGroup Customer
+     *
+     * @apiSuccess {Array} customer Customer.
      */
     public function actionDetail($customer_id)
     {
@@ -52,6 +68,12 @@ class CustomerController extends BaseController
      * @param string $store_uuid
      * @param string $customer_id
      * @return ActiveDataProvider
+     * 
+     * @api {get} /customers/orders Get all customers orders
+     * @apiName ListAllCustomerOrders
+     * @apiParam {string} customer_id Customer ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiGroup Customer
      */
     public function actionListAllCustomerOrders($customer_id, $store_uuid = null)
     {
@@ -69,6 +91,17 @@ class CustomerController extends BaseController
     /**
      * Export customers data to excel
      * @return mixed
+     * 
+     * @api {get} /customers/export-to-excel Export customers data to excel
+     * @apiName ExportToExcel
+     * 
+     * @apiParam {string} start_date Start date.
+     * @apiParam {string} end_date End date.
+     * 
+     * @apiGroup Customer
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionExportToExcel()
     {
@@ -185,6 +218,20 @@ class CustomerController extends BaseController
 
     /**
      * add new customer
+     * 
+     * @api {post} /customers Add new customer
+     * 
+     * @apiName CreateCustomer
+     * 
+     * @apiParam {string} customer_name Customer name.
+     * @apiParam {string} customer_phone_number Customer phone number.
+     * @apiParam {string} country_code Country code.
+     * @apiParam {string} customer_email Customer email.
+     * 
+     * @apiGroup Customer
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
      */
     public function actionCreate() {
 

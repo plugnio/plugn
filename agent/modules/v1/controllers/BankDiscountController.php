@@ -30,6 +30,14 @@ class BankDiscountController extends BaseController {
     /**
      * @param $store_uuid
      * @return ActiveDataProvider
+     * 
+     * @api {get} /bank-discounts/list Get list of bank discounts
+     * @apiParam {string} keyword Keyword.
+     * @apiParam {string} status Status.
+     * @apiName ListBankDiscounts
+     * @apiGroup BankDiscount
+     *
+     * @apiSuccess {Array} bankDiscounts List of bank discounts.
      */
     public function actionList($store_uuid = null) {
 
@@ -66,6 +74,23 @@ class BankDiscountController extends BaseController {
     /**
      * Create bank discount
      * @return array
+     * 
+     * @api {post} /bank-discounts/create Create bank discount
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} bank_id Bank ID.
+     * @apiParam {string} discount_type Discount type.
+     * @apiParam {string} discount_amount Discount amount.
+     * @apiParam {string} valid_from Valid from.
+     * @apiParam {string} valid_until Valid until.
+     * @apiParam {string} max_redemption Max redemption.
+     * @apiParam {string} limit_per_customer Limit per customer.
+     * @apiParam {string} minimum_order_amount Minimum order amount.
+     * @apiName CreateBankDiscount
+     * @apiGroup BankDiscount
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {Array} model Bank discount.
      */
     public function actionCreate() {
 
@@ -110,6 +135,25 @@ class BankDiscountController extends BaseController {
      * @param $store_uuid
      * @return array|string[]
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /bank-discounts/update Update bank discount
+     * @apiParam {string} bank_discount_id Bank discount ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} bank_id Bank ID.
+     * @apiParam {string} discount_type Discount type.
+     * @apiParam {string} discount_amount Discount amount.
+     * @apiParam {string} valid_from Valid from.
+     * @apiParam {string} valid_until Valid until.
+     * @apiParam {string} max_redemption Max redemption.
+     * @apiParam {string} limit_per_customer Limit per customer.
+     * @apiParam {string} minimum_order_amount Minimum order amount.
+     * 
+     * @apiName UpdateBankDiscount
+     * @apiGroup BankDiscount
+     *
+     * @apiSuccess {string} operation success|error.
+     * @apiSuccess {string} message Message.
+     * @apiSuccess {Array} model Bank discount.
      */
      public function actionUpdate($bank_discount_id, $store_uuid = null)
      {
@@ -152,6 +196,14 @@ class BankDiscountController extends BaseController {
      * Ability to update bank discount status
      * @return array
      * @throws NotFoundHttpException
+     * 
+     * @api {post} /bank-discounts/update-status Update bank discount status
+     * @apiParam {string} bank_discount_id Bank discount ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiParam {string} bank_discount_status Bank discount status.
+     * 
+     * @apiName UpdateBankDiscountStatus
+     * @apiGroup BankDiscount
      */
      public function actionUpdateBankDiscountStatus() {
          
@@ -188,6 +240,14 @@ class BankDiscountController extends BaseController {
      * @param $bank_discount_id
      * @return BankDiscount
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /bank-discounts/:id Get bank discount detail
+     * @apiParam {string} bank_discount_id Bank discount ID.
+     * @apiParam {string} store_uuid Store UUID.
+     * @apiName GetBankDiscountDetail
+     * @apiGroup BankDiscount
+     *
+     * @apiSuccess {Array} bankDiscount Bank discount.
      */
     public function actionDetail($bank_discount_id, $store_uuid = null) {
         $this->ownerCheck();
@@ -196,6 +256,12 @@ class BankDiscountController extends BaseController {
 
      /**
       * Delete Bank Discount
+      * 
+      * @api {DELETE} /bank-discount/:bank_discount_id Delete bank discount
+      * @apiParam {string} bank_discount_id Bank discount ID.
+      * @apiParam {string} store_uuid Store UUID.
+      * @apiName DeleteBankDiscount
+      * @apiGroup BankDiscount
       */
      public function actionDelete($bank_discount_id, $store_uuid = null)
      {

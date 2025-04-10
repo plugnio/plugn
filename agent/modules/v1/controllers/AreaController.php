@@ -7,16 +7,26 @@ use api\models\City;
 use api\models\State;
 use Yii;
 use yii\db\Expression;
-use yii\rest\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use agent\models\Area;
 
-
+/**
+ * AreaController implements the CRUD actions for Area model.
+ */
 class AreaController extends BaseController {
 
     /**
      * @return ActiveDataProvider
+     *
+     * @api {get} /areas List areas
+     * @apiParam {string} [keyword] Keyword to search for.
+     * @apiParam {string} [city_id] City id.
+     * @apiParam {string} [store_id] Store id.
+     * @apiName ListAreas
+     * @apiGroup Area
+     *
+     * @apiSuccess {Array} List of areas.
      */
     public function actionList() {
 
@@ -56,6 +66,15 @@ class AreaController extends BaseController {
 
     /**
      * @return ActiveDataProvider
+     * 
+     * @api {get} /areas/delivery-areas List delivery areas
+     * @apiParam {string} [keyword] Keyword to search for.
+     * @apiParam {string} [city_id] City id.
+     * @apiParam {string} [store_id] Store id.
+     * @apiName ListDeliveryAreas
+     * @apiGroup Area
+     *
+     * @apiSuccess {Array} List of area delivery zones.
      */
     public function actionDeliveryAreas() {
 
@@ -98,6 +117,18 @@ class AreaController extends BaseController {
      * Return Area detail
      * @param integer $area_id
      * @return Area
+     * 
+     * @api {get} /areas/:id Get area detail
+     * @apiParam {string} [area_id] Area id.
+     * @apiName GetAreaDetail
+     * @apiGroup Area
+     *
+     * @apiSuccess {id} area_id Area id.
+     * @apiSuccess {id} city_id City id.
+     * @apiSuccess {string} area_name Area name.
+     * @apiSuccess {string} area_name_ar Area name in Arabic.
+     * @apiSuccess {string} latitude Latitude.
+     * @apiSuccess {string} longitude Longitude.
      */
     public function actionDetail($id) {
         return $this->findModel($id);
@@ -105,6 +136,19 @@ class AreaController extends BaseController {
 
     /**
      * @return void
+     * 
+     * @api {get} /areas/city-by-location Get city by location
+     * @apiName GetCityByLocation
+     * @apiParam {string} latitude Latitude.
+     * @apiParam {string} longitude Longitude.
+     * @apiParam {string} postal_code Postal code.
+     * @apiGroup Area
+     *
+     * @apiSuccess {id} city_id City id.
+     * @apiSuccess {string} state_id State id.
+     * @apiSuccess {string} country_id Country id.
+     * @apiSuccess {string} city_name City name.
+     * @apiSuccess {string} city_name_ar City name in Arabic.
      */
     public function actionCityByLocation() {
         $latitude = Yii::$app->request->get('latitude');
@@ -122,6 +166,13 @@ class AreaController extends BaseController {
      * @param $city_id
      * @return ActiveDataProvider
      * @throws NotFoundHttpException
+     * 
+     * @api {get} /areas/city-areas/:city_id Get city areas
+     * @apiParam {string} [keyword] Keyword to search for.
+     * @apiName GetCityAreas
+     * @apiGroup Area
+     *
+     * @apiSuccess {Array} List of city areas.
      */
     public function actionCityAreas($city_id)
     {
@@ -148,6 +199,18 @@ class AreaController extends BaseController {
         ]);
     }
 
+    /**
+     * @param $country_id
+     * @return ActiveDataProvider
+     * @throws NotFoundHttpException
+     * 
+     * @api {get} /areas/country-areas/:country_id Get country areas
+     * @apiParam {string} [keyword] Keyword to search for.
+     * @apiName GetCountryAreas
+     * @apiGroup Area
+     *
+     * @apiSuccess {Array} List of countries with areas.
+     */
     public function actionCountryAreas($country_id)
     {
         $keyword = Yii::$app->request->get("keyword");
@@ -173,6 +236,18 @@ class AreaController extends BaseController {
         ]);
     }
 
+    /**
+     * @param $country_id
+     * @return ActiveDataProvider
+     * @throws NotFoundHttpException
+     * 
+     * @api {get} /areas/country-states/:country_id Get country states
+     * @apiParam {string} [keyword] Keyword to search for.
+     * @apiName GetCountryStates
+     * @apiGroup Area
+     *
+     * @apiSuccess {Array} List of countries with states.
+     */
     public function actionCountryStates($country_id)
     {
         $keyword = Yii::$app->request->get("keyword");
@@ -196,7 +271,16 @@ class AreaController extends BaseController {
     }
 
     /**
-     * Return list of cities available for state
+     * @param $country_id
+     * @return ActiveDataProvider
+     * @throws NotFoundHttpException
+     * 
+     * @api {get} /areas/country-cities/:country_id Get country cities
+     * @apiParam {string} [keyword] Keyword to search for.
+     * @apiName GetCountryCities
+     * @apiGroup Area
+     *
+     * @apiSuccess {Array} List of countries with cities.
      */
     public function actionCountryCities($country_id)
     {
@@ -229,7 +313,16 @@ class AreaController extends BaseController {
     }
 
     /**
-     * Return list of cities available for state
+     * @param $state_id
+     * @return ActiveDataProvider
+     * @throws NotFoundHttpException
+     * 
+     * @api {get} /areas/state-cities/:state_id Get state cities
+     * @apiParam {string} [keyword] Keyword to search for.
+     * @apiName GetStateCities
+     * @apiGroup Area
+     *
+     * @apiSuccess {Array} List of cities available for state.
      */
     public function actionStateCities($state_id)
     {
