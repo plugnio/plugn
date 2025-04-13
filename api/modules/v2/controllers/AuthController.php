@@ -165,6 +165,13 @@ class AuthController extends BaseController {
      * If everything is alright,
      * Returns the BEARER access token required for futher requests to the API
      * @return array
+     * 
+     * @api {GET} /login Login
+     * @apiName Login
+     * @apiGroup Auth
+     * 
+     * @header {string} Authorization Basic Auth username and password (md5 hash of username:password).
+     * @apiSuccess {string} message Message.
      */
     public function actionLogin() {
 
@@ -188,6 +195,19 @@ class AuthController extends BaseController {
     /**
      * todo: register user with store
      * @return mixed
+     * 
+     * @api {POST} /signup Signup
+     * @apiName Signup
+     * @apiGroup Auth
+     * 
+     * @apiParam {string} first_name First name.
+     * @apiParam {string} last_name Last name.
+     * @apiParam {string} email Email.
+     * @apiParam {string} password Password.
+     * @apiParam {string} phone_number Phone number.
+     * @apiParam {string} country_code Country code.
+     * @apiSuccess {string} message Message.
+     * 
      */
     public function actionSignup() {
         
@@ -229,7 +249,16 @@ class AuthController extends BaseController {
 
     /**
      * Update email address
-     * @return type
+     * @return array
+     * 
+     * @api {POST} /update-email Update email
+     * @apiName UpdateEmail
+     * @apiGroup Auth
+     * 
+     * @apiParam {string} unVerifiedToken Unverified token.
+     * @apiParam {string} newEmail New email.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdateEmail() {
 
@@ -304,6 +333,14 @@ class AuthController extends BaseController {
     /**
      * Re-send manual verification email to customer
      * @return array
+     * 
+     * @api {POST} /resend-verification-email Resend verification email
+     * @apiName ResendVerificationEmail
+     * @apiGroup Auth
+     * 
+     * @apiParam {string} email Email.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionResendVerificationEmail()
     {
@@ -390,6 +427,14 @@ class AuthController extends BaseController {
 
     /**
      * Check if candidate email already verified
+     * 
+     * @api {POST} /is-email-verified Is email verified
+     * @apiName IsEmailVerified
+     * @apiGroup Auth
+     * 
+     * @apiParam {string} token Token.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionIsEmailVerified() {
 
@@ -413,6 +458,15 @@ class AuthController extends BaseController {
     /**
      * Process email verification
      * @return array
+     * 
+     * @api {POST} /verify-email Verify email
+     * @apiName VerifyEmail
+     * @apiGroup Auth
+     * 
+     * @apiParam {string} code Code.
+     * @apiParam {string} email Email.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionVerifyEmail() {
 
@@ -479,6 +533,13 @@ class AuthController extends BaseController {
     /**
      * Sends password reset email to user
      * @return array
+     * 
+     * @api {POST} /request-reset-password Request reset password
+     * @apiName RequestResetPassword
+     * @apiGroup Auth
+     * 
+     * @apiParam {string} email Email.
+     * @apiSuccess {string} message Message.
      */
     public function actionRequestResetPassword() {
 
@@ -554,6 +615,12 @@ class AuthController extends BaseController {
     /**
      * Updates password based on passed token
      * @return array
+     * 
+     * @api {POST} /update-password Update password
+     * @apiName UpdatePassword
+     * @apiGroup Auth
+     * 
+     * @apiParam {string} token Token.
      */
     public function actionUpdatePassword() {
 
@@ -607,8 +674,9 @@ class AuthController extends BaseController {
     
     /**
      * Return customer data after successful login
-     * @param type $customer
-     * @return type
+     * @param Customer $customer
+     * @param int $new_user
+     * @return array
      */
     private function _loginResponse($customer, $new_user = 0) {
 
@@ -636,7 +704,13 @@ class AuthController extends BaseController {
 
     /**
      * return user location detail by user ip address
-     * @return type
+     * @return array 
+     * 
+     * @api {GET} /locate Locate
+     * @apiName Locate
+     * @apiGroup Auth
+     * 
+     * @apiSuccess {ipstackResponse} ipstackResponse Ipstack response.
      */
     public function actionLocate() {
         return Yii::$app->ipstack->locate();

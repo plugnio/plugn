@@ -24,6 +24,12 @@ class CampaignController extends BaseController
     /**
      * @param $id
      * @return array|string[]
+     * 
+     * @api {GET} /campaigns/:id Click campaign
+     * @apiName ClickCampaign
+     * @apiGroup Campaign
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionClick($id)
     {

@@ -53,6 +53,12 @@ class ChatController extends Controller
 
     /**
      * @return void
+     * 
+     * @api {POST} /chat Chat
+     * @apiName Chat
+     * @apiGroup Chat
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionChat($id)
     {

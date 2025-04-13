@@ -54,6 +54,7 @@ class BlogController extends BaseController
     /**
      * Lists all Blog models.
      * @return mixed
+     * 
      */
     public function actionList()
     {

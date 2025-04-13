@@ -55,6 +55,15 @@ class VoucherController extends BaseController
         return $actions;
     }
 
+    /**
+     * Return list of vouchers
+     * 
+     * @api {GET} /vouchers List of vouchers
+     * @apiName ListOfVouchers
+     * @apiGroup Voucher
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionList() {
 
         $store = $this->findStore();

@@ -50,6 +50,13 @@ class PageController extends BaseController
         return $actions;
     }
 
+    /**
+     * Return page by slug
+     * 
+     * @api {GET} /pages/:slug Page
+     * @apiName Page
+     * @apiGroup Page
+     * 
     public function actionView($slug) {
         return $this->findModel($slug);
     }

@@ -70,6 +70,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return List of countries available for delivery
+     * 
+     * @api {GET} /delivery-zones/list-of-countries List of countries
+     * @apiName ListOfCountries
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionListOfCountries($restaurant_uuid)
     {
@@ -129,6 +135,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return List of business locations that support pickup
+     * 
+     * @api {GET} /delivery-zones/list-of-pickup-locations List of pickup locations
+     * @apiName ListOfPickupLocations
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionListPickupLocations($restaurant_uuid)
     {
@@ -155,6 +167,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return Delivery zone
+     * 
+     * @api {GET} /delivery-zones/:delivery_zone_id Delivery zone
+     * @apiName DeliveryZone
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionGetDeliveryZone($restaurant_uuid, $delivery_zone_id)
     {
@@ -221,6 +239,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * @return void
+     * 
+     * @api {GET} /delivery-zones/city-by-location City by location
+     * @apiName CityByLocation
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCityByLocation() {
         $latitude = Yii::$app->request->get('latitude');
@@ -238,6 +262,12 @@ class DeliveryZoneController extends BaseController
      * return delivery zone for tax + delivery fee details by location provided
      * @return string[]
      * @throws NotFoundHttpException
+     * 
+     * @api {GET} /delivery-zones/by-location Delivery zone by location
+     * @apiName DeliveryZoneByLocation
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionByLocation()
     {
@@ -332,6 +362,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return pickup location
+     * 
+     * @api {GET} /delivery-zones/get-pickup-location Get pickup location
+     * @apiName GetPickupLocation
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionGetPickupLocation($restaurant_uuid, $pickup_location_id)
     {
@@ -360,6 +396,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of areas available for delivery
+     * 
+     * @api {GET} /delivery-zones/list-of-areas List of areas
+     * @apiName ListOfAreas
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionListOfAreas($restaurant_uuid, $country_id)
     {
@@ -409,6 +451,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of states available for delivery
+     * 
+     * @api {GET} /delivery-zones/states States
+     * @apiName States
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionStates($country_id)
     {
@@ -438,6 +486,15 @@ class DeliveryZoneController extends BaseController
         ]);
     }
 
+    /**
+     * Return list of areas available for city
+     * 
+     * @api {GET} /delivery-zones/city-areas City areas
+     * @apiName CityAreas
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionCityAreas($city_id)
     {
         $keyword = Yii::$app->request->get("keyword");
@@ -463,6 +520,15 @@ class DeliveryZoneController extends BaseController
         ]);
     }
 
+    /**
+     * Return list of areas available for country
+     * 
+     * @api {GET} /delivery-zones/country-areas Country areas
+     * @apiName CountryAreas
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionCountryAreas($country_id)
     {
         $keyword = Yii::$app->request->get("keyword");
@@ -488,6 +554,15 @@ class DeliveryZoneController extends BaseController
         ]);
     }
 
+    /**
+     * Return list of states available for country
+     * 
+     * @api {GET} /delivery-zones/country-states Country states
+     * @apiName CountryStates
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionCountryStates($country_id)
     {
         $keyword = Yii::$app->request->get("keyword");
@@ -512,6 +587,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of cities available for state
+     * 
+     * @api {GET} /delivery-zones/country-cities Country cities
+     * @apiName CountryCities
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCountryCities($country_id)
     {
@@ -545,6 +626,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of cities available for state
+     * 
+     * @api {GET} /delivery-zones/state-cities State cities
+     * @apiName StateCities
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionStateCities($state_id)
     {
@@ -574,6 +661,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of cities available for delivery
+     * 
+     * @api {GET} /delivery-zones/cities Cities
+     * @apiName Cities
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCities($state_id)
     {
@@ -610,6 +703,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * Return list of Countries available for delivery
+     * 
+     * @api {GET} /delivery-zones/countries Countries
+     * @apiName Countries
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCountries()
     {
@@ -634,6 +733,12 @@ class DeliveryZoneController extends BaseController
 
     /**
      * @return array|string[]
+     * 
+     * @api {GET} /delivery-zones/get-delivery-time Get delivery time
+     * @apiName GetDeliveryTime
+     * @apiGroup DeliveryZone
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionGetDeliveryTime()
     {

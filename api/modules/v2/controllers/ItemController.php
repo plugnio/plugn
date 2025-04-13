@@ -59,6 +59,12 @@ class ItemController extends BaseController {
 
     /**
      * Return category's products
+     * 
+     * @api {GET} /items/category-products Category products
+     * @apiName CategoryProducts
+     * @apiGroup Item
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCategoryProducts($category_id = null, $slug = null) {
 
@@ -103,6 +109,12 @@ class ItemController extends BaseController {
     /**
      * list items
      * @return ActiveDataProvider
+     * 
+     * @api {GET} /items Items
+     * @apiName Items
+     * @apiGroup Item
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionItems()
     {
@@ -143,6 +155,12 @@ class ItemController extends BaseController {
 
     /**
      * Return restaurant menu
+     * 
+     * @api {GET} /items/restaurant-menu Restaurant menu
+     * @apiName RestaurantMenu
+     * @apiGroup Item
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionRestaurantMenu() {
 
@@ -195,6 +213,16 @@ class ItemController extends BaseController {
 
     /**
      * Return restaurant menu
+     * 
+     * @api {GET} /items/category-items Category items
+     * @apiName CategoryItems
+     * @apiGroup Item
+     * 
+     * @apiParam {string} restaurant_uuid Restaurant UUID.
+     * @apiParam {string} category_id Category ID.
+     * @apiParam {string} keyword Keyword.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCategoryItems() {
 
@@ -231,6 +259,15 @@ class ItemController extends BaseController {
 
     /**
      * Return item's data
+     * 
+     * @api {GET} /items/item-data Item data
+     * @apiName ItemData
+     * @apiGroup Item
+     * 
+     * @apiParam {string} item_uuid Item UUID.
+     * @apiParam {string} expand Expand.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionItemData()
     {
@@ -265,6 +302,12 @@ class ItemController extends BaseController {
 
     /**
      * Return item's data
+     * 
+     * @api {GET} /items/view View
+     * @apiName View
+     * @apiGroup Item
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionView($slug)
     {

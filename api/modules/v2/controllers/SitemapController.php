@@ -15,6 +15,15 @@ use yii\web\NotFoundHttpException;
  */
 class SitemapController extends Controller
 {
+    /**
+     * Generate sitemap
+     * 
+     * @api {GET} /sitemap/:storeUuid Sitemap
+     * @apiName Sitemap
+     * @apiGroup Sitemap
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionIndex($storeUuid)
     {
         $restaurant = $this->findModel($storeUuid);

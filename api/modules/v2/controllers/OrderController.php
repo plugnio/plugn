@@ -82,6 +82,12 @@ class OrderController extends BaseController
      * @param $id
      * @return array|string[]|void
      * @throws NotFoundHttpException
+     * 
+     * @api {PATCH} /orders/:id Update order
+     * @apiName UpdateOrder
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdateOrder($id) {
 
@@ -129,6 +135,12 @@ class OrderController extends BaseController
      * @return array
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\db\Exception
+     * 
+     * @api {POST} /orders/init-order Init order
+     * @apiName InitOrder
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionInitOrder($id)
     {
@@ -488,6 +500,47 @@ class OrderController extends BaseController
 
     /**
      * Place an order
+     * 
+     * @api {POST} /orders/place-an-order Place an order
+     * @apiName PlaceAnOrder
+     * @apiGroup Order
+     * 
+     * @apiParam {string} order_uuid Order UUID.
+     * @apiParam {string} restaurant_uuid Restaurant UUID.
+     * @apiParam {string} payment_method_id Payment method ID.
+     * @apiParam {string} is_market_order Is market order.
+     * @apiParam {string} voucher_id Voucher ID.
+     * @apiParam {string} sender_name Sender name.
+     * @apiParam {string} recipient_name Recipient name.
+     * @apiParam {string} recipient_phone_number Recipient phone number.
+     * @apiParam {string} gift_message Gift message.
+     * @apiParam {string} order_instruction Order instruction.
+     * @apiParam {string} items Items.
+     * @apiParam {string} order_mode Order mode.
+     * @apiParam {string} delivery_zone_id Delivery zone ID.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} state_id State ID.
+     * @apiParam {string} city_id City ID.
+     * @apiParam {string} area_id Area ID.
+     * @apiParam {string} block Block.
+     * @apiParam {string} street Street.
+     * @apiParam {string} avenue Avenue.
+     * @apiParam {string} house_number House number.
+     * @apiParam {string} floor Floor.
+     * @apiParam {string} building Building.
+     * @apiParam {string} apartment Apartment.
+     * @apiParam {string} office Office.
+     * @apiParam {string} unit_type Unit type.
+     * @apiParam {string} special_directions Special directions.
+     * @apiParam {string} latitude Latitude.
+     * @apiParam {string} longitude Longitude.
+     * @apiParam {string} scheduled_time_start_from Scheduled time start from.
+     * @apiParam {string} scheduled_time_to Scheduled time to.
+     * @apiParam {string} bank_name Bank name.
+     * @apiParam {string} payment_token Payment token.
+     * @apiParam {string} source Source.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionPlaceAnOrder($id)
     {
@@ -947,6 +1000,12 @@ class OrderController extends BaseController
      * Process callback from My Fatoorah payment gateway
      * @param string $paymentId
      * @return mixed
+     * 
+     * @api {POST} /orders/my-fatoorah-callback My Fatoorah callback
+     * @apiName MyFatoorahCallback
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionMyFatoorahCallback($paymentId)
     {
@@ -1018,6 +1077,12 @@ class OrderController extends BaseController
      * Process callback from TAP payment gateway
      * @param string $tap_id
      * @return mixed
+     * 
+     * @api {POST} /orders/callback/:tap_id TAP callback
+     * @apiName Callback
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCallback($tap_id)
     {
@@ -1073,6 +1138,12 @@ class OrderController extends BaseController
      * @throws \setasign\Fpdi\PdfParser\PdfParserException
      * @throws \setasign\Fpdi\PdfParser\Type\PdfTypeException
      * @throws \yii\base\InvalidConfigException
+     * 
+     * @api {GET} /orders/download-invoice/:id Download invoice
+     * @apiName DownloadInvoice
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionDownloadInvoice($id)
     {
@@ -1156,6 +1227,24 @@ class OrderController extends BaseController
      * Process callback from TAP payment gateway
      * @param string $tap_id
      * @return mixed
+     * 
+     * @api {POST} /orders/payment-webhook Payment webhook
+     * @apiName PaymentWebhook
+     * @apiGroup Order
+     * 
+     * @apiParam {string} id Charge ID.
+     * @apiParam {string} status Status.
+     * @apiParam {string} amount Amount.
+     * @apiParam {string} currency Currency.
+     * @apiParam {string} reference Reference.
+     * @apiParam {string} destinations Destinations.
+     * @apiParam {string} response Response.
+     * @apiParam {string} source Source.
+     * @apiParam {string} transaction Transaction.
+     * @apiParam {string} acquirer Acquirer.
+     * @apiParam {string} headerSignature Header signature.
+     *          
+     * @apiSuccess {string} message Message.
      */
     public function actionPaymentWebhook()
     {
@@ -1254,6 +1343,16 @@ class OrderController extends BaseController
     /**
      * list all orders
      * @return ActiveDataProvider
+     * 
+     * @api {GET} /orders/list List all orders
+     * @apiName ListOrders
+     * @apiGroup Order
+     * 
+     * @apiParam {string} restaurant_uuid Restaurant UUID.
+     * @apiParam {string} phone_number Phone number.
+     * @apiParam {string} email Email.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionList()
     {
@@ -1302,6 +1401,12 @@ class OrderController extends BaseController
      * @param type $id
      * @param type $restaurant_uuid
      * @return type
+     * 
+     * @api {GET} /orders/order-details/:id Order details
+     * @apiName OrderDetails
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionOrderDetails($id, $restaurant_uuid)
     {
@@ -1395,6 +1500,16 @@ class OrderController extends BaseController
 
     /**
      * Whether is valid promo code or no
+     * 
+     * @api {POST} /orders/apply-bank-discount Apply bank discount
+     * @apiName ApplyBankDiscount
+     * @apiGroup Order
+     * 
+     * @apiParam {string} restaurant_uuid Restaurant UUID.
+     * @apiParam {string} phone_number Phone number.
+     * @apiParam {string} bank_name Bank name.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionApplyBankDiscount()
     {
@@ -1424,6 +1539,17 @@ class OrderController extends BaseController
 
     /**
      * Whether is valid promo code or no
+     * 
+     * @api {POST} /orders/apply-promo-code Apply promo code
+     * @apiName ApplyPromoCode
+     * @apiGroup Order
+     * 
+     * @apiParam {string} order_uuid Order UUID.
+     * @apiParam {string} restaurant_uuid Restaurant UUID.
+     * @apiParam {string} phone_number Phone number.
+     * @apiParam {string} code Code.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionApplyPromoCode($order_uuid = null)
     {
@@ -1489,6 +1615,12 @@ class OrderController extends BaseController
 
     /**
      * update order instruction
+     * 
+     * @api {POST} /orders/instruction/:order_uuid Update order instruction
+     * @apiName UpdateOrderInstruction
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionInstruction($order_uuid = null)
     {
@@ -1508,6 +1640,12 @@ class OrderController extends BaseController
      * True if there are pending  orders , false if these isn't any
      * @param type $restaurantUuid
      * @return boolean
+     * 
+     * @api {GET} /orders/check-pending-orders Check pending orders
+     * @apiName CheckPendingOrders
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionCheckPendingOrders($restaurant_uuid)
     {
@@ -1520,6 +1658,12 @@ class OrderController extends BaseController
 
     /**
      * Update order status
+     * 
+     * @api {POST} /orders/update-mashkor-order-status Update mashkor order status
+     * @apiName UpdateMashkorOrderStatus
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdateMashkorOrderStatus()
     {
@@ -1599,6 +1743,12 @@ class OrderController extends BaseController
 
     /**
      * Update order status
+     * 
+     * @api {POST} /orders/update-armada-order-status Update armada order status
+     * @apiName UpdateArmadaOrderStatus
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdateArmadaOrderStatus()
     {
@@ -1656,6 +1806,12 @@ class OrderController extends BaseController
 
     /**
      * @return array
+     * 
+     * @api {POST} /orders/validate-cart Validate cart
+     * @apiName ValidateCart
+     * @apiGroup Order
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionValidateCart() {
 

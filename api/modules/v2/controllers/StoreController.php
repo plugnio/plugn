@@ -63,6 +63,12 @@ class StoreController extends BaseController
     /**
      * return store lists
      * @return array|\yii\db\ActiveRecord[]
+     * 
+     * @api {GET} /stores Stores list
+     * @apiName StoresList
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionList()
     {
@@ -84,6 +90,12 @@ class StoreController extends BaseController
      * return store detail by id
      * @param $id
      * @return Category
+     * 
+     * @api {GET} /stores/:id Store detail
+     * @apiName StoreDetail
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionView($id = null)
     {
@@ -110,6 +122,12 @@ class StoreController extends BaseController
      * @param $domain
      * @return \common\models\Restaurant
      * @throws NotFoundHttpException
+     * 
+     * @api {GET} /stores/by-domain Store by domain
+     * @apiName StoreByDomain
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionByDomain($domain)
     {
@@ -120,6 +138,12 @@ class StoreController extends BaseController
      * @param $id
      * @return array|\common\models\query\Agent
      * @throws NotFoundHttpException
+     * 
+     * @api {GET} /stores/by-package Store by package
+     * @apiName StoreByPackage
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionByPackage($id)
     {
@@ -137,6 +161,12 @@ class StoreController extends BaseController
      * @param $domain
      * @return void
      * @throws NotFoundHttpException
+     * 
+     * @api {GET} /stores/manifest-by-domain Manifest by domain
+     * @apiName ManifestByDomain
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionManifestByDomain($domain)
     {
@@ -192,6 +222,12 @@ class StoreController extends BaseController
 
     /**
      * Return Restaurant's branches
+     * 
+     * @api {GET} /stores/get-opening-hours Get opening hours
+     * @apiName GetOpeningHours
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionGetOpeningHours()
     {
@@ -252,6 +288,17 @@ class StoreController extends BaseController
 
     /**
      * @return array|string[]
+     * 
+     * @api {GET} /stores/get-delivery-time Get delivery time
+     * @apiName GetDeliveryTime
+     * @apiGroup Store
+     * 
+     * @queryParam {string} restaurant_uuid Restaurant UUID.
+     * @queryParam {string} delivery_zone_id Delivery zone ID.
+     * 
+     * @apiParam {string} cart Cart.
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionGetDeliveryTime()
     {
@@ -314,6 +361,12 @@ class StoreController extends BaseController
 
     /**
      * Return Store's Locations
+     * 
+     * @api {GET} /stores/list-all-stores-locations List all stores locations
+     * @apiName ListAllStoresLocations
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionListAllStoresLocations($id)
     {
@@ -332,6 +385,12 @@ class StoreController extends BaseController
 
     /**
      * Return Restaurant's data
+     * 
+     * @api {GET} /stores/get-restaurant-data Get restaurant data
+     * @apiName GetRestaurantData
+     * @apiGroup Store
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionGetRestaurantData($branch_name)
     {

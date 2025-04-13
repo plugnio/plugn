@@ -389,7 +389,7 @@ fi`
 
 https://apidocjs.com
 
-apidoc -i src -o apidoc
+apidoc -i api -o apidoc
 
 apidoc -i agent -o agent-doc
 
