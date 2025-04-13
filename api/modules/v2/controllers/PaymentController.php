@@ -62,6 +62,12 @@ class PaymentController extends BaseController
 
     /**
      *  Return Payment details
+     * 
+     * @api {POST} /payments/myfatoorah-webhook MyFatoorah webhook
+     * @apiName MyFatoorahWebhook
+     * @apiGroup Payment
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionMyFatoorahWebhook()
     {
@@ -118,6 +124,12 @@ class PaymentController extends BaseController
 
     /**
      * return a list of payments method that restaurant's owner added on agent dashboard
+     * 
+     * @api {GET} /payments/list-all-restaurants-payment-method List all restaurants payment method
+     * @apiName ListAllRestaurantsPaymentMethod
+     * @apiGroup Payment
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionListAllRestaurantsPaymentMethod($id = null)
     {

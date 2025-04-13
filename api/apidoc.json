@@ -1,0 +1,7 @@
+{
+    "name": "Plugn store API",
+    "version": "0.1.0",
+    "description": "Plugn store API documentation. For staging environment use https://api.dev.plugn.io/v1",
+    "title": "Plugn store API",
+    "url" : "https://api.plugn.io/v2"
+}

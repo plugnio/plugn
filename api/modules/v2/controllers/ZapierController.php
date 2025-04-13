@@ -78,6 +78,12 @@ class ZapierController extends Controller {
   /**
    * Get store list
    * @return boolean
+   * 
+   * @api {GET} /zapier/get-store-list Get store list
+   * @apiName GetStoreList
+   * @apiGroup Zapier
+   * 
+   * @apiSuccess {string} message Message.
    */
     public function actionGetStoreList() {
 
@@ -101,6 +107,12 @@ class ZapierController extends Controller {
    * True if there are pending  orders , false if these isn't any
    * @param type $restaurantUuid
    * @return boolean
+   * 
+   * @api {GET} /zapier/get-latest-order Get latest order
+   * @apiName GetLatestOrder
+   * @apiGroup Zapier
+   * 
+   * @apiSuccess {string} message Message.
    */
     public function actionGetLatestOrder($restaurant_uuid) {
 

@@ -59,6 +59,15 @@ class AddressController extends BaseController
         return $actions;
     }
 
+    /**
+     * @return array
+     * 
+     * @api {get} /addresses List addresses
+     * @apiName ListAddresses
+     * @apiGroup Address
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionList()
     {
         $query = Yii::$app->user->identity
@@ -71,6 +80,31 @@ class AddressController extends BaseController
 
     /**
      * @return array
+     * 
+     * @api {post} /addresses Add address
+     * @apiName AddAddress
+     * @apiGroup Address
+     * 
+     * @apiParam {string} address_id Address ID.
+     * @apiParam {string} area_id Area ID.
+     * @apiParam {string} city_id City ID.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} unit_type Unit type.
+     * @apiParam {string} house_number House number.
+     * @apiParam {string} floor Floor.
+     * @apiParam {string} apartment Apartment.
+     * @apiParam {string} building Building.
+     * @apiParam {string} block Block.
+     * @apiParam {string} street Street.
+     * @apiParam {string} avenue Avenue.
+     * @apiParam {string} office Office.
+     * @apiParam {string} postalcode Postal code.
+     * @apiParam {string} address_1 Address 1.
+     * @apiParam {string} address_2 Address 2.
+     * @apiParam {string} special_directions Special directions.
+     * @apiParam {string} delivery_instructions Delivery instructions.
+     *  
+     * @apiSuccess {string} message Message.
      */
     public function actionAdd()
     {
@@ -112,6 +146,33 @@ class AddressController extends BaseController
         ];
     }
 
+    /**
+     * @return array
+     * 
+     * @api {patch} /addresses/:id Update address
+     * @apiName UpdateAddress
+     * @apiGroup Address
+     * 
+     * @apiParam {string} area_id Area ID.
+     * @apiParam {string} city_id City ID.
+     * @apiParam {string} country_id Country ID.
+     * @apiParam {string} unit_type Unit type.
+     * @apiParam {string} house_number House number.
+     * @apiParam {string} floor Floor.
+     * @apiParam {string} apartment Apartment.
+     * @apiParam {string} building Building.
+     * @apiParam {string} block Block.
+     * @apiParam {string} street Street.
+     * @apiParam {string} avenue Avenue.
+     * @apiParam {string} office Office.
+     * @apiParam {string} postalcode Postal code.
+     * @apiParam {string} address_1 Address 1.
+     * @apiParam {string} address_2 Address 2.
+     * @apiParam {string} special_directions Special directions.
+     * @apiParam {string} delivery_instructions Delivery instructions.
+     *  
+     * @apiSuccess {string} message Message.    
+     */
     public function actionUpdate($id)
     {
         $address = $this->findModel($id);
@@ -150,11 +211,30 @@ class AddressController extends BaseController
         ];
     }
 
+    /**
+     * @return array
+     * 
+     * @api {get} /addresses/:id Detail address
+     * @apiName DetailAddress
+     * @apiGroup Address
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionDetail($id)
     {
         return $this->findModel($id);
     }
 
+
+    /**
+     * @return array
+     * 
+     * @api {delete} /addresses/:id Delete address
+     * @apiName DeleteAddress
+     * @apiGroup Address
+     * 
+     * @apiSuccess {string} message Message.
+     */
     public function actionDelete($id)
     {
         $model = $this->findModel($id);

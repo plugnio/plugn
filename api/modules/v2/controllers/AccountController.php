@@ -6,7 +6,6 @@ use common\models\Customer;
 use Yii;
 use yii\rest\Controller;
 
-
 class AccountController extends BaseController
 {
     public function behaviors()
@@ -60,6 +59,12 @@ class AccountController extends BaseController
     /**
      * return user profile
      * @return \yii\web\IdentityInterface|null
+     *
+     * @api {get} /account Get account
+     * @apiName GetAccount
+     * @apiGroup Account
+     * 
+     * @apiSuccess {Customer} customer Customer.
      */
     public function actionDetail()
     {
@@ -71,6 +76,12 @@ class AccountController extends BaseController
     /**
      * soft delete account
      * @return array
+     * 
+     * @api {delete} /account Delete account
+     * @apiName DeleteAccount
+     * @apiGroup Account
+     * 
+     * @apiSuccess {string} message Message.
      */
     public function actionDelete()
     {
@@ -94,6 +105,18 @@ class AccountController extends BaseController
 
     /**
      * @return array
+     * 
+     * @api {patch} /account Update account
+     * @apiName UpdateAccount
+     * @apiGroup Account
+     * 
+     * @apiParam {string} email Email.
+     * @apiParam {string} first_name First name.
+     * @apiParam {string} last_name Last name.
+     * @apiParam {string} phone_number Phone number.
+     * @apiParam {string} country_code Country code.
+     *  
+     * @apiSuccess {string} message Message.
      */
     public function actionUpdate()
     {
