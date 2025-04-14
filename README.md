@@ -398,3 +398,13 @@ todo
 - api method and url compare with main.php 
 - add details for passing token 
 - warning in doc generation command
+
+# db backup 
+
+- mysqldump --host=plugn-main-latest-cluster.cluster-c8mekjvvbygf.eu-west-2.rds.amazonaws.com --user=yo3an --password=iamyo3an yo3an | gzip > backup.sql.gz
+- aws s3 cp ./backup.sql.gz s3://plugn-public-anyone-can-upload-24hr-expiry/backups/backup.sql.gz
+- download from s3 
+
+## to install aws 
+
+- sudo snap install aws-cli --classic 

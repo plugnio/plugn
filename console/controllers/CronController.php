@@ -477,6 +477,7 @@ class CronController extends \yii\console\Controller
                 }
 
                 $store->platform_fee = 0.05;
+
                 if(!$store->save(false)) {
                     print_r($store->getErrors());
                     Yii::error($store->getErrors());
@@ -595,12 +596,13 @@ class CronController extends \yii\console\Controller
 
         $query = Subscription::find()
             ->andWhere(['subscription_status' => Subscription::STATUS_ACTIVE])
-            ->andWhere(['notified_email' => 0])
+            ->andWhere(['notified_email' => 0, "subscription.plan_id" => 2])
             ->andWhere(['not', ['subscription_end_at' => null]])
             ->andWhere(['between', 'subscription_end_at', $start_date, $end_date])
             ->with(['plan', 'restaurant']);
 
         foreach ($query->batch() as $subscriptions) {
+
             foreach ($subscriptions as $subscription) {
 
                 foreach ($subscription->restaurant->getOwnerAgent()->all() as $agent) {
