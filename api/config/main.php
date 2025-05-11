@@ -73,6 +73,19 @@ return [
                         'OPTIONS <id>' => 'options',
                     ]
                 ],
+                [ // CartController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/cart',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'GET' => 'index',
+                        'POST' => 'add',
+                        'PATCH <id>' => 'update',
+                        // OPTIONS VERBS
+                        'OPTIONS' => 'options',
+                        'OPTIONS <id>' => 'options',
+                    ]
+                ],
                 [// CampaignController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v1/campaign',

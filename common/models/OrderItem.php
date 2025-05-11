@@ -436,7 +436,7 @@ class OrderItem extends \yii\db\ActiveRecord {
         $value = [];
         if (count($this->orderItemExtraOptions) > 0) {
             foreach ($this->orderItemExtraOptions as $extra) {
-                $value[] = $extra['extra_option_name'];
+                $value[] = $extra['option_name'] .": ".$extra['extra_option_name'];
             }
             if (count($value) > 0) {
                 return implode(',', $value);
