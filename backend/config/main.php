@@ -50,7 +50,7 @@ return [
             ],
         ],
         'urlManager' => [
-            'enablePrettyUrl' => true,
+            'enablePrettyUrl' => false,
             'showScriptName' => false,
             'rules' => [
                 'site/auth' => 'site/auth',
