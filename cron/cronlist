@@ -48,7 +48,7 @@
 #* * * * * cd ~/www && ./yii migrate --interactive=0 > /dev/null 2>&1
 
 # Invalidate Cache every 4 hours
-0 0,4,8,12,16,20 * * * /home/ubuntu/invalidate-cloudfront-cache.sh
+#0 0,4,8,12,16,20 * * * /home/ubuntu/invalidate-cloudfront-cache.sh
 
 # Run Cron Commands Once A Day
 30 13 * * * /usr/local/bin/php ~/www/yii cron/daily > /dev/null 2>&1
