@@ -49,13 +49,13 @@ return [
                 ],
             ],
         ],
-        'urlManager' => [
+        /*'urlManager' => [
             'enablePrettyUrl' => false,
             'showScriptName' => false,
             'rules' => [
                 'site/auth' => 'site/auth',
             ],
-        ],
+        ],*/
     ],
     'params' => $params,
 ];

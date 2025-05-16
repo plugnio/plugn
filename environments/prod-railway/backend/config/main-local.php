@@ -5,12 +5,12 @@ return [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'IPzstcYT6LrNZ7AsUzf8Zz5XtEtX1',
         ],
-         'urlManager' => [
+        /* 'urlManager' => [
             'class' => 'yii\web\UrlManager',
             'baseUrl' => 'https://admin.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
-        ],
+        ],*/
         'session' => [
             // Use Redis as a cache
             'class' => 'yii\redis\Session',
