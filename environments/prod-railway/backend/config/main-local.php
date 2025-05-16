@@ -8,7 +8,7 @@ return [
          'urlManager' => [
             'class' => 'yii\web\UrlManager',
             'baseUrl' => 'https://admin.plugn.io',
-            'enablePrettyUrl' => true,
+            'enablePrettyUrl' => false,
             'showScriptName' => false,
         ],
         'session' => [
