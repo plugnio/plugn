@@ -52,6 +52,7 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'baseUrl' => 'http://admin.plugn.io',
             'rules' => [
                 'site/auth' => 'site/auth',
             ],
