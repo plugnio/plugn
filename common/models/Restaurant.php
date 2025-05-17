@@ -1094,12 +1094,17 @@ class Restaurant extends ActiveRecord
 
         if(str_contains($this->restaurant_domain, ".plugn.site")) {
 
-            $isExists = self::find()
+            $isExistsQuery = self::find()
                 ->andWhere([
                     'is_deleted' => 0,
                     'restaurant_domain' => str_replace(".site", ".store", $this->restaurant_domain)
-                ])
-                ->exists();
+                ]);
+            
+            if ($this->restaurant_uuid) {
+                $isExistsQuery->andWhere(["!=", "restaurant_uuid", $this->restaurant_uuid]);
+            }
+    
+            $isExists = $isExistsQuery->exists();
 
             if($isExists) {
                 $this->addError($attribute, Yii::t("app", 'Domain already registered with other website'));
