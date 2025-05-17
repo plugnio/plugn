@@ -21,9 +21,9 @@ return [
                 '172.16.0.0/12',   // Docker network
                 '192.168.0.0/16',  // Local network
             ],
-            'headers' => [
+           /* 'headers' => [
                 'X-Forwarded-Proto' => 'https',
-            ],
+            ],*/
         ],
         'assetManager' => [
           'linkAssets' => true,

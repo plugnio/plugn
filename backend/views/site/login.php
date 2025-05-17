@@ -38,10 +38,13 @@ $this->params['breadcrumbs'][] = $this->title;
             <br />
             <br />
 
+            <?= \yii\helpers\Html::a('Login with Google', ['site/auth', 'authclient' => 'google'], 
+                ['class' => 'btn btn-primary']) ?>
+            <!--
             <?= AuthChoice::widget([
                 'baseAuthUrl' => ['site/auth'],
             ]) ?>
-            <!--
+
             <div class="btn btn-login-bawes">
                 <div style="float: left; margin-inline-start: -10px;">
 
