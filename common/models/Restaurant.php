@@ -1122,9 +1122,12 @@ class Restaurant extends ActiveRecord
 
         if (
             $this->scenario == self::SCENARIO_CREATE_STORE_BY_AGENT &&
-            !str_contains($this->restaurant_domain, ".plugn.site")
+            (
+                !str_contains($this->restaurant_domain, ".plugn.store") ||
+                !str_contains($this->restaurant_domain, ".plugn.site")
+            )
         ) {
-            $this->restaurant_domain = $this->restaurant_domain . ".plugn.site";
+            $this->restaurant_domain = $this->restaurant_domain . ".plugn.store";
         }
 
         $isExistQuery = self::find()
@@ -3675,15 +3678,15 @@ class Restaurant extends ActiveRecord
 
             //Create a new record in queue table for netlify if old domain or custom domain
 
-            if(!str_contains($this->restaurant_domain, ".plugn.site"))
-            {
+            //if(!str_contains($this->restaurant_domain, ".plugn.site"))
+            //{
                 $queue = new Queue();
                 $queue->restaurant_uuid = $this->restaurant_uuid;
                 $queue->queue_status = Queue::QUEUE_STATUS_PENDING;
 
                 if (!$queue->save ())
                     Yii::error ('Queue Error:' . json_encode ($queue->errors));
-            }
+            /*}
             else
             {
                 Restaurant::updateAll([
@@ -3691,7 +3694,7 @@ class Restaurant extends ActiveRecord
                 ], [
                     'restaurant_uuid' => $this->restaurant_uuid
                 ]);
-            }
+            }*/
         }
 
         if ($insert) {
@@ -3783,12 +3786,14 @@ class Restaurant extends ActiveRecord
                     Yii::error(print_r($response->data, true), "netlify update site api error:");
                 }
 
-            } else if
-            (
-                !str_contains($this->restaurant_domain, ".plugn.site") &&
-                !str_contains($this->restaurant_domain, ".plugn.store")
-            ) //check if custom domain then publish to netlify as need ssl
+            } else 
             {
+                /*
+                    (
+                        !str_contains($this->restaurant_domain, ".plugn.site") &&
+                        !str_contains($this->restaurant_domain, ".plugn.store")
+                    ) //check if custom domain then publish to netlify as need ssl
+                 */
                 $response = Yii::$app->netlifyComponent->createSite($this);
 
                 if ($response->isOk)
