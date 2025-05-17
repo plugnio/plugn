@@ -803,11 +803,11 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
 
-        if($store->site_id) {
+        /*if($store->site_id) {
             Yii::$app->session->setFlash('errorResponse', "Site already published!");
 
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-        }
+        }*/
 
         if(str_contains($store->restaurant_domain, ".plugn.site"))
         {

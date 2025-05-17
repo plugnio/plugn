@@ -126,8 +126,9 @@ $tapLatestError = $model->getApiLogs()
 
         } else {
 
-            if (!str_contains($model->restaurant_domain, ".plugn.site") &&
-                !$model->site_id)
+            //!str_contains($model->restaurant_domain, ".plugn.site") &&
+            
+            if (!$model->site_id)
             {
                 echo Html::a('Publish', ['publish', 'id' => $model->restaurant_uuid], [
                     'class' => 'btn btn-success',
