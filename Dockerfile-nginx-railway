@@ -95,7 +95,8 @@ RUN rm /etc/nginx/sites-enabled/default
 EXPOSE 80
 
 # Start Nginx and PHP-FPM
+#&& service nginx restart && 
 #CMD ["sh", "-c", "sleep 5 && ./yii migrate && service nginx restart && php-fpm && tail -f /dev/null"]
 CMD ["sh", "-c", "./init --env=Production-Railway --overwrite=All && ./yii migrate --interactive=0 \
-    && service nginx restart && php-fpm \
+    php-fpm \
     && service cron restart && crontab ./cron/cronlist && tail -f /dev/null"]
