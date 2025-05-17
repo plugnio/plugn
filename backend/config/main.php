@@ -50,9 +50,9 @@ return [
             ],
         ],
         'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'baseUrl' => 'http://admin.plugn.io',
+            'enablePrettyUrl' => false,
+            'showScriptName' => true,
+            'baseUrl' => 'https://admin.plugn.io',
             'rules' => [
                 'site/auth' => 'site/auth',
             ],
