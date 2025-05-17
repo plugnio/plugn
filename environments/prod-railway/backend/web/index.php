@@ -1,5 +1,9 @@
 <?php
 
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
+
 function isHeadlessChrome() {
     if (isset($_SERVER['HTTP_USER_AGENT'])) {
         $userAgent = $_SERVER['HTTP_USER_AGENT'];
@@ -17,7 +21,7 @@ if (isHeadlessChrome()) {
     die();
 }
 
-defined('YII_DEBUG') or define('YII_DEBUG', true);
+defined('YII_DEBUG') or define('YII_DEBUG', false);
 defined('YII_ENV') or define('YII_ENV', 'prod');
 
 require __DIR__ . '/../../vendor/autoload.php';

@@ -10,6 +10,7 @@ return [
             'baseUrl' => 'https://admin.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => true,
+            'hostInfo' => 'https://admin.plugn.io',
         ],
         'session' => [
             // Use Redis as a cache

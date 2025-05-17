@@ -10,6 +10,7 @@ return [
             'baseUrl' => 'https://admin.plugn.io',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'hostInfo' => 'https://admin.plugn.io',
         ],
     ],
 ];
