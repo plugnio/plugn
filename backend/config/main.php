@@ -16,6 +16,11 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
+            'trustedHosts' => [
+                '10.0.0.0/8',      // Railway internal network
+                '172.16.0.0/12',   // Docker network
+                '192.168.0.0/16',  // Local network
+            ],
         ],
         'assetManager' => [
           'linkAssets' => true,
