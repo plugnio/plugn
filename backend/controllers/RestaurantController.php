@@ -1205,11 +1205,11 @@ class RestaurantController extends Controller {
             }
         }
 
-        if (!str_starts_with($model->owner_number, $model->owner_phone_country_code)) {
+        if ($model->owner_number && !str_starts_with($model->owner_number, $model->owner_phone_country_code)) {
             $model->owner_number = '+' . $model->owner_phone_country_code . " ".  $model->owner_number;
         }
 
-        if (!str_starts_with($model->phone_number, $model->phone_number_country_code)) {
+        if ($model->phone_number && !str_starts_with($model->phone_number, $model->phone_number_country_code)) {
             $model->phone_number = '+' .$model->phone_number_country_code . " ". $model->phone_number;
         }
 

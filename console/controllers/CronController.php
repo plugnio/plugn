@@ -1379,16 +1379,35 @@ class CronController extends \yii\console\Controller
             foreach ($stores as $store) {
 
                 $store->restaurant_domain = str_replace([".site"], [".store"], $store->restaurant_domain);
-                $store->save(false);
+
+                //check if unique domain
+                $isExists = Restaurant::find()
+                    ->andWhere(["!=", "restaurant_uuid", $store->restaurant_uuid])
+                    ->andWhere(["=", "restaurant_domain", $store->restaurant_domain])
+                    ->exists();
+
+                if ($isExists) {
+                    $store->restaurant_domain = explode(".", $store->restaurant_domain)[0] . "-2.plugn.store";
+                }
+
+                if (!$store->save(false)) {
+                    $this->stdout('[Netlify > Error updating domain]' . json_encode($store->errors) . PHP_EOL);
+                    continue;
+                }
+
+                $store = Restaurant::find()
+                    ->andWhere(["restaurant_uuid" => $store->restaurant_uuid])
+                    ->one();
 
                 $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($store, "main");
 
-                //for api rate limit 
-                sleep(1);
+                //for api rate limit https://docs.netlify.com/security/secure-access-to-sites/rate-limiting/
+                sleep(30);
 
                 if ($createNewSiteResponse->isOk) {
 
                     $site_id = $createNewSiteResponse->data['site_id'];
+
                     $store->site_id = $site_id;
                     $store->save(false);
 
@@ -1399,7 +1418,14 @@ class CronController extends \yii\console\Controller
 
                     $this->stdout('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data) . PHP_EOL);
 
-                    Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
+                    if (isset($createNewSiteResponse->data['errors']['custom_domain'])) {
+                        $store->restaurant_domain = explode(".", $store->restaurant_domain)[0] . "-3.plugn.store";
+                        if (!$store->save(false)) {
+                            $this->stdout('[Netlify > Error updating domain]' . json_encode($store->errors) . PHP_EOL);
+                        }
+                    }
+
+                   // Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
                 }
             }
         }
