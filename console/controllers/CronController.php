@@ -1319,7 +1319,7 @@ class CronController extends \yii\console\Controller
     public function actionNetlifyFix() {
 
         $query = Restaurant::find()
-            ->andWhere(["NOT LIKE", "restaurant_domain", ".site"])//hosted only on netlify
+           // ->andWhere(["NOT LIKE", "restaurant_domain", ".site"])//hosted only on netlify
             ->andWhere(new Expression("total_items > 0 AND restaurant.is_deleted=0 and site_id is null and has_deployed=1"));
 
         $i = 0;
@@ -1347,12 +1347,15 @@ class CronController extends \yii\console\Controller
                 if ($site_id) {
 
                     $i++;
-                    //$this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
+                    $this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
 
                     $store->site_id = $site_id;
-                    $store->save(false);
+                    if (!$store->save(false)) {
+                        $this->stdout('[Netlify > Error updating domain]' . json_encode($store->errors) . PHP_EOL);
+                        continue;
+                    }
 
-                    Yii::$app->netlifyComponent->upgradeSite($store);
+                    //Yii::$app->netlifyComponent->upgradeSite($store);
 
                     $this->stdout($store->restaurant_domain . ' Updated' . PHP_EOL);
                 }
@@ -1370,6 +1373,7 @@ class CronController extends \yii\console\Controller
 
         $query = Restaurant::find()
             ->andWhere(["LIKE", "restaurant_domain", ".site"])
+            ->groupBy("restaurant_domain")
             ->andWhere(new Expression("total_items > 0 AND restaurant.is_deleted=0 and site_id is null and has_deployed=1"));
 
         $i = 0;
@@ -1409,7 +1413,9 @@ class CronController extends \yii\console\Controller
                     $site_id = $createNewSiteResponse->data['site_id'];
 
                     $store->site_id = $site_id;
-                    $store->save(false);
+                    if (!$store->save(false)) {
+                        $this->stdout('[Netlify > Error updating site id]' . json_encode($store->errors) . PHP_EOL);
+                    }
 
                     $i++;
                     $this->stdout($store->restaurant_domain . ' Created' . PHP_EOL);
@@ -1417,6 +1423,13 @@ class CronController extends \yii\console\Controller
                 } else {
 
                     $this->stdout('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data) . PHP_EOL);
+
+                    /*if (isset($createNewSiteResponse->data['errors']['custom_domain'])) {
+                        $store->restaurant_domain = explode(".", $store->restaurant_domain)[0] . "-3.plugn.store";
+                        if (!$store->save(false)) {
+                            $this->stdout('[Netlify > Error updating domain]' . json_encode($store->errors) . PHP_EOL);
+                        }
+                    }*/
 
                     if (isset($createNewSiteResponse->data['errors']['custom_domain'])) {
                         $store->restaurant_domain = explode(".", $store->restaurant_domain)[0] . "-3.plugn.store";
