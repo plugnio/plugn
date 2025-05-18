@@ -1362,11 +1362,51 @@ class CronController extends \yii\console\Controller
         $this->stdout($i . ' Total' . PHP_EOL);
     }
 
+    /**
+     * move .site to .store
+     * @return void
+     */
+    public function actionMoveToNetlify() {
+
+        $query = Restaurant::find()
+            ->andWhere(["LIKE", "restaurant_domain", ".site"])
+            ->andWhere(new Expression("restaurant.is_deleted=0 and site_id is null and has_deployed=1"));
+
+        $i = 0;
+
+        foreach ($query->batch() as $stores) {
+
+            foreach ($stores as $store) {
+
+                $store->restaurant_domain = str_replace([".site"], [".store"], $store->restaurant_domain);
+                $store->save(false);
+
+                $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($store, "main");
+
+                if ($createNewSiteResponse->isOk) {
+
+                    $site_id = $createNewSiteResponse->data['site_id'];
+                    $store->site_id = $site_id;
+                    $store->save(false);
+
+                    $i++;
+                    $this->stdout($store->restaurant_domain . ' Created' . PHP_EOL);
+
+                } else {
+
+                    $this->stdout('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data) . PHP_EOL);
+
+                    Yii::error('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data), __METHOD__);
+                }
+            }
+        }
+
+        $this->stdout($i . ' Total' . PHP_EOL);
+    }
+
     public function actionGenerateGptFile() {
         $store = Restaurant::findOne("rest_20219f60-3eda-11eb-b97d-0673128d0c9c");
 
         $store->generateGPTTrainingData();
     }
-
-
 }
