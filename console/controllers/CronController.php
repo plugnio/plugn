@@ -1399,6 +1399,41 @@ class CronController extends \yii\console\Controller
                     continue;
                 }
 
+                //before creating site check if already exists
+
+                $domain = str_replace(["https://", "http://", "www"], ["", "", ""], $store['restaurant_domain']);
+
+                $response = Yii::$app->netlifyComponent->listSiteData(1, $domain);
+
+                $site_id = null;
+
+                foreach ($response->data as $site) {
+                    if (
+                        $domain == $site['custom_domain'] ||
+                        in_array($domain, $site['domain_aliases'])
+                    ) {
+                        $site_id = $site['site_id'];
+                        continue;
+                    }
+                }
+
+                if ($site_id) {
+
+                    $i++;
+                    $this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
+
+                    $store->site_id = $site_id;
+                    if (!$store->save(false)) {
+                        $this->stdout('[Netlify > Error updating domain]' . json_encode($store->errors) . PHP_EOL);
+                        continue;
+                    }
+
+                    //Yii::$app->netlifyComponent->upgradeSite($store);
+
+                    $this->stdout($store->restaurant_domain . ' Updated' . PHP_EOL);
+                    continue;
+                }
+
                 /*$store = Restaurant::find()
                     ->andWhere(["restaurant_uuid" => $store->restaurant_uuid])
                     ->one();*/
@@ -1422,6 +1457,41 @@ class CronController extends \yii\console\Controller
 
                 } else {
 
+                    //check if false error
+
+                    $domain = str_replace(["https://", "http://", "www"], ["", "", ""], $store['restaurant_domain']);
+
+                    $response = Yii::$app->netlifyComponent->listSiteData(1, $domain);
+
+                    $site_id = null;
+
+                    foreach ($response->data as $site) {
+                        if (
+                            $domain == $site['custom_domain'] ||
+                            in_array($domain, $site['domain_aliases'])
+                        ) {
+                            $site_id = $site['site_id'];
+                            continue;
+                        }
+                    }
+
+                    if ($site_id) {
+
+                        $i++;
+                        $this->stdout('update restaurant set site_id="' . $site_id . '" where restaurant_uuid="' . $store['restaurant_uuid'] . '";'.PHP_EOL );
+
+                        $store->site_id = $site_id;
+                        if (!$store->save(false)) {
+                            $this->stdout('[Netlify > Error updating domain]' . json_encode($store->errors) . PHP_EOL);
+                            continue;
+                        }
+
+                        //Yii::$app->netlifyComponent->upgradeSite($store);
+
+                        $this->stdout($store->restaurant_domain . ' Updated' . PHP_EOL);
+                        continue;
+                    }
+                    
                     $this->stdout('[Netlify > While Creating new site]' . json_encode($createNewSiteResponse->data) . PHP_EOL);
 
                     /*if (isset($createNewSiteResponse->data['errors']['custom_domain'])) {
