@@ -1383,6 +1383,9 @@ class CronController extends \yii\console\Controller
 
                 $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($store, "main");
 
+                //for api rate limit 
+                sleep(1);
+
                 if ($createNewSiteResponse->isOk) {
 
                     $site_id = $createNewSiteResponse->data['site_id'];
