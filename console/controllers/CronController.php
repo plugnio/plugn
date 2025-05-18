@@ -1320,7 +1320,7 @@ class CronController extends \yii\console\Controller
 
         $query = Restaurant::find()
             ->andWhere(["NOT LIKE", "restaurant_domain", ".site"])//hosted only on netlify
-            ->andWhere(new Expression("restaurant.is_deleted=0 and site_id is null and has_deployed=1"));
+            ->andWhere(new Expression("total_items > 0 AND restaurant.is_deleted=0 and site_id is null and has_deployed=1"));
 
         $i = 0;
 
@@ -1370,7 +1370,7 @@ class CronController extends \yii\console\Controller
 
         $query = Restaurant::find()
             ->andWhere(["LIKE", "restaurant_domain", ".site"])
-            ->andWhere(new Expression("restaurant.is_deleted=0 and site_id is null and has_deployed=1"));
+            ->andWhere(new Expression("total_items > 0 AND restaurant.is_deleted=0 and site_id is null and has_deployed=1"));
 
         $i = 0;
 
@@ -1383,7 +1383,7 @@ class CronController extends \yii\console\Controller
                 //check if unique domain
                 $isExists = Restaurant::find()
                     ->andWhere(["!=", "restaurant_uuid", $store->restaurant_uuid])
-                    ->andWhere(["=", "restaurant_domain", $store->restaurant_domain])
+                    ->andWhere(["restaurant_domain" => $store->restaurant_domain])
                     ->exists();
 
                 if ($isExists) {
@@ -1395,9 +1395,9 @@ class CronController extends \yii\console\Controller
                     continue;
                 }
 
-                $store = Restaurant::find()
+                /*$store = Restaurant::find()
                     ->andWhere(["restaurant_uuid" => $store->restaurant_uuid])
-                    ->one();
+                    ->one();*/
 
                 $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($store, "main");
 
