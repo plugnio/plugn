@@ -8,9 +8,10 @@ $config = [
         ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
-            'baseUrl' => '/~saoud/plugn/plugn-yii2/backend/web/',
+            'baseUrl' => 'https://admin.dev.plugn.io',
             'enablePrettyUrl' => false,
             'showScriptName' => false,
+            'hostInfo' => 'https://admin.dev.plugn.io',
         ],
         'session' => [
             // Use Redis as a cache

@@ -7,6 +7,13 @@ $config = [
             'cookieValidationKey' => 'IPzstcYT6LrNZ7AsUzf8Zz5XtEtX1',
         ],
     ],
+    'urlManager' => [
+        'class' => 'yii\web\UrlManager',
+        'baseUrl' => 'https://admin.dev.plugn.io',
+        'enablePrettyUrl' => true,
+        'showScriptName' => false,
+        'hostInfo' => 'https://admin.dev.plugn.io',
+    ],
 ];
 
 if (YII_DEBUG) {
