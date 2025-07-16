@@ -8,7 +8,7 @@ use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\httpclient\Client;
 use yii\base\InvalidConfigException;
-
+use yii\httpclient\CurlTransport;
 
 /**
  * TapPayments class for payment processing
@@ -879,7 +879,9 @@ class TapPayments extends Component
                 null,
                 'Tap Payments');
 
-        $client = new Client();
+        $client = new Client([
+            'transport' => CurlTransport::class,
+        ]);
 
         $headers = [
             'authorization' => 'Bearer ' . $this->vendorSecretApiKey,

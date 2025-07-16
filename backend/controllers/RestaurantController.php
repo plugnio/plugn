@@ -803,11 +803,11 @@ class RestaurantController extends Controller {
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
 
-        if($store->site_id) {
+        /*if($store->site_id) {
             Yii::$app->session->setFlash('errorResponse', "Site already published!");
 
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-        }
+        }*/
 
         if(str_contains($store->restaurant_domain, ".plugn.site"))
         {
@@ -815,7 +815,7 @@ class RestaurantController extends Controller {
 
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
         }
-        else if(str_contains($store->restaurant_domain, ".plugn.store"))
+        /*else if(str_contains($store->restaurant_domain, ".plugn.store"))
         {
             $store->restaurant_domain = str_replace(".plugn.store",
                 ".plugn.site", $store->restaurant_domain);
@@ -825,7 +825,7 @@ class RestaurantController extends Controller {
             }
 
             return $this->redirect(['view', 'id' => $store->restaurant_uuid]);
-        }
+        }*/
 
         //if custom domain
 
@@ -1205,11 +1205,11 @@ class RestaurantController extends Controller {
             }
         }
 
-        if (!str_starts_with($model->owner_number, $model->owner_phone_country_code)) {
+        if ($model->owner_number && !str_starts_with($model->owner_number, $model->owner_phone_country_code)) {
             $model->owner_number = '+' . $model->owner_phone_country_code . " ".  $model->owner_number;
         }
 
-        if (!str_starts_with($model->phone_number, $model->phone_number_country_code)) {
+        if ($model->phone_number && !str_starts_with($model->phone_number, $model->phone_number_country_code)) {
             $model->phone_number = '+' .$model->phone_number_country_code . " ". $model->phone_number;
         }
 

@@ -7,9 +7,10 @@ return [
         ],
          'urlManager' => [
             'class' => 'yii\web\UrlManager',
-            'baseUrl' => 'http://admin.plugn.io',
+            'baseUrl' => 'https://admin.plugn.io',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'hostInfo' => 'https://admin.plugn.io',
         ],
     ],
 ];

@@ -5,19 +5,23 @@ return [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'IPzstcYT6LrNZ7AsUzf8Zz5XtEtX1',
         ],
-         'urlManager' => [
+        'urlManager' => [
             'class' => 'yii\web\UrlManager',
             'baseUrl' => 'https://admin.plugn.io',
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
+            'enablePrettyUrl' => false,
+            'showScriptName' => true,
+            'hostInfo' => 'https://admin.plugn.io',
         ],
         'session' => [
             // Use Redis as a cache
             'class' => 'yii\redis\Session',
             'redis' => [
-                'hostname' => 'plugn-redis.0x1cgp.0001.euw2.cache.amazonaws.com',
+                'class' => 'yii\redis\Connection',
+                'hostname' => 'redis-xkt_.railway.internal',
+                'username' => 'default',
+                'password' => 'BGtjhtRKQJvAirawTCZjYrjwRrQAGFBS',
                 'port' => 6379,
-                'database' => 5,
+                'database' => 0,
             ]
         ],
     ],

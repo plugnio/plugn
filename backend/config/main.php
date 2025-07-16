@@ -16,6 +16,14 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
+            'trustedHosts' => [
+                '10.0.0.0/8',      // Railway internal network
+                '172.16.0.0/12',   // Docker network
+                '192.168.0.0/16',  // Local network
+            ],
+           /* 'headers' => [
+                'X-Forwarded-Proto' => 'https',
+            ],*/
         ],
         'assetManager' => [
           'linkAssets' => true,
@@ -50,8 +58,10 @@ return [
             ],
         ],
         'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
+            'enablePrettyUrl' => false,
+            'showScriptName' => true,
+            'baseUrl' => 'https://admin.plugn.io',
+            'hostInfo' => 'https://admin.plugn.io',
             'rules' => [
                 'site/auth' => 'site/auth',
             ],
