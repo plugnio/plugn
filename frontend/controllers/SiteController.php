@@ -427,7 +427,7 @@ class SiteController extends Controller
             $created = $transaction['created'];
         }
 
-        $amountCharged = \Yii::$app->formatter->asDecimal($amount, $decimal_place);
+        $amountCharged = number_format($amount, $decimal_place, '.', '');
         $toBeHashedString = 'x_id'.$charge_id.'x_amount'.$amountCharged.'x_currency'.$currency.'x_gateway_reference'.$gateway_reference.'x_payment_reference'.$payment_reference.'x_status'.$status.'x_created'.$created.'';
 
         $isValidSignature = true;
