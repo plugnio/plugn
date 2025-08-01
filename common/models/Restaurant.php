@@ -1077,7 +1077,6 @@ class Restaurant extends ActiveRecord
         $count = $this->getRestaurantDomainRequests()->count();
 
         if ($count > 3) {
-            Yii::error("Store #" . $this->restaurant_uuid . " having more than 3 domain assigned to store");
             $this->addError($attribute, 'You can not assign more than 3 domain to site');
             return false;
         }
