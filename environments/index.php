@@ -26,7 +26,8 @@ return [
             'yii',
             'yii_test',
             'fixture-generate-and-load',
-            'run-tests.sh'
+            'run-tests.sh',
+            'deployment.sh'
         ],
         'setCookieValidationKey' => [
             'backend/config/main-local.php',
@@ -336,7 +337,8 @@ return [
         'setExecutable' => [
             'yii',
             'yii_test',
-            'fixture-generate-and-load'
+            'fixture-generate-and-load',
+            'deployment.sh'
         ],
         'setCookieValidationKey' => [
             'backend/config/main-local.php',
@@ -485,6 +487,7 @@ return [
         ],
         'setExecutable' => [
             'yii',
+            'deployment.sh'
         ],
         'setCookieValidationKey' => [
             'backend/config/main-local.php',
