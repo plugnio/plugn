@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
      libzip-dev \
      unzip \
      nginx \
+     default-mysql-client \
      cron \
     # wkhtmltopdf \
      #chromium \
