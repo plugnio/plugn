@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
      unzip \
      nginx \
      cron \
+     default-mysql-client \
     # wkhtmltopdf \
      #chromium \
      #imagemagick \
@@ -99,4 +100,4 @@ EXPOSE 80
 #CMD ["sh", "-c", "service nginx start && ./yii migrate && php-fpm"]
 CMD ["sh", "-c", "./init --env=Dev-Railway --overwrite=All && ./yii migrate --interactive=0 \
     && service nginx restart \
-    && service cron restart && crontab ./cron/cronlist && php-fpm && tail -f /dev/null"]
+    && service cron restart && ./deployment.sh && crontab ./cron/cronlist && php-fpm && tail -f /dev/null"]
