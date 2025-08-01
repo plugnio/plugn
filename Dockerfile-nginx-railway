@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
      unzip \
      nginx \
      cron \
+     default-mysql-client \
      #wkhtmltopdf \
      #chromium \
      #imagemagick \
