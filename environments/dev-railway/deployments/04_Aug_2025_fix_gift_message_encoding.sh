@@ -17,7 +17,7 @@ done
 
 echo "Converting 'order' table to utf8mb4 for emoji support..."
 mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "
-  ALTER TABLE order
+  ALTER TABLE `order`
   MODIFY gift_message VARCHAR(255)
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
