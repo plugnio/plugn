@@ -1,5 +1,6 @@
 #!/bin/sh
 # One-time deployment script logging completion to deployment_complete.txt
+
 SCRIPT_NAME="04_Aug_2025_fix_gift_message_encoding.sh"
 
 # Exit if deployment already completed
