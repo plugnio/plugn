@@ -1,6 +1,7 @@
 #!/bin/sh
 # One-time deployment script logging completion to deployment_complete.txt
-SCRIPT_NAME="04_Aug_2025_tap_fix.sh"
+
+SCRIPT_NAME="04_Aug_2025_fix_gift_message_encoding.sh"
 
 # Exit if deployment already completed
 if grep -Fx "$SCRIPT_NAME" ./deployments/deployment_complete.txt >/dev/null 2>&1; then
