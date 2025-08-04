@@ -42,7 +42,8 @@
         "kartik-v/yii2-widget-fileinput": "^1.1",
         "borales/yii2-phone-input": "^0.3.0",
         "understeam/yii2-slack": "^0.3.0",
-        "yiisoft/yii2-authclient": "^2.2"
+        "yiisoft/yii2-authclient": "^2.2",
+        "kartik-v/yii2-widget-datepicker": "^1.4"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "^2.1",
