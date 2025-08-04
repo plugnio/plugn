@@ -1,9 +1,9 @@
 #!/bin/sh
 
-MYSQL_HOST="mysql-eemz.railway.internal"
+MYSQL_HOST="mysql.railway.internal"
 MYSQL_PORT=3306
 MYSQL_USER="root"
-MYSQL_PASSWORD="xXzEvGzMcCYiFIkfogNUjqLcGFRVHbRp"
+MYSQL_PASSWORD="FbSkwSvXwjsQPEfQrNvNzdLmJuTLFPyo"
 MYSQL_DATABASE="railway"
 
 echo "Waiting for MySQL at $MYSQL_HOST:$MYSQL_PORT..."
@@ -17,8 +17,6 @@ done
 
 echo "Converting 'order' table to utf8mb4 for emoji support..."
 mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "
-  ALTER TABLE order
-  MODIFY gift_message VARCHAR(255)
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
+  ALTER TABLE \`order\`
+  MODIFY gift_message VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 "
