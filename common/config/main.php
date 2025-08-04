@@ -136,7 +136,7 @@ return [
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',
-            'token' => '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',
+            'token' => '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',
             'branch' => 'master'
         ],
         'slack' => [
