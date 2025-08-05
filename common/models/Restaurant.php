@@ -636,6 +636,7 @@ class Restaurant extends ActiveRecord
             [['referral_code'], 'exist', 'skipOnError' => true, 'targetClass' => Partner::className(), 'targetAttribute' => ['referral_code' => 'referral_code']],
             [['country_id'], 'exist', 'skipOnError' => true, 'targetClass' => Country::className(), 'targetAttribute' => ['country_id' => 'country_id']],
             [['currency_id'], 'exist', 'skipOnError' => true, 'targetClass' => Currency::className(), 'targetAttribute' => ['currency_id' => 'currency_id']],
+            [['store_branch_name'], 'match', 'pattern' => '/^[a-zA-Z0-9\-_\.\/]+$/', 'message' => 'Branch name can only contain alphanumeric characters, hyphens, underscores, dots, and forward slashes.'],
         ];
     }
 
