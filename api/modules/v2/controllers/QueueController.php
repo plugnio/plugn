@@ -56,42 +56,63 @@ class QueueController extends BaseController
         }
 
         // Get and validate input
-        $restaurantUuid = $request->getBodyParam('restaurant_uuid');
         $queueStatus = $request->getBodyParam('queue_status');
 
-        if (empty($restaurantUuid) || empty($queueStatus)) {
+        if (empty($queueStatus)) {
             Yii::$app->response->statusCode = 400; // Bad Request
             return [
                 'success' => false,
-                'message' => 'restaurant_uuid and queue_status are required',
+                'message' => 'queue_status is required',
             ];
         }
 
-        // Verify restaurant exists and user has access
-        $restaurant = Restaurant::findOne(['restaurant_uuid' => $restaurantUuid]);
-        if (!$restaurant) {
-            Yii::$app->response->statusCode = 404; // Not Found
+        // Get all active restaurants
+        $activeRestaurants = Restaurant::find()
+            ->select('restaurant_uuid')
+            ->where(['restaurant_status' => 1])
+            ->asArray()
+            ->all();
+
+        if (empty($activeRestaurants)) {
             return [
                 'success' => false,
-                'message' => 'Restaurant not found',
+                'message' => 'No active restaurants found',
             ];
         }
 
-        // Create and save queue entry
-        $model = new Queue();
-        $model->restaurant_uuid = $restaurantUuid;
-        $model->queue_status = $queueStatus;
-        
-        if ($model->save()) {
-            return [
+        $successCount = 0;
+        $errors = [];
+
+        // Create queue entries for all active restaurants
+        foreach ($activeRestaurants as $restaurant) {
+            $model = new Queue();
+            $model->restaurant_uuid = $restaurant['restaurant_uuid'];
+            $model->queue_status = $queueStatus;
+            
+            if ($model->save()) {
+                $successCount++;
+            } else {
+                $errors[$restaurant['restaurant_uuid']] = $model->getErrors();
+            }
+        }
+
+        if ($successCount > 0) {
+            $response = [
                 'success' => true,
-                'message' => 'Queue created successfully',
+                'message' => "Successfully created queue entries for $successCount restaurants",
                 'data' => [
-                    'queue_id' => $model->queue_id,
-                    'restaurant_uuid' => $model->restaurant_uuid,
-                    'queue_status' => $model->queue_status,
+                    'success_count' => $successCount,
+                    'total_restaurants' => count($activeRestaurants)
                 ]
             ];
+
+            // Add errors if any
+            if (!empty($errors)) {
+                $response['data']['errors'] = $errors;
+                $response['data']['error_count'] = count($errors);
+            }
+
+            return $response;
         }
 
         // If save failed
