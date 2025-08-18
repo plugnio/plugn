@@ -66,61 +66,40 @@ class QueueController extends BaseController
             ];
         }
 
-        // Get all active restaurants
-        $activeRestaurants = Restaurant::find()
-            ->select('restaurant_uuid')
-            ->where(['restaurant_status' => 1])
-            ->asArray()
-            ->all();
-
-        if (empty($activeRestaurants)) {
-            return [
-                'success' => false,
-                'message' => 'No active restaurants found',
-            ];
-        }
-
-        $successCount = 0;
         $errors = [];
 
-        // Create queue entries for all active restaurants
-        foreach ($activeRestaurants as $restaurant) {
-            $model = new Queue();
-            $model->restaurant_uuid = $restaurant['restaurant_uuid'];
-            $model->queue_status = $queueStatus;
-            
-            if ($model->save()) {
-                $successCount++;
-            } else {
-                $errors[$restaurant['restaurant_uuid']] = $model->getErrors();
-            }
-        }
+        // Update existing failed queues (status 5) to pending (status 1) for today
+        $today = date('Y-m-d');
+        $updatedCount = Queue::updateAll(
+            ['queue_status' => 1], // Set status to pending (1)
+            [
+                'AND',
+                ['DATE(queue_created_at)' => $today],
+                ['queue_status' => 5] // Current status is failed (5)
+            ]
+        );
 
-        if ($successCount > 0) {
-            $response = [
-                'success' => true,
-                'message' => "Successfully created queue entries for $successCount restaurants",
-                'data' => [
-                    'success_count' => $successCount,
-                    'total_restaurants' => count($activeRestaurants)
-                ]
-            ];
-
-            // Add errors if any
-            if (!empty($errors)) {
-                $response['data']['errors'] = $errors;
-                $response['data']['error_count'] = count($errors);
-            }
-
-            return $response;
-        }
-
-        // If save failed
-        Yii::$app->response->statusCode = 422; // Unprocessable Entity
-        return [
-            'success' => false,
-            'message' => 'Failed to create queue',
-            'errors' => $model->getErrors()
+        // Prepare response with details about the operation
+        $response = [
+            'success' => true,
+            'message' => "Queue processing completed",
+            'data' => [
+                'updated_entries' => $updatedCount,
+                'date' => $today
+            ]
         ];
+
+        // Add errors if any occurred during creation
+        if (!empty($errors)) {
+            $response['data']['errors'] = $errors;
+            $response['data']['error_count'] = count($errors);
+        }
+
+        // If no updates or new entries were made
+        if ($updatedCount === 0) {
+            $response['message'] = 'No queue entries were updated or created';
+        }
+
+        return $response;
     }
 }
