@@ -92,18 +92,18 @@ class Queue extends \yii\db\ActiveRecord {
                 /**
                  * if branch already exists
                  *
-                if(Yii::$app->githubComponent->isBranchExists($store_model->store_branch_name)) {
-                    $branchName = $branchName .'_'. time();
+                 * */
+                $createBranchResponse = null;
+                $isBranchExists = Yii::$app->githubComponent->isBranchExists($store_model->store_branch_name);
+                if(!$isBranchExists) {
+                    $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
+                }
 
-                    $this->restaurant->branch_name = $branchName;
-                    $this->restaurant->save(false);
-                }*/
+                if($isBranchExists || ($createBranchResponse && $createBranchResponse->headers['http-code'] == 201)) { // Created
 
-                $createBranchResponse = Yii::$app->githubComponent->createBranch($sha, $branchName);
-
-                if($createBranchResponse->headers['http-code'] == 201) { // Created
-
-                    sleep(1);
+                    if (!$isBranchExists) {
+                        sleep(1);
+                    }
 
                     $createNewSiteResponse = Yii::$app->netlifyComponent->createSite($store_model);
 
