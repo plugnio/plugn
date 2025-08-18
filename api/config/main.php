@@ -451,6 +451,15 @@ return [
                         'OPTIONS' => 'options',
                     ]
                 ],
+                [// QueueController
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'v2/queue',
+                    'pluralize' => false,
+                    'patterns' => [
+                        'POST' => 'create',
+                        'OPTIONS' => 'options',
+                    ]
+                ],
                 [// OrderController
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'v2/order',
