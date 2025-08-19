@@ -132,7 +132,8 @@ return [
         ],
         'netlifyComponent' => [
             'class' => 'common\components\NetlifyComponent',
-            'token' => 'dIaf1ZOTSo-XWIaf7OHy8AgZGMkg9l90E1RWPenKxCs'
+            'token' => 'nfp_WccnMMKPwsmjb8VHZPQXTkbYxKoZDeu65b76'
+            // 'token' => 'dIaf1ZOTSo-XWIaf7OHy8AgZGMkg9l90E1RWPenKxCs'
         ],
         'githubComponent' => [
             'class' => 'common\components\GithubComponent',
