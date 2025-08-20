@@ -69,12 +69,12 @@ class QueueController extends BaseController
         $errors = [];
 
         // Update existing failed queues (status 5) to pending (status 1) for today
-        $today = date('Y-m-d');
+        $date = date('Y-m-d', strtotime('2025-08-18'));
         $updatedCount = Queue::updateAll(
             ['queue_status' => 1], // Set status to pending (1)
             [
                 'AND',
-                ['DATE(queue_created_at)' => $today],
+                ['DATE(queue_created_at)' => $date],
                 ['queue_status' => 5] // Current status is failed (5)
             ]
         );
@@ -85,7 +85,7 @@ class QueueController extends BaseController
             'message' => "Queue processing completed",
             'data' => [
                 'updated_entries' => $updatedCount,
-                'date' => $today
+                'date' => $date
             ]
         ];
 
