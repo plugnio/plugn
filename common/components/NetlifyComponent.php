@@ -19,7 +19,7 @@ use common\models\PaymentMethod;
 class NetlifyComponent extends Component {
 
     private $apiEndpoint = 'https://api.netlify.com/api/v1';
-    private $accountId = '5f16ba5ca2422df049a81c8e';
+    private $accountSlug = 'plugn';
     
 
     public $token;
@@ -80,7 +80,7 @@ class NetlifyComponent extends Component {
                 "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
                 "dir" => $dir
             ],
-            "account_id" => $this->accountId,
+            "account_slug" => $this->accountSlug
         ];
 
         $client = new Client();
@@ -298,6 +298,7 @@ class NetlifyComponent extends Component {
                 "cmd" => "export STORE=".$store->restaurant_uuid." && npm run build",
                 "dir" => "dist"
             ],
+            "account_slug" => $this->accountSlug
         ];
 
         return $this->updateSite($store->site_id, $params);
