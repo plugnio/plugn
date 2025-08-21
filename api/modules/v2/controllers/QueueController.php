@@ -75,7 +75,8 @@ class QueueController extends BaseController
             [
                 'AND',
                 ['DATE(queue_created_at)' => $date],
-                ['queue_status' => 5] // Current status is failed (5)
+                ['queue_status' => 5],
+                ['like', 'queue_response', 'API Deploy rate limit surpassed for application']
             ]
         );
 
