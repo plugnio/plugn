@@ -8,6 +8,7 @@ docker compose -f docker-compose-prod.yml up --force-recreate
 
 Step by step 
 
+
 Run the following command after installing Docker
 
 ```bash
